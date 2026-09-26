@@ -17,6 +17,10 @@ extends Node3D
 		_rebuild()
 @export var module_width: float = 4.0
 @export var module_height: float = 4.0
+## Adds a slightly shrunken box occluder covering the run so rooms behind the
+## wall are culled (project setting rendering/occlusion_culling is on).
+@export var occluder: bool = true
+@export var module_depth: float = 0.35
 
 
 func _ready() -> void:
@@ -38,3 +42,11 @@ func _rebuild() -> void:
 		module.position = Vector3((i + 0.5) * module_width * scale_x, 0.0, 0.0)
 		module.scale = Vector3(scale_x, 1.0, 1.0)
 		add_child(module)
+	if occluder and not Engine.is_editor_hint():
+		var occ := OccluderInstance3D.new()
+		var box := BoxOccluder3D.new()
+		box.size = Vector3(length - 0.1, module_height - 0.1, module_depth * 0.6)
+		occ.occluder = box
+		occ.position = Vector3(length / 2.0, module_height / 2.0, 0.0)
+		occ.set_meta("wall_run_generated", true)
+		add_child(occ)

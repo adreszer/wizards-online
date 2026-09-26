@@ -73,7 +73,7 @@ def room_torches(name, x0, x1, z0, z1, top, spacing=8.0, first=4.0):
 
 def ceiling(name, x0, x1, z0, z1, y):
     inst(name, "res://objects/environment/modular/modular_floor.tscn", (x0, y, z0), parent="Ceilings",
-         props={"size_x": f"{x1 - x0:.3f}", "size_z": f"{z1 - z0:.3f}",
+         props={"size_x": f"{x1 - x0:.3f}", "size_z": f"{z1 - z0:.3f}", "occluder_y": "0.245",
                 "module_scene": f'ExtResource("{ext_id("PackedScene", "res://objects/environment/modular/ceiling_tile.tscn")}")'})
 
 FLOOR = (1, 1, 1); WALL = (1, 1, 1); ACCENT = (1, 1, 1); LINTEL = (1, 1, 1)
@@ -89,7 +89,7 @@ def floor(name, x0, x1, z0, z1, top, color=FLOOR, thick=1.0, tile="plain"):
     """Modular floor tiles with their top at `top`, over a greybox sub-floor that
     hides the void under raised areas (ledge faces, pit walls)."""
     scene, tile_thick = FLOOR_TILES[tile]
-    props = {"size_x": f"{x1 - x0:.3f}", "size_z": f"{z1 - z0:.3f}"}
+    props = {"size_x": f"{x1 - x0:.3f}", "size_z": f"{z1 - z0:.3f}", "occluder_y": f"{-tile_thick / 2:.3f}"}
     if tile != "plain":
         props["module_scene"] = f'ExtResource("{ext_id("PackedScene", scene)}")'
     inst(name, "res://objects/environment/modular/modular_floor.tscn", (x0, top, z0), parent="Floors", props=props)

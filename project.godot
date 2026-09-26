@@ -153,5 +153,6 @@ common/physics_ticks_per_second=60
 [rendering]
 
 anti_aliasing/quality/msaa_3d=2
+occlusion_culling/use_occlusion_culling=true
 environment/defaults/default_clear_color=Color(0.08, 0.07, 0.12, 1)
 textures/vram_compression/import_etc2_astc=true

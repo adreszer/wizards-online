@@ -86,6 +86,7 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.05, 0)
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 0.000, -10.000)
 size_x = 16.000
 size_z = 13.000
+occluder_y = -0.230
 
 [node name="Entrance_FloorLow_Sub" parent="Geometry" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.730, -3.500)
@@ -96,6 +97,7 @@ color = Color(1.000, 1.000, 1.000, 1)
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 1.200, -18.500)
 size_x = 16.000
 size_z = 8.500
+occluder_y = -0.230
 
 [node name="Entrance_FloorHigh_Sub" parent="Geometry" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.130, -14.250)
@@ -212,12 +214,14 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 8.000, -18.500)
 size_x = 16.000
 size_z = 21.500
+occluder_y = 0.245
 module_scene = ExtResource("10")
 
 [node name="Corridor_Floor" parent="Floors" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -3.000, 1.200, -45.000)
 size_x = 6.000
 size_z = 26.500
+occluder_y = -0.230
 
 [node name="Corridor_Floor_Sub" parent="Geometry" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.130, -31.750)
@@ -301,12 +305,14 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -3.000, 9.200, -45.000)
 size_x = 6.000
 size_z = 26.500
+occluder_y = 0.245
 module_scene = ExtResource("10")
 
 [node name="Secret_Floor" parent="Floors" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 3.500, 1.200, -36.000)
 size_x = 8.000
 size_z = 8.000
+occluder_y = -0.110
 module_scene = ExtResource("14")
 
 [node name="Secret_Floor_Sub" parent="Geometry" instance=ExtResource("2")]
@@ -369,6 +375,7 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 3.500, 9.200, -36.000)
 size_x = 8.000
 size_z = 8.000
+occluder_y = 0.245
 module_scene = ExtResource("10")
 
 [node name="SecretPlaque" parent="." instance=ExtResource("7")]
@@ -394,6 +401,7 @@ length = 16.000
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 1.200, -65.000)
 size_x = 16.000
 size_z = 20.000
+occluder_y = -0.110
 module_scene = ExtResource("14")
 
 [node name="Training_Floor_Sub" parent="Geometry" instance=ExtResource("2")]
@@ -499,12 +507,14 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 9.200, -65.000)
 size_x = 16.000
 size_z = 20.000
+occluder_y = 0.245
 module_scene = ExtResource("10")
 
 [node name="Puzzle_Floor" parent="Floors" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 1.200, -90.000)
 size_x = 16.000
 size_z = 25.000
+occluder_y = -0.230
 
 [node name="Puzzle_Floor_Sub" parent="Geometry" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.130, -77.500)
@@ -633,12 +643,14 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 9.200, -90.000)
 size_x = 16.000
 size_z = 25.000
+occluder_y = 0.245
 module_scene = ExtResource("10")
 
 [node name="Plat_Entry" parent="Floors" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 1.200, -94.000)
 size_x = 16.000
 size_z = 4.000
+occluder_y = -0.230
 
 [node name="Plat_Entry_Sub" parent="Geometry" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.130, -92.000)
@@ -649,6 +661,7 @@ color = Color(1.000, 1.000, 1.000, 1)
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 1.200, -130.000)
 size_x = 16.000
 size_z = 4.000
+occluder_y = -0.230
 
 [node name="Plat_Exit_Sub" parent="Geometry" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.130, -128.000)
@@ -659,6 +672,7 @@ color = Color(1.000, 1.000, 1.000, 1)
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, -6.000, -126.000)
 size_x = 16.000
 size_z = 32.000
+occluder_y = -0.230
 
 [node name="Plat_PitFloor_Sub" parent="Geometry" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -6.730, -110.000)
@@ -798,6 +812,7 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 9.200, -130.000)
 size_x = 16.000
 size_z = 40.000
+occluder_y = 0.245
 module_scene = ExtResource("10")
 
 [node name="PlatPlaque" parent="." instance=ExtResource("7")]
@@ -808,6 +823,7 @@ text = "PLAQUE_PLATFORMS"
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 1.200, -155.000)
 size_x = 16.000
 size_z = 25.000
+occluder_y = -0.230
 
 [node name="Final_Floor_Sub" parent="Geometry" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.130, -142.500)
@@ -920,12 +936,14 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 9.200, -155.000)
 size_x = 16.000
 size_z = 25.000
+occluder_y = 0.245
 module_scene = ExtResource("10")
 
 [node name="Reward_Floor" parent="Floors" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 1.200, -170.000)
 size_x = 12.000
 size_z = 15.000
+occluder_y = -0.110
 module_scene = ExtResource("14")
 
 [node name="Reward_Floor_Sub" parent="Geometry" instance=ExtResource("2")]
@@ -993,6 +1011,7 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 9.200, -170.000)
 size_x = 12.000
 size_z = 15.000
+occluder_y = 0.245
 module_scene = ExtResource("10")
 
 [node name="RewardPlaque" parent="." instance=ExtResource("7")]

@@ -19,6 +19,11 @@ extends Node3D
 		module_scene = value
 		_rebuild()
 @export var module_size: float = 4.0
+## Adds a slightly shrunken box occluder in the slab so storeys hide each
+## other. [member occluder_y] is the slab centre relative to the origin:
+## negative for floors (slab below the origin), positive for ceilings.
+@export var occluder: bool = true
+@export var occluder_y: float = -0.23
 
 
 func _ready() -> void:
@@ -43,3 +48,11 @@ func _rebuild() -> void:
 			tile.position = Vector3((ix + 0.5) * module_size * sx, 0.0, (iz + 0.5) * module_size * sz)
 			tile.scale = Vector3(sx, 1.0, sz)
 			add_child(tile)
+	if occluder and not Engine.is_editor_hint():
+		var occ := OccluderInstance3D.new()
+		var box := BoxOccluder3D.new()
+		box.size = Vector3(size_x - 0.1, 0.2, size_z - 0.1)
+		occ.occluder = box
+		occ.position = Vector3(size_x / 2.0, occluder_y, size_z / 2.0)
+		occ.set_meta("floor_generated", true)
+		add_child(occ)

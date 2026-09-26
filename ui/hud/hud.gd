@@ -31,6 +31,7 @@ func _ready() -> void:
 	GameEvents.collectible_total_changed.connect(_on_total_changed)
 	GameEvents.notification_requested.connect(show_notification)
 	GameEvents.spell_learned.connect(_on_spell_learned)
+	GameEvents.area_entered.connect(_on_area_entered)
 	NetworkManager.status_changed.connect(_on_status_changed)
 	_prompt_label.visible = false
 	_notification_label.visible = false
@@ -108,6 +109,12 @@ func _on_focus_changed(interactable: Interactable) -> void:
 	else:
 		_prompt_label.text = tr("HUD_PROMPT") % tr(interactable.prompt_text)
 		_prompt_label.visible = true
+
+
+## Area name toast when the player walks into a named part of the castle.
+func _on_area_entered(_area_id: StringName, zone: Node) -> void:
+	if zone.has_method("display_name"):
+		show_notification(zone.display_name(), 2.5)
 
 
 func show_notification(text: String, duration: float = 3.0) -> void:

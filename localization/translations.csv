@@ -87,3 +87,68 @@ NOTIFY_INVENTORY_HINT,You carry a torch. Press Tab to open your satchel and take
 ITEM_DEFAULT_NAME,Item,Przedmiot
 ITEM_TORCH_NAME,Torch,Pochodnia
 ITEM_TORCH_DESC,An everburning torch. Held in hand it lights the halls around you and never goes out.,"Wieczna pochodnia. Trzymana w dłoni oświetla sale wokół ciebie i nigdy nie gaśnie."
+AREA_UNKNOWN,Unknown place,Nieznane miejsce
+AREA_GROUNDS,The Grounds,Błonia
+AREA_GREENHOUSE,Greenhouse (Herb Lore),Szklarnia (Zielnictwo)
+AREA_PADDOCK,Beast Paddock,Zagroda dla stworzeń
+AREA_ENTRANCE_HALL,Entrance Hall,Sień
+AREA_GREAT_HALL,Great Hall,Wielka Sala
+AREA_STAIR_HALL,Stair Hall,Hala Schodów
+AREA_COURTYARD,Courtyard,Dziedziniec
+AREA_NORTH_HALL,North Hall,Sala Północna
+AREA_NORTH_HALL_1,"North Hall, upper floor","Sala Północna, piętro"
+AREA_LIBRARY,Library,Biblioteka
+AREA_KITCHENS,Kitchens,Kuchnie
+AREA_HOUSE3_COMMON,House Three common room,Pokój wspólny Domu Trzeciego
+AREA_HOUSE3_DORM,House Three dormitory,Sypialnie Domu Trzeciego
+AREA_HOUSE4_COMMON,House Four common room,Pokój wspólny Domu Czwartego
+AREA_HOUSE4_DORM,House Four dormitory,Sypialnie Domu Czwartego
+AREA_CORRIDOR_W_0,West Corridor,Korytarz Zachodni
+AREA_CORRIDOR_W_1,"West Corridor, upper floor","Korytarz Zachodni, piętro"
+AREA_CORRIDOR_E_0,East Corridor,Korytarz Wschodni
+AREA_CORRIDOR_E_1,"East Corridor, upper floor","Korytarz Wschodni, piętro"
+AREA_CLASS_SHAPESHAPING,Shapeshaping Classroom,Sala Przekształceń
+AREA_CLASS_SIGILCRAFT,Sigilcraft Classroom,Sala Sigilistyki
+AREA_CLASS_CHRONICLES,Chronicles of Magic Classroom,Sala Kronik Magii
+AREA_CLASS_GLYPHS,Glyph Lore Classroom,Sala Glifów
+AREA_CLASS_NUMEROMANCY,Numeromancy Classroom,Sala Numeromancji
+AREA_CLASS_WARDING,Warding Classroom,Sala Sztuk Ochronnych
+AREA_CLASS_HERBLORE,Herb Lore Classroom,Sala Zielnictwa
+AREA_CLASS_SKYRIDING,Skyriding Classroom,Sala Jazdy Podniebnej
+AREA_CLASS_BEASTLORE,Beastlore Classroom,Sala Bestiologii
+AREA_CLASS_STARGAZING,Stargazing Classroom,Sala Gwiazdoznawstwa
+AREA_CLASS_ELIXIRS,Elixirs Classroom,Sala Eliksirów
+AREA_CLASS_FARSIGHT,Farsight Classroom,Sala Dalekowidzenia
+AREA_STAFF_ROOM,Staff Room,Pokój Nauczycielski
+AREA_HOSPITAL_WING,Infirmary,Izba Chorych
+AREA_SONG_ROOM,Song Room,Sala Pieśni
+AREA_RECORDS_ROOM,Records Room,Archiwum
+AREA_GALLERY,Long Gallery,Długa Galeria
+AREA_ROOST,Messenger Roost,Gołębnik Posłańców
+AREA_TOWER_NE_0,Northeast Tower,Wieża Północno-Wschodnia
+AREA_TOWER_NE_1,"Northeast Tower, first floor","Wieża Północno-Wschodnia, pierwsze piętro"
+AREA_TOWER_NE_2,House One common room,Pokój wspólny Domu Pierwszego
+AREA_TOWER_NE_3,House One dormitory,Sypialnie Domu Pierwszego
+AREA_TOWER_NW_0,Northwest Tower,Wieża Północno-Zachodnia
+AREA_TOWER_NW_1,"Northwest Tower, first floor","Wieża Północno-Zachodnia, pierwsze piętro"
+AREA_TOWER_NW_2,House Two common room,Pokój wspólny Domu Drugiego
+AREA_TOWER_NW_3,House Two dormitory,Sypialnie Domu Drugiego
+AREA_TOWER_SW_0,Southwest Tower,Wieża Południowo-Zachodnia
+AREA_TOWER_SW_1,"Southwest Tower, first floor","Wieża Południowo-Zachodnia, pierwsze piętro"
+AREA_TOWER_SW_2,"Southwest Tower, second floor","Wieża Południowo-Zachodnia, drugie piętro"
+AREA_STARGAZING_PLATFORM,Stargazing Platform,Taras Gwiazdoznawstwa
+AREA_DUNGEON_CORRIDOR,Dungeon Corridor,Korytarz Lochów
+AREA_CELLARS,Cellars,Piwnice
+AREA_UNDERCROFT,Undercroft,Krypta
+AREA_HIDDEN_STUDY,Hidden Study,Ukryty Gabinet
+AREA_LOFT,Forgotten Loft,Zapomniany Strych
+PLAQUE_CASTLE_ENTRANCE,"Welcome to the school. The Great Hall lies east, the Stair Hall west, the courtyard ahead. Look closely: the castle keeps its secrets from the hasty.","Witaj w szkole. Wielka Sala jest na wschód, Hala Schodów na zachód, dziedziniec na wprost. Patrz uważnie: zamek skrywa tajemnice przed niecierpliwymi."
+PLAQUE_GREAT_HALL,"The Great Hall. Feasts, announcements and the house tallies happen here.","Wielka Sala. Tu odbywają się uczty, ogłoszenia i liczenie punktów domów."
+PLAQUE_LIBRARY,"Silence, please. The towers on either side hold the common rooms of two houses.",Proszę o ciszę. Wieże po obu stronach kryją pokoje wspólne dwóch domów.
+PLAQUE_SIGILCRAFT,"Sigilcraft classroom. Until lessons begin, a practice tome waits in the middle of the room; purple glimmers answer to magic.","Sala Sigilistyki. Zanim zaczną się lekcje, na środku sali czeka księga do ćwiczeń; fioletowe błyski odpowiadają na magię."
+PLAQUE_STAIR_HALL,The Stair Hall climbs three storeys. Mind the drop from the landings.,Hala Schodów wznosi się przez trzy piętra. Uważaj na przepaść z podestów.
+PLAQUE_UNDERCROFT,Few know of the undercroft. Fewer still leave with its fragments.,Niewielu wie o krypcie. Jeszcze mniej wychodzi z niej z fragmentami.
+PLAQUE_HIDDEN_STUDY,"A chronicler once wrote here in secret. The wall answered to a spell, as it did for you.","Pewien kronikarz pisał tu w tajemnicy. Ściana odpowiadała na zaklęcie, tak jak dla ciebie."
+PLAQUE_LOFT,"Above the Great Hall, forgotten. The dust here has not been disturbed in years.","Nad Wielką Salą, zapomniany. Kurz nie był tu ruszany od lat."
+PLAQUE_STARGAZING,The stargazing platform. Lessons happen after dark; the sky is the classroom.,Taras Gwiazdoznawstwa. Lekcje odbywają się po zmroku; niebo jest salą.
+PLAQUE_GROUNDS,"The school grounds. Greenhouse to the east, the beast paddock to the west, the entrance hall straight ahead.","Błonia szkoły. Szklarnia na wschód, zagroda dla stworzeń na zachód, sień na wprost."

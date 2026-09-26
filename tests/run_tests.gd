@@ -11,6 +11,7 @@ const COLLECTIBLE_SCENE := preload("res://gameplay/collectibles/collectible.tscn
 const PLATFORM_SCENE := preload("res://objects/platforms/moving_platform.tscn")
 const CHECKPOINT_SCENE := preload("res://gameplay/checkpoints/checkpoint.tscn")
 const LEVEL_SCENE := preload("res://levels/mvp/mvp_level.tscn")
+const CASTLE_SCENE := preload("res://levels/castle/castle.tscn")
 const ARCANE_PULSE := preload("res://resources/spells/arcane_pulse.tres")
 const TORCH := preload("res://resources/items/torch.tres")
 const INVENTORY_PANEL_SCENE := preload("res://ui/inventory/inventory_panel.tscn")
@@ -34,6 +35,7 @@ func _run() -> void:
 	await _test_interaction()
 	await _test_moving_platform()
 	await _test_level_wiring()
+	await _test_castle()
 	_test_localization()
 	await _test_characters()
 	print(t.summary())
@@ -149,7 +151,7 @@ func _test_movement() -> void:
 	var stair_peak := 0.0
 	var visual_peak := 0.0
 	var visual_dipped := false
-	for i in range(60):
+	for i in range(120):  # the step-up hops once per 0.45 m of intended travel, so three steps take ~0.4 s
 		await get_tree().physics_frame
 		stair_peak = maxf(stair_peak, player.global_position.y)
 		visual_peak = maxf(visual_peak, player.visual.global_position.y)
@@ -515,6 +517,60 @@ func _test_moving_platform() -> void:
 	t.check(carried > 2.0, "platform carries the player (%.2f m in 1 s)" % carried)
 	t.check(absf(player.global_position.x - platform.global_position.x) < 0.8, "player stays centred on the platform")
 	await _clear([platform])
+
+
+# --- Castle ------------------------------------------------------------------------------
+
+func _test_castle() -> void:
+	t.section("Castle")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	await get_tree().physics_frame
+	var zones: Array[AreaZone] = castle.get_zones()
+	t.check(zones.size() >= 50, "castle has %d named areas" % zones.size())
+	var untranslated: Array[String] = []
+	for z in zones:
+		if tr(z.display_key) == z.display_key:
+			untranslated.append(z.display_key)
+	t.check(untranslated.is_empty(), "every area has a translated name (missing: %s)" % ", ".join(untranslated))
+	t.check(castle.get_node_or_null("StartPoint") != null, "castle has a StartPoint")
+	t.check(get_tree().get_nodes_in_group("secret_walls").size() >= 3, "castle has secret passages")
+	t.check(GameSession.get_total(&"arcane_fragment") >= 10, "castle registers its fragments (got %d)" % GameSession.get_total(&"arcane_fragment"))
+	# Every area has a floor under its centre (rooms with stair holes keep their centre solid).
+	var fell: Array[String] = []
+	for z in zones:
+		var base_y := z.global_position.y - z.size.y / 2.0
+		await _spawn_player(Vector3(z.global_position.x, base_y + 0.2, z.global_position.z))
+		await _wait(0.4)
+		if not player.movement.is_grounded or absf(player.global_position.y - base_y) > 0.3:
+			fell.append("%s (y %.2f vs %.2f)" % [z.area_id, player.global_position.y, base_y])
+	t.check(fell.is_empty(), "every area has a floor at its centre (%s)" % ", ".join(fell))
+	# Area events: walking north from the start crosses the grounds into the entrance hall.
+	var entered: Array = []
+	var on_enter := func(id: StringName, _z: Node) -> void: entered.append(id)
+	GameEvents.area_entered.connect(on_enter)
+	await _spawn_player(castle.get_node("StartPoint").global_position + Vector3(2, 0.1, 0))
+	player.movement.set_external_move(Vector3(0, 0, -1), true)
+	await _wait(9.0)
+	player.movement.set_external_move(Vector3.ZERO)
+	t.check(entered.has(&"grounds") and entered.has(&"entrance_hall"), "walking north enters the grounds then the entrance hall (%s)" % str(entered))
+	t.check(player.global_position.z < 44.0, "the entrance doorway can be walked through (z %.1f)" % player.global_position.z)
+	GameEvents.area_entered.disconnect(on_enter)
+	# Grand staircase: the first flight climbs from the ground to the first landing.
+	await _spawn_player(Vector3(-33.975, 1.2, 46.5))
+	player.movement.set_external_move(Vector3(0, 0, -1), false)
+	await _wait(8.0)
+	player.movement.set_external_move(Vector3.ZERO)
+	t.check(player.global_position.y > 8.5 and player.global_position.z < 32.5, "stairs: walking up the first flight reaches the landing (y %.2f, z %.2f)" % [player.global_position.y, player.global_position.z])
+	# Tower flight: from the foot of the southwest tower's stair to its first floor.
+	await _spawn_player(Vector3(-38.025, 1.2, 38.5))
+	player.movement.set_external_move(Vector3(0, 0, -1), false)
+	await _wait(8.0)
+	player.movement.set_external_move(Vector3.ZERO)
+	t.check(player.global_position.y > 8.5, "stairs: tower flight reaches the first floor (y %.2f, z %.2f)" % [player.global_position.y, player.global_position.z])
+	castle.queue_free()
+	await get_tree().process_frame
 
 
 # --- Level wiring ------------------------------------------------------------------------

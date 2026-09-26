@@ -1,4 +1,4 @@
-# Arcanum Halls — multiplayer magical-school adventure (MVP)
+# Arcanum Halls — multiplayer magical-school adventure
 
 A small third-person adventure prototype built in Godot 4.7: explore a mysterious magical school, platform, cast a spell, solve environmental puzzles, find secrets, collect fragments — optionally alongside other players via Nakama (presence + chat).
 

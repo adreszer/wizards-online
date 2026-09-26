@@ -32,7 +32,7 @@ alias godot=/Applications/Godot.app/Contents/MacOS/Godot   # add to ~/.zshrc
 
 All commands below assume `godot` resolves.
 
-Choose **Play OFFLINE**. The full level is playable without any backend.
+Choose **Play OFFLINE**. The whole castle is explorable without any backend.
 
 Controls: WASD move · Shift run · Space jump · hold right mouse button and drag to orbit the camera · scroll wheel zoom · left click / F cast · E interact · Tab satchel (inventory; click the torch to hold it) · Enter or T chat · Esc pause · F1 lock the cursor for always-on mouse look · F3 debug overlay.
 
@@ -107,6 +107,8 @@ godot --headless --path . -s tools/inspect_model.gd -- res://assets/models/envir
 # render the validation scene from fixed viewpoints to PNGs (opens a window)
 godot --path . tools/capture_validation.tscn -- --out=/absolute/output/dir
 ```
+
+Regenerating the castle after editing its plan (`python3 tools/generate_castle.py` from the project root) rewrites `levels/castle/castle.tscn`; hand edits belong in the generator, in `objects/`, or in `levels/castle/castle.gd`. New rooms need an `AREA_<ID>` row in `localization/translations.csv` (the castle test fails on a missing name).
 
 Adding a new environment module: drop the GLB under `assets/models/…` (never edit it in-repo), run `inspect_model.gd`, create a wrapper `.tscn` under `objects/environment/…` with the fitting transform + simple collision, and place instances in the validation scene before using them in a level. Conventions are in `docs/plan.md` → "Production environment asset pipeline".
 

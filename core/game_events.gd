@@ -32,3 +32,7 @@ signal ui_input_capture_changed(captured: bool)
 
 ## The level's end trigger was reached.
 signal level_completed()
+
+## The local player walked into / out of a named castle area (see AreaZone).
+signal area_entered(area_id: StringName, zone: Node)
+signal area_exited(area_id: StringName, zone: Node)
