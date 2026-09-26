@@ -1,5 +1,5 @@
 # Nakama configuration for LOCAL DEVELOPMENT ONLY. Do not reuse in production.
-name: wizards-online-dev
+name: wizards-dev
 data_dir: /nakama/data
 
 logger:

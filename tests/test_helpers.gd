@@ -20,6 +20,7 @@ func check(condition: bool, label: String) -> bool:
 
 func section(name: String) -> void:
 	log_lines.append("[%s]" % name)
+	print("--- %s" % name)
 
 
 func summary() -> String:

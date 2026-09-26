@@ -26,77 +26,77 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Vendor Nakama Godot client addon (`addons/com.heroiclabs.nakama`)
 - [x] InputMap actions: move_*, jump, sprint, cast, interact, chat, pause, debug_overlay (keyboard + joypad bindings)
 - [x] Physics layer names
-- [~] Docs: plan.md, architecture.md, development.md, README.md
-- [~] Autoloads: GameEvents, GameSession, NetworkManager (documented in architecture.md)
-- [ ] Game root scene + test/sandbox scene
+- [x] Docs: plan.md, architecture.md, development.md, README.md
+- [x] Autoloads: GameEvents, GameSession, NetworkManager (documented in architecture.md)
+- [x] Game root scene + test/sandbox scene
 
 ### Milestone 2 — Player
-- [ ] PlayerInput (intent from InputMap, camera-relative)
-- [ ] PlayerMovement (walk/run/jump/gravity/slopes/stairs/air control/accel/decel/landing)
-- [ ] Camera rig (yaw/pitch, sensitivity, distance, height, limits, smoothing, SpringArm collision)
-- [ ] CharacterVisual placeholder + AnimationTree state machine (idle/walk/run/jump/fall/land/cast)
-- [ ] AnimationController decoupled from movement via state signals
-- [ ] Local vs remote player split (`LocalPlayer` subtree)
+- [x] PlayerInput (intent from InputMap, camera-relative)
+- [x] PlayerMovement (walk/run/jump/gravity/slopes/stairs/air control/accel/decel/landing)
+- [x] Camera rig (yaw/pitch, sensitivity, distance, height, limits, smoothing, SpringArm collision)
+- [x] CharacterVisual placeholder + AnimationTree state machine (idle/walk/run/jump/fall/land/cast)
+- [x] AnimationController decoupled from movement via state signals
+- [x] Local vs remote player split (`LocalPlayer` subtree)
 
 ### Milestone 3 — Gameplay components
-- [ ] Health component (damage/heal/death signals)
-- [ ] Checkpoint + RespawnHandler + KillZone/DamageZone hazards
-- [ ] Interactable + InteractionController + prompt
-- [ ] Collectible + CollectibleDefinition + counter in GameSession + HUD
+- [x] Health component (damage/heal/death signals)
+- [x] Checkpoint + RespawnHandler + KillZone/DamageZone hazards
+- [x] Interactable + InteractionController + prompt
+- [x] Collectible + CollectibleDefinition + counter in GameSession + HUD
 
 ### Milestone 4 — Magic
-- [ ] SpellDefinition resource (Arcane Pulse data)
-- [ ] SpellCaster (center-screen aim, aim assist, range, cooldown, learn spell)
-- [ ] SpellProjectile + SpellEffect
-- [ ] SpellReceiver component (composition, signal-driven)
-- [ ] Cast events routed for network replication
+- [x] SpellDefinition resource (Arcane Pulse data)
+- [x] SpellCaster (center-screen aim, aim assist, range, cooldown, learn spell)
+- [x] SpellProjectile + SpellEffect
+- [x] SpellReceiver component (composition, signal-driven)
+- [x] Cast events routed for network replication
 
 ### Milestone 5 — Level mechanics
-- [ ] Magic switch
-- [ ] Magic door
-- [ ] Pushable block + pressure plate
-- [ ] Rotating statue + statue puzzle
-- [ ] Moving platform (points, speed, loop, activation, carries player)
-- [ ] Hazards (kill zone, damage zone)
-- [ ] Secret wall mechanism
-- [ ] Lever, plaque, spell tome (non-spell interactables)
+- [x] Magic switch
+- [x] Magic door
+- [x] Pushable block + pressure plate
+- [x] Rotating statue + statue puzzle
+- [x] Moving platform (points, speed, loop, activation, carries player)
+- [x] Hazards (kill zone, damage zone)
+- [x] Secret wall mechanism
+- [x] Lever, plaque, spell tome (non-spell interactables)
 
 ### Milestone 6 — Vertical slice
-- [ ] Greybox level: Entrance → Corridor (secret) → Training → Puzzle → Platforming → Final Puzzle → Reward
-- [ ] ~10 Arcane Fragments incl. several in secret room
-- [ ] Checkpoints per chamber
-- [ ] Offline playthrough verified (headless simulation + manual)
+- [x] Greybox level: Entrance → Corridor (secret) → Training → Puzzle → Platforming → Final Puzzle → Reward
+- [x] ~10 Arcane Fragments incl. several in secret room
+- [x] Checkpoints per chamber
+- [x] Offline playthrough verified (headless simulation + manual)
 
 ### Milestone 7 — Backend
-- [ ] docker-compose.yml (Nakama + PostgreSQL)
-- [ ] Nakama Lua module: world match handler + `join_world` RPC
-- [ ] Device authentication + display name
-- [ ] Graceful failure when backend is down
+- [x] docker-compose.yml (Nakama + PostgreSQL)
+- [x] Nakama Lua module: world match handler + `join_world` RPC
+- [x] Device authentication + display name
+- [x] Graceful failure when backend is down
 
 ### Milestone 8 — Multiplayer
-- [ ] World session join/leave
-- [ ] PlayerSpawner (local + remote)
-- [ ] State synchronizer (12 Hz, position/yaw/velocity/movement state)
-- [ ] Remote interpolation
-- [ ] Animation replication via movement state
-- [ ] Spell cast replication
-- [ ] Join/leave roster from server
+- [x] World session join/leave
+- [x] PlayerSpawner (local + remote)
+- [x] State synchronizer (12 Hz, position/yaw/velocity/movement state)
+- [x] Remote interpolation
+- [x] Animation replication via movement state
+- [x] Spell cast replication
+- [x] Join/leave roster from server
 
 ### Milestone 9 — Chat
-- [ ] Nakama room channel join
-- [ ] Chat UI (open/type/send/receive/close)
-- [ ] Input capture while typing
-- [ ] Max length + sanitization
-- [ ] Join/leave system messages
+- [x] Nakama room channel join
+- [x] Chat UI (open/type/send/receive/close)
+- [x] Input capture while typing
+- [x] Max length + sanitization
+- [x] Join/leave system messages
 
 ### Milestone 10 — Debugging & polish
-- [ ] F3 debug overlay (FPS, position, velocity, grounded, state, spell, target, online status, ping, player count)
-- [ ] Debug ray visualization toggle
-- [ ] Pause menu
-- [ ] Reconnect behavior
-- [ ] Error handling audit
-- [ ] Documentation pass
-- [ ] Final test pass documented below
+- [x] F3 debug overlay (FPS, position, velocity, grounded, state, spell, target, online status, ping, player count)
+- [x] Debug ray visualization toggle
+- [x] Pause menu
+- [x] Reconnect behavior
+- [x] Error handling audit
+- [x] Documentation pass
+- [x] Final test pass documented below
 
 ## Architectural decisions
 
@@ -114,6 +114,11 @@ See `docs/architecture.md` for the full breakdown. In short:
 | 10 | Device authentication | Zero-friction, stable per machine (`user://nakama_device_id`). Two clients on one machine get distinct IDs via a `--user-suffix` / env override (see development.md). |
 | 11 | Hand-authored `.tscn` files | The whole project is generated headlessly; scenes are plain text and remain fully editable in the Godot editor. |
 
+## Manual verification log
+
+- 2026-09-26: offline playthrough by the developer surfaced a bug (HUD crosshair swallowed mouse-look after learning the spell) — fixed, HUD controls now ignore mouse events.
+- Bugs found by headless tests and fixed: step-up used the (already zeroed) velocity instead of the intended direction; step probe landed on the ledge edge (steep contact normal); scripted jumps were cut short by low-jump gravity; Nakama config `name` exceeded 16 chars; pressure plate closing a door during level teardown.
+
 ## Known limitations
 
 - Puzzle/door/collectible state is local to each client in online mode (players see each other, not each other's puzzle progress).
@@ -124,20 +129,20 @@ See `docs/architecture.md` for the full breakdown. In short:
 
 ## Testing status
 
-Automated: `tests/run_tests.gd` runs headless (`godot --headless --path . -s tests/run_tests.gd`).
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (66 gameplay checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
-| Movement | walking, running, jumping, gravity | [ ] headless test pass |
-| Movement | slopes, stairs | [ ] headless test pass (ramp + step) |
-| Movement | moving platform carries player | [ ] headless test pass |
-| Camera | rotation, collision, no wall clipping | [ ] manual (SpringArm3D) + headless pitch clamp test |
-| Spell | cast works, invalid targets ignored, receivers react, range | [ ] headless test pass |
-| Interaction | nearest looked-at object selected, prompt | [ ] headless test pass |
-| Health | damage, death, checkpoint respawn | [ ] headless test pass |
-| Collectibles | counter, no double collect | [ ] headless test pass |
-| Level | full offline playthrough | [ ] scripted headless walkthrough + manual |
-| Multiplayer | two clients connect, see each other, movement/jump/spell replicate | [ ] two headless clients against local Nakama (`tests/run_multiplayer_test.gd`) |
-| Multiplayer | disconnect removes player, reconnect works | [ ] two-client test |
-| Chat | messages between clients | [ ] two-client test |
-| Offline | playable with backend stopped | [ ] verified (Docker stopped) |
+| Movement | walking, running, jumping, gravity | [x] headless test pass |
+| Movement | slopes, stairs | [x] headless test pass (ramp lip + 3×0.4 m steps via step-up) |
+| Movement | moving platform carries player | [x] headless test pass |
+| Camera | rotation, collision, no wall clipping | [x] headless: yaw/pitch, clamps, spring arm shortens against a wall; manual mouse-look verified |
+| Spell | cast works, invalid targets ignored, receivers react, range | [x] headless test pass |
+| Interaction | nearest looked-at object selected, prompt | [x] headless test pass |
+| Health | damage, death, checkpoint respawn | [x] headless test pass |
+| Collectibles | counter, no double collect | [x] headless test pass |
+| Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger) + manual play |
+| Multiplayer | two clients connect, see each other, movement/jump/spell replicate | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 20 + 14 checks pass |
+| Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
+| Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
+| Offline | playable with backend stopped | [x] `run_offline_fallback_test` with backend stopped: readable error, offline world playable |

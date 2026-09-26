@@ -68,7 +68,14 @@ godot --headless --path . tests/run_tests.tscn
 
 # two headless clients against a running Nakama (docker compose up -d first)
 godot --headless --path . tests/run_multiplayer_test.tscn -- --instance=1 --name=ClientA &
+sleep 4
 godot --headless --path . tests/run_multiplayer_test.tscn -- --instance=2 --name=ClientB --role=b
+
+# reconnect: start it, then `docker compose restart nakama` while it runs
+godot --headless --path . tests/run_reconnect_test.tscn -- --instance=3
+
+# graceful failure: run with the backend STOPPED (docker compose stop)
+godot --headless --path . tests/run_offline_fallback_test.tscn
 ```
 
 Exit code is non-zero on failure; the summary is printed at the end.

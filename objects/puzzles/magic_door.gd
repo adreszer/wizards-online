@@ -38,7 +38,7 @@ func toggle() -> void:
 
 
 func set_open(value: bool) -> void:
-	if is_open == value:
+	if is_open == value or not is_inside_tree():
 		return
 	is_open = value
 	var target := _closed_position + (Vector3.UP * open_height if is_open else Vector3.ZERO)

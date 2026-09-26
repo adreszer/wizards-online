@@ -40,6 +40,6 @@ func _get_device_id() -> String:
 static func _describe(ex: NakamaException, prefix: String) -> String:
 	if ex == null:
 		return prefix
-	if ex.status_code == -1 or ex.message.is_empty():
+	if ex.status_code < 100 or ex.message.is_empty() or ex.message.begins_with("HTTPRequest failed"):
 		return "%s: server unreachable" % prefix
 	return "%s: %s (%d)" % [prefix, ex.message, ex.status_code]
