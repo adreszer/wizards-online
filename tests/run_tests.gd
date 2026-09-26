@@ -147,13 +147,22 @@ func _test_movement() -> void:
 	await _wait(0.3)
 	player.movement.set_external_move(Vector3(-1, 0, 0), false)
 	var stair_peak := 0.0
+	var visual_peak := 0.0
+	var visual_dipped := false
 	for i in range(60):
 		await get_tree().physics_frame
 		stair_peak = maxf(stair_peak, player.global_position.y)
+		visual_peak = maxf(visual_peak, player.visual.global_position.y)
+		if player.visual.position.y < -0.1:
+			visual_dipped = true
 		if stair_peak > 1.1:
 			break
 	t.check(stair_peak > 1.0, "climbs 0.4 m stairs without jumping (peak y=%.2f)" % stair_peak)
+	t.check(visual_dipped, "mesh eases up each step instead of popping with the body")
+	t.check(visual_peak < stair_peak - 0.05, "mesh trails the body during the climb (%.2f < %.2f)" % [visual_peak, stair_peak])
 	player.movement.set_external_move(Vector3.ZERO)
+	await _wait(0.5)
+	t.check(player.visual.position.length() < 0.01, "mesh settles back onto the body after the stairs")
 	await _clear(fixtures)
 
 

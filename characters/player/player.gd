@@ -35,7 +35,12 @@ const LAYER_WORLD := 1 << 0
 @onready var camera_rig: CameraRig = $LocalPlayer/CameraRig
 @onready var interaction_controller: InteractionController = $LocalPlayer/InteractionController
 
+## How fast the mesh eases back after a step-up (1/s). Higher = snappier.
+@export var step_smoothing: float = 26.0
+
 var cast_origin: Node3D
+## World-space offset applied to the mesh so a one-tick step-up reads as a smooth climb.
+var _visual_offset: Vector3 = Vector3.ZERO
 ## Off-hand socket the held item (torch…) is parented to.
 var off_hand: Node3D
 
@@ -82,6 +87,7 @@ func _setup_local() -> void:
 	movement.setup(self, player_input)
 	movement.frame_yaw_provider = camera_rig.get_yaw
 	movement.state_changed.connect(animation_controller.set_movement_state)
+	movement.stepped.connect(_on_stepped)
 	spell_caster.setup(self, peer_id, camera_rig, cast_origin)
 	spell_caster.spell_cast.connect(_on_spell_cast)
 	interaction_controller.setup(self, camera_rig)
@@ -120,6 +126,24 @@ func _setup_remote() -> void:
 	spell_caster.spell_cast.connect(_on_spell_cast)
 	synchronizer.setup_remote(self)
 	synchronizer.movement_state_received.connect(animation_controller.set_movement_state_name)
+
+
+func _on_stepped(displacement: Vector3) -> void:
+	_visual_offset -= displacement
+
+
+func _process(delta: float) -> void:
+	if not is_local:
+		return
+	if _visual_offset == Vector3.ZERO:
+		return
+	_visual_offset = _visual_offset.lerp(Vector3.ZERO, 1.0 - exp(-step_smoothing * delta))
+	if _visual_offset.length_squared() < 0.00001:
+		_visual_offset = Vector3.ZERO
+	# The body yaws with facing, so convert the world offset into its local frame.
+	visual.position = global_basis.inverse() * _visual_offset
+	camera_rig.follow_offset = _visual_offset
+	nameplate.position = Vector3(0.0, 2.25, 0.0) + visual.position
 
 
 func _physics_process(_delta: float) -> void:

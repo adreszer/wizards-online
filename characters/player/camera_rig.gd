@@ -30,6 +30,8 @@ extends Node3D
 @export var position_smoothing: float = 22.0
 @export var initial_pitch_degrees: float = -14.0
 @export var input_enabled: bool = true
+## World-space offset added to the follow point (the player sets it while easing a step-up).
+var follow_offset: Vector3 = Vector3.ZERO
 
 var yaw: float = 0.0
 var pitch: float = 0.0
@@ -158,7 +160,7 @@ func _process(delta: float) -> void:
 		stop_orbit()
 	if target == null:
 		return
-	var desired := target.global_position + Vector3.UP * target_height
+	var desired := target.global_position + follow_offset + Vector3.UP * target_height
 	var t := 1.0 - exp(-position_smoothing * delta)
 	global_position = global_position.lerp(desired, t)
 	if not is_equal_approx(distance, _target_distance):

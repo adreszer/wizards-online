@@ -14,6 +14,9 @@ const STATE_NAMES: PackedStringArray = ["idle", "walk", "run", "jump", "fall", "
 signal state_changed(new_state: State, old_state: State)
 signal jumped()
 signal landed(impact_speed: float)
+## The body was lifted onto a ledge in one tick; `displacement` is the world-space jump
+## (up and forward). Visuals subtract it and ease back so the climb reads as motion.
+signal stepped(displacement: Vector3)
 
 @export_group("Ground")
 @export var walk_speed: float = 4.2
@@ -261,4 +264,7 @@ func _try_step_up(move_dir: Vector3, delta: float) -> void:
 		if debug_step: print("step: too steep ", result.get_collision_normal())
 		return
 	if debug_step: print("step: OK ", travel)
-	body.global_position = raised.origin + travel + Vector3.UP * 0.01
+	var destination := raised.origin + travel + Vector3.UP * 0.01
+	var displacement := destination - from.origin
+	body.global_position = destination
+	stepped.emit(displacement)
