@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://magicdoor0001"]
+[gd_scene load_steps=9 format=3 uid="uid://magicdoor0001"]
 
 [ext_resource type="Script" path="res://objects/puzzles/magic_door.gd" id="1"]
 [ext_resource type="AudioStream" path="res://assets/audio/door.wav" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/door_magical_sliding.glb" id="3"]
 
 [sub_resource type="StandardMaterial3D" id="DoorMat"]
 albedo_color = Color(0.35, 0.25, 0.5, 1)
@@ -30,9 +31,8 @@ collision_layer = 1
 collision_mask = 0
 sync_to_physics = false
 
-[node name="Mesh" type="MeshInstance3D" parent="Panel"]
-mesh = SubResource("PanelMesh")
-surface_material_override/0 = SubResource("DoorMat")
+[node name="Model" parent="Panel" instance=ExtResource("3")]
+transform = Transform3D(1.799131, 0, 0, 0, 1.682004, 0, 0, 0, 1.293515, 0.000574, 0.000783, -0.000561)
 
 [node name="Shape" type="CollisionShape3D" parent="Panel"]
 shape = SubResource("PanelShape")

@@ -120,7 +120,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Pillar (9,960 tris) and ceiling (9,547 tris) re-exported with normal maps; bounds unchanged, wrappers untouched. Whole modular set is now ≤10.2k tris per module
 - [ ] Textures: floor2 ships four 4K maps, the others mix 2K/4K; downscale metallic-roughness maps to 2K when convenient
 - [x] Doorway module `doorway.glb` → `doorway.tscn` (4 × 4 × 0.35 m, pointed arch ≈3.8 m wide at the base, ≈3.8 m tall; jamb + arch box collision); replaces every greybox lintel (7 doors + training archway)
-- [ ] `doorway.glb` is still the dense export (207,692 tris) — remesh at 10K and overwrite the file
+- [x] `doorway.glb` remeshed: 9,003 tris + normal map, identical bounds
+- [x] Magic door slab `door_magical_sliding.glb` (7,478 tris + normal map) fitted into `magic_door.tscn` as exactly 3.0 × 3.2 × 0.4 m on the sliding AnimatableBody3D; collision and animation unchanged
 
 ### Milestone 12 — Localization (Polish primary, English secondary)
 - [x] All player-facing strings moved to `localization/translations.csv` (72 keys: menus, pause, HUD, chat, network/status messages, interaction prompts, notifications, plaques, spell/collectible names)
