@@ -92,14 +92,16 @@ def side_walls(name, x0, x1, z0, z1, top):
     wall_run(name + "_WR", (x1, top, z1), z1 - z0, math.radians(90))
 
 def end_wall(name, x0, x1, z, top, opening=None, open_h=OPEN_H):
+    """End wall along X at `z`. With an opening, a 4 m doorway module replaces the
+    wall segment centred on the opening (the arch is ~3.8 m wide × 3.8 m tall) and
+    the upper wall rows run full width above it."""
     if opening is None:
         wall_run(name, (x0, top, z), x1 - x0, 0.0)
         return
-    ox0, ox1 = opening
-    wall_run(name + "_L", (x0, top, z), ox0 - x0, 0.0, rows=1)
-    wall_run(name + "_R", (ox1, top, z), x1 - ox1, 0.0, rows=1)
-    # Lintel above the opening (greybox beam, slightly proud of the wall face), then full rows above.
-    block(name + "_Lintel", ((ox0 + ox1) / 2, top + open_h + (MODULE_H - open_h) / 2, z), (ox1 - ox0 + 0.2, MODULE_H - open_h, T + 0.1), LINTEL)
+    cx = (opening[0] + opening[1]) / 2
+    wall_run(name + "_L", (x0, top, z), (cx - 2.0) - x0, 0.0, rows=1)
+    wall_run(name + "_R", (cx + 2.0, top, z), x1 - (cx + 2.0), 0.0, rows=1)
+    inst(name + "_Doorway", "res://objects/environment/modular/doorway.tscn", (cx, top, z), parent="Walls")
     upper_rows = int(round(WALL_H / MODULE_H)) - 1
     for r in range(upper_rows):
         wall_run(name + f"_Row{r + 2}", (x0, top + (r + 1) * MODULE_H, z), x1 - x0, 0.0, rows=1)

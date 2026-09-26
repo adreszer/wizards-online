@@ -119,7 +119,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Rooms raised to 8 m: two stacked wall rows, full-width upper row above door lintels; sun dimmed, ambient/torches raised for enclosed rooms
 - [x] Pillar (9,960 tris) and ceiling (9,547 tris) re-exported with normal maps; bounds unchanged, wrappers untouched. Whole modular set is now ≤10.2k tris per module
 - [ ] Textures: floor2 ships four 4K maps, the others mix 2K/4K; downscale metallic-roughness maps to 2K when convenient
-- [ ] Doorway module
+- [x] Doorway module `doorway.glb` → `doorway.tscn` (4 × 4 × 0.35 m, pointed arch ≈3.8 m wide at the base, ≈3.8 m tall; jamb + arch box collision); replaces every greybox lintel (7 doors + training archway)
+- [ ] `doorway.glb` is still the dense export (207,692 tris) — remesh at 10K and overwrite the file
 
 ### Milestone 12 — Localization (Polish primary, English secondary)
 - [x] All player-facing strings moved to `localization/translations.csv` (72 keys: menus, pause, HUD, chat, network/status messages, interaction prompts, notifications, plaques, spell/collectible names)

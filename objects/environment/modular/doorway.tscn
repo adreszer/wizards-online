@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://doorway000001"]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/doorway.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="JambShape"]
+size = Vector3(0.12, 4, 0.35)
+
+[sub_resource type="BoxShape3D" id="ArchShape"]
+size = Vector3(4, 0.3, 0.35)
+
+[node name="Doorway" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(2.101608, 0, 0, 0, 2.385009, 0, 0, 0, 2.048795, 0.00115, 2.000506, 0.000912)
+
+[node name="JambL" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.94, 2, 0)
+shape = SubResource("JambShape")
+
+[node name="JambR" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.94, 2, 0)
+shape = SubResource("JambShape")
+
+[node name="Arch" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+shape = SubResource("ArchShape")
