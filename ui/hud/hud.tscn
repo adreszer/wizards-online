@@ -30,7 +30,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="TopLeft/VBox/HealthRow"]
 layout_mode = 2
-text = "Health"
+text = "HUD_HEALTH"
 
 [node name="HealthBar" type="ProgressBar" parent="TopLeft/VBox/HealthRow"]
 unique_name_in_owner = true
@@ -46,7 +46,7 @@ text = "100 / 100"
 [node name="FragmentsLabel" type="Label" parent="TopLeft/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Fragments: 0 / 0"
+text = "HUD_FRAGMENTS"
 
 [node name="SpellRow" type="HBoxContainer" parent="TopLeft/VBox"]
 layout_mode = 2
@@ -54,7 +54,7 @@ layout_mode = 2
 [node name="SpellLabel" type="Label" parent="TopLeft/VBox/SpellRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Spell: —"
+text = "HUD_SPELL_NONE"
 
 [node name="CooldownBar" type="ProgressBar" parent="TopLeft/VBox/SpellRow"]
 unique_name_in_owner = true
@@ -79,7 +79,7 @@ theme_override_styles/panel = SubResource("PanelStyle")
 [node name="StatusLabel" type="Label" parent="TopRight"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Offline"
+text = "HUD_STATUS_OFFLINE"
 horizontal_alignment = 2
 
 [node name="Crosshair" type="Control" parent="."]
@@ -125,7 +125,7 @@ offset_top = 40.0
 offset_right = 150.0
 offset_bottom = 70.0
 theme_override_font_sizes/font_size = 22
-text = "[E] Interact"
+text = "HUD_PROMPT"
 horizontal_alignment = 1
 
 [node name="NotificationLabel" type="Label" parent="."]

@@ -27,5 +27,5 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_level_completed() -> void:
-	GameEvents.notification_requested.emit("Vertical slice complete! Fragments: %d / %d" % [
+	GameEvents.notification_requested.emit(tr("NOTIFY_SLICE_COMPLETE") % [
 		GameSession.get_collected(&"arcane_fragment"), GameSession.get_total(&"arcane_fragment")], 8.0)

@@ -22,10 +22,10 @@ core/game.tscn (Game)
 |----------|------------------|
 | `Nakama` (addon) | Required by the official client to host HTTP/WebSocket adapters. |
 | `GameEvents` | Signal bus for broadcast-style events (collectible picked up, checkpoint, notification, UI input capture). Keeps HUD, level objects and the spawner decoupled. |
-| `GameSession` | Session-scoped state that survives scene swaps: play mode, display name, host/port, collectible counters, "UI owns the keyboard" flag. No gameplay logic. |
+| `GameSession` | Session-scoped state that survives scene swaps: play mode, display name, language, host/port, collectible counters, "UI owns the keyboard" flag. Applies the locale at startup via the static `Localization` helper. No gameplay logic. |
 | `NetworkManager` | The single networking boundary. Composed of `NakamaAuthentication`, `WorldSession`, `StateSynchronizer`, `ChatManager`. Gameplay never touches Nakama types. |
 
-Nothing else is global.
+Nothing else is global. Text is looked up by key through Godot's `TranslationServer` (`localization/translations.csv`, Polish primary / English secondary; see docs/development.md → Localization).
 
 ## Player (composition)
 
@@ -117,10 +117,11 @@ addons/com.heroiclabs.nakama   vendored official client (only third-party depend
 assets/audio                   generated placeholder tones
 assets/models                  source models (GLB) as exported by the art pipeline; never edited here
 characters/player, components  player scene + components
-core/                          game root, world, autoloads
+core/                          game root, world, autoloads, Localization helper
 gameplay/{spells,interaction,collectibles,health,checkpoints}
 levels/mvp                     greybox level + wiring script
 levels/dev                     development-only scenes (asset validation)
+localization/                  translations.csv (keys,en,pl) → generated .translation files
 multiplayer/{authentication,synchronization,chat} + network_manager, world_session, player_spawner
 nakama/                        local.yml + Lua modules (mounted into the container)
 objects/{greybox,puzzles,platforms,interactables}

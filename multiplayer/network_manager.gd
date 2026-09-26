@@ -66,11 +66,11 @@ func get_players() -> Dictionary:
 ## Returns "" on success, otherwise a human-readable error (also emitted).
 func connect_online(display_name: String) -> String:
 	if status == Status.CONNECTING:
-		return "Already connecting"
+		return tr("NET_ALREADY_CONNECTING")
 	if status == Status.ONLINE:
 		return ""
 	local_display_name = display_name
-	_set_status(Status.CONNECTING, "Connecting to %s:%d…" % [GameSession.nakama_host, GameSession.nakama_port])
+	_set_status(Status.CONNECTING, tr("NET_CONNECTING_TO") % [GameSession.nakama_host, GameSession.nakama_port])
 	authentication.create_client(
 		GameSession.nakama_host, GameSession.nakama_port,
 		str(ProjectSettings.get_setting("game/network/scheme", "http")),
@@ -90,14 +90,17 @@ func connect_online(display_name: String) -> String:
 		connection_failed.emit(err)
 		return err
 	_reconnect_attempts = 0
-	_set_status(Status.ONLINE, "Online as %s" % display_name)
+	_set_status(Status.ONLINE, tr("NET_ONLINE_AS") % display_name)
 	connected.emit()
 	return ""
 
 
-func disconnect_online(reason: String = "Disconnected") -> void:
+## `reason` is shown to the player; defaults to the localized "Disconnected".
+func disconnect_online(reason: String = "") -> void:
 	if status == Status.OFFLINE:
 		return
+	if reason.is_empty():
+		reason = tr("NET_DISCONNECTED")
 	await _teardown()
 	_set_status(Status.OFFLINE, reason)
 	disconnected.emit(reason)
@@ -115,7 +118,7 @@ func send_spell_cast(cast: Dictionary) -> void:
 
 func send_chat(text: String) -> bool:
 	if not is_online():
-		system_message.emit("You are offline; chat is unavailable.")
+		system_message.emit(tr("CHAT_OFFLINE"))
 		return false
 	return chat_manager.send(text)
 
@@ -135,12 +138,12 @@ func _set_status(new_status: Status, message: String) -> void:
 
 func _on_player_joined(sid: String, display_name: String) -> void:
 	player_joined.emit(sid, display_name)
-	system_message.emit("%s joined the area." % display_name)
+	system_message.emit(tr("CHAT_PLAYER_JOINED") % display_name)
 
 
 func _on_player_left(sid: String, display_name: String) -> void:
 	player_left.emit(sid, display_name)
-	system_message.emit("%s left the area." % display_name)
+	system_message.emit(tr("CHAT_PLAYER_LEFT") % display_name)
 
 
 ## Abrupt socket loss: drop remote players and try to reconnect a few times.
@@ -152,8 +155,8 @@ func _on_socket_closed() -> void:
 		player_left.emit(sid, state_synchronizer.get_display_name(sid))
 	state_synchronizer.reset()
 	chat_manager.leave()
-	_set_status(Status.CONNECTING, "Connection lost, reconnecting…")
-	system_message.emit("Connection lost. Reconnecting…")
+	_set_status(Status.CONNECTING, tr("NET_CONNECTION_LOST"))
+	system_message.emit(tr("CHAT_CONNECTION_LOST"))
 	var name := local_display_name
 	while _reconnect_attempts < 3:
 		_reconnect_attempts += 1
@@ -161,10 +164,10 @@ func _on_socket_closed() -> void:
 		status = Status.OFFLINE
 		var err: String = await connect_online(name)
 		if err.is_empty():
-			system_message.emit("Reconnected.")
+			system_message.emit(tr("CHAT_RECONNECTED"))
 			_reconnecting = false
 			return
 	_reconnecting = false
-	_set_status(Status.ERROR, "Reconnect failed; continuing offline.")
-	disconnected.emit("Reconnect failed")
-	system_message.emit("Could not reconnect. You are now playing offline.")
+	_set_status(Status.ERROR, tr("NET_RECONNECT_FAILED_OFFLINE"))
+	disconnected.emit(tr("NET_RECONNECT_FAILED"))
+	system_message.emit(tr("CHAT_RECONNECT_FAILED"))

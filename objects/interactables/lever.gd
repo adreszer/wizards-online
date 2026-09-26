@@ -24,7 +24,7 @@ func _on_interacted(_interactor: Node) -> void:
 	var tween := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(_handle, "rotation:x", deg_to_rad(-40.0 if is_on else 40.0), 0.35)
 	_audio.play()
-	_interactable.prompt_text = "Pull lever back" if is_on else "Pull lever"
+	_interactable.prompt_text = "INTERACT_PULL_LEVER_BACK" if is_on else "INTERACT_PULL_LEVER"
 	toggled.emit(is_on)
 	if is_on:
 		pulled.emit()
@@ -37,4 +37,4 @@ func reset() -> void:
 	is_on = false
 	var tween := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(_handle, "rotation:x", deg_to_rad(40.0), 0.35)
-	_interactable.prompt_text = "Pull lever"
+	_interactable.prompt_text = "INTERACT_PULL_LEVER"

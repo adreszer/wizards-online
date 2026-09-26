@@ -9,7 +9,8 @@ extends Node
 signal interacted(interactor: Node)
 signal focus_changed(focused: bool)
 
-@export var prompt_text: String = "Interact"
+## Translation key shown in the HUD prompt (the HUD calls tr() on it).
+@export var prompt_text: String = "INTERACT_DEFAULT"
 @export var enabled: bool = true
 @export var one_shot: bool = false
 @export var focus_point_offset: Vector3 = Vector3(0, 0.5, 0)

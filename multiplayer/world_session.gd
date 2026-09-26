@@ -25,7 +25,7 @@ func connect_socket(client: NakamaClient, session: NakamaSession) -> String:
 	socket.closed.connect(_on_closed)
 	var result: NakamaAsyncResult = await socket.connect_async(session, true)
 	if result.is_exception():
-		return "Socket connection failed: %s" % result.get_exception().message
+		return tr("NET_SOCKET_FAILED") % result.get_exception().message
 	return ""
 
 
@@ -33,14 +33,14 @@ func connect_socket(client: NakamaClient, session: NakamaSession) -> String:
 func join_world(client: NakamaClient, session: NakamaSession, display_name: String) -> String:
 	var rpc: NakamaAPI.ApiRpc = await client.rpc_async(session, "join_world", "{}")
 	if rpc.is_exception():
-		return "join_world RPC failed: %s (is the Nakama Lua module loaded?)" % rpc.get_exception().message
+		return tr("NET_JOIN_RPC_FAILED") % rpc.get_exception().message
 	var payload := NetworkProtocol.decode(rpc.payload)
 	match_id = str(payload.get("match_id", ""))
 	if match_id.is_empty():
-		return "join_world RPC returned no match id"
+		return tr("NET_JOIN_NO_MATCH")
 	var joined: NakamaRTAPI.Match = await socket.join_match_async(match_id, {"display_name": display_name})
 	if joined.is_exception():
-		return "Joining the world failed: %s" % joined.get_exception().message
+		return tr("NET_JOIN_FAILED") % joined.get_exception().message
 	if joined.self_user != null:
 		self_session_id = joined.self_user.session_id
 	return ""

@@ -24,7 +24,7 @@ func join(p_socket: NakamaSocket, self_user_id: String, self_name: String, name_
 	var channel: NakamaRTAPI.Channel = await socket.join_chat_async(
 		NetworkProtocol.CHAT_ROOM, NakamaRTMessage.ChannelJoin.ChannelType.Room, false, false)
 	if channel.is_exception():
-		return "Chat join failed: %s" % channel.get_exception().message
+		return tr("NET_CHAT_JOIN_FAILED") % channel.get_exception().message
 	channel_id = channel.id
 	return ""
 

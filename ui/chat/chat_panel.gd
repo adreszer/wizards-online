@@ -21,7 +21,7 @@ func _ready() -> void:
 	_panel.visible = GameSession.is_online()
 	_input_field.visible = false
 	if GameSession.is_online():
-		add_system_line("Press Enter to chat.")
+		add_system_line(tr("CHAT_HINT_OPEN"))
 
 
 func _unhandled_input(event: InputEvent) -> void:

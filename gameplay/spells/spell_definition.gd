@@ -4,8 +4,9 @@ extends Resource
 ## Adding a new spell means adding a new .tres, not editing SpellCaster.
 
 @export var id: StringName = &"spell"
-@export var display_name: String = "Spell"
-@export_multiline var description: String = ""
+## Translation keys; callers show tr(display_name) / tr(description).
+@export var display_name: String = "SPELL_ARCANE_PULSE_NAME"
+@export var description: String = ""
 @export var icon: Texture2D
 ## Effect type that SpellReceivers filter on (e.g. &"force").
 @export var effect_type: StringName = &"force"

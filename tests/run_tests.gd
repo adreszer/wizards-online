@@ -31,6 +31,7 @@ func _run() -> void:
 	await _test_interaction()
 	await _test_moving_platform()
 	await _test_level_wiring()
+	_test_localization()
 	print(t.summary())
 	get_tree().quit(1 if t.failed > 0 else 0)
 
@@ -422,3 +423,65 @@ func _test_level_wiring() -> void:
 	t.check(completed[0], "reaching the reward room completes the level")
 	level.queue_free()
 	await get_tree().process_frame
+
+
+# --- Localization --------------------------------------------------------------
+
+## Every key in localization/translations.csv must resolve in both locales, and
+## locale resolution / display-name sanitizing must behave as documented.
+func _test_localization() -> void:
+	t.section("Localization")
+	var previous := TranslationServer.get_locale()
+	var loaded := TranslationServer.get_loaded_locales()
+	t.check(loaded.has("pl") and loaded.has("en"), "pl and en translations loaded (%s)" % str(loaded))
+
+	var file := FileAccess.open("res://localization/translations.csv", FileAccess.READ)
+	t.check(file != null, "translations.csv readable")
+	var header := file.get_csv_line()
+	t.check(header.size() >= 3 and header[0] == "keys" and header[1] == "en" and header[2] == "pl", "csv header is keys,en,pl")
+	var keys: PackedStringArray = []
+	var missing: PackedStringArray = []
+	while not file.eof_reached():
+		var row := file.get_csv_line()
+		if row.size() < 3 or row[0].is_empty():
+			continue
+		keys.append(row[0])
+		if row[1].strip_edges().is_empty() or row[2].strip_edges().is_empty():
+			missing.append(row[0])
+	file.close()
+	t.check(keys.size() > 60, "csv has the expected number of keys (%d)" % keys.size())
+	t.check(missing.is_empty(), "no empty en/pl cell (%s)" % str(missing))
+	var duplicates: PackedStringArray = []
+	var seen: Dictionary = {}
+	for key in keys:
+		if seen.has(key):
+			duplicates.append(key)
+		seen[key] = true
+	t.check(duplicates.is_empty(), "no duplicate keys (%s)" % str(duplicates))
+
+	for locale in Localization.SUPPORTED:
+		TranslationServer.set_locale(locale)
+		var untranslated: PackedStringArray = []
+		for key in keys:
+			if tr(key) == key:
+				untranslated.append(key)
+		t.check(untranslated.is_empty(), "[%s] every key translates (stale import? %s)" % [locale, str(untranslated)])
+
+	TranslationServer.set_locale("en")
+	t.check(tr("MENU_PLAY_OFFLINE") == "Play OFFLINE", "en: MENU_PLAY_OFFLINE")
+	t.check((tr("HUD_FRAGMENTS") % [3, 11]) == "Fragments: 3 / 11", "en: formatted HUD_FRAGMENTS")
+	TranslationServer.set_locale("pl")
+	t.check(tr("MENU_PLAY_OFFLINE") == "Graj OFFLINE", "pl: MENU_PLAY_OFFLINE")
+	t.check(tr("PLAYER_DEFAULT_NAME") == "Uczeń", "pl: default player name has diacritics intact")
+	t.check(GameSession.sanitize_display_name("") == "Uczeń", "pl: empty display name falls back to localized default")
+	# Fallback locale is Polish: an unsupported locale gets Polish text.
+	TranslationServer.set_locale("de")
+	t.check(tr("MENU_PLAY_OFFLINE") == "Graj OFFLINE", "unsupported locale falls back to Polish")
+
+	t.check(Localization.resolve("pl") == "pl" and Localization.resolve("en") == "en", "explicit setting wins")
+	t.check(Localization.SUPPORTED.has(Localization.resolve(Localization.AUTO)), "auto resolves to a supported locale")
+	t.check(Localization.SUPPORTED.has(Localization.resolve("garbage")), "unknown setting behaves like auto")
+
+	t.check(GameSession.sanitize_display_name("Michał Żółć") == "Michał Żółć", "display names keep Polish letters")
+	t.check(GameSession.sanitize_display_name(" [Ro]wan_1 ") == "Rowan_1", "display names drop brackets and outer spaces")
+	TranslationServer.set_locale(previous)

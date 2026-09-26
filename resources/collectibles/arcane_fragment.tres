@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1")
 id = &"arcane_fragment"
-display_name = "Arcane Fragment"
+display_name = "COLLECTIBLE_ARCANE_FRAGMENT"
 value = 1
 color = Color(0.6, 0.9, 1, 1)
 pickup_sound = ExtResource("2")

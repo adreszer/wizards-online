@@ -162,7 +162,7 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 
 [node name="EntrancePlaque" parent="." instance=ExtResource("6")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -7.600, 1.600, -2.000)
-text = "Welcome, apprentice. The halls reward those who look closely. Purple glimmers answer to magic."
+text = "PLAQUE_ENTRANCE"
 
 [node name="Entrance_PL0" parent="Pillars" instance=ExtResource("7")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 0.000, 3.000)
@@ -329,7 +329,7 @@ module_scene = ExtResource("8")
 
 [node name="SecretPlaque" parent="." instance=ExtResource("6")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 11.100, 2.400, -32.000)
-text = "Well found. Curiosity is the first lesson."
+text = "PLAQUE_SECRET"
 
 [node name="Training_Back_L" parent="Walls" instance=ExtResource("3")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 1.200, -45.000)
@@ -400,7 +400,7 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 
 [node name="TrainingPlaque" parent="." instance=ExtResource("6")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -7.600, 2.400, -52.000)
-text = "Wake both crystals to pass. Aim through the centre of your sight."
+text = "PLAQUE_TRAINING"
 
 [node name="TrainingSwitchA" parent="." instance=ExtResource("14")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -5.500, 1.200, -62.000)
@@ -522,7 +522,7 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 
 [node name="PuzzlePlaque" parent="." instance=ExtResource("6")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 7.600, 2.400, -70.000)
-text = "What is out of reach may still be touched. Weight holds the far door."
+text = "PLAQUE_PUZZLE"
 
 [node name="PuzzleGate" parent="." instance=ExtResource("4")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 1.200, -78.000)
@@ -708,7 +708,7 @@ module_scene = ExtResource("8")
 
 [node name="PlatPlaque" parent="." instance=ExtResource("6")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -7.600, 2.400, -92.000)
-text = "Mind the drop. The crimson floor bites; leap it."
+text = "PLAQUE_PLATFORMS"
 
 [node name="Final_Floor" parent="Floors" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 1.200, -155.000)
@@ -770,7 +770,7 @@ initial_state = 3
 
 [node name="FinalPlaque" parent="." instance=ExtResource("6")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -7.600, 2.400, -136.000)
-text = "Turn every gaze upon the far door, then pull the lever."
+text = "PLAQUE_FINAL"
 
 [node name="FinalLever" parent="." instance=ExtResource("5")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 6.000, 1.200, -151.000)
@@ -875,7 +875,7 @@ module_scene = ExtResource("8")
 
 [node name="RewardPlaque" parent="." instance=ExtResource("6")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 2.400, -169.600)
-text = "You have reached the end of the vertical slice. Thank you for playing."
+text = "PLAQUE_REWARD"
 
 [node name="Torch0" type="OmniLight3D" parent="Lights"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, -4)

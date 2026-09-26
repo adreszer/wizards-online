@@ -44,7 +44,7 @@ horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
-text = "MVP vertical slice"
+text = "MENU_SUBTITLE"
 horizontal_alignment = 1
 
 [node name="Grid" type="GridContainer" parent="Center/Panel/Margin/VBox"]
@@ -53,7 +53,7 @@ columns = 2
 
 [node name="NameLabel" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
 layout_mode = 2
-text = "Display name"
+text = "MENU_DISPLAY_NAME"
 
 [node name="NameEdit" type="LineEdit" parent="Center/Panel/Margin/VBox/Grid"]
 unique_name_in_owner = true
@@ -61,9 +61,17 @@ custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 max_length = 16
 
+[node name="LanguageLabel" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+text = "MENU_LANGUAGE"
+
+[node name="LanguageOption" type="OptionButton" parent="Center/Panel/Margin/VBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="HostLabel" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
 layout_mode = 2
-text = "Nakama host"
+text = "MENU_HOST"
 
 [node name="HostEdit" type="LineEdit" parent="Center/Panel/Margin/VBox/Grid"]
 unique_name_in_owner = true
@@ -71,7 +79,7 @@ layout_mode = 2
 
 [node name="PortLabel" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
 layout_mode = 2
-text = "Nakama port"
+text = "MENU_PORT"
 
 [node name="PortEdit" type="LineEdit" parent="Center/Panel/Margin/VBox/Grid"]
 unique_name_in_owner = true
@@ -86,13 +94,13 @@ alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
-text = "Play OFFLINE"
+text = "MENU_PLAY_OFFLINE"
 
 [node name="OnlineButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
-text = "Play ONLINE"
+text = "MENU_PLAY_ONLINE"
 
 [node name="StatusLabel" type="Label" parent="Center/Panel/Margin/VBox"]
 unique_name_in_owner = true
@@ -104,11 +112,11 @@ autowrap_mode = 3
 [node name="Help" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
-text = "WASD move · Shift run · Space jump · Mouse look · LMB cast · E interact · Enter chat · F1 free cursor · F3 debug · Esc pause"
+text = "MENU_CONTROLS"
 horizontal_alignment = 1
 
 [node name="QuitButton" type="Button" parent="Center/Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Quit"
+text = "MENU_QUIT"

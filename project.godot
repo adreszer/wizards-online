@@ -123,6 +123,11 @@ debug_overlay={
 ]
 }
 
+[internationalization]
+
+locale/fallback="pl"
+locale/translations=PackedStringArray("res://localization/translations.en.translation", "res://localization/translations.pl.translation")
+
 [layer_names]
 
 3d_physics/layer_1="world"

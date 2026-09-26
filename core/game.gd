@@ -27,7 +27,7 @@ func _on_start_requested() -> void:
 func _on_return_to_menu() -> void:
 	get_tree().paused = false
 	if NetworkManager.is_online():
-		await NetworkManager.disconnect_online("Left the world")
+		await NetworkManager.disconnect_online(tr("NET_LEFT_WORLD"))
 	_show_menu()
 
 

@@ -17,7 +17,9 @@ local OP_STATE, OP_SPELL_CAST = 1, 2
 local OP_ROSTER, OP_PLAYER_JOINED, OP_PLAYER_LEFT = 10, 11, 12
 local OP_PING = 20
 local TICK_RATE = 15
-local MAX_NAME_LENGTH = 16
+-- Bytes, not characters: the client caps names at 16 characters, which with
+-- UTF-8 diacritics (Polish etc.) can take more bytes.
+local MAX_NAME_BYTES = 48
 
 local M = {}
 
@@ -25,7 +27,17 @@ local function sanitize_name(name, fallback)
   if type(name) ~= "string" then
     return fallback
   end
-  name = name:gsub("[^%w _%-]", ""):gsub("^%s+", ""):gsub("%s+$", ""):sub(1, MAX_NAME_LENGTH)
+  -- Mirrors GameSession.sanitize_display_name: ASCII letters/digits, space,
+  -- "_" and "-", plus any multi-byte UTF-8 sequence (accented Latin letters).
+  name = name:gsub("[^%w _%-\128-\255]", ""):gsub("^%s+", ""):gsub("%s+$", "")
+  if #name > MAX_NAME_BYTES then
+    local cut = MAX_NAME_BYTES
+    -- do not split a multi-byte character: back off over continuation bytes
+    while cut > 0 and name:byte(cut + 1) and name:byte(cut + 1) >= 128 and name:byte(cut + 1) < 192 do
+      cut = cut - 1
+    end
+    name = name:sub(1, cut):gsub("%s+$", "")
+  end
   if #name == 0 then
     return fallback
   end

@@ -23,7 +23,7 @@ script = ExtResource("1")
 
 [node name="Interactable" type="Node" parent="."]
 script = ExtResource("2")
-prompt_text = "Pull lever"
+prompt_text = "INTERACT_PULL_LEVER"
 focus_point_offset = Vector3(0, 1.0, 0)
 
 [node name="Base" type="MeshInstance3D" parent="."]

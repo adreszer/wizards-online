@@ -44,5 +44,5 @@ scroll_following = true
 [node name="Input" type="LineEdit" parent="Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-placeholder_text = "Say something… (Enter to send, Esc to close)"
+placeholder_text = "CHAT_PLACEHOLDER"
 max_length = 200

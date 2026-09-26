@@ -119,6 +119,15 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Pillar 194,486 tris and ceiling 612,066 tris per module — same re-export need as the floors (target ≤10k each)
 - [ ] Doorway module
 
+### Milestone 12 — Localization (Polish primary, English secondary)
+- [x] All player-facing strings moved to `localization/translations.csv` (72 keys: menus, pause, HUD, chat, network/status messages, interaction prompts, notifications, plaques, spell/collectible names)
+- [x] `core/localization.gd`: locale resolution (explicit setting → `--lang=` → Steam language hook → OS language → Polish), Polish as fallback locale
+- [x] Language picker on the main menu (System default / Polski / English), persisted in `settings.cfg`; menu re-translates live
+- [x] Display names accept accented Latin letters client- and server-side (Lua sanitizer cuts on UTF-8 boundaries)
+- [x] Headless test: both locales load, every key has both columns, no duplicates, no stale import, name sanitizing
+- [ ] Steam: wire `Localization.steam_language()` to `Steam.getCurrentGameLanguage()` when GodotSteam is added; list PL + EN on the store page
+- [ ] Native-speaker pass over the Polish copy before release; add a dedicated UI font and verify diacritics in every label (default Godot font covers Latin Extended-A)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
@@ -185,7 +194,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (66 gameplay checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (85 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
@@ -198,6 +207,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Health | damage, death, checkpoint respawn | [x] headless test pass |
 | Collectibles | counter, no double collect | [x] headless test pass |
 | Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
+| Localization | pl/en load, all keys translated, fallback, name sanitizing | [x] headless test pass; in-game visual check of Polish text (menu, HUD, plaques) pending |
 | Multiplayer | two clients connect, see each other, movement/jump/spell replicate | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 20 + 14 checks pass |
 | Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |

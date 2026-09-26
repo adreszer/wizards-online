@@ -50,7 +50,7 @@ func _process(_delta: float) -> void:
 		lines.append("Position: (%.2f, %.2f, %.2f)" % [body.global_position.x, body.global_position.y, body.global_position.z])
 		lines.append("Velocity: (%.2f, %.2f, %.2f) |h|=%.2f" % [body.velocity.x, body.velocity.y, body.velocity.z, movement.get_horizontal_speed()])
 		lines.append("Grounded: %s   State: %s" % [str(movement.is_grounded), movement.get_state_name()])
-		lines.append("Spell: %s   Cooldown: %.2f" % [caster.equipped_spell.display_name if caster.equipped_spell else "none", caster.cooldown_remaining])
+		lines.append("Spell: %s   Cooldown: %.2f" % [tr(caster.equipped_spell.display_name) if caster.equipped_spell else "none", caster.cooldown_remaining])
 		lines.append("Spell target: %s" % (caster.current_target.name if caster.current_target else "-"))
 		lines.append("Interact focus: %s" % (interaction.focused.get_parent().name if interaction.focused else "-"))
 		lines.append("Health: %d / %d" % [_player.health.current, _player.health.max_health])

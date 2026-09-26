@@ -35,7 +35,7 @@ learn_sound = ExtResource("4")
 
 [node name="Interactable" type="Node" parent="."]
 script = ExtResource("2")
-prompt_text = "Study the tome"
+prompt_text = "INTERACT_STUDY_TOME"
 one_shot = true
 focus_point_offset = Vector3(0, 1.2, 0)
 

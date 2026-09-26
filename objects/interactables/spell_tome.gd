@@ -14,7 +14,7 @@ signal learned(by: Node)
 
 func _ready() -> void:
 	_interactable.one_shot = true
-	_interactable.prompt_text = "Study the tome"
+	_interactable.prompt_text = "INTERACT_STUDY_TOME"
 	_interactable.interacted.connect(_on_interacted)
 	if learn_sound != null:
 		_audio.stream = learn_sound
@@ -30,6 +30,6 @@ func _on_interacted(interactor: Node) -> void:
 		return
 	caster.learn_spell(spell)
 	_audio.play()
-	GameEvents.notification_requested.emit("Learned %s — aim with the centre of the screen and press Cast (LMB)." % spell.display_name, 6.0)
+	GameEvents.notification_requested.emit(tr("NOTIFY_SPELL_LEARNED") % tr(spell.display_name), 6.0)
 	learned.emit(interactor)
 	set_process(false)

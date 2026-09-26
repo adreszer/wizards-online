@@ -18,6 +18,9 @@ const FRAGMENT_ID := &"arcane_fragment"
 var _player: Node
 var _caster: SpellCaster
 var _notification_timer: float = 0.0
+var _focused: Interactable
+var _status: int = NetworkManager.Status.OFFLINE
+var _status_message: String = ""
 
 
 func _ready() -> void:
@@ -71,25 +74,26 @@ func _on_total_changed(_id: StringName, _max_total: int) -> void:
 
 
 func _update_fragments() -> void:
-	_fragments_label.text = "Fragments: %d / %d" % [GameSession.get_collected(FRAGMENT_ID), GameSession.get_total(FRAGMENT_ID)]
+	_fragments_label.text = tr("HUD_FRAGMENTS") % [GameSession.get_collected(FRAGMENT_ID), GameSession.get_total(FRAGMENT_ID)]
 
 
 func _on_spell_learned(definition: Resource) -> void:
 	if definition == null:
-		_spell_label.text = "Spell: —"
+		_spell_label.text = tr("HUD_SPELL_NONE")
 		_cooldown_bar.visible = false
 		_crosshair.visible = false
 	else:
-		_spell_label.text = "Spell: %s" % definition.display_name
+		_spell_label.text = tr("HUD_SPELL") % tr(definition.display_name)
 		_cooldown_bar.visible = true
 		_crosshair.visible = true
 
 
 func _on_focus_changed(interactable: Interactable) -> void:
+	_focused = interactable
 	if interactable == null:
 		_prompt_label.visible = false
 	else:
-		_prompt_label.text = "[E] %s" % interactable.prompt_text
+		_prompt_label.text = tr("HUD_PROMPT") % tr(interactable.prompt_text)
 		_prompt_label.visible = true
 
 
@@ -100,12 +104,24 @@ func show_notification(text: String, duration: float = 3.0) -> void:
 
 
 func _on_status_changed(status: int, message: String) -> void:
+	_status = status
+	_status_message = message
 	match status:
 		NetworkManager.Status.ONLINE:
-			_status_label.text = "Online · %s" % GameSession.display_name
+			_status_label.text = tr("HUD_STATUS_ONLINE") % GameSession.display_name
 		NetworkManager.Status.CONNECTING:
-			_status_label.text = message if not message.is_empty() else "Connecting…"
+			_status_label.text = message if not message.is_empty() else tr("HUD_STATUS_CONNECTING")
 		NetworkManager.Status.ERROR:
-			_status_label.text = "Offline (%s)" % message
+			_status_label.text = tr("HUD_STATUS_OFFLINE_REASON") % message
 		_:
-			_status_label.text = "Offline"
+			_status_label.text = tr("HUD_STATUS_OFFLINE")
+
+
+## Re-render the code-formatted labels when the language changes at runtime.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_update_fragments()
+		_on_spell_learned(_caster.equipped_spell if _caster != null else null)
+		if is_instance_valid(_focused):
+			_on_focus_changed(_focused)
+		_on_status_changed(_status, _status_message)

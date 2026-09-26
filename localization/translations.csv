@@ -1,0 +1,73 @@
+keys,en,pl
+MENU_SUBTITLE,MVP vertical slice,Pionowy wycinek MVP
+MENU_DISPLAY_NAME,Display name,Nazwa gracza
+MENU_LANGUAGE,Language,Język
+MENU_LANGUAGE_AUTO,System default,Domyślny systemu
+MENU_HOST,Nakama host,Serwer Nakama
+MENU_PORT,Nakama port,Port Nakama
+MENU_PLAY_OFFLINE,Play OFFLINE,Graj OFFLINE
+MENU_PLAY_ONLINE,Play ONLINE,Graj ONLINE
+MENU_QUIT,Quit,Wyjdź
+MENU_CONTROLS,WASD move · Shift run · Space jump · Mouse look · LMB cast · E interact · Enter chat · F1 free cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · Mysz rozglądanie · LPM czar · E interakcja · Enter czat · F1 uwolnij kursor · F3 debug · Esc pauza
+MENU_CONNECTING,Connecting…,Łączenie…
+MENU_CONNECT_FAILED_HINT,"Start the backend with `docker compose up -d`, or play OFFLINE.",Uruchom backend poleceniem `docker compose up -d` albo graj OFFLINE.
+PAUSE_TITLE,Paused,Pauza
+PAUSE_RESUME,Resume,Wznów
+PAUSE_RETURN_TO_MENU,Return to menu,Wróć do menu
+PAUSE_QUIT,Quit,Wyjdź z gry
+HUD_HEALTH,Health,Zdrowie
+HUD_FRAGMENTS,Fragments: %d / %d,Fragmenty: %d / %d
+HUD_SPELL_NONE,Spell: —,Czar: —
+HUD_SPELL,Spell: %s,Czar: %s
+HUD_PROMPT,[E] %s,[E] %s
+HUD_STATUS_ONLINE,Online · %s,Online · %s
+HUD_STATUS_CONNECTING,Connecting…,Łączenie…
+HUD_STATUS_OFFLINE,Offline,Offline
+HUD_STATUS_OFFLINE_REASON,Offline (%s),Offline (%s)
+CHAT_PLACEHOLDER,"Say something… (Enter to send, Esc to close)","Napisz coś… (Enter wysyła, Esc zamyka)"
+CHAT_HINT_OPEN,Press Enter to chat.,"Naciśnij Enter, aby pisać na czacie."
+CHAT_OFFLINE,You are offline; chat is unavailable.,Jesteś offline; czat jest niedostępny.
+CHAT_PLAYER_JOINED,%s joined the area.,%s pojawia się w okolicy.
+CHAT_PLAYER_LEFT,%s left the area.,%s opuszcza okolicę.
+CHAT_CONNECTION_LOST,Connection lost. Reconnecting…,Utracono połączenie. Ponowne łączenie…
+CHAT_RECONNECTED,Reconnected.,Połączono ponownie.
+CHAT_RECONNECT_FAILED,Could not reconnect. You are now playing offline.,Nie udało się połączyć ponownie. Grasz teraz offline.
+NET_ALREADY_CONNECTING,Already connecting,Łączenie już trwa
+NET_CONNECTING_TO,Connecting to %s:%d…,Łączenie z %s:%d…
+NET_ONLINE_AS,Online as %s,Online jako %s
+NET_DISCONNECTED,Disconnected,Rozłączono
+NET_LEFT_WORLD,Left the world,Opuszczono świat
+NET_CONNECTION_LOST,"Connection lost, reconnecting…","Utracono połączenie, ponowne łączenie…"
+NET_RECONNECT_FAILED_OFFLINE,Reconnect failed; continuing offline.,Ponowne łączenie nie powiodło się; gra trwa offline.
+NET_RECONNECT_FAILED,Reconnect failed,Ponowne łączenie nie powiodło się
+NET_AUTH_FAILED,Authentication failed,Uwierzytelnianie nie powiodło się
+NET_SERVER_UNREACHABLE,%s: server unreachable,%s: serwer nieosiągalny
+NET_ERROR_WITH_CODE,%s: %s (%d),%s: %s (%d)
+NET_SOCKET_FAILED,Socket connection failed: %s,Połączenie z serwerem nie powiodło się: %s
+NET_JOIN_RPC_FAILED,join_world RPC failed: %s (is the Nakama Lua module loaded?),RPC join_world nie powiodło się: %s (czy moduł Lua Nakamy jest załadowany?)
+NET_JOIN_NO_MATCH,join_world RPC returned no match id,RPC join_world nie zwróciło identyfikatora świata
+NET_JOIN_FAILED,Joining the world failed: %s,Dołączenie do świata nie powiodło się: %s
+NET_CHAT_JOIN_FAILED,Chat join failed: %s,Dołączenie do czatu nie powiodło się: %s
+INTERACT_DEFAULT,Interact,Użyj
+INTERACT_READ,Read,Czytaj
+INTERACT_PULL_LEVER,Pull lever,Pociągnij dźwignię
+INTERACT_PULL_LEVER_BACK,Pull lever back,Cofnij dźwignię
+INTERACT_STUDY_TOME,Study the tome,Przestudiuj księgę
+NOTIFY_SPELL_LEARNED,Learned %s — aim with the centre of the screen and press Cast (LMB).,Poznajesz czar %s — celuj środkiem ekranu i naciśnij Czar (LPM).
+NOTIFY_SECRET_PASSAGE,A hidden passage opens!,Otwiera się ukryte przejście!
+NOTIFY_CHECKPOINT,Checkpoint reached,Punkt kontrolny
+NOTIFY_STATUES_ALIGNED,The statues' gaze aligns. Something unlocked.,Spojrzenia posągów się zbiegają. Coś się odblokowało.
+NOTIFY_LEVER_STUCK,The lever will not budge while the statues look away.,"Dźwignia ani drgnie, dopóki posągi patrzą w inną stronę."
+NOTIFY_SLICE_COMPLETE,Vertical slice complete! Fragments: %d / %d,Pionowy wycinek ukończony! Fragmenty: %d / %d
+PLAQUE_DEFAULT,An inscription.,Inskrypcja.
+PLAQUE_ENTRANCE,"Welcome, apprentice. The halls reward those who look closely. Purple glimmers answer to magic.","Witaj, uczniu. Te sale nagradzają uważnych. Fioletowe błyski odpowiadają na magię."
+PLAQUE_SECRET,Well found. Curiosity is the first lesson.,Dobrze znalezione. Ciekawość to pierwsza lekcja.
+PLAQUE_TRAINING,Wake both crystals to pass. Aim through the centre of your sight.,"Obudź oba kryształy, by przejść. Celuj środkiem swojego spojrzenia."
+PLAQUE_PUZZLE,What is out of reach may still be touched. Weight holds the far door.,"Co poza zasięgiem, wciąż można dotknąć. Ciężar trzyma dalsze drzwi."
+PLAQUE_PLATFORMS,Mind the drop. The crimson floor bites; leap it.,Uważaj na przepaść. Szkarłatna posadzka kąsa; przeskocz ją.
+PLAQUE_FINAL,"Turn every gaze upon the far door, then pull the lever.","Zwróć każde spojrzenie ku dalszym drzwiom, potem pociągnij dźwignię."
+PLAQUE_REWARD,You have reached the end of the vertical slice. Thank you for playing.,To koniec pionowego wycinka. Dziękujemy za grę.
+SPELL_ARCANE_PULSE_NAME,Arcane Pulse,Tajemny Impuls
+SPELL_ARCANE_PULSE_DESC,A focused pulse of raw arcane force. Activates magical mechanisms and shoves loose objects.,Skupiony impuls czystej tajemnej mocy. Uruchamia magiczne mechanizmy i odpycha luźne przedmioty.
+COLLECTIBLE_ARCANE_FRAGMENT,Arcane Fragment,Tajemny Fragment
+PLAYER_DEFAULT_NAME,Apprentice,Uczeń
