@@ -183,7 +183,26 @@ func _test_camera() -> void:
 	t.check(dist < rig.distance - 0.5, "spring arm shortens against a wall (%.2f < %.2f)" % [dist, rig.distance])
 	t.check(cam.global_position.z < 1.2, "camera stays on the player's side of the wall")
 	t.check(cam.current, "local camera is the current camera")
+	t.check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "cursor is free by default")
+	rig.start_orbit()
+	# The headless display server has no cursor capture, so only assert the mode on a real one.
+	var headless := DisplayServer.get_name() == "headless"
+	t.check(rig.is_orbiting and (headless or Input.mouse_mode == Input.MOUSE_MODE_CAPTURED), "right button drag captures the cursor")
+	var yaw_before := rig.get_yaw()
+	rig._unhandled_input(_mouse_motion(Vector2(50, 0)))
+	t.check(absf(rig.get_yaw() - yaw_before) > 0.05, "dragging with the right button orbits the camera")
+	rig.stop_orbit()
+	t.check(not rig.is_orbiting and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "releasing the right button frees the cursor")
+	yaw_before = rig.get_yaw()
+	rig._unhandled_input(_mouse_motion(Vector2(50, 0)))
+	t.check(is_equal_approx(rig.get_yaw(), yaw_before), "mouse motion without the right button leaves the camera alone")
 	await _clear([floor_body, wall])
+
+
+func _mouse_motion(relative: Vector2) -> InputEventMouseMotion:
+	var ev := InputEventMouseMotion.new()
+	ev.relative = relative
+	return ev
 
 
 # --- Health / checkpoints -------------------------------------------------------

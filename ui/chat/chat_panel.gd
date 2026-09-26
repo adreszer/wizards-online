@@ -56,7 +56,7 @@ func close() -> void:
 	_input_field.release_focus()
 	GameSession.ui_input_captured = false
 	if not get_tree().paused:
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
 func _on_submitted(text: String) -> void:

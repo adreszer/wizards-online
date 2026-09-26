@@ -30,6 +30,6 @@ func _toggle() -> void:
 func _set_paused(paused: bool) -> void:
 	get_tree().paused = paused
 	_root.visible = paused
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused else Input.MOUSE_MODE_CAPTURED
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if paused:
 		_resume.grab_focus()

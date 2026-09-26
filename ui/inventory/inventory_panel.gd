@@ -67,7 +67,7 @@ func close() -> void:
 	_root.visible = false
 	GameSession.ui_input_captured = false
 	if not get_tree().paused:
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
 func _refresh() -> void:

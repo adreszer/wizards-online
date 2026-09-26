@@ -5,6 +5,12 @@ extends Node3D
 ## Hierarchy: CameraRig (yaw, top-level) → Pitch → SpringArm3D → Camera3D.
 ## The SpringArm3D keeps the camera out of level geometry. Movement code asks
 ## [method get_yaw] for its reference frame; spell aiming asks [method get_aim_ray].
+##
+## Look input: the cursor is free by default. Holding the right mouse button
+## captures it and orbits the camera around the character; releasing puts the
+## cursor back where it was. A persistent capture (F1 / [member Input.mouse_mode]
+## set to CAPTURED by something else) also drives the camera, for players who
+## prefer classic mouse look.
 ## Camera "zones"/cinematic constraints can later be layered on by driving
 ## [member yaw]/[member pitch]/[member distance] from an external controller
 ## and setting [member input_enabled] to false.
@@ -22,6 +28,10 @@ extends Node3D
 
 var yaw: float = 0.0
 var pitch: float = 0.0
+## True while the right mouse button is held and the rig owns the mouse capture.
+var is_orbiting: bool = false
+
+var _orbit_cursor_position: Vector2 = Vector2.ZERO
 
 @onready var _pitch_node: Node3D = $Pitch
 @onready var _spring_arm: SpringArm3D = $Pitch/SpringArm3D
@@ -41,7 +51,7 @@ func _ready() -> void:
 
 func activate() -> void:
 	_camera.current = true
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
 func get_camera() -> Camera3D:
@@ -61,10 +71,52 @@ func get_aim_ray() -> Dictionary:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not input_enabled or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+	if event is InputEventMouseButton:
+		var button := event as InputEventMouseButton
+		if button.button_index != MOUSE_BUTTON_RIGHT:
+			return
+		if button.pressed:
+			if _can_start_orbit():
+				start_orbit()
+				get_viewport().set_input_as_handled()
+		elif is_orbiting:
+			stop_orbit()
+			get_viewport().set_input_as_handled()
 		return
-	if event is InputEventMouseMotion:
+	if not input_enabled:
+		return
+	if event is InputEventMouseMotion and (is_orbiting or Input.mouse_mode == Input.MOUSE_MODE_CAPTURED):
 		apply_look_delta((event as InputEventMouseMotion).relative)
+
+
+func _can_start_orbit() -> bool:
+	if not input_enabled or is_orbiting or Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		return false
+	if get_tree().paused or GameSession.ui_input_captured:
+		return false
+	return true
+
+
+## Right button pressed: hide + capture the cursor so the drag can go on forever.
+func start_orbit() -> void:
+	is_orbiting = true
+	_orbit_cursor_position = get_viewport().get_mouse_position()
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+## Right button released (or the window lost focus): give the cursor back where it was.
+func stop_orbit() -> void:
+	if not is_orbiting:
+		return
+	is_orbiting = false
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		get_viewport().warp_mouse(_orbit_cursor_position)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT or what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		stop_orbit()
 
 
 ## Rotate by a mouse-style delta in pixels (also used by tests / future gamepad look).
@@ -76,6 +128,9 @@ func apply_look_delta(relative: Vector2) -> void:
 
 
 func _process(delta: float) -> void:
+	# The release can be swallowed while paused or behind a UI panel.
+	if is_orbiting and not Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		stop_orbit()
 	if target == null:
 		return
 	var desired := target.global_position + Vector3.UP * target_height

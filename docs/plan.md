@@ -38,7 +38,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 ### Milestone 2 — Player
 - [x] PlayerInput (intent from InputMap, camera-relative)
 - [x] PlayerMovement (walk/run/jump/gravity/slopes/stairs/air control/accel/decel/landing)
-- [x] Camera rig (yaw/pitch, sensitivity, distance, height, limits, smoothing, SpringArm collision)
+- [x] Camera rig (yaw/pitch, sensitivity, distance, height, limits, smoothing, SpringArm collision); free cursor by default, hold right mouse button to orbit (F1 locks the cursor for always-on mouse look)
 - [x] CharacterVisual placeholder + AnimationTree state machine (idle/walk/run/jump/fall/land/cast)
 - [x] AnimationController decoupled from movement via state signals
 - [x] Local vs remote player split (`LocalPlayer` subtree)

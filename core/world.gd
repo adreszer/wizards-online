@@ -17,7 +17,8 @@ func _ready() -> void:
 	_show_satchel_hint(player)
 
 
-## F1: free / recapture the mouse without pausing (screenshots, window juggling).
+## F1: lock the cursor for classic always-on mouse look (and unlock again).
+## The default is a free cursor with right-button-drag orbiting (see CameraRig).
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_cursor") and not get_tree().paused and not GameSession.ui_input_captured:
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
