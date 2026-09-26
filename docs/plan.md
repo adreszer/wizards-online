@@ -118,6 +118,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Ceiling module `ceiling.glb` → `ceiling_tile.tscn` (panel rotated flat, 4 × 4 × 0.49 m, underside at the node origin); tiled with `ModularFloor` at 8 m over every room (158 tiles)
 - [x] Rooms raised to 8 m: two stacked wall rows, full-width upper row above door lintels; sun dimmed, ambient/torches raised for enclosed rooms
 - [x] Pillar (9,960 tris) and ceiling (9,547 tris) re-exported with normal maps; bounds unchanged, wrappers untouched. Whole modular set is now ≤10.2k tris per module
+- [x] Wall torch `wall-torch.glb` (10,048 tris) → `objects/environment/props/wall_torch.tscn`: origin at the mounting plate, flickering OmniLight at the flame; 44 torches placed on side walls between pillars, replacing the 15 floating omni lights
+- [x] Spell switch `spell-switch-crystal.glb` (9,225 tris) fitted into `magic_switch.tscn` at 1.7 m tall; on/off feedback is an additive glow sphere inside the crystal plus the light
 - [ ] Textures: floor2 ships four 4K maps, the others mix 2K/4K; downscale metallic-roughness maps to 2K when convenient
 - [x] Doorway module `doorway.glb` → `doorway.tscn` (4 × 4 × 0.35 m, pointed arch ≈3.8 m wide at the base, ≈3.8 m tall; jamb + arch box collision); replaces every greybox lintel (7 doors + training archway)
 - [x] `doorway.glb` remeshed: 9,003 tris + normal map, identical bounds

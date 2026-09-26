@@ -48,9 +48,12 @@ func _apply_visual() -> void:
 	if mat == null:
 		mat = StandardMaterial3D.new()
 		mat.emission_enabled = true
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 		_crystal.material_override = mat
 	var c := on_color if is_on else off_color
-	mat.albedo_color = c
+	mat.albedo_color = Color(c, 0.55 if is_on else 0.2)
 	mat.emission = c
 	mat.emission_energy_multiplier = 2.5 if is_on else 0.8
 	_light.light_color = c

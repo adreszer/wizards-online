@@ -3,15 +3,14 @@
 [ext_resource type="Script" path="res://objects/puzzles/magic_switch.gd" id="1"]
 [ext_resource type="Script" path="res://gameplay/spells/spell_receiver.gd" id="2"]
 [ext_resource type="AudioStream" path="res://assets/audio/switch.wav" id="3"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/spell-switch-crystal.glb" id="4"]
 
-[sub_resource type="BoxMesh" id="BaseMesh"]
-size = Vector3(0.8, 1.0, 0.8)
-
-[sub_resource type="PrismMesh" id="CrystalMesh"]
-size = Vector3(0.45, 0.6, 0.45)
+[sub_resource type="SphereMesh" id="CrystalMesh"]
+radius = 0.17
+height = 0.34
 
 [sub_resource type="BoxShape3D" id="Shape"]
-size = Vector3(0.8, 1.7, 0.8)
+size = Vector3(0.62, 1.7, 0.62)
 
 [node name="MagicSwitch" type="StaticBody3D"]
 collision_layer = 9
@@ -23,9 +22,8 @@ script = ExtResource("2")
 accepted_effect_types = Array[StringName]([&"force"])
 aim_point_offset = Vector3(0, 1.3, 0)
 
-[node name="Base" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-mesh = SubResource("BaseMesh")
+[node name="Model" parent="." instance=ExtResource("4")]
+transform = Transform3D(0.894, 0, 0, 0, 0.894, 0, 0, 0, 0.894, 0.0003, 0.8507, -0.0016)
 
 [node name="Crystal" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
