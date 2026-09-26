@@ -52,7 +52,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 ### Milestone 4 — Magic
 - [x] SpellDefinition resource (Arcane Pulse data)
 - [x] SpellCaster (center-screen aim, aim assist, range, cooldown, learn spell)
-- [x] SpellProjectile + SpellEffect
+- [x] SpellProjectile + SpellEffect (GPU particle trail laid evenly along the flight path, tinted per spell)
 - [x] SpellReceiver component (composition, signal-driven)
 - [x] Cast events routed for network replication
 

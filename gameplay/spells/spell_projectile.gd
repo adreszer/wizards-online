@@ -4,12 +4,21 @@ extends Node3D
 ## physics step (no tunnelling), delivers a [SpellEffect] to the first
 ## [SpellReceiver] hit and plays a burst. Cosmetic projectiles (remote players)
 ## fly and burst but never apply effects.
+##
+## The trail is laid manually: every physics step the segment just travelled is
+## sampled every [member trail_spacing] metres and one particle is emitted at
+## each sample, so the whole flight path glows evenly no matter how fast the
+## projectile moves or how the frame rate compares to the physics rate.
 
 signal hit(collider: Node, position: Vector3)
 signal expired()
 
 @export var collision_mask: int = 0b0000_1101  # world | remote_player | spell_target
 @export var burst_lifetime: float = 0.5
+## Distance between consecutive trail particles along the flight path.
+@export var trail_spacing: float = 0.07
+## Random sideways drift given to each trail particle (m/s).
+@export var trail_scatter_speed: float = 0.35
 
 var definition: SpellDefinition
 var direction: Vector3 = Vector3.FORWARD
@@ -22,10 +31,13 @@ var exclude_rids: Array[RID] = []
 
 var _travelled: float = 0.0
 var _finished: bool = false
+## Distance travelled since the last trail particle was laid.
+var _trail_carry: float = 0.0
+var _rng := RandomNumberGenerator.new()
 
 @onready var _mesh: MeshInstance3D = $Mesh
 @onready var _light: OmniLight3D = $OmniLight3D
-@onready var _trail: CPUParticles3D = $Trail
+@onready var _trail: GPUParticles3D = $Trail
 @onready var _burst: CPUParticles3D = $Burst
 @onready var _audio: AudioStreamPlayer3D = $ImpactAudio
 
@@ -49,8 +61,11 @@ func _ready() -> void:
 			mat.emission = definition.color
 			_mesh.set_surface_override_material(0, mat)
 		_light.light_color = definition.color
-		_trail.color = definition.color
 		_burst.color = definition.color
+		var trail_mat := _trail.process_material.duplicate() as ParticleProcessMaterial
+		if trail_mat != null:
+			trail_mat.color = definition.color
+			_trail.process_material = trail_mat
 		if definition.impact_sound != null:
 			_audio.stream = definition.impact_sound
 	if direction.length_squared() > 0.0:
@@ -70,8 +85,10 @@ func _physics_process(delta: float) -> void:
 	var result := space.intersect_ray(query)
 	if not result.is_empty():
 		global_position = result["position"]
+		_lay_trail(from, result["position"])
 		_on_hit(result["collider"], result["position"], result["normal"])
 		return
+	_lay_trail(from, to)
 	global_position = to
 	_travelled += step
 	if _travelled >= max_distance:
@@ -88,6 +105,26 @@ func _on_hit(collider: Node, position: Vector3, _normal: Vector3) -> void:
 	_finish(true)
 
 
+## Emits trail particles evenly spaced along the segment [param from] -> [param to].
+func _lay_trail(from: Vector3, to: Vector3) -> void:
+	var segment := to - from
+	var length := segment.length()
+	if length <= 0.0 or trail_spacing <= 0.0:
+		return
+	var dir := segment / length
+	var color := definition.color if definition != null else Color.WHITE
+	var flags := GPUParticles3D.EMIT_FLAG_POSITION | GPUParticles3D.EMIT_FLAG_VELOCITY | GPUParticles3D.EMIT_FLAG_COLOR
+	var d := trail_spacing - _trail_carry
+	while d <= length:
+		var pos := from + dir * d
+		var scatter := Vector3(_rng.randfn(0.0, 1.0), _rng.randfn(0.0, 1.0), _rng.randfn(0.0, 1.0))
+		scatter -= dir * scatter.dot(dir)  # keep the drift perpendicular to the flight path
+		var velocity := scatter.normalized() * _rng.randf_range(0.2, 1.0) * trail_scatter_speed
+		_trail.emit_particle(Transform3D(Basis.IDENTITY, pos), velocity, color, Color(), flags)
+		d += trail_spacing
+	_trail_carry = length - (d - trail_spacing)
+
+
 func _fizzle() -> void:
 	expired.emit()
 	_finish(false)
@@ -97,9 +134,9 @@ func _finish(impact: bool) -> void:
 	_finished = true
 	_mesh.visible = false
 	_light.visible = false
-	_trail.emitting = false
 	if impact:
 		_burst.emitting = true
 		if _audio.stream != null:
 			_audio.play()
-	get_tree().create_timer(burst_lifetime).timeout.connect(queue_free)
+	# Keep the node alive until both the burst and the last trail particles have faded.
+	get_tree().create_timer(maxf(burst_lifetime, _trail.lifetime)).timeout.connect(queue_free)

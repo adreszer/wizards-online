@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://spellproj0001"]
+[gd_scene load_steps=11 format=3 uid="uid://spellproj0001"]
 
 [ext_resource type="Script" path="res://gameplay/spells/spell_projectile.gd" id="1"]
 
@@ -20,6 +20,44 @@ height = 0.1
 shading_mode = 0
 vertex_color_use_as_albedo = true
 
+[sub_resource type="Gradient" id="TrailFade"]
+offsets = PackedFloat32Array(0, 0.15, 1)
+colors = PackedColorArray(1, 1, 1, 0.9, 1, 1, 1, 0.75, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="TrailFadeTex"]
+gradient = SubResource("TrailFade")
+
+[sub_resource type="ParticleProcessMaterial" id="TrailProcess"]
+gravity = Vector3(0, 0.35, 0)
+damping_min = 1.0
+damping_max = 2.0
+scale_min = 0.45
+scale_max = 1.0
+scale_over_velocity_min = 0.0
+scale_over_velocity_max = 0.0
+color_ramp = SubResource("TrailFadeTex")
+
+[sub_resource type="GradientTexture2D" id="SparkTex"]
+gradient = SubResource("TrailFade")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="StandardMaterial3D" id="SparkMat"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = SubResource("SparkTex")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="SparkMesh"]
+material = SubResource("SparkMat")
+size = Vector2(0.12, 0.12)
+
 [node name="SpellProjectile" type="Node3D"]
 script = ExtResource("1")
 
@@ -32,18 +70,14 @@ light_color = Color(0.65, 0.5, 1, 1)
 light_energy = 2.0
 omni_range = 4.0
 
-[node name="Trail" type="CPUParticles3D" parent="."]
-amount = 24
-lifetime = 0.4
-mesh = SubResource("ParticleMesh")
-direction = Vector3(0, 0, 1)
-spread = 20.0
-initial_velocity_min = 0.5
-initial_velocity_max = 1.5
-gravity = Vector3(0, 0, 0)
-scale_amount_min = 0.5
-scale_amount_max = 1.0
-color = Color(0.65, 0.5, 1, 1)
+[node name="Trail" type="GPUParticles3D" parent="."]
+top_level = true
+emitting = false
+amount = 320
+lifetime = 0.7
+local_coords = false
+process_material = SubResource("TrailProcess")
+draw_pass_1 = SubResource("SparkMesh")
 
 [node name="Burst" type="CPUParticles3D" parent="."]
 emitting = false
