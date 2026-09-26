@@ -132,7 +132,7 @@ block("Entrance_FrontLowFill", (0, 0.6, -18.5), (16.5, 1.2, T), WALL)
 inst("EntranceDoor", "res://objects/puzzles/magic_door.tscn", (0, 1.2, -18.5))
 inst("EntranceLever", "res://objects/interactables/lever.tscn", (5.5, 1.2, -16.5), rot_y=math.radians(90))
 inst("EntrancePlaque", "res://objects/interactables/plaque.tscn", (-7.6, 1.6, -2), rot_y=math.radians(90),
-     props={"text": '"Welcome, apprentice. The halls reward those who look closely. Purple glimmers answer to magic."'})
+     props={"text": '"PLAQUE_ENTRANCE"'})
 room_pillars("Entrance", -8, 8, -18.5, 3, 0.0)
 room_torches("Entrance", -8, 8, -18.5, 3, 0.0)
 ceiling("Entrance_Ceiling", -8, 8, -18.5, 3, WALL_H)
@@ -160,7 +160,7 @@ room_pillars("Secret", 3.5, 11.5, -36, -28, 1.2, mid=False)
 room_torches("Secret", 3.5, 11.5, -36, -28, 1.2, first=4.0)
 ceiling("Secret_Ceiling", 3.5, 11.5, -36, -28, 1.2 + WALL_H)
 inst("SecretPlaque", "res://objects/interactables/plaque.tscn", (11.1, 2.4, -32), rot_y=math.radians(-90),
-     props={"text": '"Well found. Curiosity is the first lesson."'})
+     props={"text": '"PLAQUE_SECRET"'})
 # ---------------- Training room z[-65,-45] x[-8,8]
 end_wall("Training_Back", -8, 8, -45, 1.2, (-1.6, 1.6), open_h=OPEN_H)
 floor("Training_Floor", -8, 8, -65, -45, 1.2, thick=2.2, tile="ornate")
@@ -169,7 +169,7 @@ end_wall("Training_Front", -8, 8, -65, 1.2, DOOR)
 inst("TrainingCheckpoint", "res://gameplay/checkpoints/checkpoint.tscn", (0, 1.2, -47.5))
 inst("SpellTome", "res://objects/interactables/spell_tome.tscn", (0, 1.2, -52))
 inst("TrainingPlaque", "res://objects/interactables/plaque.tscn", (-7.6, 2.4, -52), rot_y=math.radians(90),
-     props={"text": '"Wake both crystals to pass. Aim through the centre of your sight."'})
+     props={"text": '"PLAQUE_TRAINING"'})
 inst("TrainingSwitchA", "res://objects/puzzles/magic_switch.tscn", (-5.5, 1.2, -62))
 block("Training_Pedestal", (5.5, 2.2, -62), (1.6, 2.0, 1.6), ACCENT)
 inst("TrainingSwitchB", "res://objects/puzzles/magic_switch.tscn", (5.5, 3.2, -62))
@@ -187,7 +187,7 @@ inst("PuzzleCheckpoint", "res://gameplay/checkpoints/checkpoint.tscn", (0, 1.2, 
 block("Puzzle_SwitchShelf", (-6.5, 3.4, -76.5), (2.0, 0.4, 2.0), ACCENT)
 inst("PuzzleSwitch", "res://objects/puzzles/magic_switch.tscn", (-6.5, 3.6, -76.5))
 inst("PuzzlePlaque", "res://objects/interactables/plaque.tscn", (7.6, 2.4, -70), rot_y=math.radians(-90),
-     props={"text": '"What is out of reach may still be touched. Weight holds the far door."'})
+     props={"text": '"PLAQUE_PUZZLE"'})
 inst("PuzzleGate", "res://objects/puzzles/magic_door.tscn", (0, 1.2, -78))
 inst("PushableBlock", "res://objects/puzzles/pushable_block.tscn", (4, 1.95, -82))
 inst("PressurePlate", "res://objects/puzzles/pressure_plate.tscn", (-3.5, 1.2, -86))
@@ -218,7 +218,7 @@ room_pillars("Plat", -8, 8, -130, -90, 1.2, mid=False)
 room_torches("Plat", -8, 8, -130, -90, 1.2)
 ceiling("Plat_Ceiling", -8, 8, -130, -90, 1.2 + WALL_H)
 inst("PlatPlaque", "res://objects/interactables/plaque.tscn", (-7.6, 2.4, -92), rot_y=math.radians(90),
-     props={"text": '"Mind the drop. The crimson floor bites; leap it."'})
+     props={"text": '"PLAQUE_PLATFORMS"'})
 # ---------------- Final puzzle z[-155,-130]
 floor("Final_Floor", -8, 8, -155, -130, 1.2, thick=2.2)
 side_walls("Final", -8, 8, -155, -130, 1.2)
@@ -227,7 +227,7 @@ inst("FinalCheckpoint", "res://gameplay/checkpoints/checkpoint.tscn", (0, 1.2, -
 for i, (x, z, st) in enumerate([(-4, -140, 1), (0, -142, 2), (4, -140, 3)]):
     inst(f"Statue{i+1}", "res://objects/puzzles/rotating_statue.tscn", (x, 1.2, z), props={"initial_state": str(st)})
 inst("FinalPlaque", "res://objects/interactables/plaque.tscn", (-7.6, 2.4, -136), rot_y=math.radians(90),
-     props={"text": '"Turn every gaze upon the far door, then pull the lever."'})
+     props={"text": '"PLAQUE_FINAL"'})
 inst("FinalLever", "res://objects/interactables/lever.tscn", (6, 1.2, -151), rot_y=math.radians(-90), props={"one_shot": "false"})
 inst("FinalDoor", "res://objects/puzzles/magic_door.tscn", (0, 1.2, -155))
 inst("Fragment_Final", "res://gameplay/collectibles/collectible.tscn", (0, 1.2, -149))
@@ -244,7 +244,7 @@ room_pillars("Reward", -6, 6, -170, -155, 1.2, mid=False)
 room_torches("Reward", -6, 6, -170, -155, 1.2)
 ceiling("Reward_Ceiling", -6, 6, -170, -155, 1.2 + WALL_H)
 inst("RewardPlaque", "res://objects/interactables/plaque.tscn", (0, 2.4, -169.6),
-     props={"text": '"You have reached the end of the vertical slice. Thank you for playing."'})
+     props={"text": '"PLAQUE_REWARD"'})
 
 lights = []
 lights.append('[node name="SecretLight" type="OmniLight3D" parent="Lights"]\ntransform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 4, -32)\nlight_color = Color(0.7, 0.5, 1, 1)\nlight_energy = 1.4\nomni_range = 12.0\n')

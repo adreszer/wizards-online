@@ -120,6 +120,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Pillar (9,960 tris) and ceiling (9,547 tris) re-exported with normal maps; bounds unchanged, wrappers untouched. Whole modular set is now ≤10.2k tris per module
 - [x] Wall torch `wall-torch.glb` (10,048 tris) → `objects/environment/props/wall_torch.tscn`: origin at the mounting plate, flickering OmniLight at the flame; 44 torches placed on side walls between pillars, replacing the 15 floating omni lights
 - [x] Spell switch `spell-switch-crystal.glb` (9,225 tris) fitted into `magic_switch.tscn` at 1.7 m tall; on/off feedback is an additive glow sphere inside the crystal plus the light
+- [x] Rotating statue `statue_rotating.glb` (9,924 tris) fitted into `rotating_statue.tscn` at 2.8 m; the model's pointing arm faces +Z so the wrapper rotates it 180° (state 0 = arm toward the far door), pivot on the figure's axis
+- [x] Level generator emits plaque translation keys (regenerations had reverted the localization commit's key change)
 - [ ] Textures: floor2 ships four 4K maps, the others mix 2K/4K; downscale metallic-roughness maps to 2K when convenient
 - [x] Doorway module `doorway.glb` → `doorway.tscn` (4 × 4 × 0.35 m, pointed arch ≈3.8 m wide at the base, ≈3.8 m tall; jamb + arch box collision); replaces every greybox lintel (7 doors + training archway)
 - [x] `doorway.glb` remeshed: 9,003 tris + normal map, identical bounds
