@@ -196,6 +196,17 @@ func _test_camera() -> void:
 	yaw_before = rig.get_yaw()
 	rig._unhandled_input(_mouse_motion(Vector2(50, 0)))
 	t.check(is_equal_approx(rig.get_yaw(), yaw_before), "mouse motion without the right button leaves the camera alone")
+	var dist_before: float = rig.distance
+	rig.zoom_by(-rig.zoom_step)
+	await _wait(0.6)
+	t.check(rig.distance < dist_before - 0.3, "scroll wheel zooms the camera in (%.2f -> %.2f)" % [dist_before, rig.distance])
+	rig.zoom_by(-1000.0)
+	await _wait(0.6)
+	t.check(is_equal_approx(rig.distance, rig.min_distance), "zoom clamps at min distance")
+	rig.zoom_by(1000.0)
+	await _wait(0.8)
+	t.check(is_equal_approx(rig.distance, rig.max_distance), "zoom clamps at max distance")
+	rig.set_distance(dist_before)
 	await _clear([floor_body, wall])
 
 

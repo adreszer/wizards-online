@@ -18,6 +18,11 @@ extends Node3D
 @export var target: Node3D
 @export var target_height: float = 1.4
 @export var distance: float = 4.6
+@export var min_distance: float = 1.6
+@export var max_distance: float = 9.0
+## Distance change per mouse-wheel notch.
+@export var zoom_step: float = 0.6
+@export var zoom_smoothing: float = 14.0
 @export var shoulder_offset: float = 0.45
 @export_range(0.01, 1.0) var mouse_sensitivity: float = 0.14
 @export var min_pitch_degrees: float = -55.0
@@ -32,6 +37,7 @@ var pitch: float = 0.0
 var is_orbiting: bool = false
 
 var _orbit_cursor_position: Vector2 = Vector2.ZERO
+var _target_distance: float = 0.0
 
 @onready var _pitch_node: Node3D = $Pitch
 @onready var _spring_arm: SpringArm3D = $Pitch/SpringArm3D
@@ -41,6 +47,7 @@ var _orbit_cursor_position: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	top_level = true
 	pitch = deg_to_rad(initial_pitch_degrees)
+	_target_distance = distance
 	_spring_arm.spring_length = distance
 	_spring_arm.position.x = shoulder_offset
 	if target != null:
@@ -73,6 +80,12 @@ func get_aim_ray() -> Dictionary:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var button := event as InputEventMouseButton
+		if button.button_index == MOUSE_BUTTON_WHEEL_UP or button.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			if button.pressed and input_enabled and not get_tree().paused and not GameSession.ui_input_captured:
+				var direction := -1.0 if button.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0
+				zoom_by(direction * zoom_step * maxf(button.factor, 0.1))
+				get_viewport().set_input_as_handled()
+			return
 		if button.button_index != MOUSE_BUTTON_RIGHT:
 			return
 		if button.pressed:
@@ -119,6 +132,18 @@ func _notification(what: int) -> void:
 		stop_orbit()
 
 
+## Move the camera closer (negative) or further (positive); smoothed in _process.
+func zoom_by(amount: float) -> void:
+	_target_distance = clampf(_target_distance + amount, min_distance, max_distance)
+
+
+## Jump straight to a distance (tests / cinematic controllers).
+func set_distance(value: float) -> void:
+	_target_distance = clampf(value, min_distance, max_distance)
+	distance = _target_distance
+	_spring_arm.spring_length = distance
+
+
 ## Rotate by a mouse-style delta in pixels (also used by tests / future gamepad look).
 func apply_look_delta(relative: Vector2) -> void:
 	yaw -= deg_to_rad(relative.x * mouse_sensitivity)
@@ -136,6 +161,10 @@ func _process(delta: float) -> void:
 	var desired := target.global_position + Vector3.UP * target_height
 	var t := 1.0 - exp(-position_smoothing * delta)
 	global_position = global_position.lerp(desired, t)
+	if not is_equal_approx(distance, _target_distance):
+		distance = lerpf(distance, _target_distance, 1.0 - exp(-zoom_smoothing * delta))
+		if absf(distance - _target_distance) < 0.005:
+			distance = _target_distance
 	if _spring_arm.spring_length != distance:
 		_spring_arm.spring_length = distance
 
