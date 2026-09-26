@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3 uid="uid://itemtorch0001"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://objects/items/held_torch.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"torch"
+display_name = "ITEM_TORCH_NAME"
+description = "ITEM_TORCH_DESC"
+max_stack = 1
+holdable = true
+held_scene = ExtResource("2")
+burn_seconds = 0.0

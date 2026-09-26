@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://world0000001"]
+[gd_scene load_steps=9 format=3 uid="uid://world0000001"]
 
 [ext_resource type="Script" path="res://core/world.gd" id="1"]
 [ext_resource type="PackedScene" path="res://levels/mvp/mvp_level.tscn" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://ui/chat/chat_panel.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://ui/menus/pause_menu.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://ui/debug/debug_overlay.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://ui/inventory/inventory_panel.tscn" id="9"]
 
 [node name="World" type="Node"]
 script = ExtResource("1")
@@ -24,6 +25,8 @@ players_root = NodePath("../Players")
 [node name="HUD" parent="." instance=ExtResource("5")]
 
 [node name="ChatPanel" parent="." instance=ExtResource("6")]
+
+[node name="InventoryPanel" parent="." instance=ExtResource("9")]
 
 [node name="PauseMenu" parent="." instance=ExtResource("7")]
 

@@ -136,3 +136,8 @@ surface_material_override/0 = SubResource("Mat_Glow")
 
 [node name="CastOrigin" type="Marker3D" parent="Wand"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0.03)
+
+[node name="OffHand" type="BoneAttachment3D" parent="."]
+bone_name = "mixamorig_LeftHand"
+use_external_skeleton = true
+external_skeleton = NodePath("../Model/target_character/Skeleton3D")

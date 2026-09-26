@@ -16,6 +16,10 @@ signal player_joined(sid: String, display_name: String)
 signal player_left(sid: String, display_name: String)
 signal player_state_received(sid: String, state: Dictionary)
 signal spell_cast_received(sid: String, cast: Dictionary)
+## A remote player took an item into their hand ("" = put it away). Validated by the server.
+signal held_item_received(sid: String, item_id: String)
+## The server sent the local player's inventory (on join and reconnect).
+signal inventory_received(state: Dictionary)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal system_message(text: String)
 
@@ -42,6 +46,8 @@ func _ready() -> void:
 	state_synchronizer.player_left.connect(_on_player_left)
 	state_synchronizer.player_state_received.connect(player_state_received.emit)
 	state_synchronizer.spell_cast_received.connect(spell_cast_received.emit)
+	state_synchronizer.held_item_received.connect(held_item_received.emit)
+	state_synchronizer.inventory_received.connect(inventory_received.emit)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 
@@ -60,6 +66,12 @@ func get_player_count() -> int:
 
 func get_players() -> Dictionary:
 	return state_synchronizer.players
+
+
+## The local player's server-side inventory ({items, held}); empty when offline
+## or not received yet.
+func get_local_inventory() -> Dictionary:
+	return state_synchronizer.local_inventory if is_online() else {}
 
 
 ## Full connect flow: authenticate → socket → join world match → join chat.
@@ -114,6 +126,11 @@ func send_player_state(state: Dictionary) -> void:
 func send_spell_cast(cast: Dictionary) -> void:
 	if is_online():
 		state_synchronizer.send_spell_cast(cast)
+
+
+func send_held_item(item_id: String) -> void:
+	if is_online():
+		state_synchronizer.send_held_item(item_id)
 
 
 func send_chat(text: String) -> bool:

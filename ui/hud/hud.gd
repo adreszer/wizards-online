@@ -8,6 +8,7 @@ extends CanvasLayer
 @onready var _fragments_label: Label = %FragmentsLabel
 @onready var _spell_label: Label = %SpellLabel
 @onready var _cooldown_bar: ProgressBar = %CooldownBar
+@onready var _held_label: Label = %HeldLabel
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _notification_label: Label = %NotificationLabel
 @onready var _status_label: Label = %StatusLabel
@@ -17,6 +18,7 @@ const FRAGMENT_ID := &"arcane_fragment"
 
 var _player: Node
 var _caster: SpellCaster
+var _inventory: Inventory
 var _notification_timer: float = 0.0
 var _focused: Interactable
 var _status: int = NetworkManager.Status.OFFLINE
@@ -35,6 +37,7 @@ func _ready() -> void:
 	_update_fragments()
 	_on_status_changed(NetworkManager.status, "")
 	_on_spell_learned(null)
+	_on_held_item_changed(null)
 
 
 func _process(delta: float) -> void:
@@ -57,6 +60,9 @@ func _bind_player(player: Node) -> void:
 	_on_spell_learned(_caster.equipped_spell)
 	var interaction: InteractionController = player.interaction_controller
 	interaction.focus_changed.connect(_on_focus_changed)
+	_inventory = player.inventory
+	_inventory.held_item_changed.connect(_on_held_item_changed)
+	_on_held_item_changed(_inventory.held_item)
 
 
 func _on_health_changed(current: int, maximum: int) -> void:
@@ -86,6 +92,13 @@ func _on_spell_learned(definition: Resource) -> void:
 		_spell_label.text = tr("HUD_SPELL") % tr(definition.display_name)
 		_cooldown_bar.visible = true
 		_crosshair.visible = true
+
+
+func _on_held_item_changed(definition: ItemDefinition) -> void:
+	if definition == null:
+		_held_label.text = tr("HUD_HELD_NONE")
+	else:
+		_held_label.text = tr("HUD_HELD") % tr(definition.display_name)
 
 
 func _on_focus_changed(interactable: Interactable) -> void:
@@ -122,6 +135,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_update_fragments()
 		_on_spell_learned(_caster.equipped_spell if _caster != null else null)
+		_on_held_item_changed(_inventory.held_item if _inventory != null else null)
 		if is_instance_valid(_focused):
 			_on_focus_changed(_focused)
 		_on_status_changed(_status, _status_message)

@@ -2,7 +2,8 @@ class_name CharacterRegistry
 extends RefCounted
 ## Playable character bodies. Ids travel over the network (join metadata /
 ## roster), so keep them short and stable. Scenes must expose an
-## `AnimationController` child and a `CastOrigin` marker somewhere inside.
+## `AnimationController` child, a `CastOrigin` marker and an `OffHand` socket
+## (held items) somewhere inside.
 
 const DEFAULT := "apprentice_m"
 

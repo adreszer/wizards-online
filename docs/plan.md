@@ -13,6 +13,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - **characters/player/** — composed player: movement, input intent, camera rig, visual + animation controller, spell caster, interaction controller, health, respawn, network synchronizer, nameplate. Local-only nodes live under `LocalPlayer`, removed for remote players.
 - **gameplay/** — reusable components: spells (definition/caster/projectile/receiver/effect), interaction (Interactable/InteractionController), collectibles, health, checkpoints/hazards.
 - **objects/** — level mechanics built by composition (SpellReceiver/Interactable children): switch, door, pushable block, pressure plate, rotating statue, moving platform, secret wall, lever, plaque, spell tome, greybox blocks.
+- **gameplay/inventory/** — `ItemDefinition`, `ItemRegistry`, `Inventory` (player component) and `HeldItemMount`; the first item is an everburning torch the player holds to light the surroundings.
 - **multiplayer/** — `NetworkManager` autoload is the only networking boundary: authentication, world session (Nakama authoritative match), state synchronizer, chat manager. Gameplay never calls Nakama directly.
 - **nakama/** — Lua runtime module: one persistent "world" match that relays presence/state/spell events and owns the player roster.
 - **ui/** — main menu, HUD, chat panel, pause menu, F3 debug overlay.
@@ -136,6 +137,16 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Steam: wire `Localization.steam_language()` to `Steam.getCurrentGameLanguage()` when GodotSteam is added; list PL + EN on the store page
 - [ ] Native-speaker pass over the Polish copy before release; add a dedicated UI font and verify diacritics in every label (default Godot font covers Latin Extended-A)
 
+### Milestone 13 — Inventory and carried light (first step of the lighting overhaul)
+- [x] `ItemDefinition` resource + `ItemRegistry` (id → `resources/items/<id>.tres`, sanitized ids, starting kit)
+- [x] `Inventory` player component (slots, stacking, hold/release, state serialization, meta registration) + `HeldItemMount` (held scene under the body's `OffHand` socket; both bodies and the build tool ship the socket)
+- [x] Torch item: never expires (`burn_seconds = 0`), `objects/items/held_torch.tscn` with a flickering OmniLight (9 m)
+- [x] Satchel UI (`Tab`, joypad Back): lists items, click to hold / put away; HUD "In hand" line; spawn hint
+- [x] Server-owned inventories: Nakama storage `inventory/items` per user, starting kit created on first join, `OP_INVENTORY` to the joiner, `OP_HELD_ITEM` validated (owned + holdable) and relayed, `held` in roster entries; offline uses the same starting kit locally
+- [x] Headless tests: inventory data/visuals/panel (run_tests), held torch replication + server-issued inventory (two-client test)
+- [ ] Lighting overhaul proper: dim ambient/sun so only placed and carried light sources light the castle; add light sources to every area first
+- [ ] Ways to obtain items in the world / from professors (server-granted, like spells), consumable torches that burn down (`burn_seconds`)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
@@ -202,7 +213,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (85 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (130 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
@@ -216,7 +227,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Collectibles | counter, no double collect | [x] headless test pass |
 | Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
 | Localization | pl/en load, all keys translated, fallback, name sanitizing | [x] headless test pass; in-game visual check of Polish text (menu, HUD, plaques) pending |
-| Multiplayer | two clients connect, see each other, movement/jump/spell replicate | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 20 + 14 checks pass |
+| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 24 + 17 checks pass |
 | Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Offline | playable with backend stopped | [x] `run_offline_fallback_test` with backend stopped: readable error, offline world playable |

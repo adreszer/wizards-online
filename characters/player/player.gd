@@ -4,7 +4,8 @@ extends CharacterBody3D
 ##
 ## This script only wires components together. Behaviour lives in:
 ## PlayerInput, PlayerMovement, CameraRig, AnimationController, SpellCaster,
-## InteractionController, Health, RespawnHandler, NetworkSynchronizer, Nameplate.
+## InteractionController, Health, RespawnHandler, NetworkSynchronizer, Nameplate,
+## Inventory, HeldItemMount.
 ## Everything under `LocalPlayer` exists only for the locally controlled
 ## instance and is freed for remote players.
 
@@ -27,12 +28,16 @@ const LAYER_WORLD := 1 << 0
 @onready var respawn_handler: RespawnHandler = $RespawnHandler
 @onready var synchronizer: NetworkSynchronizer = $NetworkSynchronizer
 @onready var nameplate: Nameplate = $Nameplate
+@onready var inventory: Inventory = $Inventory
+@onready var held_item_mount: HeldItemMount = $HeldItemMount
 @onready var local_root: Node = $LocalPlayer
 @onready var player_input: PlayerInput = $LocalPlayer/PlayerInput
 @onready var camera_rig: CameraRig = $LocalPlayer/CameraRig
 @onready var interaction_controller: InteractionController = $LocalPlayer/InteractionController
 
 var cast_origin: Node3D
+## Off-hand socket the held item (torch…) is parented to.
+var off_hand: Node3D
 
 
 func _ready() -> void:
@@ -40,6 +45,9 @@ func _ready() -> void:
 	set_meta("player", self)
 	_apply_character()
 	cast_origin = visual.find_child("CastOrigin", true, false) as Node3D
+	off_hand = _find_off_hand()
+	held_item_mount.setup(off_hand)
+	inventory.held_item_changed.connect(held_item_mount.show_item)
 	nameplate.set_display_name(display_name)
 	if is_local:
 		_setup_local()
@@ -81,6 +89,23 @@ func _setup_local() -> void:
 	synchronizer.setup_local(self)
 	camera_rig.activate()
 	GameEvents.local_player_spawned.emit(self)
+
+
+## Every registered body ships an `OffHand` socket; a body without one gets a
+## marker at hip height so held items never silently disappear.
+func _find_off_hand() -> Node3D:
+	var socket := visual.find_child("OffHand", true, false) as Node3D
+	if socket == null:
+		socket = Marker3D.new()
+		socket.name = "OffHand"
+		visual.add_child(socket)
+		socket.position = Vector3(-0.35, 1.1, -0.1)
+	return socket
+
+
+## Remote players: the held item id arrives from the server, already validated.
+func set_remote_held_item(item_id: String) -> void:
+	held_item_mount.show_item(ItemRegistry.load_definition(item_id))
 
 
 func _setup_remote() -> void:

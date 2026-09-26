@@ -8,7 +8,7 @@ MENU_PORT,Nakama port,Port Nakama
 MENU_PLAY_OFFLINE,Play OFFLINE,Graj OFFLINE
 MENU_PLAY_ONLINE,Play ONLINE,Graj ONLINE
 MENU_QUIT,Quit,Wyjdź
-MENU_CONTROLS,WASD move · Shift run · Space jump · Mouse look · LMB cast · E interact · Enter chat · F1 free cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · Mysz rozglądanie · LPM czar · E interakcja · Enter czat · F1 uwolnij kursor · F3 debug · Esc pauza
+MENU_CONTROLS,WASD move · Shift run · Space jump · Mouse look · LMB cast · E interact · Tab satchel · Enter chat · F1 free cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · Mysz rozglądanie · LPM czar · E interakcja · Tab sakwa · Enter czat · F1 uwolnij kursor · F3 debug · Esc pauza
 MENU_CONNECTING,Connecting…,Łączenie…
 MENU_CONNECT_FAILED_HINT,"Start the backend with `docker compose up -d`, or play OFFLINE.",Uruchom backend poleceniem `docker compose up -d` albo graj OFFLINE.
 PAUSE_TITLE,Paused,Pauza
@@ -75,3 +75,15 @@ MENU_CHARACTER,Character,Postać
 CHAR_APPRENTICE_M,Apprentice (male),Uczeń
 CHAR_APPRENTICE_F,Apprentice (female),Uczennica
 CHAR_PLACEHOLDER,Placeholder capsule,Kapsuła zastępcza
+HUD_HELD,In hand: %s,W dłoni: %s
+HUD_HELD_NONE,In hand: —,W dłoni: —
+INVENTORY_TITLE,Satchel,Sakwa
+INVENTORY_EMPTY,Your satchel is empty.,Twoja sakwa jest pusta.
+INVENTORY_HINT,Click an item to see what it does.,"Kliknij przedmiot, aby zobaczyć, do czego służy."
+INVENTORY_CLICK_TO_HOLD,Click to take it in hand or put it away.,"Kliknij, aby wziąć do ręki lub schować."
+INVENTORY_HELD_MARK,(in hand),(w dłoni)
+INVENTORY_CLOSE_HINT,Tab or Esc closes,Tab lub Esc zamyka
+NOTIFY_INVENTORY_HINT,You carry a torch. Press Tab to open your satchel and take it in hand.,"Masz przy sobie pochodnię. Naciśnij Tab, aby otworzyć sakwę i wziąć ją do ręki."
+ITEM_DEFAULT_NAME,Item,Przedmiot
+ITEM_TORCH_NAME,Torch,Pochodnia
+ITEM_TORCH_DESC,An everburning torch. Held in hand it lights the halls around you and never goes out.,"Wieczna pochodnia. Trzymana w dłoni oświetla sale wokół ciebie i nigdy nie gaśnie."

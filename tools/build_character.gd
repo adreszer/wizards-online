@@ -177,5 +177,7 @@ func _scene_text(id: String, glb: String, clips: Dictionary, offsets: Array, ske
 	s += '[node name="Wand" type="BoneAttachment3D" parent="."]\nbone_name = "mixamorig_RightHand"\nuse_external_skeleton = true\nexternal_skeleton = NodePath("../Model/%s")\n\n' % skeleton_path
 	s += '[node name="WandMesh" type="MeshInstance3D" parent="Wand"]\ntransform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0.03)\nmesh = SubResource("Mesh_Wand")\nsurface_material_override/0 = SubResource("Mat_Wand")\n\n'
 	s += '[node name="Glow" type="MeshInstance3D" parent="Wand"]\ntransform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.44, 0.03)\nvisible = false\nmesh = SubResource("Mesh_Glow")\nsurface_material_override/0 = SubResource("Mat_Glow")\n\n'
-	s += '[node name="CastOrigin" type="Marker3D" parent="Wand"]\ntransform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0.03)\n'
+	s += '[node name="CastOrigin" type="Marker3D" parent="Wand"]\ntransform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0.03)\n\n'
+	# Off-hand socket for held items (torch…); see HeldItemMount.
+	s += '[node name="OffHand" type="BoneAttachment3D" parent="."]\nbone_name = "mixamorig_LeftHand"\nuse_external_skeleton = true\nexternal_skeleton = NodePath("../Model/%s")\n' % skeleton_path
 	return s

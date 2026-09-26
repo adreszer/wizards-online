@@ -490,6 +490,9 @@ surface_material_override/0 = SubResource("Mat_Glow")
 [node name="CastOrigin" type="Marker3D" parent="Arm/Wand"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
 
+[node name="OffHand" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38, 1.05, -0.1)
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 "": SubResource("AnimLib")

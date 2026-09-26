@@ -27,7 +27,7 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if get_tree().paused:
 		return
-	if not is_open and event.is_action_pressed("chat") and GameSession.is_online():
+	if not is_open and event.is_action_pressed("chat") and GameSession.is_online() and not GameSession.ui_input_captured:
 		open()
 		get_viewport().set_input_as_handled()
 

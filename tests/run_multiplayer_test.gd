@@ -44,6 +44,9 @@ func _run() -> void:
 	await _wait(0.5)
 	var spawner: PlayerSpawner = world.get_node("PlayerSpawner")
 	t.check(spawner.local_player != null and spawner.local_player.is_local, "local player spawned")
+	var inv: Inventory = spawner.local_player.inventory
+	t.check(not NetworkManager.get_local_inventory().is_empty(), "server sent the inventory on join")
+	t.check(inv.has(&"torch"), "local inventory holds the server-issued torch")
 	if role == "b":
 		await _run_actor(spawner)
 	else:
@@ -89,7 +92,8 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(not remote.is_local and remote.display_name == "ClientB", "remote player is not local and has B's name (%s)" % remote.display_name)
 	t.check(remote.get_node_or_null("LocalPlayer") == null, "remote player has no LocalPlayer subtree (no camera/input)")
 	t.check(joins.has("ClientB"), "join event received for ClientB")
-	t.check(system_lines.any(func(l: String) -> bool: return l.begins_with("ClientB joined")), "join system message shown")
+	var joined_line: String = tr("CHAT_PLAYER_JOINED") % "ClientB"
+	t.check(system_lines.has(joined_line), "join system message shown (%s)" % joined_line)
 	t.check(NetworkManager.get_player_count() == 2, "player count is 2")
 
 	var start_pos: Vector3 = remote.global_position
@@ -119,6 +123,9 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(states_seen.has("walk") or states_seen.has("run"), "remote animation state shows walking/running (%s)" % str(states_seen.keys()))
 	t.check(states_seen.has("jump") or states_seen.has("fall") or max_y > start_pos.y + 0.5, "remote jump replicates (max y %.2f)" % max_y)
 	t.check(casts_seen > 0, "remote spell cast event received")
+	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.held_item_mount.is_holding(), 10.0)
+	t.check(ok, "remote player's torch shows up when B holds it")
+	t.check(NetworkManager.get_players().values().any(func(e: Dictionary) -> bool: return e.get("held", "") == "torch"), "roster tracks B's held item")
 	t.check(chat_lines.any(func(l: String) -> bool: return l == "[ClientB] hello from B"), "chat message from B received: %s" % str(chat_lines))
 	NetworkManager.send_chat("hello from A")
 	t.check(NetworkManager.get_ping_ms() >= 0, "ping measured (%d ms)" % NetworkManager.get_ping_ms())
@@ -140,6 +147,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(ok, "sees ClientA already in the world")
 	if ok:
 		t.check(_remote(spawner).display_name == "ClientA", "remote player named ClientA")
+	t.check(player.inventory.hold_id(&"torch"), "holds the torch (sent to the server)")
 	player.movement.set_external_move(Vector3(0, 0, -1), true)
 	await _wait(1.5)
 	player.movement.request_jump()

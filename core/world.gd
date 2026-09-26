@@ -12,8 +12,9 @@ signal return_to_menu_requested()
 func _ready() -> void:
 	_pause_menu.return_to_menu_requested.connect(return_to_menu_requested.emit)
 	_spawner.spawn_point = _level.get_node("StartPoint")
-	_spawner.spawn_local(GameSession.display_name, NetworkManager.local_user_id)
+	var player: Node = _spawner.spawn_local(GameSession.display_name, NetworkManager.local_user_id)
 	GameEvents.level_completed.connect(_on_level_completed)
+	_show_satchel_hint(player)
 
 
 ## F1: free / recapture the mouse without pausing (screenshots, window juggling).
@@ -24,6 +25,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		get_viewport().set_input_as_handled()
+
+
+## First-time nudge toward the torch (the server inventory may arrive a moment
+## after the spawn, hence the short delay).
+func _show_satchel_hint(player: Node) -> void:
+	await get_tree().create_timer(1.5).timeout
+	if not is_instance_valid(player) or not is_inside_tree():
+		return
+	var inventory: Inventory = player.inventory
+	if inventory.held_item == null and not inventory.is_empty():
+		GameEvents.notification_requested.emit(tr("NOTIFY_INVENTORY_HINT"), 8.0)
 
 
 func _on_level_completed() -> void:

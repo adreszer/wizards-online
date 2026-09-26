@@ -38,6 +38,8 @@ Player (CharacterBody3D, player.gd — wiring only)
 ├── Health
 ├── RespawnHandler      checkpoint transform, death/fall respawn
 ├── NetworkSynchronizer local: sample+send 12 Hz · remote: buffer+interpolate
+├── Inventory           items carried + the one held in the off hand (data + signals)
+├── HeldItemMount       instantiates the held item's scene under the body's `OffHand` socket
 ├── Nameplate           Label3D (hidden for local)
 └── LocalPlayer (Node3D) — freed for remote players
     ├── PlayerInput            InputMap → intent (cleared while UI captures input)
@@ -67,6 +69,20 @@ SpellEffect (RefCounted)    definition, effect_type, caster, caster_id, hit posi
 
 Aiming: the camera ray from the screen centre is intersected with the world; a cone (`aim_assist_angle_degrees`) around it prefers the nearest `SpellReceiver` in range with line of sight from the wand. The projectile is fired from the wand tip toward the resolved point. Adding a second spell = a new `.tres` (+ optionally a new projectile scene); `SpellCaster` is untouched. Objects react by connecting to their receiver's signal (`MagicSwitch`, `PushableBlock`, `RotatingStatue`, `SecretWall`), never by checking the spell's name.
 
+## Inventory and held items
+
+```
+ItemDefinition (Resource)   id, name/description keys, icon, max_stack, holdable, held_scene, burn_seconds (0 = never expires)
+ItemRegistry (static)       id → resources/items/<id>.tres, sanitize(), default_state() (starting kit: one torch)
+Inventory (Node)            slots [{def, count}], held_item; add/remove/hold/release, to_state/load_state; meta "inventory"
+HeldItemMount (Node)        show_item(def): frees the previous held scene, instantiates def.held_scene under the OffHand socket
+HeldTorch (objects/items)   handle mesh + flickering OmniLight; the first light source a player can carry
+```
+
+- Every character body exposes an `OffHand` socket (a `BoneAttachment3D` on the left hand for rigged bodies, a `Marker3D` on the placeholder; `tools/build_character.gd` emits it). `Player` falls back to a generated marker if a body lacks one.
+- Local players change what they hold through their `Inventory` (the Tab satchel panel calls `toggle_hold`); the `held_item_changed` signal drives both `HeldItemMount` and, online, `NetworkManager.send_held_item`. Remote players skip the inventory: the server-validated id goes straight to `Player.set_remote_held_item`.
+- **Lighting direction.** The torch is the first step toward a world lit only by light sources: carried lights are plain children of a held scene, so no lighting code needs to know about items. Ambient light and the sun will be dimmed once every area has placed light sources.
+
 ## Level mechanics
 
 All in `objects/`: `MagicSwitch`, `MagicDoor` (AnimatableBody3D panel), `PushableBlock` (RigidBody3D), `PressurePlate` (Area3D), `RotatingStatue` + `StatuePuzzle`, `MovingPlatform` (AnimatableBody3D, `sync_to_physics`, waypoints, loop modes, activation), `SecretWall`, `Lever`, `Plaque`, `SpellTome`. Objects expose signals/methods; `levels/mvp/mvp_level.gd` holds only the level-specific wiring (e.g. "both switches open the door"). Greybox geometry is `GreyboxBlock` (`@tool`, size-driven mesh + collision). Rooms are 8 m tall: floors and ceilings are `ModularFloor` (ceilings use the `ceiling_tile` wrapper), pillars are `pillar.tscn` instances placed by the generator at corners and every 8 m, and walls are two stacked rows of `ModularWallRun`. Floors are `ModularFloor` (tiles the `floor_tile` wrapper over a rectangle, top at the node origin) and walls are `ModularWallRun` (`objects/environment/modular/`), a `@tool` node that tiles the `wall_plain` wrapper along its length with an even X stretch so runs end exactly on room boundaries; the level itself is produced by `tools/generate_level.py`, so geometry changes go in the generator or in the wrapper scenes.
@@ -77,11 +93,11 @@ All in `objects/`: `MagicSwitch`, `MagicDoor` (AnimatableBody3D panel), `Pushabl
 NetworkManager (autoload)
 ├── NakamaAuthentication   device auth (+ --instance suffix), display name in session vars
 ├── WorldSession           socket, "join_world" RPC → join authoritative match, decodes op codes
-├── StateSynchronizer      roster (sid → name), ping, send/receive state & casts
+├── StateSynchronizer      roster (sid → name, char, held), local inventory, ping, send/receive state, casts & held items
 └── ChatManager            room channel "world", sanitization, sender-name lookup via roster
 ```
 
-Server (`nakama/modules/`): `world.lua` registers the `join_world` RPC (finds the match by label, creates it if missing) and a `ChannelMessageSend` before-hook that rejects empty/oversized chat. `world_match.lua` is the authoritative match handler: it owns the roster (names from join metadata, sanitized), sends the roster to joiners, broadcasts join/leave, relays state and spell casts to everyone else, and echoes pings.
+Server (`nakama/modules/`): `world.lua` registers the `join_world` RPC (finds the match by label, creates it if missing) and a `ChannelMessageSend` before-hook that rejects empty/oversized chat. `world_match.lua` is the authoritative match handler: it owns the roster (names from join metadata, sanitized), sends the roster to joiners, broadcasts join/leave, relays state and spell casts to everyone else, and echoes pings. It also owns **inventories**: on join it reads the user's `inventory/items` storage object (creating the starting kit, one torch, on first join), sends it to the joining client (`OP_INVENTORY`) and keeps it in match state; a client's `OP_HELD_ITEM` is accepted only for an owned, holdable item, persisted, and then broadcast to the others. Roster entries carry `held` so late joiners see what everyone holds.
 
 Op codes are defined once in `multiplayer/network_protocol.gd` and mirrored in the Lua file.
 
@@ -92,6 +108,7 @@ Op codes are defined once in `multiplayer/network_protocol.gd` and mirrored in t
 | Player identity, display name, roster, join/leave | **Server** | Clients never trust another client's claims about who is present. |
 | Player transform, velocity, movement state | Client-authoritative (relayed by the server) | The match handler is the place to add rate limits / sanity checks later. |
 | Spell cast events | Client-authoritative, cosmetic on other clients | Carries `caster_id`; a future `target` field + server validation enables duels. |
+| Inventory contents, held item | **Server** | Nakama storage (`inventory` / `items`, per user). Clients only request `hold`; the server validates ownership and relays. Offline mode uses the same starting kit locally. |
 | Puzzle / door / collectible state | **Local only** | Documented MVP limitation; receivers are signal-driven so a server trigger can call the same handlers. |
 | Chat | Server-validated (length), client-rendered | Names resolved through the server roster. |
 
@@ -100,6 +117,7 @@ Op codes are defined once in `multiplayer/network_protocol.gd` and mirrored in t
 - Local players sample at `game/network/state_send_rate` (12 Hz) and send `{p, y, v, s, g}` as JSON (position, yaw, velocity, state name, grounded).
 - Remote players keep a snapshot buffer and render 120 ms behind the newest snapshot, interpolating between surrounding snapshots and extrapolating briefly on velocity if starved. Large jumps (respawn) snap.
 - Animation on remote players is driven by the replicated movement state name; casts trigger the same `play_cast()` and a cosmetic projectile.
+- Held items are events, not part of the 12 Hz snapshot: `OP_HELD_ITEM {id}` client → server (validated) → `{sid, id}` to the others; the current value also rides in roster / join entries.
 - Two sessions of the same account are distinct players because everything is keyed by Nakama **session id**, not user id.
 
 ## Input
@@ -118,16 +136,16 @@ assets/audio                   generated placeholder tones
 assets/models                  source models (GLB) as exported by the art pipeline; never edited here
 characters/player, components  player scene + components
 core/                          game root, world, autoloads, Localization helper
-gameplay/{spells,interaction,collectibles,health,checkpoints}
+gameplay/{spells,interaction,collectibles,health,checkpoints,inventory}
 levels/mvp                     greybox level + wiring script
 levels/dev                     development-only scenes (asset validation)
 localization/                  translations.csv (keys,en,pl) → generated .translation files
 multiplayer/{authentication,synchronization,chat} + network_manager, world_session, player_spawner
 nakama/                        local.yml + Lua modules (mounted into the container)
-objects/{greybox,puzzles,platforms,interactables}
+objects/{greybox,puzzles,platforms,interactables,items}   items = held-item scenes (torch)
 objects/environment            wrapper scenes for imported environment modules (transform, collision, layers)
 tools/                         headless dev utilities (model inspection, screenshot capture)
-resources/{spells,collectibles} data resources
+resources/{spells,collectibles,items} data resources
 tests/                         headless test runners
-ui/{menus,hud,chat,debug}
+ui/{menus,hud,chat,inventory,debug}
 ```

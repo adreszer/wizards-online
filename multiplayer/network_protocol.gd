@@ -7,12 +7,17 @@ extends RefCounted
 const OP_STATE := 1
 ## client → server → all other players: spell cast event
 const OP_SPELL_CAST := 2
-## server → joining player: full roster {players: [{sid, uid, name}], self_sid}
+## client → server (validated against the server-side inventory) → all other
+## players: {id} the sender now holds ("" = hands free)
+const OP_HELD_ITEM := 3
+## server → joining player: full roster {players: [{sid, uid, name, char, held}], self_sid}
 const OP_ROSTER := 10
 ## server → others: {sid, uid, name}
 const OP_PLAYER_JOINED := 11
 ## server → others: {sid, uid, name}
 const OP_PLAYER_LEFT := 12
+## server → joining player: its own inventory {items: [{id, count}], held}
+const OP_INVENTORY := 13
 ## client → server → same client: {t: ms} (round-trip latency probe)
 const OP_PING := 20
 

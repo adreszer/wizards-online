@@ -32,6 +32,8 @@ func setup_local(p_player: Node) -> void:
 		return
 	var caster: SpellCaster = player.spell_caster
 	caster.spell_cast.connect(_on_local_spell_cast)
+	var inventory: Inventory = player.inventory
+	inventory.held_item_changed.connect(_on_local_held_item_changed)
 
 
 func setup_remote(p_player: Node) -> void:
@@ -76,6 +78,10 @@ func _on_local_spell_cast(definition: SpellDefinition, origin: Vector3, directio
 	})
 
 
+func _on_local_held_item_changed(definition: ItemDefinition) -> void:
+	NetworkManager.send_held_item(String(definition.id) if definition != null else "")
+
+
 # --- Remote --------------------------------------------------------------------
 
 ## Called by the PlayerSpawner when a state message arrives for this player.
@@ -107,6 +113,10 @@ func receive_state(state: Dictionary) -> void:
 func receive_spell_cast(definition: SpellDefinition, origin: Vector3, direction: Vector3) -> void:
 	var caster: SpellCaster = player.spell_caster
 	caster.cast_remote(definition, origin, direction)
+
+
+func receive_held_item(item_id: String) -> void:
+	player.set_remote_held_item(item_id)
 
 
 func _tick_remote(delta: float) -> void:

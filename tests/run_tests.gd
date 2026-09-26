@@ -12,6 +12,8 @@ const PLATFORM_SCENE := preload("res://objects/platforms/moving_platform.tscn")
 const CHECKPOINT_SCENE := preload("res://gameplay/checkpoints/checkpoint.tscn")
 const LEVEL_SCENE := preload("res://levels/mvp/mvp_level.tscn")
 const ARCANE_PULSE := preload("res://resources/spells/arcane_pulse.tres")
+const TORCH := preload("res://resources/items/torch.tres")
+const INVENTORY_PANEL_SCENE := preload("res://ui/inventory/inventory_panel.tscn")
 const TestHelpers := preload("res://tests/test_helpers.gd")
 
 var t := TestHelpers.new()
@@ -28,6 +30,7 @@ func _run() -> void:
 	await _test_health_and_checkpoints()
 	await _test_collectibles()
 	await _test_spell()
+	await _test_inventory()
 	await _test_interaction()
 	await _test_moving_platform()
 	await _test_level_wiring()
@@ -303,6 +306,95 @@ func _test_spell() -> void:
 	await _clear([floor_body, switch2, switch3, far, aim])
 
 
+# --- Inventory -----------------------------------------------------------------
+
+func _test_inventory() -> void:
+	t.section("Inventory")
+	# Registry
+	t.check(ItemRegistry.exists("torch") and ItemRegistry.load_definition("torch") == TORCH, "registry resolves torch by id")
+	t.check(ItemRegistry.sanitize("nope") == "" and ItemRegistry.sanitize("../torch") == "" and ItemRegistry.sanitize("torch") == "torch", "registry rejects unknown / unsafe ids")
+	t.check(TORCH.holdable and TORCH.held_scene != null and TORCH.burn_seconds == 0.0, "torch is holdable, has a held scene and never expires")
+	var state := ItemRegistry.default_state()
+	t.check(state["items"].size() == 1 and state["items"][0]["id"] == "torch", "starting kit is one torch")
+
+	# Data component
+	var inv := Inventory.new()
+	add_child(inv)
+	var held_events: Array = []
+	inv.held_item_changed.connect(func(d: ItemDefinition) -> void: held_events.append(d))
+	t.check(inv.is_empty() and not inv.hold(TORCH), "cannot hold an item you do not own")
+	t.check(inv.add(TORCH, 1) == 1 and inv.has(&"torch") and inv.count_of(&"torch") == 1, "add + count")
+	inv.add(TORCH, 2)
+	t.check(inv.count_of(&"torch") == 3 and inv.slots.size() == 3, "non-stackable items take one slot each")
+	t.check(inv.hold(TORCH) and inv.held_item == TORCH and held_events.size() == 1, "hold emits held_item_changed")
+	inv.hold(TORCH)
+	t.check(held_events.size() == 1, "holding the same item again is a no-op")
+	t.check(inv.remove(&"torch", 2) == 2 and inv.count_of(&"torch") == 1 and inv.held_item == TORCH, "removing spare copies keeps the held one")
+	t.check(inv.remove(&"torch", 5) == 1 and inv.is_empty() and inv.held_item == null and held_events.size() == 2, "removing the last held item frees the hands")
+	inv.load_state({"items": [{"id": "torch", "count": 1}, {"id": "bogus", "count": 3}], "held": "torch"})
+	t.check(inv.slots.size() == 1 and inv.held_item == TORCH, "load_state drops unknown items and restores the held item")
+	var round_trip := inv.to_state()
+	t.check(round_trip["held"] == "torch" and round_trip["items"] == [{"id": "torch", "count": 1}], "to_state round-trips")
+	inv.load_state({"items": [], "held": "torch"})
+	t.check(inv.is_empty() and inv.held_item == null and held_events.back() == null, "load_state without the held item frees the hands")
+	inv.queue_free()
+
+	# Visual: local player, placeholder body
+	var fixtures: Array = []
+	fixtures.append(TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(20, 1, 20)))
+	await _spawn_player(Vector3(0, 0.1, 0))
+	t.check(Inventory.find_on(player) == player.inventory, "inventory registers on the player via meta")
+	t.check(player.off_hand != null and player.off_hand.name == "OffHand", "player found its OffHand socket")
+	t.check(_find_light(player) == null, "no light before anything is held")
+	player.inventory.load_state(ItemRegistry.default_state())
+	t.check(player.inventory.hold_id(&"torch"), "player holds the torch")
+	var light := _find_light(player)
+	t.check(light != null and light.omni_range > 5.0, "held torch spawns an OmniLight under the off hand")
+	t.check(player.held_item_mount.current_node != null and player.held_item_mount.current_node.get_parent() == player.off_hand, "held scene is parented to the OffHand socket")
+	await _wait(0.3)
+	t.check(is_instance_valid(light) and light.light_energy > 0.5, "torch keeps flickering above zero")
+	player.inventory.release_held()
+	await get_tree().process_frame
+	t.check(_find_light(player) == null, "putting the torch away removes the light")
+
+	# Panel: opens on the action, captures input, click holds
+	var panel := INVENTORY_PANEL_SCENE.instantiate()
+	add_child(panel)
+	panel._bind_player(player)
+	panel.open()
+	t.check(panel.is_open and GameSession.ui_input_captured, "panel open captures UI input")
+	var buttons: Array = panel.get_node("%Slots").get_children().filter(func(n: Node) -> bool: return n is Button)
+	t.check(buttons.size() == 1, "one slot button for the torch")
+	if buttons.size() == 1:
+		(buttons[0] as Button).pressed.emit()
+		t.check(player.inventory.held_item == TORCH, "clicking the slot takes the torch in hand")
+		await get_tree().process_frame
+		buttons = panel.get_node("%Slots").get_children().filter(func(n: Node) -> bool: return n is Button)
+		(buttons[0] as Button).pressed.emit()
+		t.check(player.inventory.held_item == null, "clicking again puts it away")
+	panel.close()
+	t.check(not panel.is_open and not GameSession.ui_input_captured, "panel close releases UI input")
+	panel.queue_free()
+
+	# Remote player path (server-validated id → mount)
+	var remote: Player = PLAYER_SCENE.instantiate()
+	remote.is_local = false
+	remote.display_name = "Remote"
+	add_child(remote)
+	await _wait(0.2)
+	remote.set_remote_held_item("torch")
+	t.check(_find_light(remote) != null, "remote player shows the replicated torch")
+	remote.set_remote_held_item("")
+	await get_tree().process_frame
+	t.check(_find_light(remote) == null, "remote player hides it again")
+	remote.queue_free()
+	await _clear(fixtures)
+
+
+func _find_light(p: Node) -> OmniLight3D:
+	return p.find_child("Flame", true, false) as OmniLight3D
+
+
 func _count_projectiles() -> int:
 	var n := 0
 	for child in get_children():
@@ -505,6 +597,12 @@ func _test_characters() -> void:
 		await _wait(0.3)
 		t.check(player.visual.scene_file_path == CharacterRegistry.load_scene(id).resource_path, "%s: visual scene swapped in" % id)
 		t.check(player.cast_origin != null and player.cast_origin.is_inside_tree(), "%s: cast origin found" % id)
+		var socket := player.visual.find_child("OffHand", true, false)
+		t.check(socket != null, "%s: OffHand socket present in the body" % id)
+		player.inventory.load_state(ItemRegistry.default_state())
+		player.inventory.hold_id(&"torch")
+		t.check(_find_light(player) != null and _find_light(player).is_inside_tree(), "%s: held torch lights up in the off hand" % id)
+		player.inventory.release_held()
 		var tree: AnimationTree = player.visual.get_node("AnimationTree")
 		t.check(tree.active, "%s: animation tree active" % id)
 		var ap: AnimationPlayer = tree.get_node(tree.anim_player)
