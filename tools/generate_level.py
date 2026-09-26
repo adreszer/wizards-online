@@ -259,13 +259,13 @@ for (kind, path), i in sorted(ext.items(), key=lambda kv: kv[1]):
 subs = '''
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
-background_color = Color(0.06, 0.05, 0.1, 1)
+background_color = Color(0.05, 0.045, 0.045, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.45, 0.4, 0.6, 1)
+ambient_light_color = Color(0.56, 0.53, 0.5, 1)
 ambient_light_energy = 0.7
 tonemap_mode = 2
 fog_enabled = true
-fog_light_color = Color(0.25, 0.2, 0.35, 1)
+fog_light_color = Color(0.2, 0.18, 0.17, 1)
 fog_density = 0.004
 
 [sub_resource type="BoxShape3D" id="EndShape"]
@@ -293,7 +293,7 @@ environment = SubResource("Env")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
-light_color = Color(0.8, 0.8, 1, 1)
+light_color = Color(0.9, 0.88, 0.85, 1)
 light_energy = 0.15
 shadow_enabled = false
 
