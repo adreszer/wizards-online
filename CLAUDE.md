@@ -4,13 +4,15 @@ Read this first in every session. It defines where the game is going, so every c
 
 ## Target state (the game we are building)
 
-A multiplayer **open-world magical school** in the spirit of Hogwarts: one large castle (plus grounds) that players explore freely together, live in, attend lessons in, and grow as wizards in. It is a social school simulation first, an action game second.
+A multiplayer **open-world magical school**: one large castle (plus grounds) that players explore freely together, live in, attend lessons in, and grow as wizards in. It is a social school simulation first, an action game second.
+
+**Design model vs. legal stance.** Internally we model the game on the Harry Potter franchise and Hogwarts: its school structure, houses, subjects, lessons, house points, secrets and atmosphere are the reference for how things should feel. Legally, the game must **not be based on that IP**: no Harry Potter names, characters, spells, places, house names, terms or artwork anywhere in the code, assets, text, scene names, translation keys or docs. Use the franchise as an unstated mental model only; every shipped element gets an original name and description. When this file mentions Hogwarts-style features it is to explain the intent, never to copy.
 
 ### 1. The castle
 - One continuous, explorable castle world: great hall, towers, dungeons, corridors, staircases, library, grounds. No linear level flow; players roam.
 - **Many hidden rooms, secret passages and mysteries.** Secrets are a core pillar: hidden doors, puzzles that unlock areas, clues spread across the castle, things that reward curiosity and cooperation.
 - **Four houses** (names to be provided by the owner later — use placeholders, never invent final names). Each house has its own **common room** and dormitory area, accessible to members of that house.
-- **A classroom for every school subject** in the Hogwarts-style curriculum (e.g. Charms, Transfiguration, Potions, Defence Against the Dark Arts, Herbology, Astronomy, History of Magic, Flying, Care of Magical Creatures, Divination, Arithmancy, Ancient Runes…). Each classroom is a real, distinct place in the castle.
+- **A classroom for every school subject.** The curriculum mirrors the reference school's breadth (charms-style spellwork, transfiguration-style shape magic, potions, defensive magic, magical plants, astronomy, history of magic, flying, magical creatures, divination, magical mathematics, ancient runes…) but each subject gets its own original name. Each classroom is a real, distinct place in the castle.
 
 ### 2. Roles: students and professors
 - Players are **students** by default.
@@ -29,7 +31,7 @@ A multiplayer **open-world magical school** in the spirit of Hogwarts: one large
 
 ### 5. Houses, points and school life
 - **House points**: professors award and deduct; a running per-house tally with a visible leaderboard/hourglass equivalent. House cup style competition.
-- Other school-life systems will follow the same pattern: anything that exists at a real Hogwarts-style school is a candidate (timetables, sorting, prefects, feasts, detentions, etc.). Prefer designs that keep these data-driven and server-authoritative.
+- Other school-life systems will follow the same pattern: anything that exists at the reference school is a candidate (timetables, sorting, prefects, feasts, detentions, etc.). Prefer designs that keep these data-driven and server-authoritative.
 
 ### 6. Chat and communication
 - **Public proximity chat**: players can text publicly and only nearby players see it (spatial/proximity based), so a classroom or common room conversation stays local.
@@ -42,7 +44,7 @@ A multiplayer **open-world magical school** in the spirit of Hogwarts: one large
 - **Server authority.** Roles, spell grants, house points, duel rules and chat routing are decided server-side; the client only requests.
 - **Build for an open world**, not chained rooms: the castle is one world with named areas, doors and zones; systems (chat proximity, house access, classroom context) key off those areas.
 - **Keep secrets in mind**: level tooling and object composition should make hidden rooms and multi-step mysteries cheap to author.
-- **Original content.** Structure and feel imitate Hogwarts, but names, text and assets are our own placeholders until the owner provides final names. Do not use trademarked names in shipped content.
+- **Original content, always.** Structure and feel follow the reference, but every name, spell, subject, house, place, item and line of text is original. If a proposed name is recognisably from the franchise, rename it. Placeholders stay until the owner provides final names.
 - Localization: Polish primary, English secondary, all text through `localization/translations.csv` (see docs/development.md).
 
 ## Where things are
