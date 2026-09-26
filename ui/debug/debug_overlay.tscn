@@ -17,6 +17,7 @@ script = ExtResource("1")
 unique_name_in_owner = true
 offset_left = 16.0
 offset_top = 140.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("PanelStyle")
 
 [node name="Label" type="Label" parent="Panel"]

@@ -24,12 +24,14 @@ signal landed(impact_speed: float)
 @export var max_slope_angle_degrees: float = 46.0
 @export var floor_snap_length: float = 0.35
 @export var step_height: float = 0.42
+## How far past the ledge edge the step probe lands (must exceed the capsule radius).
+@export var step_forward_distance: float = 0.45
 
 @export_group("Air")
 @export var jump_velocity: float = 8.0
 @export var gravity_multiplier: float = 2.2
 @export var fall_gravity_multiplier: float = 2.9
-@export var low_jump_gravity_multiplier: float = 4.0
+@export var low_jump_gravity_multiplier: float = 3.4
 @export var air_acceleration: float = 14.0
 @export var air_drag: float = 1.5
 @export var max_fall_speed: float = 40.0
@@ -48,6 +50,7 @@ var is_grounded: bool = false
 var facing_yaw: float = 0.0
 var last_move_direction: Vector3 = Vector3.ZERO
 
+var debug_step: bool = false
 var _base_gravity: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 var _coyote_timer: float = 0.0
 var _jump_buffer_timer: float = 0.0
@@ -55,6 +58,7 @@ var _land_timer: float = 0.0
 var _was_grounded: bool = false
 var _peak_fall_speed: float = 0.0
 var _jump_requested_externally: bool = false
+var _external_jump_hold: float = 0.0
 var _external_move: Vector3 = Vector3.ZERO
 var _external_sprint: bool = false
 
@@ -77,8 +81,10 @@ func set_external_move(direction: Vector3, sprint: bool = false) -> void:
 	_external_sprint = sprint
 
 
-func request_jump() -> void:
+## Scripted jump; the button counts as held for `hold_seconds` (full-height jump).
+func request_jump(hold_seconds: float = 0.35) -> void:
 	_jump_requested_externally = true
+	_external_jump_hold = hold_seconds
 
 
 func get_horizontal_speed() -> float:
@@ -95,8 +101,9 @@ func _physics_process(delta: float) -> void:
 	var move_dir := _compute_move_direction()
 	var sprint := (input != null and input.sprint_held) or _external_sprint
 	var jump_pressed := (input != null and input.consume_jump()) or _jump_requested_externally
-	var jump_held := (input != null and input.jump_held) or _jump_requested_externally
+	var jump_held := (input != null and input.jump_held) or _external_jump_hold > 0.0
 	_jump_requested_externally = false
+	_external_jump_hold = maxf(0.0, _external_jump_hold - delta)
 
 	_was_grounded = is_grounded
 	is_grounded = body.is_on_floor()
@@ -159,7 +166,7 @@ func _physics_process(delta: float) -> void:
 		body.rotation.y = facing_yaw
 
 	if is_grounded and not did_jump:
-		_try_step_up(delta)
+		_try_step_up(move_dir, delta)
 
 	body.move_and_slide()
 
@@ -215,36 +222,43 @@ func _update_state(sprint: bool, did_jump: bool) -> void:
 
 
 ## Forgiving stair handling: when walking into a low ledge, lift the body onto it.
-func _try_step_up(delta: float) -> void:
-	if step_height <= 0.0:
+func _try_step_up(move_dir: Vector3, delta: float) -> void:
+	if step_height <= 0.0 or move_dir.length_squared() < 0.0001:
 		return
-	var horizontal := Vector3(body.velocity.x, 0.0, body.velocity.z)
-	if horizontal.length_squared() < 0.01:
-		return
-	var motion := horizontal * delta
+	# Use the intended direction: velocity is already zeroed when we're pressed against the ledge.
+	var forward := move_dir.normalized()
+	var motion := forward * maxf(get_horizontal_speed(), walk_speed) * delta
 	var from := body.global_transform
 	# Must be blocked at current height...
 	if not body.test_move(from, motion):
+		if debug_step: print("step: not blocked")
 		return
 	var up := Vector3.UP * step_height
 	if body.test_move(from, up):
+		if debug_step: print("step: ceiling")
 		return
 	var raised := from
 	raised.origin += up
-	# ...and free at the raised height.
-	if body.test_move(raised, motion):
+	# ...and free at the raised height, far enough to land past the edge.
+	var probe := forward * maxf(step_forward_distance, motion.length())
+	if body.test_move(raised, probe):
+		if debug_step: print("step: blocked when raised")
 		return
-	raised.origin += motion
+	raised.origin += probe
 	var params := PhysicsTestMotionParameters3D.new()
 	params.from = raised
 	params.motion = -up
 	var result := PhysicsTestMotionResult3D.new()
 	if not PhysicsServer3D.body_test_motion(body.get_rid(), params, result):
+		if debug_step: print("step: no floor below")
 		return
 	var travel := result.get_travel()
 	# Require an actual ledge (not just the floor we're already on) and a walkable surface.
 	if travel.length() > step_height - 0.04:
+		if debug_step: print("step: travel too long ", travel.length())
 		return
 	if result.get_collision_normal().angle_to(Vector3.UP) > body.floor_max_angle:
+		if debug_step: print("step: too steep ", result.get_collision_normal())
 		return
+	if debug_step: print("step: OK ", travel)
 	body.global_position = raised.origin + travel + Vector3.UP * 0.01

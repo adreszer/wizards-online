@@ -64,11 +64,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not input_enabled or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 	if event is InputEventMouseMotion:
-		var motion := event as InputEventMouseMotion
-		yaw -= deg_to_rad(motion.relative.x * mouse_sensitivity)
-		pitch -= deg_to_rad(motion.relative.y * mouse_sensitivity)
-		pitch = clampf(pitch, deg_to_rad(min_pitch_degrees), deg_to_rad(max_pitch_degrees))
-		_apply_rotation()
+		apply_look_delta((event as InputEventMouseMotion).relative)
+
+
+## Rotate by a mouse-style delta in pixels (also used by tests / future gamepad look).
+func apply_look_delta(relative: Vector2) -> void:
+	yaw -= deg_to_rad(relative.x * mouse_sensitivity)
+	pitch -= deg_to_rad(relative.y * mouse_sensitivity)
+	pitch = clampf(pitch, deg_to_rad(min_pitch_degrees), deg_to_rad(max_pitch_degrees))
+	_apply_rotation()
 
 
 func _process(delta: float) -> void:
