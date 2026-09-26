@@ -11,8 +11,18 @@
 ```bash
 git clone git@github.com:adreszer/wizards-online.git
 cd wizards-online
-godot --path .            # or open project.godot in the editor and press F5
+godot --headless --path . --import   # one-time: builds the import cache + class list
+godot --path .                       # or open project.godot in the editor and press F5
 ```
+
+`tools/run.sh` does both steps (import only when needed) and finds the macOS app bundle automatically:
+
+```bash
+tools/run.sh                                  # play
+tools/run.sh -- --name=Rowan --instance=2     # a second client
+```
+
+The one-time import matters: without it, class names such as `Player` are unknown to a headless run and scripts fail to parse. Opening the project in the editor performs the same import.
 
 On macOS there is no `godot` on the PATH by default; the binary is inside the app bundle. Either use the full path or alias it once:
 
