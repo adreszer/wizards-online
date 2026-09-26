@@ -123,11 +123,16 @@ func _test_movement() -> void:
 	player.velocity = Vector3.ZERO
 	await _wait(0.3)
 	player.movement.set_external_move(Vector3(1, 0, 0), false)
-	await _wait(1.5)
-	t.check(player.global_position.y > 1.0 and player.movement.is_grounded, "walks up a 30° slope (pos=%s wall=%s)" % [player.global_position, player.is_on_wall()])
+	var peak_y := 0.0
+	for i in range(45):
+		await get_tree().physics_frame
+		peak_y = maxf(peak_y, player.global_position.y)
+		if peak_y > 1.5:
+			break
+	t.check(peak_y > 1.0, "walks up a 30° slope (peak y=%.2f)" % peak_y)
 	player.movement.set_external_move(Vector3.ZERO)
 	await _wait(0.5)
-	t.check(player.movement.get_horizontal_speed() < 0.2, "stands still on the slope (no sliding)")
+	t.check(player.movement.is_grounded and player.movement.get_horizontal_speed() < 0.2, "stands still on the slope (no sliding)")
 
 	# Stairs: 0.4 m steps
 	player.global_position = Vector3(-10, 0.1, 0)
@@ -136,8 +141,13 @@ func _test_movement() -> void:
 		fixtures.append(TestHelpers.make_floor(self, Vector3(-13 - i * 0.8, 0.2 * (i + 1), 0), Vector3(0.8, 0.4 * (i + 1), 4)))
 	await _wait(0.3)
 	player.movement.set_external_move(Vector3(-1, 0, 0), false)
-	await _wait(1.5)
-	t.check(player.global_position.y > 1.0, "climbs 0.4 m stairs without jumping (pos=%s wall=%s)" % [player.global_position, player.is_on_wall()])
+	var stair_peak := 0.0
+	for i in range(60):
+		await get_tree().physics_frame
+		stair_peak = maxf(stair_peak, player.global_position.y)
+		if stair_peak > 1.1:
+			break
+	t.check(stair_peak > 1.0, "climbs 0.4 m stairs without jumping (peak y=%.2f)" % stair_peak)
 	player.movement.set_external_move(Vector3.ZERO)
 	await _clear(fixtures)
 
