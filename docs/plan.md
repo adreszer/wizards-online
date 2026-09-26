@@ -17,6 +17,10 @@ See `docs/architecture.md` for the full breakdown. In short:
 - **nakama/** — Lua runtime module: one persistent "world" match that relays presence/state/spell events and owns the player roster.
 - **ui/** — main menu, HUD, chat panel, pause menu, F3 debug overlay.
 - **levels/mvp/** — greybox vertical slice.
+- **assets/models/** — imported source models (GLB) exactly as produced by the art pipeline; never edited in-repo.
+- **objects/environment/** — wrapper scenes that turn a source model into a placeable module (transform, collision, layers).
+- **levels/dev/** — development-only scenes (asset validation); not part of the game flow.
+- **tools/** — headless/dev utilities (model inspection, screenshot capture).
 
 ## Milestones
 
@@ -98,7 +102,50 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Documentation pass
 - [x] Final test pass documented below
 
-## Architectural decisions
+### Milestone 11 — Production environment asset pipeline (in validation, not finalized)
+- [x] First production asset: `assets/models/environment/modular/wall_plain.glb` (Meshy, untouched source)
+- [x] Wrapper scene `objects/environment/modular/wall_plain.tscn` (normalised 4 × 4 × 0.35 m, bottom-centre pivot, box collision)
+- [x] Dev validation scene `levels/dev/asset_validation.tscn` (single wall, 3× tiled, 90° corner, player scale, labels)
+- [x] Headless wrapper test `tests/validate_wall_plain.tscn`; dev tools `tools/inspect_model.gd`, `tools/capture_validation.tscn`
+- [ ] In-game visual sign-off of the wall (seams, top edge, material) → decide whether this becomes the canonical workflow
+- [ ] Decide seam strategy (see findings) before building more modules
+- [ ] Corner / pillar module, doorway module, floor module
+
+## Production environment asset pipeline (in validation)
+
+**Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
+
+**Module convention (`wall_plain.tscn`).**
+- Final size 4.0 m wide (X) × 4.0 m high (Y) × 0.35 m deep (Z). The GLB is unrotated; width is already along X.
+- Pivot: bottom-centre — origin on the floor, centred on width and depth. Rotating a wall by 90°/180° keeps it on the same grid line, which is why depth is centred rather than pushed to one side.
+- Grid placement: a wall's origin sits on the midpoint of a 4 m grid edge, y = 0. Walls along X: `(4i + 2, 0, 4j)` rotation 0. Walls along Z: `(4i, 0, 4j + 2)` rotation 90° about Y. Straight runs need no offsets.
+- Corner rule (butt joint): the continuing wall is shifted by half the depth (0.175 m) so its end cap sits flush with the outer face of the terminating wall, e.g. `WallX` at `(18, 0, 0)` and `WallZ` at `(20.175, 0, 1.825)` rotated 90°. Placing both strictly on the grid instead leaves a 0.175 m notch on the outer corner (inherent to centred depth); a corner pillar module would remove the offset rule.
+- Collision: a single `BoxShape3D` 4 × 4 × 0.35 on physics layer 1 (`world`), mask 0, same as `GreyboxBlock`. The detailed stone geometry is never used for collision.
+
+**Wrapper transform (derived from the imported AABB with `tools/inspect_model.gd`).**
+
+| | Imported (scene units) | Wrapper scale | Final |
+|---|---|---|---|
+| Width X | 1.9025 (−0.9526 … 0.9499) | 2.102529 | 4.000 m |
+| Height Y | 1.7435 (−0.8735 … 0.8701) | 2.294190 | 4.000 m |
+| Depth Z | 0.2940 (−0.1471 … 0.1469) | 1.190581 | 0.350 m |
+
+Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom-centre. Scale is non-uniform (Y is 9 % larger than X, Z 43 % smaller) because the Meshy export's aspect does not match the intended module; the stones therefore read slightly taller and shallower than authored. If that is unwanted the fix belongs in the art tool, not the wrapper.
+
+**Validation scene** `levels/dev/asset_validation.tscn` (run with `godot --path . levels/dev/asset_validation.tscn`): A single wall at x = −6, B three walls at x = 2, 6, 10 (12 m run), C corner at x = 16…20.35, D the regular player spawned at (4, 0, −7) facing the tiled run. Lighting is a warm key light + ambient + three torch-coloured omni fills + SSAO — neutral enough to judge colour, roughness, normal detail and silhouette. Floor is a 4 m checkerboard of greybox tiles as a grid reference.
+
+**Findings (first pass, Godot 4.7.2, default import).**
+- Import: one node, one `ArrayMesh` surface, 3031 triangles, 6083 vertices. One `StandardMaterial3D` ("BakedMaterial"): base colour 2048², metallic-roughness 4096² (metallic = blue channel, roughness = green, factors 1.0). No normal map, no AO, no emission. Import generated LODs and a shadow mesh (defaults).
+- Material: opaque (no transparency), `cull_mode = Disabled` because the glTF flags the material double-sided. Renders correctly but costs back-face rasterisation on a closed mesh; worth switching to back-face culling in the exporter or via an import material override once the workflow is fixed.
+- Normals: unit length, all face windings agree with the vertex normals (0 flipped of 3031). No visible shading breaks; normal detail comes from geometry only (no normal map).
+- Textures: both PNGs embedded in the GLB (5.6 MB + 9.3 MB); Godot imported them as VRAM-compressed `.ctex`. The metallic-roughness map is 4× the pixel count of the base colour and mostly flat — an obvious later optimisation, deliberately not applied yet.
+- Tiling: three walls at exact 4 m spacing align on the grid. A thin see-through line is visible at each seam: the end caps are bevelled stones, so the end face sits inside the bounding box. Measured front-silhouette gap between neighbours: 8–26 mm (median 14 mm) over the wall height. Options: (a) overscale the visual by ~0.5 % in X in the wrapper so the bevels overlap, (b) ask Meshy/Blender for flat, full-height end caps, (c) accept and hide with pillars. Not changed yet — decision pending visual review.
+- Top edge: uneven stone tops, up to 29 mm below 4.0 m (median 3 mm). A ceiling or second row placed at y = 4 would show slivers. Bottom sits within 1–9 mm of the floor: fine.
+- Corner: the butt joint is flush on the outer face; the same bevel groove appears where the end cap meets the neighbouring face.
+- Scale: 4 m wall ≈ 2.2× the 1.8 m player capsule; reads as a tall academy hall wall.
+- Collision: player walks up to the face and stops at 0.35 m (capsule radius), cannot pass through, walks freely past the end.
+
+
 
 | # | Decision | Rationale |
 |---|----------|-----------|
@@ -113,6 +160,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 | 9 | Greybox built from a `@tool` `GreyboxBlock` scene | Keeps the level `.tscn` compact and lets blocks be resized in-editor while auto-updating collision. |
 | 10 | Device authentication | Zero-friction, stable per machine (`user://nakama_device_id`). Two clients on one machine get distinct IDs via a `--user-suffix` / env override (see development.md). |
 | 11 | Hand-authored `.tscn` files | The whole project is generated headlessly; scenes are plain text and remain fully editable in the Godot editor. |
+| 12 | Source models stay untouched under `assets/models/`; engine configuration lives in wrapper `.tscn` scenes under `objects/environment/` | Re-exporting art never touches gameplay data; wrappers carry transform, collision and layers. Pending sign-off (Milestone 11). |
 
 ## Manual verification log
 
@@ -146,3 +194,5 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Offline | playable with backend stopped | [x] `run_offline_fallback_test` with backend stopped: readable error, offline world playable |
+| Assets | wall_plain wrapper: 4 × 4 × 0.35 m, bottom-centre pivot, box collision, player blocked | [x] headless (`tests/validate_wall_plain.tscn`, 11 checks) |
+| Assets | wall_plain visual: seams, corner, top edge, material | [~] captured with `tools/capture_validation.tscn`; in-game sign-off pending |

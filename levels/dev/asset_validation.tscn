@@ -1,0 +1,285 @@
+[gd_scene load_steps=6 format=3 uid="uid://assetvalid001"]
+
+[ext_resource type="PackedScene" path="res://objects/environment/modular/wall_plain.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://objects/greybox/greybox_block.tscn" id="2"]
+[ext_resource type="Script" path="res://levels/dev/asset_validation.gd" id="3"]
+[ext_resource type="PackedScene" path="res://ui/debug/debug_overlay.tscn" id="4"]
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 1
+background_color = Color(0.11, 0.1, 0.14, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.6, 0.56, 0.66, 1)
+ambient_light_energy = 0.45
+tonemap_mode = 2
+ssao_enabled = true
+
+[node name="AssetValidation" type="Node3D"]
+script = ExtResource("3")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="KeyLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
+light_color = Color(1, 0.96, 0.9, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="TorchFill" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3, -3.5)
+light_color = Color(1, 0.8, 0.55, 1)
+light_energy = 2.5
+shadow_enabled = true
+omni_range = 14.0
+
+[node name="TorchFillSingle" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3, -3.5)
+light_color = Color(1, 0.8, 0.55, 1)
+light_energy = 2.0
+omni_range = 12.0
+
+[node name="TorchFillCorner" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 3, -3.5)
+light_color = Color(1, 0.8, 0.55, 1)
+light_energy = 2.0
+omni_range = 12.0
+
+[node name="StartPoint" type="Marker3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 4, 0.05, -7)
+
+[node name="DebugOverlay" parent="." instance=ExtResource("4")]
+
+[node name="Floor" type="Node3D" parent="."]
+
+[node name="Tile_0_0" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.1, -6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_0_1" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.1, -2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_0_2" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.1, 2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_0_3" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, -0.1, 6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_1_0" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.1, -6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_1_1" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.1, -2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_1_2" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.1, 2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_1_3" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, -0.1, 6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_2_0" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.1, -6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_2_1" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.1, -2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_2_2" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.1, 2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_2_3" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.1, 6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_3_0" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -0.1, -6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_3_1" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -0.1, -2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_3_2" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -0.1, 2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_3_3" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, -0.1, 6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_4_0" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -0.1, -6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_4_1" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -0.1, -2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_4_2" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -0.1, 2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_4_3" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -0.1, 6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_5_0" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -0.1, -6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_5_1" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -0.1, -2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_5_2" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -0.1, 2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_5_3" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -0.1, 6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_6_0" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -0.1, -6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_6_1" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -0.1, -2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_6_2" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -0.1, 2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_6_3" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -0.1, 6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_7_0" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -0.1, -6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_7_1" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -0.1, -2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="Tile_7_2" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -0.1, 2)
+size = Vector3(4, 0.2, 4)
+color = Color(0.42, 0.41, 0.46, 1)
+
+[node name="Tile_7_3" parent="Floor" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, -0.1, 6)
+size = Vector3(4, 0.2, 4)
+color = Color(0.34, 0.33, 0.38, 1)
+
+[node name="A_SingleWall" type="Node3D" parent="."]
+
+[node name="Wall" parent="A_SingleWall" instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+
+[node name="Label" type="Label3D" parent="A_SingleWall"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -6, 4.7, 0)
+billboard = 1
+pixel_size = 0.005
+text = "A  single wall"
+font_size = 96
+outline_size = 12
+
+[node name="B_TiledWalls" type="Node3D" parent="."]
+
+[node name="Wall1" parent="B_TiledWalls" instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+
+[node name="Wall2" parent="B_TiledWalls" instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+
+[node name="Wall3" parent="B_TiledWalls" instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 0)
+
+[node name="Label" type="Label3D" parent="B_TiledWalls"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 6, 4.7, 0)
+billboard = 1
+pixel_size = 0.005
+text = "B  3 x 4 m tiled (12 m)"
+font_size = 96
+outline_size = 12
+
+[node name="C_Corner" type="Node3D" parent="."]
+
+[node name="WallX" parent="C_Corner" instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 0)
+
+[node name="WallZ" parent="C_Corner" instance=ExtResource("1")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 20.175, 0, 1.825)
+
+[node name="Label" type="Label3D" parent="C_Corner"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 18, 4.7, 0)
+billboard = 1
+pixel_size = 0.005
+text = "C  90 deg corner"
+font_size = 96
+outline_size = 12
+
+[node name="D_PlayerScale" type="Node3D" parent="."]
+
+[node name="Label" type="Label3D" parent="D_PlayerScale"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 4, 5.6, 0)
+billboard = 1
+pixel_size = 0.005
+text = "D  player scale (walk up to any wall)"
+font_size = 72
+outline_size = 12
+
+[node name="DevInfo" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="DevInfo"]
+offset_left = 16.0
+offset_top = 16.0
+theme_override_font_sizes/font_size = 18
+text = "Wall Plain
+4.0m x 4.0m x ~0.35m
+~3K triangles
+Production Asset Test
+
+A single  |  B 3x tiled  |  C corner  |  D player scale
+Esc: toggle mouse   F3: debug overlay"

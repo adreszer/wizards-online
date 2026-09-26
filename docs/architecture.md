@@ -115,13 +115,17 @@ All gameplay reads InputMap actions through `PlayerInput`; no physical keys anyw
 ```
 addons/com.heroiclabs.nakama   vendored official client (only third-party dependency)
 assets/audio                   generated placeholder tones
+assets/models                  source models (GLB) as exported by the art pipeline; never edited here
 characters/player, components  player scene + components
 core/                          game root, world, autoloads
 gameplay/{spells,interaction,collectibles,health,checkpoints}
 levels/mvp                     greybox level + wiring script
+levels/dev                     development-only scenes (asset validation)
 multiplayer/{authentication,synchronization,chat} + network_manager, world_session, player_spawner
 nakama/                        local.yml + Lua modules (mounted into the container)
 objects/{greybox,puzzles,platforms,interactables}
+objects/environment            wrapper scenes for imported environment modules (transform, collision, layers)
+tools/                         headless dev utilities (model inspection, screenshot capture)
 resources/{spells,collectibles} data resources
 tests/                         headless test runners
 ui/{menus,hud,chat,debug}

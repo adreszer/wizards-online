@@ -90,6 +90,24 @@ godot --headless --path . tests/run_offline_fallback_test.tscn
 
 Exit code is non-zero on failure; the summary is printed at the end.
 
+## Asset validation scene and tools
+
+```bash
+# dev scene: one wall, 3x tiled walls, a 90° corner, the player (Esc toggles mouse, F3 overlay)
+godot --path . levels/dev/asset_validation.tscn
+
+# wrapper dimensions, pivot, collision, player-blocked check (headless)
+godot --headless --path . tests/validate_wall_plain.tscn
+
+# print what Godot imported from a model: tree, AABB, triangles, materials, textures
+godot --headless --path . -s tools/inspect_model.gd -- res://assets/models/environment/modular/wall_plain.glb
+
+# render the validation scene from fixed viewpoints to PNGs (opens a window)
+godot --path . tools/capture_validation.tscn -- --out=/absolute/output/dir
+```
+
+Adding a new environment module: drop the GLB under `assets/models/…` (never edit it in-repo), run `inspect_model.gd`, create a wrapper `.tscn` under `objects/environment/…` with the fitting transform + simple collision, and place instances in the validation scene before using them in a level. Conventions are in `docs/plan.md` → "Production environment asset pipeline".
+
 ## Project settings of note
 
 `project.godot` → `[game]`:
