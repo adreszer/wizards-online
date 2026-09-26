@@ -104,7 +104,7 @@ autowrap_mode = 3
 [node name="Help" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
-text = "WASD move · Shift run · Space jump · Mouse look · LMB cast · E interact · Enter chat · F3 debug · Esc pause"
+text = "WASD move · Shift run · Space jump · Mouse look · LMB cast · E interact · Enter chat · F1 free cursor · F3 debug · Esc pause"
 horizontal_alignment = 1
 
 [node name="QuitButton" type="Button" parent="Center/Panel/Margin/VBox"]

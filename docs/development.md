@@ -34,7 +34,7 @@ All commands below assume `godot` resolves.
 
 Choose **Play OFFLINE**. The full level is playable without any backend.
 
-Controls: WASD move · Shift run · Space jump · mouse look · left click / F cast · E interact · Enter or T chat · Esc pause · F3 debug overlay.
+Controls: WASD move · Shift run · Space jump · mouse look · left click / F cast · E interact · Enter or T chat · Esc pause · F1 free/recapture the cursor without pausing · F3 debug overlay.
 
 ## Backend (Nakama + PostgreSQL)
 
