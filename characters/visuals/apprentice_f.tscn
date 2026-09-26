@@ -1,0 +1,143 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/characters/apprentice_f/apprentice_f.glb" id="1"]
+[ext_resource type="Script" path="res://characters/components/animation_controller.gd" id="2"]
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_idle"]
+animation = &"Idle_4"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_walk"]
+animation = &"Walking"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_run"]
+animation = &"Running"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_jump"]
+animation = &"Regular_Jump"
+start_offset = 0.340
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_fall"]
+animation = &"Fall2"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_land"]
+animation = &"Regular_Jump"
+start_offset = 1.140
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_cast"]
+animation = &"mage_soell_cast_7"
+
+[sub_resource type="AnimationNodeTransition" id="ANT_Movement"]
+xfade_time = 0.18
+input_count = 6
+input_0/name = &"idle"
+input_0/auto_advance = false
+input_0/break_loop_at_end = false
+input_0/reset = true
+input_1/name = &"walk"
+input_1/auto_advance = false
+input_1/break_loop_at_end = false
+input_1/reset = true
+input_2/name = &"run"
+input_2/auto_advance = false
+input_2/break_loop_at_end = false
+input_2/reset = true
+input_3/name = &"jump"
+input_3/auto_advance = false
+input_3/break_loop_at_end = false
+input_3/reset = true
+input_4/name = &"fall"
+input_4/auto_advance = false
+input_4/break_loop_at_end = false
+input_4/reset = true
+input_5/name = &"land"
+input_5/auto_advance = false
+input_5/break_loop_at_end = false
+input_5/reset = true
+
+[sub_resource type="AnimationNodeOneShot" id="ANO_Cast"]
+filter_enabled = true
+filters = [NodePath("target_character/Skeleton3D:mixamorig_Spine"), NodePath("target_character/Skeleton3D:mixamorig_Spine1"), NodePath("target_character/Skeleton3D:mixamorig_Spine2"), NodePath("target_character/Skeleton3D:mixamorig_Neck"), NodePath("target_character/Skeleton3D:mixamorig_Head"), NodePath("target_character/Skeleton3D:mixamorig_HeadTop_End"), NodePath("target_character/Skeleton3D:mixamorig_LeftShoulder"), NodePath("target_character/Skeleton3D:mixamorig_LeftArm"), NodePath("target_character/Skeleton3D:mixamorig_LeftForeArm"), NodePath("target_character/Skeleton3D:mixamorig_LeftHand"), NodePath("target_character/Skeleton3D:mixamorig_LeftHandMiddle4"), NodePath("target_character/Skeleton3D:mixamorig_RightShoulder"), NodePath("target_character/Skeleton3D:mixamorig_RightArm"), NodePath("target_character/Skeleton3D:mixamorig_RightForeArm"), NodePath("target_character/Skeleton3D:mixamorig_RightHand"), NodePath("target_character/Skeleton3D:mixamorig_RightHandMiddle4")]
+fadein_time = 0.08
+fadeout_time = 0.2
+
+[sub_resource type="AnimationNodeBlendTree" id="ANBT_Root"]
+nodes/Idle/node = SubResource("ANA_idle")
+nodes/Idle/position = Vector2(-500, 0)
+nodes/Walk/node = SubResource("ANA_walk")
+nodes/Walk/position = Vector2(-500, 120)
+nodes/Run/node = SubResource("ANA_run")
+nodes/Run/position = Vector2(-500, 240)
+nodes/Jump/node = SubResource("ANA_jump")
+nodes/Jump/position = Vector2(-500, 360)
+nodes/Fall/node = SubResource("ANA_fall")
+nodes/Fall/position = Vector2(-500, 480)
+nodes/Land/node = SubResource("ANA_land")
+nodes/Land/position = Vector2(-500, 600)
+nodes/CastAnim/node = SubResource("ANA_cast")
+nodes/CastAnim/position = Vector2(-200, 300)
+nodes/Movement/node = SubResource("ANT_Movement")
+nodes/Movement/position = Vector2(-200, 0)
+nodes/Cast/node = SubResource("ANO_Cast")
+nodes/Cast/position = Vector2(100, 0)
+nodes/output/position = Vector2(350, 0)
+node_connections = [&"Movement", 0, &"Idle", &"Movement", 1, &"Walk", &"Movement", 2, &"Run", &"Movement", 3, &"Jump", &"Movement", 4, &"Fall", &"Movement", 5, &"Land", &"Cast", 0, &"Movement", &"Cast", 1, &"CastAnim", &"output", 0, &"Cast"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Wand"]
+albedo_color = Color(0.35, 0.22, 0.12, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Glow"]
+albedo_color = Color(0.7, 0.55, 1, 1)
+emission_enabled = true
+emission = Color(0.6, 0.45, 1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="Mesh_Wand"]
+size = Vector3(0.035, 0.42, 0.035)
+
+[sub_resource type="SphereMesh" id="Mesh_Glow"]
+radius = 0.07
+height = 0.14
+
+[node name="CharacterVisual" type="Node3D"]
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+root_node = NodePath("../Model")
+tree_root = SubResource("ANBT_Root")
+anim_player = NodePath("../Model/AnimationPlayer")
+parameters/Movement/current_state = "idle"
+parameters/Movement/transition_request = ""
+parameters/Movement/current_index = 0
+parameters/Cast/active = false
+parameters/Cast/internal_active = false
+parameters/Cast/request = 0
+
+[node name="AnimationController" type="Node" parent="." node_paths=PackedStringArray("animation_tree")]
+script = ExtResource("2")
+animation_tree = NodePath("../AnimationTree")
+
+[node name="Wand" type="BoneAttachment3D" parent="."]
+bone_name = "mixamorig_RightHand"
+use_external_skeleton = true
+external_skeleton = NodePath("../Model/target_character/Skeleton3D")
+
+[node name="WandMesh" type="MeshInstance3D" parent="Wand"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0.03)
+mesh = SubResource("Mesh_Wand")
+surface_material_override/0 = SubResource("Mat_Wand")
+
+[node name="Glow" type="MeshInstance3D" parent="Wand"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.44, 0.03)
+visible = false
+mesh = SubResource("Mesh_Glow")
+surface_material_override/0 = SubResource("Mat_Glow")
+
+[node name="CastOrigin" type="Marker3D" parent="Wand"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0.03)
+
+[node name="OffHand" type="BoneAttachment3D" parent="."]
+bone_name = "mixamorig_LeftHand"
+use_external_skeleton = true
+external_skeleton = NodePath("../Model/target_character/Skeleton3D")

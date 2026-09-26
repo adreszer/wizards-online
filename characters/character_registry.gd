@@ -9,6 +9,7 @@ const DEFAULT := "apprentice_m"
 
 const CHARACTERS := {
 	"apprentice_m": {"scene": "res://characters/visuals/apprentice_m.tscn", "name_key": "CHAR_APPRENTICE_M"},
+	"apprentice_f": {"scene": "res://characters/visuals/apprentice_f.tscn", "name_key": "CHAR_APPRENTICE_F"},
 	"placeholder": {"scene": "res://characters/components/character_visual.tscn", "name_key": "CHAR_PLACEHOLDER"},
 }
 
