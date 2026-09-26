@@ -81,7 +81,7 @@ func connect_online(display_name: String) -> String:
 		local_user_id = authentication.user_id
 		err = await world_session.connect_socket(authentication.client, authentication.session)
 	if err.is_empty():
-		err = await world_session.join_world(authentication.client, authentication.session, display_name)
+		err = await world_session.join_world(authentication.client, authentication.session, display_name, GameSession.character_id)
 	if err.is_empty():
 		err = await chat_manager.join(world_session.socket, local_user_id, display_name, state_synchronizer.get_display_name_for_user)
 	if not err.is_empty():

@@ -44,9 +44,18 @@ local function sanitize_name(name, fallback)
   return name
 end
 
+local CHARACTERS = { apprentice_m = true, apprentice_f = true, placeholder = true }
+
+local function sanitize_character(id)
+  if type(id) == "string" and CHARACTERS[id] then
+    return id
+  end
+  return "apprentice_m"
+end
+
 local function entry_for(state, sid)
   local p = state.presences[sid]
-  return { sid = sid, uid = p.user_id, name = state.names[sid] or p.username }
+  return { sid = sid, uid = p.user_id, name = state.names[sid] or p.username, char = state.chars[sid] or "apprentice_m" }
 end
 
 local function others(state, except_sid)
@@ -60,12 +69,13 @@ local function others(state, except_sid)
 end
 
 function M.match_init(context, params)
-  local state = { presences = {}, names = {} }
+  local state = { presences = {}, names = {}, chars = {} }
   return state, TICK_RATE, "world"
 end
 
 function M.match_join_attempt(context, dispatcher, tick, state, presence, metadata)
   state.names[presence.session_id] = sanitize_name(metadata and metadata.display_name, presence.username)
+  state.chars[presence.session_id] = sanitize_character(metadata and metadata.character)
   return state, true
 end
 
@@ -94,6 +104,7 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       local entry = entry_for(state, sid)
       state.presences[sid] = nil
       state.names[sid] = nil
+      state.chars[sid] = nil
       local rest = others(state, sid)
       if #rest > 0 then
         dispatcher.broadcast_message(OP_PLAYER_LEFT, nk.json_encode(entry), rest, nil, true)

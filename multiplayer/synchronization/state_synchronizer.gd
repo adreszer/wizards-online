@@ -69,14 +69,14 @@ func _on_roster(roster: Array, self_sid: String) -> void:
 		if sid.is_empty() or sid == self_sid:
 			continue
 		if not players.has(sid):
-			players[sid] = {"uid": str(entry.get("uid", "")), "name": str(entry.get("name", "?"))}
+			players[sid] = {"uid": str(entry.get("uid", "")), "name": str(entry.get("name", "?")), "char": str(entry.get("char", ""))}
 			player_joined.emit(sid, players[sid]["name"])
 
 
-func _on_player_joined(sid: String, uid: String, display_name: String) -> void:
+func _on_player_joined(sid: String, uid: String, display_name: String, character_id: String = "") -> void:
 	if sid.is_empty() or sid == session.self_session_id or players.has(sid):
 		return
-	players[sid] = {"uid": uid, "name": display_name}
+	players[sid] = {"uid": uid, "name": display_name, "char": character_id}
 	player_joined.emit(sid, display_name)
 
 

@@ -5,6 +5,7 @@ signal start_requested()
 
 @onready var _name_edit: LineEdit = %NameEdit
 @onready var _language_option: OptionButton = %LanguageOption
+@onready var _character_option: OptionButton = %CharacterOption
 @onready var _host_edit: LineEdit = %HostEdit
 @onready var _port_edit: LineEdit = %PortEdit
 @onready var _offline_button: Button = %OfflineButton
@@ -16,6 +17,7 @@ signal start_requested()
 func _ready() -> void:
 	_name_edit.text = GameSession.display_name
 	_build_language_picker()
+	_build_character_picker()
 	_host_edit.text = GameSession.nakama_host
 	_port_edit.text = str(GameSession.nakama_port)
 	_offline_button.pressed.connect(_on_offline)
@@ -74,9 +76,20 @@ func _build_language_picker() -> void:
 	_language_option.item_selected.connect(_on_language_selected)
 
 
+func _build_character_picker() -> void:
+	_character_option.clear()
+	for id in CharacterRegistry.ids():
+		_character_option.add_item(tr(CharacterRegistry.name_key(id)))
+		_character_option.set_item_metadata(_character_option.item_count - 1, id)
+		if id == GameSession.character_id:
+			_character_option.select(_character_option.item_count - 1)
+	_character_option.item_selected.connect(func(index: int) -> void: GameSession.set_character(str(_character_option.get_item_metadata(index))))
+
+
 func _on_language_selected(index: int) -> void:
 	GameSession.set_language(str(_language_option.get_item_metadata(index)))
 	_name_edit.text = GameSession.display_name
+	_build_character_picker()
 
 
 func _set_busy(busy: bool) -> void:

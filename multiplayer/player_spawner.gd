@@ -38,6 +38,7 @@ func spawn_local(display_name: String, peer_id: String) -> Node:
 	player.is_local = true
 	player.display_name = display_name
 	player.peer_id = peer_id
+	player.character_id = GameSession.character_id
 	player.name = "LocalPlayer"
 	_get_root().add_child(player)
 	if spawn_point != null:
@@ -62,6 +63,7 @@ func _on_player_joined(sid: String, display_name: String) -> void:
 	player.is_local = false
 	player.display_name = display_name
 	player.peer_id = sid
+	player.character_id = CharacterRegistry.sanitize(str(NetworkManager.get_players().get(sid, {}).get("char", "")))
 	player.name = "Remote_%s" % sid.validate_node_name()
 	_get_root().add_child(player)
 	if spawn_point != null:

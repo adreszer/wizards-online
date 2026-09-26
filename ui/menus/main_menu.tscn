@@ -69,6 +69,14 @@ text = "MENU_LANGUAGE"
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="CharacterLabel" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+text = "MENU_CHARACTER"
+
+[node name="CharacterOption" type="OptionButton" parent="Center/Panel/Margin/VBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="HostLabel" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
 layout_mode = 2
 text = "MENU_HOST"

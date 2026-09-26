@@ -71,3 +71,7 @@ SPELL_ARCANE_PULSE_NAME,Arcane Pulse,Tajemny Impuls
 SPELL_ARCANE_PULSE_DESC,A focused pulse of raw arcane force. Activates magical mechanisms and shoves loose objects.,Skupiony impuls czystej tajemnej mocy. Uruchamia magiczne mechanizmy i odpycha luźne przedmioty.
 COLLECTIBLE_ARCANE_FRAGMENT,Arcane Fragment,Tajemny Fragment
 PLAYER_DEFAULT_NAME,Apprentice,Uczeń
+MENU_CHARACTER,Character,Postać
+CHAR_APPRENTICE_M,Apprentice (male),Uczeń
+CHAR_APPRENTICE_F,Apprentice (female),Uczennica
+CHAR_PLACEHOLDER,Placeholder capsule,Kapsuła zastępcza

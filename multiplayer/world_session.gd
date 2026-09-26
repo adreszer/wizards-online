@@ -5,7 +5,7 @@ extends Node
 
 signal socket_closed()
 signal roster_received(players: Array, self_sid: String)
-signal player_joined(sid: String, uid: String, display_name: String)
+signal player_joined(sid: String, uid: String, display_name: String, character_id: String)
 signal player_left(sid: String, uid: String, display_name: String)
 signal state_received(sid: String, state: Dictionary)
 signal spell_cast_received(sid: String, cast: Dictionary)
@@ -30,7 +30,7 @@ func connect_socket(client: NakamaClient, session: NakamaSession) -> String:
 
 
 ## Asks the server module for the shared world match and joins it.
-func join_world(client: NakamaClient, session: NakamaSession, display_name: String) -> String:
+func join_world(client: NakamaClient, session: NakamaSession, display_name: String, character_id: String = "") -> String:
 	var rpc: NakamaAPI.ApiRpc = await client.rpc_async(session, "join_world", "{}")
 	if rpc.is_exception():
 		return tr("NET_JOIN_RPC_FAILED") % rpc.get_exception().message
@@ -38,7 +38,7 @@ func join_world(client: NakamaClient, session: NakamaSession, display_name: Stri
 	match_id = str(payload.get("match_id", ""))
 	if match_id.is_empty():
 		return tr("NET_JOIN_NO_MATCH")
-	var joined: NakamaRTAPI.Match = await socket.join_match_async(match_id, {"display_name": display_name})
+	var joined: NakamaRTAPI.Match = await socket.join_match_async(match_id, {"display_name": display_name, "character": character_id})
 	if joined.is_exception():
 		return tr("NET_JOIN_FAILED") % joined.get_exception().message
 	if joined.self_user != null:
@@ -81,7 +81,7 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 			self_session_id = str(payload.get("self_sid", self_session_id))
 			roster_received.emit(payload.get("players", []), self_session_id)
 		NetworkProtocol.OP_PLAYER_JOINED:
-			player_joined.emit(str(payload.get("sid", "")), str(payload.get("uid", "")), str(payload.get("name", "")))
+			player_joined.emit(str(payload.get("sid", "")), str(payload.get("uid", "")), str(payload.get("name", "")), str(payload.get("char", "")))
 		NetworkProtocol.OP_PLAYER_LEFT:
 			player_left.emit(str(payload.get("sid", "")), str(payload.get("uid", "")), str(payload.get("name", "")))
 		NetworkProtocol.OP_PING:

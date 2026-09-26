@@ -16,6 +16,8 @@ var display_name: String = ""
 ## Localization.AUTO, "pl" or "en"; persisted. The effective locale is
 ## TranslationServer.get_locale().
 var language: String = Localization.AUTO
+## Body used for the local player (see CharacterRegistry). Sent as join metadata online.
+var character_id: String = CharacterRegistry.DEFAULT
 var nakama_host: String = ProjectSettings.get_setting("game/network/host", "127.0.0.1")
 var nakama_port: int = int(ProjectSettings.get_setting("game/network/port", 7350))
 
@@ -78,6 +80,11 @@ func set_display_name(raw: String) -> void:
 	_save_settings()
 
 
+func set_character(id: String) -> void:
+	character_id = CharacterRegistry.sanitize(id)
+	_save_settings()
+
+
 ## Switches the game language now and persists the choice.
 func set_language(setting: String) -> void:
 	language = setting if (setting == Localization.AUTO or Localization.SUPPORTED.has(setting)) else Localization.AUTO
@@ -125,6 +132,7 @@ func _load_settings() -> void:
 		return
 	display_name = str(cfg.get_value("player", "display_name", display_name))
 	language = str(cfg.get_value("player", "language", language))
+	character_id = CharacterRegistry.sanitize(str(cfg.get_value("player", "character", character_id)))
 	nakama_host = str(cfg.get_value("network", "host", nakama_host))
 	nakama_port = int(cfg.get_value("network", "port", nakama_port))
 
@@ -133,6 +141,7 @@ func _save_settings() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("player", "display_name", display_name)
 	cfg.set_value("player", "language", language)
+	cfg.set_value("player", "character", character_id)
 	cfg.set_value("network", "host", nakama_host)
 	cfg.set_value("network", "port", nakama_port)
 	cfg.save(SETTINGS_PATH)
@@ -142,8 +151,11 @@ func _save_settings() -> void:
 ##   --name=Elara   sets the display name for this run only
 ##   --host=..., --port=...
 ##   --lang=pl|en   forces the language for this run (see Localization)
+##   --character=apprentice_m|placeholder   body for this run
 func _apply_command_line_overrides() -> void:
 	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--character="):
+			character_id = CharacterRegistry.sanitize(arg.trim_prefix("--character="))
 		if arg.begins_with("--name="):
 			display_name = sanitize_display_name(arg.trim_prefix("--name="))
 		elif arg.begins_with("--host="):

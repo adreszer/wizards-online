@@ -16,6 +16,8 @@ const LAYER_WORLD := 1 << 0
 @export var is_local: bool = true
 @export var peer_id: String = ""
 @export var display_name: String = "Apprentice"
+## CharacterRegistry id. Empty = keep the visual already in the scene.
+@export var character_id: String = ""
 
 @onready var movement: PlayerMovement = $Movement
 @onready var visual: Node3D = $CharacterVisual
@@ -36,12 +38,31 @@ var cast_origin: Node3D
 func _ready() -> void:
 	set_meta("health", health)
 	set_meta("player", self)
-	cast_origin = visual.get_node_or_null("Arm/Wand/CastOrigin") as Node3D
+	_apply_character()
+	cast_origin = visual.find_child("CastOrigin", true, false) as Node3D
 	nameplate.set_display_name(display_name)
 	if is_local:
 		_setup_local()
 	else:
 		_setup_remote()
+
+
+## Replaces the CharacterVisual subtree with the registry scene for character_id.
+func _apply_character() -> void:
+	if character_id.is_empty() or not CharacterRegistry.is_valid(character_id):
+		return
+	var scene := CharacterRegistry.load_scene(character_id)
+	if scene == null or visual.scene_file_path == scene.resource_path:
+		return
+	var new_visual := scene.instantiate() as Node3D
+	new_visual.name = "CharacterVisual"
+	var old := visual
+	old.name = "CharacterVisual_old"
+	add_child(new_visual)
+	move_child(new_visual, old.get_index())
+	old.queue_free()
+	visual = new_visual
+	animation_controller = new_visual.get_node("AnimationController") as AnimationController
 
 
 func _setup_local() -> void:

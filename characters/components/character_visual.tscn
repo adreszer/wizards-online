@@ -506,6 +506,6 @@ parameters/Cast/active = false
 parameters/Cast/internal_active = false
 parameters/Cast/request = 0
 
-[node name="AnimationController" type="Node" parent="."]
+[node name="AnimationController" type="Node" parent="." node_paths=PackedStringArray("animation_tree")]
 script = ExtResource("1")
 animation_tree = NodePath("../AnimationTree")

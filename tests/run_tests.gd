@@ -32,6 +32,7 @@ func _run() -> void:
 	await _test_moving_platform()
 	await _test_level_wiring()
 	_test_localization()
+	await _test_characters()
 	print(t.summary())
 	get_tree().quit(1 if t.failed > 0 else 0)
 
@@ -485,3 +486,40 @@ func _test_localization() -> void:
 	t.check(GameSession.sanitize_display_name("Michał Żółć") == "Michał Żółć", "display names keep Polish letters")
 	t.check(GameSession.sanitize_display_name(" [Ro]wan_1 ") == "Rowan_1", "display names drop brackets and outer spaces")
 	TranslationServer.set_locale(previous)
+
+
+# --- Characters -----------------------------------------------------------------------
+
+func _test_characters() -> void:
+	t.section("Characters")
+	var floor_body := TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(20, 1, 20))
+	for id in CharacterRegistry.ids():
+		if player != null:
+			player.queue_free()
+			await get_tree().process_frame
+		player = PLAYER_SCENE.instantiate()
+		player.is_local = true
+		player.character_id = id
+		add_child(player)
+		player.global_position = Vector3(0, 0.1, 0)
+		await _wait(0.3)
+		t.check(player.visual.scene_file_path == CharacterRegistry.load_scene(id).resource_path, "%s: visual scene swapped in" % id)
+		t.check(player.cast_origin != null and player.cast_origin.is_inside_tree(), "%s: cast origin found" % id)
+		var tree: AnimationTree = player.visual.get_node("AnimationTree")
+		t.check(tree.active, "%s: animation tree active" % id)
+		var ap: AnimationPlayer = tree.get_node(tree.anim_player)
+		var missing := []
+		for state in PlayerMovement.STATE_NAMES:
+			var node_name: String = state.capitalize()
+			var anim_node := (tree.tree_root as AnimationNodeBlendTree).get_node(node_name) as AnimationNodeAnimation
+			if anim_node == null or not ap.has_animation(anim_node.animation):
+				missing.append(state)
+		t.check(missing.is_empty(), "%s: all movement states map to existing clips %s" % [id, str(missing)])
+		player.movement.set_external_move(Vector3(0, 0, -1), false)
+		await _wait(0.4)
+		t.check(player.animation_controller.current_state_name == "walk", "%s: controller reaches walk state" % id)
+		player.animation_controller.play_cast()
+		await _wait(0.2)
+		t.check(bool(tree.get("parameters/Cast/active")), "%s: cast one-shot plays" % id)
+		player.movement.set_external_move(Vector3.ZERO)
+	await _clear([floor_body])
