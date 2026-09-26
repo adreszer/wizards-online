@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://mvplevel00001"]
+[gd_scene load_steps=24 format=3 uid="uid://mvplevel00001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/modular_floor.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/greybox/greybox_block.tscn" id="2"]
@@ -9,17 +9,18 @@
 [ext_resource type="PackedScene" path="res://objects/puzzles/secret_wall.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://gameplay/checkpoints/checkpoint.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://gameplay/collectibles/collectible.tscn" id="9"]
-[ext_resource type="PackedScene" path="res://objects/interactables/spell_tome.tscn" id="10"]
-[ext_resource type="PackedScene" path="res://objects/puzzles/magic_switch.tscn" id="11"]
-[ext_resource type="PackedScene" path="res://objects/puzzles/pushable_block.tscn" id="12"]
-[ext_resource type="PackedScene" path="res://objects/puzzles/pressure_plate.tscn" id="13"]
-[ext_resource type="PackedScene" path="res://gameplay/checkpoints/kill_zone.tscn" id="14"]
-[ext_resource type="PackedScene" path="res://objects/platforms/moving_platform.tscn" id="15"]
-[ext_resource type="PackedScene" path="res://gameplay/checkpoints/damage_zone.tscn" id="16"]
-[ext_resource type="PackedScene" path="res://objects/puzzles/rotating_statue.tscn" id="17"]
-[ext_resource type="Script" path="res://objects/puzzles/statue_puzzle.gd" id="18"]
-[ext_resource type="Script" path="res://levels/mvp/mvp_level.gd" id="19"]
-[ext_resource type="Script" path="res://levels/mvp/level_end.gd" id="20"]
+[ext_resource type="PackedScene" path="res://objects/environment/modular/floor_tile_2.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://objects/interactables/spell_tome.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://objects/puzzles/magic_switch.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://objects/puzzles/pushable_block.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://objects/puzzles/pressure_plate.tscn" id="14"]
+[ext_resource type="PackedScene" path="res://gameplay/checkpoints/kill_zone.tscn" id="15"]
+[ext_resource type="PackedScene" path="res://objects/platforms/moving_platform.tscn" id="16"]
+[ext_resource type="PackedScene" path="res://gameplay/checkpoints/damage_zone.tscn" id="17"]
+[ext_resource type="PackedScene" path="res://objects/puzzles/rotating_statue.tscn" id="18"]
+[ext_resource type="Script" path="res://objects/puzzles/statue_puzzle.gd" id="19"]
+[ext_resource type="Script" path="res://levels/mvp/mvp_level.gd" id="20"]
+[ext_resource type="Script" path="res://levels/mvp/level_end.gd" id="21"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -36,7 +37,7 @@ fog_density = 0.004
 size = Vector3(12, 4, 2)
 
 [node name="MvpLevel" type="Node3D" node_paths=PackedStringArray("entrance_lever", "entrance_door", "training_switch_a", "training_switch_b", "training_door", "puzzle_switch", "puzzle_gate", "puzzle_plate", "puzzle_door", "statue_puzzle", "final_lever", "final_door", "secret_wall")]
-script = ExtResource("19")
+script = ExtResource("20")
 entrance_lever = NodePath("EntranceLever")
 entrance_door = NodePath("EntranceDoor")
 training_switch_a = NodePath("TrainingSwitchA")
@@ -196,10 +197,11 @@ color = Color(0.620, 0.550, 0.700, 1)
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 3.500, 1.200, -36.000)
 size_x = 8.000
 size_z = 8.000
+module_scene = ExtResource("10")
 
 [node name="Secret_Floor_Sub" parent="Geometry" instance=ExtResource("2")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 7.500, -0.130, -32.000)
-size = Vector3(8.000, 1.740, 8.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 7.500, -0.080, -32.000)
+size = Vector3(8.000, 1.840, 8.000)
 color = Color(0.350, 0.300, 0.450, 1)
 
 [node name="Secret_WR" parent="Walls" instance=ExtResource("3")]
@@ -244,10 +246,11 @@ color = Color(0.500, 0.460, 0.550, 1)
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -8.000, 1.200, -65.000)
 size_x = 16.000
 size_z = 20.000
+module_scene = ExtResource("10")
 
 [node name="Training_Floor_Sub" parent="Geometry" instance=ExtResource("2")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.130, -55.000)
-size = Vector3(16.000, 1.740, 20.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.080, -55.000)
+size = Vector3(16.000, 1.840, 20.000)
 color = Color(0.420, 0.400, 0.470, 1)
 
 [node name="Training_WL" parent="Walls" instance=ExtResource("3")]
@@ -274,14 +277,14 @@ color = Color(0.500, 0.460, 0.550, 1)
 [node name="TrainingCheckpoint" parent="." instance=ExtResource("8")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 1.200, -47.500)
 
-[node name="SpellTome" parent="." instance=ExtResource("10")]
+[node name="SpellTome" parent="." instance=ExtResource("11")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 1.200, -52.000)
 
 [node name="TrainingPlaque" parent="." instance=ExtResource("6")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -7.600, 2.400, -52.000)
 text = "Wake both crystals to pass. Aim through the centre of your sight."
 
-[node name="TrainingSwitchA" parent="." instance=ExtResource("11")]
+[node name="TrainingSwitchA" parent="." instance=ExtResource("12")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -5.500, 1.200, -62.000)
 
 [node name="Training_Pedestal" parent="Geometry" instance=ExtResource("2")]
@@ -289,7 +292,7 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 size = Vector3(1.600, 2.000, 1.600)
 color = Color(0.620, 0.550, 0.700, 1)
 
-[node name="TrainingSwitchB" parent="." instance=ExtResource("11")]
+[node name="TrainingSwitchB" parent="." instance=ExtResource("12")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 5.500, 3.200, -62.000)
 
 [node name="TrainingDoor" parent="." instance=ExtResource("4")]
@@ -350,7 +353,7 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 size = Vector3(2.000, 0.400, 2.000)
 color = Color(0.620, 0.550, 0.700, 1)
 
-[node name="PuzzleSwitch" parent="." instance=ExtResource("11")]
+[node name="PuzzleSwitch" parent="." instance=ExtResource("12")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.500, 3.600, -76.500)
 
 [node name="PuzzlePlaque" parent="." instance=ExtResource("6")]
@@ -360,10 +363,10 @@ text = "What is out of reach may still be touched. Weight holds the far door."
 [node name="PuzzleGate" parent="." instance=ExtResource("4")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 1.200, -78.000)
 
-[node name="PushableBlock" parent="." instance=ExtResource("12")]
+[node name="PushableBlock" parent="." instance=ExtResource("13")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 1.950, -82.000)
 
-[node name="PressurePlate" parent="." instance=ExtResource("13")]
+[node name="PressurePlate" parent="." instance=ExtResource("14")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -3.500, 1.200, -86.000)
 
 [node name="PuzzleDoor" parent="." instance=ExtResource("4")]
@@ -436,7 +439,7 @@ color = Color(0.500, 0.460, 0.550, 1)
 [node name="PlatCheckpoint" parent="." instance=ExtResource("8")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 1.200, -91.500)
 
-[node name="PitKillZone" parent="." instance=ExtResource("14")]
+[node name="PitKillZone" parent="." instance=ExtResource("15")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -4.500, -110.000)
 
 [node name="Plat_P1" parent="Geometry" instance=ExtResource("2")]
@@ -459,7 +462,7 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 size = Vector3(4.000, 1.000, 4.000)
 color = Color(0.350, 0.550, 0.650, 1)
 
-[node name="MovingPlatform1" parent="." instance=ExtResource("15")]
+[node name="MovingPlatform1" parent="." instance=ExtResource("16")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 2.000, 1.800, -110.000)
 points = Array[Vector3]([Vector3(0, 0, -9)])
 speed = 2.2
@@ -474,7 +477,7 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 [node name="Fragment_Plat3" parent="MovingPlatform1" instance=ExtResource("9")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 0.200, 0.000)
 
-[node name="CursedFloor" parent="." instance=ExtResource("16")]
+[node name="CursedFloor" parent="." instance=ExtResource("17")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 1.200, -128.000)
 damage_on_enter = 20
 damage_per_tick = 10
@@ -517,15 +520,15 @@ color = Color(0.500, 0.460, 0.550, 1)
 [node name="FinalCheckpoint" parent="." instance=ExtResource("8")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 1.200, -132.500)
 
-[node name="Statue1" parent="." instance=ExtResource("17")]
+[node name="Statue1" parent="." instance=ExtResource("18")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -4.000, 1.200, -140.000)
 initial_state = 1
 
-[node name="Statue2" parent="." instance=ExtResource("17")]
+[node name="Statue2" parent="." instance=ExtResource("18")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 1.200, -142.000)
 initial_state = 2
 
-[node name="Statue3" parent="." instance=ExtResource("17")]
+[node name="Statue3" parent="." instance=ExtResource("18")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 1.200, -140.000)
 initial_state = 3
 
@@ -547,10 +550,11 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 1.200, -170.000)
 size_x = 12.000
 size_z = 15.000
+module_scene = ExtResource("10")
 
 [node name="Reward_Floor_Sub" parent="Geometry" instance=ExtResource("2")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.130, -162.500)
-size = Vector3(12.000, 1.740, 15.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.080, -162.500)
+size = Vector3(12.000, 1.840, 15.000)
 color = Color(0.500, 0.420, 0.300, 1)
 
 [node name="Reward_WL" parent="Walls" instance=ExtResource("3")]
@@ -689,7 +693,7 @@ light_energy = 1.4
 omni_range = 12.0
 
 [node name="StatuePuzzle" type="Node" parent="." node_paths=PackedStringArray("statues")]
-script = ExtResource("18")
+script = ExtResource("19")
 statues = [NodePath("../Statue1"), NodePath("../Statue2"), NodePath("../Statue3")]
 required_states = Array[int]([0, 0, 0])
 
@@ -697,7 +701,7 @@ required_states = Array[int]([0, 0, 0])
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -160)
 collision_layer = 0
 collision_mask = 2
-script = ExtResource("20")
+script = ExtResource("21")
 
 [node name="Shape" type="CollisionShape3D" parent="LevelEnd"]
 shape = SubResource("EndShape")

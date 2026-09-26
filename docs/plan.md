@@ -111,7 +111,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] In-game visual sign-off of the wall (seams, top edge, material) → decide whether this becomes the canonical workflow
 - [ ] Decide seam strategy (see findings) before building more modules
 - [x] Floor module: `assets/models/environment/modular/floor.glb` → wrapper `floor_tile.tscn` (4 × 4 × 0.46 m, top-centre pivot, box collision) → `ModularFloor` tiler; every level floor now tiled (11 areas, 158 tiles) over a greybox sub-floor
-- [ ] Floor mesh is 395,742 triangles per tile (wall: 3,031). With 158 instances this is the dominant render cost; re-export at ≤10k triangles (bake detail into the normal map) before more floors are placed
+- [x] Second floor variant `floor2.glb` → `floor_tile_2.tscn` (4 × 4 × 0.36 m); used in the training room, secret room and reward room so special areas read differently
+- [ ] Floor meshes are 395,742 (floor) and 224,608 (floor2) triangles per tile (wall: 3,031). With 158 instances this is the dominant render cost; re-export at ≤10k triangles (bake detail into the normal map) before more floors are placed
 - [ ] Corner / pillar module, doorway module
 
 ## Production environment asset pipeline (in validation)

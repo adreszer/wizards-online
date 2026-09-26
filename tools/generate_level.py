@@ -40,14 +40,21 @@ def wall_run(name, start, length, rot_y=0.0):
 FLOOR = (0.42, 0.40, 0.47); WALL = (0.55, 0.52, 0.6); ACCENT = (0.62, 0.55, 0.7); LINTEL = (0.5, 0.46, 0.55)
 WALL_H = 4.0; T = 0.35; OPEN_H = 3.6
 
-FLOOR_TILE_THICK = 0.46
-def floor(name, x0, x1, z0, z1, top, color=FLOOR, thick=1.0):
+# Floor tile variants: wrapper scene -> slab thickness (from the wrapper's collision box).
+FLOOR_TILES = {
+    "plain": ("res://objects/environment/modular/floor_tile.tscn", 0.46),
+    "ornate": ("res://objects/environment/modular/floor_tile_2.tscn", 0.36),
+}
+def floor(name, x0, x1, z0, z1, top, color=FLOOR, thick=1.0, tile="plain"):
     """Modular floor tiles with their top at `top`, over a greybox sub-floor that
     hides the void under raised areas (ledge faces, pit walls)."""
-    inst(name, "res://objects/environment/modular/modular_floor.tscn", (x0, top, z0), parent="Floors",
-         props={"size_x": f"{x1 - x0:.3f}", "size_z": f"{z1 - z0:.3f}"})
-    sub_top = top - FLOOR_TILE_THICK
-    sub_thick = max(0.2, thick - FLOOR_TILE_THICK)
+    scene, tile_thick = FLOOR_TILES[tile]
+    props = {"size_x": f"{x1 - x0:.3f}", "size_z": f"{z1 - z0:.3f}"}
+    if tile != "plain":
+        props["module_scene"] = f'ExtResource("{ext_id("PackedScene", scene)}")'
+    inst(name, "res://objects/environment/modular/modular_floor.tscn", (x0, top, z0), parent="Floors", props=props)
+    sub_top = top - tile_thick
+    sub_thick = max(0.2, thick - tile_thick)
     block(name + "_Sub", ((x0 + x1) / 2, sub_top - sub_thick / 2, (z0 + z1) / 2), (x1 - x0, sub_thick, z1 - z0), color)
 
 # Walls are placed with their centre line on the room boundary (x0 / x1 / z), so a
@@ -93,7 +100,7 @@ inst("CorridorCheckpoint", "res://gameplay/checkpoints/checkpoint.tscn", (0, 1.2
 inst("Fragment_Corridor", "res://gameplay/collectibles/collectible.tscn", (0, 2.0, -40))
 block("Corridor_Ledge", (0, 1.6, -40), (2, 0.8, 2), ACCENT)
 # Secret room x[3.5,11.5] z[-36,-28]
-floor("Secret_Floor", 3.5, 11.5, -36, -28, 1.2, color=(0.35, 0.3, 0.45), thick=2.2)
+floor("Secret_Floor", 3.5, 11.5, -36, -28, 1.2, color=(0.35, 0.3, 0.45), thick=2.2, tile="ornate")
 wall_run("Secret_WR", (11.5, 1.2, -28), 8.0, math.radians(90))
 wall_run("Secret_WN", (3.5, 1.2, -28), 8.0, 0.0)
 wall_run("Secret_WS", (3.5, 1.2, -36), 8.0, 0.0)
@@ -103,7 +110,7 @@ inst("SecretPlaque", "res://objects/interactables/plaque.tscn", (11.1, 2.4, -32)
      props={"text": '"Well found. Curiosity is the first lesson."'})
 # ---------------- Training room z[-65,-45] x[-8,8]
 end_wall("Training_Back", -8, 8, -45, 1.2, (-1.6, 1.6), open_h=OPEN_H)
-floor("Training_Floor", -8, 8, -65, -45, 1.2, thick=2.2)
+floor("Training_Floor", -8, 8, -65, -45, 1.2, thick=2.2, tile="ornate")
 side_walls("Training", -8, 8, -65, -45, 1.2)
 end_wall("Training_Front", -8, 8, -65, 1.2, DOOR)
 inst("TrainingCheckpoint", "res://gameplay/checkpoints/checkpoint.tscn", (0, 1.2, -47.5))
@@ -163,7 +170,7 @@ inst("FinalLever", "res://objects/interactables/lever.tscn", (6, 1.2, -151), rot
 inst("FinalDoor", "res://objects/puzzles/magic_door.tscn", (0, 1.2, -155))
 inst("Fragment_Final", "res://gameplay/collectibles/collectible.tscn", (0, 1.2, -149))
 # ---------------- Reward room z[-170,-155] x[-6,6]
-floor("Reward_Floor", -6, 6, -170, -155, 1.2, color=(0.5, 0.42, 0.3), thick=2.2)
+floor("Reward_Floor", -6, 6, -170, -155, 1.2, color=(0.5, 0.42, 0.3), thick=2.2, tile="ornate")
 side_walls("Reward", -6, 6, -170, -155, 1.2)
 end_wall("Reward_Back", -6, 6, -170, 1.2)
 block("Reward_Pedestal", (0, 1.6, -165), (2, 0.8, 2), (0.7, 0.6, 0.35))
