@@ -69,7 +69,7 @@ Aiming: the camera ray from the screen centre is intersected with the world; a c
 
 ## Level mechanics
 
-All in `objects/`: `MagicSwitch`, `MagicDoor` (AnimatableBody3D panel), `PushableBlock` (RigidBody3D), `PressurePlate` (Area3D), `RotatingStatue` + `StatuePuzzle`, `MovingPlatform` (AnimatableBody3D, `sync_to_physics`, waypoints, loop modes, activation), `SecretWall`, `Lever`, `Plaque`, `SpellTome`. Objects expose signals/methods; `levels/mvp/mvp_level.gd` holds only the level-specific wiring (e.g. "both switches open the door"). Greybox geometry is `GreyboxBlock` (`@tool`, size-driven mesh + collision).
+All in `objects/`: `MagicSwitch`, `MagicDoor` (AnimatableBody3D panel), `PushableBlock` (RigidBody3D), `PressurePlate` (Area3D), `RotatingStatue` + `StatuePuzzle`, `MovingPlatform` (AnimatableBody3D, `sync_to_physics`, waypoints, loop modes, activation), `SecretWall`, `Lever`, `Plaque`, `SpellTome`. Objects expose signals/methods; `levels/mvp/mvp_level.gd` holds only the level-specific wiring (e.g. "both switches open the door"). Greybox geometry is `GreyboxBlock` (`@tool`, size-driven mesh + collision). Walls are `ModularWallRun` (`objects/environment/modular/`), a `@tool` node that tiles the `wall_plain` wrapper along its length with an even X stretch so runs end exactly on room boundaries; the level itself is produced by `tools/generate_level.py`, so geometry changes go in the generator or in the wrapper scenes.
 
 ## Networking
 
