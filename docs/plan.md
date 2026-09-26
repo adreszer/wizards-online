@@ -112,7 +112,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Decide seam strategy (see findings) before building more modules
 - [x] Floor module: `assets/models/environment/modular/floor.glb` → wrapper `floor_tile.tscn` (4 × 4 × 0.46 m, top-centre pivot, box collision) → `ModularFloor` tiler; every level floor now tiled (11 areas, 158 tiles) over a greybox sub-floor
 - [x] Second floor variant `floor2.glb` → `floor_tile_2.tscn` (4 × 4 × 0.36 m); used in the training room, secret room and reward room so special areas read differently
-- [ ] Floor meshes are 395,742 (floor) and 224,608 (floor2) triangles per tile (wall: 3,031). With 158 instances this is the dominant render cost; re-export at ≤10k triangles (bake detail into the normal map) before more floors are placed
+- [x] `floor.glb` re-exported via Meshy remesh: 10,173 tris with a normal map, same bounds (wrapper unchanged)
+- [ ] `floor2.glb` is still 224,608 triangles per tile (wall: 3,031). With 158 instances this is the dominant render cost; re-export at ≤10k triangles (bake detail into the normal map) before more floors are placed
 - [x] Pillar module `pillar.glb` → `pillar.tscn` (uniform ×4.20 → 1.06 × 8 × 1.06 m, bottom-centre pivot); placed at every room corner and every 8 m along side walls (48 pillars), hiding wall seams and corners
 - [x] Ceiling module `ceiling.glb` → `ceiling_tile.tscn` (panel rotated flat, 4 × 4 × 0.49 m, underside at the node origin); tiled with `ModularFloor` at 8 m over every room (158 tiles)
 - [x] Rooms raised to 8 m: two stacked wall rows, full-width upper row above door lintels; sun dimmed, ambient/torches raised for enclosed rooms
