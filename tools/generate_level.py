@@ -40,8 +40,15 @@ def wall_run(name, start, length, rot_y=0.0):
 FLOOR = (0.42, 0.40, 0.47); WALL = (0.55, 0.52, 0.6); ACCENT = (0.62, 0.55, 0.7); LINTEL = (0.5, 0.46, 0.55)
 WALL_H = 4.0; T = 0.35; OPEN_H = 3.6
 
+FLOOR_TILE_THICK = 0.46
 def floor(name, x0, x1, z0, z1, top, color=FLOOR, thick=1.0):
-    block(name, ((x0 + x1) / 2, top - thick / 2, (z0 + z1) / 2), (x1 - x0, thick, z1 - z0), color)
+    """Modular floor tiles with their top at `top`, over a greybox sub-floor that
+    hides the void under raised areas (ledge faces, pit walls)."""
+    inst(name, "res://objects/environment/modular/modular_floor.tscn", (x0, top, z0), parent="Floors",
+         props={"size_x": f"{x1 - x0:.3f}", "size_z": f"{z1 - z0:.3f}"})
+    sub_top = top - FLOOR_TILE_THICK
+    sub_thick = max(0.2, thick - FLOOR_TILE_THICK)
+    block(name + "_Sub", ((x0 + x1) / 2, sub_top - sub_thick / 2, (z0 + z1) / 2), (x1 - x0, sub_thick, z1 - z0), color)
 
 # Walls are placed with their centre line on the room boundary (x0 / x1 / z), so a
 # wall's inner face sits T/2 inside the boundary. Side walls run along -Z; a run
@@ -221,6 +228,8 @@ shadow_enabled = true
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.05, 0)
 
 [node name="Geometry" type="Node3D" parent="."]
+
+[node name="Floors" type="Node3D" parent="."]
 
 [node name="Walls" type="Node3D" parent="."]
 
