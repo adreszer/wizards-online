@@ -32,13 +32,40 @@ def inst(name, path, pos, parent=".", rot_y=0.0, props=None):
         body += f'{k} = {v}\n'
     nodes.append(body)
 
-def wall_run(name, start, length, rot_y=0.0):
-    """A modular wall from `start` (floor level, run origin) along the rotated +X for `length` metres."""
-    inst(name, "res://objects/environment/modular/modular_wall_run.tscn", start, parent="Walls", rot_y=rot_y,
-         props={"length": f"{length:.3f}"})
+def wall_run(name, start, length, rot_y=0.0, rows=None):
+    """A modular wall from `start` (floor level, run origin) along the rotated +X for
+    `length` metres, stacked in 4 m rows up to WALL_H (castle-height rooms)."""
+    if rows is None:
+        rows = int(round(WALL_H / MODULE_H))
+    for r in range(rows):
+        suffix = "" if r == 0 else f"_Row{r + 1}"
+        inst(name + suffix, "res://objects/environment/modular/modular_wall_run.tscn",
+             (start[0], start[1] + r * MODULE_H, start[2]), parent="Walls", rot_y=rot_y,
+             props={"length": f"{length:.3f}"})
+
+def pillar(name, x, z, top):
+    inst(name, "res://objects/environment/modular/pillar.tscn", (x, top, z), parent="Pillars")
+
+def room_pillars(name, x0, x1, z0, z1, top, mid=True):
+    """Corner pillars plus one every PILLAR_SPACING metres along the side walls."""
+    zs = [z1, z0]
+    if mid:
+        z = z1 - PILLAR_SPACING
+        while z > z0 + 2.0:
+            zs.append(z)
+            z -= PILLAR_SPACING
+    for i, z in enumerate(zs):
+        pillar(f"{name}_PL{i}", x0, z, top)
+        pillar(f"{name}_PR{i}", x1, z, top)
+
+def ceiling(name, x0, x1, z0, z1, y):
+    inst(name, "res://objects/environment/modular/modular_floor.tscn", (x0, y, z0), parent="Ceilings",
+         props={"size_x": f"{x1 - x0:.3f}", "size_z": f"{z1 - z0:.3f}",
+                "module_scene": f'ExtResource("{ext_id("PackedScene", "res://objects/environment/modular/ceiling_tile.tscn")}")'})
 
 FLOOR = (0.42, 0.40, 0.47); WALL = (0.55, 0.52, 0.6); ACCENT = (0.62, 0.55, 0.7); LINTEL = (0.5, 0.46, 0.55)
-WALL_H = 4.0; T = 0.35; OPEN_H = 3.6
+WALL_H = 8.0; MODULE_H = 4.0; T = 0.35; OPEN_H = 3.6
+PILLAR_SPACING = 8.0
 
 # Floor tile variants: wrapper scene -> slab thickness (from the wrapper's collision box).
 FLOOR_TILES = {
@@ -69,10 +96,13 @@ def end_wall(name, x0, x1, z, top, opening=None, open_h=OPEN_H):
         wall_run(name, (x0, top, z), x1 - x0, 0.0)
         return
     ox0, ox1 = opening
-    wall_run(name + "_L", (x0, top, z), ox0 - x0, 0.0)
-    wall_run(name + "_R", (ox1, top, z), x1 - ox1, 0.0)
-    # Lintel above the opening (greybox beam, slightly proud of the wall face)
-    block(name + "_Lintel", ((ox0 + ox1) / 2, top + open_h + (WALL_H - open_h) / 2, z), (ox1 - ox0 + 0.2, WALL_H - open_h, T + 0.1), LINTEL)
+    wall_run(name + "_L", (x0, top, z), ox0 - x0, 0.0, rows=1)
+    wall_run(name + "_R", (ox1, top, z), x1 - ox1, 0.0, rows=1)
+    # Lintel above the opening (greybox beam, slightly proud of the wall face), then full rows above.
+    block(name + "_Lintel", ((ox0 + ox1) / 2, top + open_h + (MODULE_H - open_h) / 2, z), (ox1 - ox0 + 0.2, MODULE_H - open_h, T + 0.1), LINTEL)
+    upper_rows = int(round(WALL_H / MODULE_H)) - 1
+    for r in range(upper_rows):
+        wall_run(name + f"_Row{r + 2}", (x0, top + (r + 1) * MODULE_H, z), x1 - x0, 0.0, rows=1)
 
 DOOR = (-1.8, 1.8)
 # ---------------- Entrance chamber  z[-18.5, 3]
@@ -88,7 +118,8 @@ inst("EntranceDoor", "res://objects/puzzles/magic_door.tscn", (0, 1.2, -18.5))
 inst("EntranceLever", "res://objects/interactables/lever.tscn", (5.5, 1.2, -16.5), rot_y=math.radians(90))
 inst("EntrancePlaque", "res://objects/interactables/plaque.tscn", (-7.6, 1.6, -2), rot_y=math.radians(90),
      props={"text": '"Welcome, apprentice. The halls reward those who look closely. Purple glimmers answer to magic."'})
-block("Entrance_Pillar1", (-6, 2, -4), (1, 4, 1), ACCENT); block("Entrance_Pillar2", (6, 2, -4), (1, 4, 1), ACCENT)
+room_pillars("Entrance", -8, 8, -18.5, 3, 0.0)
+ceiling("Entrance_Ceiling", -8, 8, -18.5, 3, WALL_H)
 # ---------------- Corridor z[-45,-18.5], x[-3,3], top 1.2
 floor("Corridor_Floor", -3, 3, -45, -18.5, 1.2, thick=2.2)
 wall_run("Corridor_WL", (-3, 1.2, -18.5), 26.5, math.radians(90))
@@ -99,6 +130,8 @@ inst("SecretWall", "res://objects/puzzles/secret_wall.tscn", (3, 1.2, -32), rot_
 inst("CorridorCheckpoint", "res://gameplay/checkpoints/checkpoint.tscn", (0, 1.2, -21))
 inst("Fragment_Corridor", "res://gameplay/collectibles/collectible.tscn", (0, 2.0, -40))
 block("Corridor_Ledge", (0, 1.6, -40), (2, 0.8, 2), ACCENT)
+room_pillars("Corridor", -3, 3, -45, -18.5, 1.2, mid=False)
+ceiling("Corridor_Ceiling", -3, 3, -45, -18.5, 1.2 + WALL_H)
 # Secret room x[3.5,11.5] z[-36,-28]
 floor("Secret_Floor", 3.5, 11.5, -36, -28, 1.2, color=(0.35, 0.3, 0.45), thick=2.2, tile="ornate")
 wall_run("Secret_WR", (11.5, 1.2, -28), 8.0, math.radians(90))
@@ -106,6 +139,8 @@ wall_run("Secret_WN", (3.5, 1.2, -28), 8.0, 0.0)
 wall_run("Secret_WS", (3.5, 1.2, -36), 8.0, 0.0)
 for i, (x, z) in enumerate([(6, -30), (9.5, -32), (6, -34)]):
     inst(f"Fragment_Secret{i+1}", "res://gameplay/collectibles/collectible.tscn", (x, 1.2, z))
+room_pillars("Secret", 3.5, 11.5, -36, -28, 1.2, mid=False)
+ceiling("Secret_Ceiling", 3.5, 11.5, -36, -28, 1.2 + WALL_H)
 inst("SecretPlaque", "res://objects/interactables/plaque.tscn", (11.1, 2.4, -32), rot_y=math.radians(-90),
      props={"text": '"Well found. Curiosity is the first lesson."'})
 # ---------------- Training room z[-65,-45] x[-8,8]
@@ -122,6 +157,8 @@ block("Training_Pedestal", (5.5, 2.2, -62), (1.6, 2.0, 1.6), ACCENT)
 inst("TrainingSwitchB", "res://objects/puzzles/magic_switch.tscn", (5.5, 3.2, -62))
 inst("TrainingDoor", "res://objects/puzzles/magic_door.tscn", (0, 1.2, -65))
 inst("Fragment_Training", "res://gameplay/collectibles/collectible.tscn", (-6, 1.2, -56))
+room_pillars("Training", -8, 8, -65, -45, 1.2)
+ceiling("Training_Ceiling", -8, 8, -65, -45, 1.2 + WALL_H)
 # ---------------- Puzzle chamber z[-90,-65]
 floor("Puzzle_Floor", -8, 8, -90, -65, 1.2, thick=2.2)
 side_walls("Puzzle", -8, 8, -90, -65, 1.2)
@@ -137,6 +174,8 @@ inst("PushableBlock", "res://objects/puzzles/pushable_block.tscn", (4, 1.95, -82
 inst("PressurePlate", "res://objects/puzzles/pressure_plate.tscn", (-3.5, 1.2, -86))
 inst("PuzzleDoor", "res://objects/puzzles/magic_door.tscn", (0, 1.2, -90))
 inst("Fragment_Puzzle", "res://gameplay/collectibles/collectible.tscn", (6, 1.2, -87))
+room_pillars("Puzzle", -8, 8, -90, -65, 1.2)
+ceiling("Puzzle_Ceiling", -8, 8, -90, -65, 1.2 + WALL_H)
 # ---------------- Platforming chamber z[-130,-90]
 floor("Plat_Entry", -8, 8, -94, -90, 1.2, thick=2.2)
 floor("Plat_Exit", -8, 8, -130, -126, 1.2, thick=2.2)
@@ -155,6 +194,8 @@ inst("Fragment_Plat1", "res://gameplay/collectibles/collectible.tscn", (1, 1.6, 
 inst("Fragment_Plat2", "res://gameplay/collectibles/collectible.tscn", (-2, 2.0, -106))
 inst("Fragment_Plat3", "res://gameplay/collectibles/collectible.tscn", (0, 0.2, 0), parent="MovingPlatform1")
 inst("CursedFloor", "res://gameplay/checkpoints/damage_zone.tscn", (0, 1.2, -128), props={"damage_on_enter": "20", "damage_per_tick": "10"})
+room_pillars("Plat", -8, 8, -130, -90, 1.2, mid=False)
+ceiling("Plat_Ceiling", -8, 8, -130, -90, 1.2 + WALL_H)
 inst("PlatPlaque", "res://objects/interactables/plaque.tscn", (-7.6, 2.4, -92), rot_y=math.radians(90),
      props={"text": '"Mind the drop. The crimson floor bites; leap it."'})
 # ---------------- Final puzzle z[-155,-130]
@@ -169,18 +210,22 @@ inst("FinalPlaque", "res://objects/interactables/plaque.tscn", (-7.6, 2.4, -136)
 inst("FinalLever", "res://objects/interactables/lever.tscn", (6, 1.2, -151), rot_y=math.radians(-90), props={"one_shot": "false"})
 inst("FinalDoor", "res://objects/puzzles/magic_door.tscn", (0, 1.2, -155))
 inst("Fragment_Final", "res://gameplay/collectibles/collectible.tscn", (0, 1.2, -149))
+room_pillars("Final", -8, 8, -155, -130, 1.2)
+ceiling("Final_Ceiling", -8, 8, -155, -130, 1.2 + WALL_H)
 # ---------------- Reward room z[-170,-155] x[-6,6]
 floor("Reward_Floor", -6, 6, -170, -155, 1.2, color=(0.5, 0.42, 0.3), thick=2.2, tile="ornate")
 side_walls("Reward", -6, 6, -170, -155, 1.2)
 end_wall("Reward_Back", -6, 6, -170, 1.2)
 block("Reward_Pedestal", (0, 1.6, -165), (2, 0.8, 2), (0.7, 0.6, 0.35))
 inst("Fragment_Reward", "res://gameplay/collectibles/collectible.tscn", (0, 2.0, -165))
+room_pillars("Reward", -6, 6, -170, -155, 1.2, mid=False)
+ceiling("Reward_Ceiling", -6, 6, -170, -155, 1.2 + WALL_H)
 inst("RewardPlaque", "res://objects/interactables/plaque.tscn", (0, 2.4, -169.6),
      props={"text": '"You have reached the end of the vertical slice. Thank you for playing."'})
 
 lights = []
 for i, z in enumerate([-4, -14, -24, -40, -32, -50, -60, -70, -85, -96, -108, -120, -135, -148, -162]):
-    lights.append(f'[node name="Torch{i}" type="OmniLight3D" parent="Lights"]\ntransform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, {z})\nlight_color = Color(1, 0.85, 0.65, 1)\nlight_energy = 1.6\nomni_range = 16.0\nshadow_enabled = true\n')
+    lights.append(f'[node name="Torch{i}" type="OmniLight3D" parent="Lights"]\ntransform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, {z})\nlight_color = Color(1, 0.85, 0.65, 1)\nlight_energy = 2.6\nomni_range = 24.0\nshadow_enabled = true\n')
 lights.append('[node name="SecretLight" type="OmniLight3D" parent="Lights"]\ntransform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 4, -32)\nlight_color = Color(0.7, 0.5, 1, 1)\nlight_energy = 1.4\nomni_range = 12.0\n')
 
 statue_script = ext_id("Script", "res://objects/puzzles/statue_puzzle.gd")
@@ -196,7 +241,7 @@ background_mode = 1
 background_color = Color(0.06, 0.05, 0.1, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.45, 0.4, 0.6, 1)
-ambient_light_energy = 0.6
+ambient_light_energy = 0.9
 tonemap_mode = 2
 fog_enabled = true
 fog_light_color = Color(0.25, 0.2, 0.35, 1)
@@ -228,8 +273,8 @@ environment = SubResource("Env")
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
 light_color = Color(0.8, 0.8, 1, 1)
-light_energy = 0.5
-shadow_enabled = true
+light_energy = 0.15
+shadow_enabled = false
 
 [node name="StartPoint" type="Marker3D" parent="."]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.05, 0)
@@ -239,6 +284,10 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.05, 0)
 [node name="Floors" type="Node3D" parent="."]
 
 [node name="Walls" type="Node3D" parent="."]
+
+[node name="Pillars" type="Node3D" parent="."]
+
+[node name="Ceilings" type="Node3D" parent="."]
 
 [node name="Lights" type="Node3D" parent="."]
 
