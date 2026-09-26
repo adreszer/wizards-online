@@ -1,0 +1,74 @@
+[gd_scene load_steps=14 format=3 uid="uid://player000001"]
+
+[ext_resource type="Script" path="res://characters/player/player.gd" id="1"]
+[ext_resource type="Script" path="res://characters/player/player_movement.gd" id="2"]
+[ext_resource type="PackedScene" path="res://characters/components/character_visual.tscn" id="3"]
+[ext_resource type="Script" path="res://gameplay/spells/spell_caster.gd" id="4"]
+[ext_resource type="Script" path="res://gameplay/health/health.gd" id="5"]
+[ext_resource type="Script" path="res://gameplay/checkpoints/respawn_handler.gd" id="6"]
+[ext_resource type="Script" path="res://multiplayer/synchronization/network_synchronizer.gd" id="7"]
+[ext_resource type="Script" path="res://characters/components/nameplate.gd" id="8"]
+[ext_resource type="Script" path="res://characters/player/player_input.gd" id="9"]
+[ext_resource type="PackedScene" path="res://characters/player/camera_rig.tscn" id="10"]
+[ext_resource type="Script" path="res://gameplay/interaction/interaction_controller.gd" id="11"]
+
+[sub_resource type="CapsuleShape3D" id="BodyShape"]
+radius = 0.35
+height = 1.8
+
+[sub_resource type="SphereShape3D" id="InteractShape"]
+radius = 2.6
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BodyShape")
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2")
+
+[node name="CharacterVisual" parent="." instance=ExtResource("3")]
+
+[node name="SpellCaster" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+script = ExtResource("4")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="RespawnHandler" type="Node" parent="."]
+script = ExtResource("6")
+
+[node name="NetworkSynchronizer" type="Node" parent="."]
+script = ExtResource("7")
+
+[node name="Nameplate" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+billboard = 1
+no_depth_test = true
+fixed_size = true
+pixel_size = 0.0006
+text = "Apprentice"
+font_size = 40
+outline_size = 10
+script = ExtResource("8")
+
+[node name="LocalPlayer" type="Node3D" parent="."]
+
+[node name="PlayerInput" type="Node" parent="LocalPlayer"]
+script = ExtResource("9")
+
+[node name="CameraRig" parent="LocalPlayer" instance=ExtResource("10")]
+
+[node name="InteractionController" type="Area3D" parent="LocalPlayer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_layer = 0
+collision_mask = 16
+script = ExtResource("11")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LocalPlayer/InteractionController"]
+shape = SubResource("InteractShape")

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SpellDefinition" load_steps=5 format=3 uid="uid://arcanepulse001"]
+
+[ext_resource type="Script" path="res://gameplay/spells/spell_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/spells/spell_projectile.tscn" id="2"]
+[ext_resource type="AudioStream" path="res://assets/audio/cast.wav" id="3"]
+[ext_resource type="AudioStream" path="res://assets/audio/impact.wav" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"arcane_pulse"
+display_name = "Arcane Pulse"
+description = "A focused pulse of raw arcane force. Activates magical mechanisms and shoves loose objects."
+effect_type = &"force"
+range = 18.0
+cooldown = 0.45
+projectile_speed = 30.0
+projectile_scene = ExtResource("2")
+strength = 7.0
+aim_assist_angle_degrees = 7.0
+cast_sound = ExtResource("3")
+impact_sound = ExtResource("4")
+color = Color(0.65, 0.5, 1, 1)

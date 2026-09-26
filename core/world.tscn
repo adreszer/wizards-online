@@ -1,0 +1,30 @@
+[gd_scene load_steps=8 format=3 uid="uid://world0000001"]
+
+[ext_resource type="Script" path="res://core/world.gd" id="1"]
+[ext_resource type="PackedScene" path="res://levels/mvp/mvp_level.tscn" id="2"]
+[ext_resource type="Script" path="res://multiplayer/player_spawner.gd" id="3"]
+[ext_resource type="PackedScene" path="res://characters/player/player.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://ui/hud/hud.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://ui/chat/chat_panel.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://ui/menus/pause_menu.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://ui/debug/debug_overlay.tscn" id="8"]
+
+[node name="World" type="Node"]
+script = ExtResource("1")
+
+[node name="Level" parent="." instance=ExtResource("2")]
+
+[node name="Players" type="Node3D" parent="."]
+
+[node name="PlayerSpawner" type="Node" parent="." node_paths=PackedStringArray("players_root")]
+script = ExtResource("3")
+player_scene = ExtResource("4")
+players_root = NodePath("../Players")
+
+[node name="HUD" parent="." instance=ExtResource("5")]
+
+[node name="ChatPanel" parent="." instance=ExtResource("6")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("7")]
+
+[node name="DebugOverlay" parent="." instance=ExtResource("8")]

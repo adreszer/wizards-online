@@ -1,0 +1,22 @@
+[gd_scene load_steps=6 format=3 uid="uid://netmanager001"]
+
+[ext_resource type="Script" path="res://multiplayer/network_manager.gd" id="1"]
+[ext_resource type="Script" path="res://multiplayer/authentication/nakama_authentication.gd" id="2"]
+[ext_resource type="Script" path="res://multiplayer/world_session.gd" id="3"]
+[ext_resource type="Script" path="res://multiplayer/synchronization/state_synchronizer.gd" id="4"]
+[ext_resource type="Script" path="res://multiplayer/chat/chat_manager.gd" id="5"]
+
+[node name="NetworkManager" type="Node"]
+script = ExtResource("1")
+
+[node name="Authentication" type="Node" parent="."]
+script = ExtResource("2")
+
+[node name="WorldSession" type="Node" parent="."]
+script = ExtResource("3")
+
+[node name="StateSynchronizer" type="Node" parent="."]
+script = ExtResource("4")
+
+[node name="ChatManager" type="Node" parent="."]
+script = ExtResource("5")

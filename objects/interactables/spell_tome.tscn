@@ -1,0 +1,64 @@
+[gd_scene load_steps=10 format=3 uid="uid://spelltome0001"]
+
+[ext_resource type="Script" path="res://objects/interactables/spell_tome.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/interaction/interactable.gd" id="2"]
+[ext_resource type="Resource" path="res://resources/spells/arcane_pulse.tres" id="3"]
+[ext_resource type="AudioStream" path="res://assets/audio/learn.wav" id="4"]
+
+[sub_resource type="StandardMaterial3D" id="StoneMat"]
+albedo_color = Color(0.4, 0.4, 0.46, 1)
+
+[sub_resource type="StandardMaterial3D" id="BookMat"]
+albedo_color = Color(0.55, 0.2, 0.7, 1)
+emission_enabled = true
+emission = Color(0.65, 0.4, 1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="PedestalMesh"]
+top_radius = 0.45
+bottom_radius = 0.6
+height = 1.1
+
+[sub_resource type="BoxMesh" id="BookMesh"]
+size = Vector3(0.6, 0.12, 0.45)
+
+[sub_resource type="CylinderShape3D" id="Shape"]
+radius = 0.6
+height = 1.6
+
+[node name="SpellTome" type="StaticBody3D"]
+collision_layer = 17
+collision_mask = 0
+script = ExtResource("1")
+spell = ExtResource("3")
+learn_sound = ExtResource("4")
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2")
+prompt_text = "Study the tome"
+one_shot = true
+focus_point_offset = Vector3(0, 1.2, 0)
+
+[node name="Pedestal" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+mesh = SubResource("PedestalMesh")
+surface_material_override/0 = SubResource("StoneMat")
+
+[node name="Book" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Book"]
+mesh = SubResource("BookMesh")
+surface_material_override/0 = SubResource("BookMat")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Book"]
+light_color = Color(0.7, 0.5, 1, 1)
+light_energy = 1.5
+omni_range = 5.0
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("Shape")
+
+[node name="Audio" type="AudioStreamPlayer3D" parent="."]
+unit_size = 8.0

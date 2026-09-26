@@ -1,0 +1,14 @@
+# Godot
+.godot/
+*.import
+export/
+export_presets.cfg
+.DS_Store
+
+# Nakama / Docker local data
+nakama/data/
+nakama/postgres-data/
+
+# Editor
+.vscode/
+.idea/

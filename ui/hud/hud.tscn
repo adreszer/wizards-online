@@ -1,0 +1,140 @@
+[gd_scene load_steps=3 format=3 uid="uid://hud000000001"]
+
+[ext_resource type="Script" path="res://ui/hud/hud.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0, 0, 0, 0.45)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="TopLeft" type="PanelContainer" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="VBox" type="VBoxContainer" parent="TopLeft"]
+layout_mode = 2
+
+[node name="HealthRow" type="HBoxContainer" parent="TopLeft/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLeft/VBox/HealthRow"]
+layout_mode = 2
+text = "Health"
+
+[node name="HealthBar" type="ProgressBar" parent="TopLeft/VBox/HealthRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 18)
+layout_mode = 2
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="TopLeft/VBox/HealthRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "100 / 100"
+
+[node name="FragmentsLabel" type="Label" parent="TopLeft/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Fragments: 0 / 0"
+
+[node name="SpellRow" type="HBoxContainer" parent="TopLeft/VBox"]
+layout_mode = 2
+
+[node name="SpellLabel" type="Label" parent="TopLeft/VBox/SpellRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Spell: —"
+
+[node name="CooldownBar" type="ProgressBar" parent="TopLeft/VBox/SpellRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 10)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="TopRight" type="PanelContainer" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -260.0
+offset_top = 16.0
+offset_right = -16.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="StatusLabel" type="Label" parent="TopRight"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Offline"
+horizontal_alignment = 2
+
+[node name="Crosshair" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="H" type="ColorRect" parent="Crosshair"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 7.0
+offset_right = 14.0
+offset_bottom = 9.0
+color = Color(1, 1, 1, 0.8)
+
+[node name="V" type="ColorRect" parent="Crosshair"]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 2.0
+offset_right = 9.0
+offset_bottom = 14.0
+color = Color(1, 1, 1, 0.8)
+
+[node name="PromptLabel" type="Label" parent="."]
+unique_name_in_owner = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = 40.0
+offset_right = 150.0
+offset_bottom = 70.0
+theme_override_font_sizes/font_size = 22
+text = "[E] Interact"
+horizontal_alignment = 1
+
+[node name="NotificationLabel" type="Label" parent="."]
+unique_name_in_owner = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -140.0
+offset_right = 400.0
+offset_bottom = -100.0
+theme_override_font_sizes/font_size = 24
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3

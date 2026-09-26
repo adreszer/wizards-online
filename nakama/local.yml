@@ -1,0 +1,28 @@
+# Nakama configuration for LOCAL DEVELOPMENT ONLY. Do not reuse in production.
+name: wizards-online-dev
+data_dir: /nakama/data
+
+logger:
+  level: INFO
+
+console:
+  username: admin
+  password: password
+
+socket:
+  server_key: defaultkey
+  port: 7350
+  max_message_size_bytes: 4096
+
+session:
+  token_expiry_sec: 7200
+  encryption_key: dev-session-encryption-key-change-me
+  refresh_encryption_key: dev-refresh-encryption-key-change-me
+
+runtime:
+  path: /nakama/data/modules
+  http_key: defaulthttpkey
+
+match:
+  input_queue_size: 256
+  call_queue_size: 256

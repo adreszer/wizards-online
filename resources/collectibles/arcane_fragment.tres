@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CollectibleDefinition" load_steps=3 format=3 uid="uid://fragmentdef001"]
+
+[ext_resource type="Script" path="res://gameplay/collectibles/collectible_definition.gd" id="1"]
+[ext_resource type="AudioStream" path="res://assets/audio/pickup.wav" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"arcane_fragment"
+display_name = "Arcane Fragment"
+value = 1
+color = Color(0.6, 0.9, 1, 1)
+pickup_sound = ExtResource("2")

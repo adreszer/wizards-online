@@ -1,0 +1,511 @@
+[gd_scene format=3 uid="uid://charvisual001"]
+
+[ext_resource type="Script" path="res://characters/components/animation_controller.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Robe"]
+albedo_color = Color(0.32, 0.22, 0.55, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_Skin"]
+albedo_color = Color(0.92, 0.78, 0.66, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Wand"]
+albedo_color = Color(0.35, 0.22, 0.12, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Glow"]
+albedo_color = Color(0.7, 0.55, 1, 1)
+emission_enabled = true
+emission = Color(0.6, 0.45, 1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="CapsuleMesh" id="Mesh_Body"]
+radius = 0.32
+height = 1.3
+
+[sub_resource type="SphereMesh" id="Mesh_Head"]
+radius = 0.24
+height = 0.48
+
+[sub_resource type="BoxMesh" id="Mesh_Wand"]
+size = Vector3(0.05, 0.05, 0.5)
+
+[sub_resource type="SphereMesh" id="Mesh_Glow"]
+radius = 0.09
+height = 0.18
+
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 1.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Body:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.95, 0), Vector3(0, 0.98, 0), Vector3(0, 0.95, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Body:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(1, 1, 1), Vector3(1.02, 0.98, 1.02), Vector3(1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Arm:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_walk"]
+resource_name = "walk"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Body:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.45, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.95, 0), Vector3(0, 1.01, 0), Vector3(0, 0.95, 0), Vector3(0, 1.01, 0), Vector3(0, 0.95, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Body:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0.05), Vector3(0, 0, -0.05), Vector3(0, 0, 0.05)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Body:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Arm:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.4, 0, 0), Vector3(-0.4, 0, 0), Vector3(0.4, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_run"]
+resource_name = "run"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Body:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.95, 0), Vector3(0, 1.05, 0), Vector3(0, 0.95, 0), Vector3(0, 1.05, 0), Vector3(0, 0.95, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Body:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(-0.18, 0, 0.08), Vector3(-0.18, 0, -0.08), Vector3(-0.18, 0, 0.08)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Body:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Arm:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.9, 0, 0), Vector3(-0.9, 0, 0), Vector3(0.9, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_jump"]
+resource_name = "jump"
+length = 0.3
+loop_mode = 0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Body:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0.95, 0), Vector3(0, 1.0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Body:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Body:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.9, 1.15, 0.9), Vector3(0.95, 1.08, 0.95)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Arm:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-2.4, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_fall"]
+resource_name = "fall"
+length = 0.5
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Body:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0.95, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Body:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.05, 0, 0), Vector3(-0.05, 0, 0), Vector3(0.05, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Body:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.95, 1.08, 0.95)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Arm:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(-2.6, 0, 0), Vector3(-2.4, 0, 0), Vector3(-2.6, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_land"]
+resource_name = "land"
+length = 0.25
+loop_mode = 0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Body:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.83, 0), Vector3(0, 0.87, 0), Vector3(0, 0.95, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Body:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Body:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(1.2, 0.75, 1.2), Vector3(1.1, 0.85, 1.1), Vector3(1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Arm:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.6, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_cast"]
+resource_name = "cast"
+length = 0.45
+loop_mode = 0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Arm:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.08, 0.3, 0.45),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-1.7, 0, 0), Vector3(-1.5, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Arm/Wand/Glow:visible")
+tracks/1/interp = 0
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.08, 0.35),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimLib"]
+_data = {
+&"idle": SubResource("Animation_idle"), &"walk": SubResource("Animation_walk"), &"run": SubResource("Animation_run"), &"jump": SubResource("Animation_jump"), &"fall": SubResource("Animation_fall"), &"land": SubResource("Animation_land"), &"cast": SubResource("Animation_cast")
+}
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_idle"]
+animation = &"idle"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_walk"]
+animation = &"walk"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_run"]
+animation = &"run"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_jump"]
+animation = &"jump"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_fall"]
+animation = &"fall"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_land"]
+animation = &"land"
+
+[sub_resource type="AnimationNodeAnimation" id="ANA_cast"]
+animation = &"cast"
+
+[sub_resource type="AnimationNodeTransition" id="ANT_Movement"]
+xfade_time = 0.15
+input_count = 6
+input_0/name = &"idle"
+input_0/auto_advance = false
+input_0/break_loop_at_end = false
+input_0/reset = true
+input_1/name = &"walk"
+input_1/auto_advance = false
+input_1/break_loop_at_end = false
+input_1/reset = true
+input_2/name = &"run"
+input_2/auto_advance = false
+input_2/break_loop_at_end = false
+input_2/reset = true
+input_3/name = &"jump"
+input_3/auto_advance = false
+input_3/break_loop_at_end = false
+input_3/reset = true
+input_4/name = &"fall"
+input_4/auto_advance = false
+input_4/break_loop_at_end = false
+input_4/reset = true
+input_5/name = &"land"
+input_5/auto_advance = false
+input_5/break_loop_at_end = false
+input_5/reset = true
+
+[sub_resource type="AnimationNodeOneShot" id="ANO_Cast"]
+filter_enabled = true
+filters = [NodePath("Arm:rotation"), NodePath("Arm/Wand/Glow:visible")]
+fadein_time = 0.05
+fadeout_time = 0.1
+
+[sub_resource type="AnimationNodeBlendTree" id="ANBT_Root"]
+graph_offset = Vector2(-200, 0)
+nodes/Idle/node = SubResource("ANA_idle")
+nodes/Idle/position = Vector2(-500, 0)
+nodes/Walk/node = SubResource("ANA_walk")
+nodes/Walk/position = Vector2(-500, 120)
+nodes/Run/node = SubResource("ANA_run")
+nodes/Run/position = Vector2(-500, 240)
+nodes/Jump/node = SubResource("ANA_jump")
+nodes/Jump/position = Vector2(-500, 360)
+nodes/Fall/node = SubResource("ANA_fall")
+nodes/Fall/position = Vector2(-500, 480)
+nodes/Land/node = SubResource("ANA_land")
+nodes/Land/position = Vector2(-500, 600)
+nodes/CastAnim/node = SubResource("ANA_cast")
+nodes/CastAnim/position = Vector2(-200, 300)
+nodes/Movement/node = SubResource("ANT_Movement")
+nodes/Movement/position = Vector2(-200, 0)
+nodes/Cast/node = SubResource("ANO_Cast")
+nodes/Cast/position = Vector2(100, 0)
+nodes/output/position = Vector2(350, 0)
+node_connections = [&"Movement", 0, &"Idle", &"Movement", 1, &"Walk", &"Movement", 2, &"Run", &"Movement", 3, &"Jump", &"Movement", 4, &"Fall", &"Movement", 5, &"Land", &"Cast", 0, &"Movement", &"Cast", 1, &"CastAnim", &"output", 0, &"Cast"]
+
+[node name="CharacterVisual" type="Node3D"]
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+mesh = SubResource("Mesh_Body")
+surface_material_override/0 = SubResource("Mat_Robe")
+
+[node name="Head" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+mesh = SubResource("Mesh_Head")
+surface_material_override/0 = SubResource("Mat_Skin")
+
+[node name="Nose" type="MeshInstance3D" parent="Body/Head"]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0, 0, -0.24)
+mesh = SubResource("Mesh_Head")
+surface_material_override/0 = SubResource("Mat_Skin")
+
+[node name="Arm" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 1.35, 0)
+
+[node name="ArmMesh" type="MeshInstance3D" parent="Arm"]
+transform = Transform3D(0.35, 0, 0, 0, 0.5, 0, 0, 0, 0.35, 0, -0.3, 0)
+mesh = SubResource("Mesh_Body")
+surface_material_override/0 = SubResource("Mat_Robe")
+
+[node name="Wand" type="MeshInstance3D" parent="Arm"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, -0.25)
+mesh = SubResource("Mesh_Wand")
+surface_material_override/0 = SubResource("Mat_Wand")
+
+[node name="Glow" type="MeshInstance3D" parent="Arm/Wand"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.28)
+visible = false
+mesh = SubResource("Mesh_Glow")
+surface_material_override/0 = SubResource("Mat_Glow")
+
+[node name="CastOrigin" type="Marker3D" parent="Arm/Wand"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimLib")
+}
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+root_node = NodePath("..")
+tree_root = SubResource("ANBT_Root")
+anim_player = NodePath("../AnimationPlayer")
+parameters/Movement/current_state = "idle"
+parameters/Movement/transition_request = ""
+parameters/Movement/current_index = 0
+parameters/Cast/active = false
+parameters/Cast/internal_active = false
+parameters/Cast/request = 0
+
+[node name="AnimationController" type="Node" parent="."]
+script = ExtResource("1")
+animation_tree = NodePath("../AnimationTree")
