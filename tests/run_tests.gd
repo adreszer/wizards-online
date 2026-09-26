@@ -602,6 +602,10 @@ func _test_characters() -> void:
 		player.inventory.load_state(ItemRegistry.default_state())
 		player.inventory.hold_id(&"torch")
 		t.check(_find_light(player) != null and _find_light(player).is_inside_tree(), "%s: held torch lights up in the off hand" % id)
+		await _wait(0.2)
+		var torch := player.held_item_mount.current_node
+		t.check(torch.global_transform.basis.y.dot(Vector3.UP) > 0.99, "%s: held torch points up regardless of the hand pose" % id)
+		t.check(torch.global_position.distance_to(player.off_hand.global_position) < 0.01, "%s: held torch stays in the hand" % id)
 		player.inventory.release_held()
 		var tree: AnimationTree = player.visual.get_node("AnimationTree")
 		t.check(tree.active, "%s: animation tree active" % id)
