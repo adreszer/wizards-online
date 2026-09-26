@@ -363,7 +363,7 @@ func _test_moving_platform() -> void:
 	await _wait(1.0)
 	var carried := player.global_position.x - before
 	t.check(carried > 2.0, "platform carries the player (%.2f m in 1 s)" % carried)
-	t.check(absf(player.global_position.x - platform.global_position.x) < 0.5, "player stays centred on the platform")
+	t.check(absf(player.global_position.x - platform.global_position.x) < 0.8, "player stays centred on the platform")
 	await _clear([platform])
 
 

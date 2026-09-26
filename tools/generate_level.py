@@ -70,7 +70,7 @@ PILLAR_SPACING = 8.0
 # Floor tile variants: wrapper scene -> slab thickness (from the wrapper's collision box).
 FLOOR_TILES = {
     "plain": ("res://objects/environment/modular/floor_tile.tscn", 0.46),
-    "ornate": ("res://objects/environment/modular/floor_tile_2.tscn", 0.36),
+    "ornate": ("res://objects/environment/modular/floor_tile_2.tscn", 0.22),
 }
 def floor(name, x0, x1, z0, z1, top, color=FLOOR, thick=1.0, tile="plain"):
     """Modular floor tiles with their top at `top`, over a greybox sub-floor that

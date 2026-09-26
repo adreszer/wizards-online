@@ -3,15 +3,15 @@
 [ext_resource type="PackedScene" path="res://assets/models/environment/modular/floor2.glb" id="1"]
 
 [sub_resource type="BoxShape3D" id="FloorShape"]
-size = Vector3(4, 0.36, 4)
+size = Vector3(4, 0.22, 4)
 
 [node name="FloorTile2" type="StaticBody3D"]
 collision_layer = 1
 collision_mask = 0
 
 [node name="Model" parent="." instance=ExtResource("1")]
-transform = Transform3D(2.102626, 0, 0, 0, 2.102626, 0, 0, 0, 2.217004, 0.001165, -0.180592, 0.001095)
+transform = Transform3D(2.113126, 0, 0, 0, 2.113126, 0, 0, 0, 2.222216, -0.005596, -0.180632, 0.003114)
 
 [node name="Shape" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0)
 shape = SubResource("FloorShape")
