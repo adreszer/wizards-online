@@ -18,7 +18,7 @@ def xf(pos, rot_y=0.0):
     c = math.cos(rot_y); s = math.sin(rot_y)
     return f'Transform3D({c:.6f}, 0, {s:.6f}, 0, 1, 0, {-s:.6f}, 0, {c:.6f}, {pos[0]:.3f}, {pos[1]:.3f}, {pos[2]:.3f})'
 
-def block(name, center, size, color=(0.55, 0.52, 0.6), parent="Geometry"):
+def block(name, center, size, color=(1, 1, 1), parent="Geometry"):
     i = ext_id("PackedScene", "res://objects/greybox/greybox_block.tscn")
     nodes.append(f'[node name="{name}" parent="{parent}" instance=ExtResource("{i}")]\n'
                  f'transform = {xf(center)}\n'
@@ -76,7 +76,7 @@ def ceiling(name, x0, x1, z0, z1, y):
          props={"size_x": f"{x1 - x0:.3f}", "size_z": f"{z1 - z0:.3f}",
                 "module_scene": f'ExtResource("{ext_id("PackedScene", "res://objects/environment/modular/ceiling_tile.tscn")}")'})
 
-FLOOR = (0.42, 0.40, 0.47); WALL = (0.55, 0.52, 0.6); ACCENT = (0.62, 0.55, 0.7); LINTEL = (0.5, 0.46, 0.55)
+FLOOR = (1, 1, 1); WALL = (1, 1, 1); ACCENT = (1, 1, 1); LINTEL = (1, 1, 1)
 WALL_H = 8.0; MODULE_H = 4.0; T = 0.35; OPEN_H = 3.6
 PILLAR_SPACING = 8.0
 
@@ -150,7 +150,7 @@ room_pillars("Corridor", -3, 3, -45, -18.5, 1.2, mid=False)
 room_torches("Corridor", -3, 3, -45, -18.5, 1.2, spacing=8.0, first=4.0)
 ceiling("Corridor_Ceiling", -3, 3, -45, -18.5, 1.2 + WALL_H)
 # Secret room x[3.5,11.5] z[-36,-28]
-floor("Secret_Floor", 3.5, 11.5, -36, -28, 1.2, color=(0.35, 0.3, 0.45), thick=2.2, tile="ornate")
+floor("Secret_Floor", 3.5, 11.5, -36, -28, 1.2, thick=2.2, tile="ornate")
 wall_run("Secret_WR", (11.5, 1.2, -28), 8.0, math.radians(90))
 wall_run("Secret_WN", (3.5, 1.2, -28), 8.0, 0.0)
 wall_run("Secret_WS", (3.5, 1.2, -36), 8.0, 0.0)
@@ -199,7 +199,7 @@ ceiling("Puzzle_Ceiling", -8, 8, -90, -65, 1.2 + WALL_H)
 # ---------------- Platforming chamber z[-130,-90]
 floor("Plat_Entry", -8, 8, -94, -90, 1.2, thick=2.2)
 floor("Plat_Exit", -8, 8, -130, -126, 1.2, thick=2.2)
-floor("Plat_PitFloor", -8, 8, -126, -94, -6.0, color=(0.2, 0.15, 0.25))
+floor("Plat_PitFloor", -8, 8, -126, -94, -6.0)
 side_walls("Plat", -8, 8, -130, -90, 1.2)
 block("Plat_WL_Low", (-8, -2.5, -110), (T, 7.4, 40.5), WALL); block("Plat_WR_Low", (8, -2.5, -110), (T, 7.4, 40.5), WALL)
 end_wall("Plat_Front", -8, 8, -130, 1.2, (-1.8, 1.8))
@@ -207,7 +207,7 @@ inst("PlatCheckpoint", "res://gameplay/checkpoints/checkpoint.tscn", (0, 1.2, -9
 inst("PitKillZone", "res://gameplay/checkpoints/kill_zone.tscn", (0, -4.5, -110))
 plats = [("P1", (-3, 1.2, -98), (3, 1, 3)), ("P2", (1, 1.6, -102), (3, 1, 3)), ("P3", (-2, 2.0, -106), (3, 1, 3)), ("P4", (-2, 2.0, -123), (4, 1, 4))]
 for n, c, s in plats:
-    block("Plat_" + n, (c[0], c[1] - s[1] / 2, c[2]), s, (0.35, 0.55, 0.65))
+    block("Plat_" + n, (c[0], c[1] - s[1] / 2, c[2]), s)
 inst("MovingPlatform1", "res://objects/platforms/moving_platform.tscn", (2, 1.8, -110),
      props={"points": "Array[Vector3]([Vector3(0, 0, -9)])", "speed": "2.2", "size": "Vector3(3, 0.4, 3)"})
 inst("Fragment_Plat1", "res://gameplay/collectibles/collectible.tscn", (1, 1.6, -102))
@@ -235,10 +235,10 @@ room_pillars("Final", -8, 8, -155, -130, 1.2)
 room_torches("Final", -8, 8, -155, -130, 1.2)
 ceiling("Final_Ceiling", -8, 8, -155, -130, 1.2 + WALL_H)
 # ---------------- Reward room z[-170,-155] x[-6,6]
-floor("Reward_Floor", -6, 6, -170, -155, 1.2, color=(0.5, 0.42, 0.3), thick=2.2, tile="ornate")
+floor("Reward_Floor", -6, 6, -170, -155, 1.2, thick=2.2, tile="ornate")
 side_walls("Reward", -6, 6, -170, -155, 1.2)
 end_wall("Reward_Back", -6, 6, -170, 1.2)
-block("Reward_Pedestal", (0, 1.6, -165), (2, 0.8, 2), (0.7, 0.6, 0.35))
+block("Reward_Pedestal", (0, 1.6, -165), (2, 0.8, 2))
 inst("Fragment_Reward", "res://gameplay/collectibles/collectible.tscn", (0, 2.0, -165))
 room_pillars("Reward", -6, 6, -170, -155, 1.2, mid=False)
 room_torches("Reward", -6, 6, -170, -155, 1.2)

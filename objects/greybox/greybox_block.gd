@@ -8,10 +8,13 @@ extends StaticBody3D
 	set(value):
 		size = value
 		_apply()
-@export var color: Color = Color(0.55, 0.52, 0.6):
+## Tint over the shared stone material (white = untinted).
+@export var color: Color = Color.WHITE:
 	set(value):
 		color = value
 		_apply()
+
+const STONE_MATERIAL: StandardMaterial3D = preload("res://assets/materials/greybox_stone.tres")
 
 @onready var _mesh: MeshInstance3D = $Mesh
 @onready var _shape: CollisionShape3D = $Shape
@@ -34,9 +37,12 @@ func _apply() -> void:
 		shape = BoxShape3D.new()
 		_shape.shape = shape
 	shape.size = size
-	var mat := _mesh.material_override as StandardMaterial3D
-	if mat == null:
-		mat = StandardMaterial3D.new()
-		mat.roughness = 0.9
-		_mesh.material_override = mat
-	mat.albedo_color = color
+	# Shared world-aligned stone material; a tinted duplicate only when a colour is set.
+	if color.is_equal_approx(Color.WHITE):
+		_mesh.material_override = STONE_MATERIAL
+	else:
+		var mat := _mesh.material_override as StandardMaterial3D
+		if mat == null or mat == STONE_MATERIAL:
+			mat = STONE_MATERIAL.duplicate() as StandardMaterial3D
+			_mesh.material_override = mat
+		mat.albedo_color = STONE_MATERIAL.albedo_color * color
