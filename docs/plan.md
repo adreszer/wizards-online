@@ -65,7 +65,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Greybox level: Entrance → Corridor (secret) → Training → Puzzle → Platforming → Final Puzzle → Reward
 - [x] ~10 Arcane Fragments incl. several in secret room
 - [x] Checkpoints per chamber
-- [x] Offline playthrough verified (headless simulation + manual)
+- [x] Offline playthrough verified headlessly (level wiring + spawn/end trigger); user playtest in progress
 
 ### Milestone 7 — Backend
 - [x] docker-compose.yml (Nakama + PostgreSQL)
@@ -136,12 +136,12 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Movement | walking, running, jumping, gravity | [x] headless test pass |
 | Movement | slopes, stairs | [x] headless test pass (ramp lip + 3×0.4 m steps via step-up) |
 | Movement | moving platform carries player | [x] headless test pass |
-| Camera | rotation, collision, no wall clipping | [x] headless: yaw/pitch, clamps, spring arm shortens against a wall; manual mouse-look verified |
+| Camera | rotation, collision, no wall clipping | [x] headless: yaw/pitch, clamps, spring arm shortens against a wall; manual mouse-look: user playtest found and confirmed the crosshair bug; re-verification pending |
 | Spell | cast works, invalid targets ignored, receivers react, range | [x] headless test pass |
 | Interaction | nearest looked-at object selected, prompt | [x] headless test pass |
 | Health | damage, death, checkpoint respawn | [x] headless test pass |
 | Collectibles | counter, no double collect | [x] headless test pass |
-| Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger) + manual play |
+| Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
 | Multiplayer | two clients connect, see each other, movement/jump/spell replicate | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 20 + 14 checks pass |
 | Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
