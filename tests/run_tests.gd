@@ -163,6 +163,24 @@ func _test_movement() -> void:
 	player.movement.set_external_move(Vector3.ZERO)
 	await _wait(0.5)
 	t.check(player.visual.position.length() < 0.01, "mesh settles back onto the body after the stairs")
+	# Back down the same stairs: stay grounded, no fall/land animation, mesh eases down.
+	var left_floor := false
+	var visual_rose := false
+	var bottom_reached := false
+	player.movement.set_external_move(Vector3(1, 0, 0), false)
+	for i in range(90):
+		await get_tree().physics_frame
+		if not player.movement.is_grounded or player.movement.state in [PlayerMovement.State.FALL, PlayerMovement.State.LAND]:
+			left_floor = true
+		if player.visual.position.y > 0.1:
+			visual_rose = true
+		if player.global_position.y < 0.2 and player.global_position.x > -10.5:
+			bottom_reached = true
+			break
+	t.check(bottom_reached, "walks back down the stairs (y=%.2f)" % player.global_position.y)
+	t.check(not left_floor, "stays grounded going down 0.4 m steps (no fall animation)")
+	t.check(visual_rose, "mesh eases down each step instead of dropping with the body")
+	player.movement.set_external_move(Vector3.ZERO)
 	await _clear(fixtures)
 
 

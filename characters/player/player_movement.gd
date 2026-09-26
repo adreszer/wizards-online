@@ -25,8 +25,11 @@ signal stepped(displacement: Vector3)
 @export var deceleration: float = 40.0
 @export var rotation_speed: float = 14.0
 @export var max_slope_angle_degrees: float = 46.0
-@export var floor_snap_length: float = 0.35
+## Must exceed step_height so walking down a stair snaps to the lower tread instead of falling.
+@export var floor_snap_length: float = 0.55
 @export var step_height: float = 0.42
+## A drop bigger than this in one grounded tick counts as a step down (slopes move far less).
+@export var step_down_threshold: float = 0.12
 ## How far past the ledge edge the step probe lands (must exceed the capsule radius).
 @export var step_forward_distance: float = 0.45
 
@@ -70,7 +73,7 @@ func setup(p_body: CharacterBody3D, p_input: PlayerInput) -> void:
 	body = p_body
 	input = p_input
 	body.floor_max_angle = deg_to_rad(max_slope_angle_degrees)
-	body.floor_snap_length = floor_snap_length
+	body.floor_snap_length = maxf(floor_snap_length, step_height + 0.1)
 	body.floor_stop_on_slope = true
 	body.floor_constant_speed = true
 	body.floor_block_on_wall = true
@@ -169,12 +172,19 @@ func _physics_process(delta: float) -> void:
 		body.rotation.y = facing_yaw
 
 	if is_grounded and not did_jump:
-		_try_step_up(move_dir, delta)
+		if not _try_step_down(move_dir):
+			_try_step_up(move_dir, delta)
 
+	var y_before_move := body.global_position.y
 	body.move_and_slide()
 
 	# Landing detection after the move -----------------------------------------
 	var grounded_now := body.is_on_floor()
+	# Floor snap pulled us down a stair in one tick: let the visuals ease down too.
+	if is_grounded and grounded_now and not did_jump:
+		var drop := body.global_position.y - y_before_move
+		if drop < -step_down_threshold:
+			stepped.emit(Vector3(0.0, drop, 0.0))
 	if grounded_now and not _was_grounded and not did_jump:
 		landed.emit(_peak_fall_speed)
 		if _peak_fall_speed > 3.0:
@@ -222,6 +232,55 @@ func _update_state(sprint: bool, did_jump: bool) -> void:
 		var old := state
 		state = new_state
 		state_changed.emit(state, old)
+
+
+## Stair descent: a rounded capsule rolls over a tread edge and briefly "falls" to the
+## next step. When the floor directly under the centre drops away by up to step_height,
+## probe forward until the lowered capsule fits and place it on the lower tread instead.
+## Returns true when the body was moved.
+func _try_step_down(move_dir: Vector3) -> bool:
+	if step_height <= 0.0 or move_dir.length_squared() < 0.0001 or body.velocity.y > 0.01:
+		return false
+	var space := body.get_world_3d().direct_space_state
+	var from := body.global_transform
+	var query := PhysicsRayQueryParameters3D.create(
+		from.origin + Vector3.UP * 0.05, from.origin - Vector3.UP * (step_height + 0.2), body.collision_mask, [body.get_rid()])
+	var hit := space.intersect_ray(query)
+	if hit.is_empty():
+		return false # Real ledge: fall.
+	var drop: float = from.origin.y - float(hit["position"].y)
+	if drop < step_down_threshold:
+		return false # Still standing on this tread.
+	if Vector3(hit["normal"]).angle_to(Vector3.UP) > body.floor_max_angle:
+		return false
+	var forward := move_dir.normalized()
+	var down := -Vector3.UP * (drop + 0.1)
+	var params := PhysicsTestMotionParameters3D.new()
+	var result := PhysicsTestMotionResult3D.new()
+	var d := 0.05
+	while d <= step_forward_distance + 0.001:
+		var probe := forward * d
+		if body.test_move(from, probe):
+			return false # Something ahead; let the wall/step-up logic deal with it.
+		var ahead := from
+		ahead.origin += probe
+		params.from = ahead
+		params.motion = down
+		if PhysicsServer3D.body_test_motion(body.get_rid(), params, result):
+			var travel := result.get_travel()
+			var walkable := result.get_collision_normal().angle_to(Vector3.UP) <= body.floor_max_angle
+			# Landed on the lower tread (not caught on the riser or the edge we came from).
+			if walkable and travel.y <= -(drop - 0.05):
+				var destination := ahead.origin + travel + Vector3.UP * 0.01
+				var displacement := destination - from.origin
+				body.global_position = destination
+				body.velocity.y = 0.0
+				if debug_step: print("step down: OK ", displacement)
+				stepped.emit(displacement)
+				return true
+		d += 0.05
+	if debug_step: print("step down: no fit")
+	return false
 
 
 ## Forgiving stair handling: when walking into a low ledge, lift the body onto it.
