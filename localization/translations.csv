@@ -99,10 +99,10 @@ AREA_NORTH_HALL,North Hall,Sala Północna
 AREA_NORTH_HALL_1,"North Hall, upper floor","Sala Północna, piętro"
 AREA_LIBRARY,Library,Biblioteka
 AREA_KITCHENS,Kitchens,Kuchnie
-AREA_HOUSE3_COMMON,House Three common room,Pokój wspólny Domu Trzeciego
-AREA_HOUSE3_DORM,House Three dormitory,Sypialnie Domu Trzeciego
-AREA_HOUSE4_COMMON,House Four common room,Pokój wspólny Domu Czwartego
-AREA_HOUSE4_DORM,House Four dormitory,Sypialnie Domu Czwartego
+AREA_HOUSE3_COMMON,Phoenara Common Room,Pokój wspólny Phoenary
+AREA_HOUSE3_DORM,Phoenara Dormitory,Sypialnie Phoenary
+AREA_HOUSE4_COMMON,Hipporys Common Room,Pokój wspólny Hipporys
+AREA_HOUSE4_DORM,Hipporys Dormitory,Sypialnie Hipporys
 AREA_CORRIDOR_W_0,West Corridor,Korytarz Zachodni
 AREA_CORRIDOR_W_1,"West Corridor, upper floor","Korytarz Zachodni, piętro"
 AREA_CORRIDOR_E_0,East Corridor,Korytarz Wschodni
@@ -126,13 +126,13 @@ AREA_RECORDS_ROOM,Records Room,Archiwum
 AREA_GALLERY,Long Gallery,Długa Galeria
 AREA_ROOST,Messenger Roost,Gołębnik Posłańców
 AREA_TOWER_NE_0,Northeast Tower,Wieża Północno-Wschodnia
-AREA_TOWER_NE_1,"Northeast Tower, first floor","Wieża Północno-Wschodnia, pierwsze piętro"
-AREA_TOWER_NE_2,House One common room,Pokój wspólny Domu Pierwszego
-AREA_TOWER_NE_3,House One dormitory,Sypialnie Domu Pierwszego
+AREA_TOWER_NE_1,Drakoryn Landing,Podest Drakorynu
+AREA_TOWER_NE_2,Drakoryn Common Room,Pokój wspólny Drakorynu
+AREA_TOWER_NE_3,Drakoryn Dormitory,Sypialnie Drakorynu
 AREA_TOWER_NW_0,Northwest Tower,Wieża Północno-Zachodnia
-AREA_TOWER_NW_1,"Northwest Tower, first floor","Wieża Północno-Zachodnia, pierwsze piętro"
-AREA_TOWER_NW_2,House Two common room,Pokój wspólny Domu Drugiego
-AREA_TOWER_NW_3,House Two dormitory,Sypialnie Domu Drugiego
+AREA_TOWER_NW_1,Grypheon Landing,Podest Grypheonu
+AREA_TOWER_NW_2,Grypheon Common Room,Pokój wspólny Grypheonu
+AREA_TOWER_NW_3,Grypheon Dormitory,Sypialnie Grypheonu
 AREA_TOWER_SW_0,Southwest Tower,Wieża Południowo-Zachodnia
 AREA_TOWER_SW_1,"Southwest Tower, first floor","Wieża Południowo-Zachodnia, pierwsze piętro"
 AREA_TOWER_SW_2,"Southwest Tower, second floor","Wieża Południowo-Zachodnia, drugie piętro"
@@ -196,10 +196,14 @@ GRANT_REASON_no_such_player,that player is no longer here.,tego gracza już tu n
 GRANT_REASON_not_in_classroom,you must stand in a classroom.,musisz stać w sali lekcyjnej.
 GRANT_REASON_target_elsewhere,the student is not in this classroom.,ucznia nie ma w tej sali.
 GRANT_REASON_already_known,the student already knows that spell.,uczeń już zna ten czar.
-HOUSE_1_NAME,First House,Pierwszy Dom
-HOUSE_2_NAME,Second House,Drugi Dom
-HOUSE_3_NAME,Third House,Trzeci Dom
-HOUSE_4_NAME,Fourth House,Czwarty Dom
+HOUSE_1_NAME,Drakoryn,Drakoryn
+HOUSE_2_NAME,Grypheon,Grypheon
+HOUSE_3_NAME,Phoenara,Phoenara
+HOUSE_4_NAME,Hipporys,Hipporys
+HOUSE_1_ANIMAL,Dragon,Smok
+HOUSE_2_ANIMAL,Griffin,Gryf
+HOUSE_3_ANIMAL,Phoenix,Feniks
+HOUSE_4_ANIMAL,Hippocampus,Hipokamp
 HUD_HOUSE,House: %s,Dom: %s
 HUD_HOUSE_NONE,House: not yet sorted,Dom: jeszcze nieprzydzielony
 INTERACT_HOUSE_DOOR,Enter,Wejdź

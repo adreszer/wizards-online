@@ -11,7 +11,7 @@ A multiplayer **open-world magical school**: one large castle (plus grounds) tha
 ### 1. The castle
 - One continuous, explorable castle world: great hall, towers, dungeons, corridors, staircases, library, grounds. No linear level flow; players roam.
 - **Many hidden rooms, secret passages and mysteries.** Secrets are a core pillar: hidden doors, puzzles that unlock areas, clues spread across the castle, things that reward curiosity and cooperation.
-- **Four houses** (names to be provided by the owner later — use placeholders, never invent final names). Each house has its own **common room** and dormitory area, accessible to members of that house.
+- **Four houses**, named by the owner: **Drakoryn** (dragon, house 1), **Grypheon** (griffin, house 2), **Phoenara** (phoenix, house 3), **Hipporys** (hippocampus / winged horse, house 4). Never rename them; other final names (subjects, places…) still come from the owner. Each house has its own **common room** and dormitory area, accessible to members of that house.
 - **A classroom for every school subject.** The curriculum mirrors the reference school's breadth (charms-style spellwork, transfiguration-style shape magic, potions, defensive magic, magical plants, astronomy, history of magic, flying, magical creatures, divination, magical mathematics, ancient runes…) but each subject gets its own original name. Each classroom is a real, distinct place in the castle.
 
 ### 2. Roles: students and professors

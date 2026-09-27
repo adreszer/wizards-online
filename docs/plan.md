@@ -190,9 +190,9 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Nameplates show professor/admin titles and colours; HUD role line with the lesson-tools hint
 - [x] Tests: unit (profile sanitising, nested-zone tracker, nameplates, panel) and two-client (promotion by id and name, denied self-promotion, dropped unknown cast, refused grants, successful grant, tome request, persistence of spells and hotbar across reconnect)
 - [ ] Lesson text tools (lecture text to the room, questions), house points award/deduct, timetables; tie grants to a lesson session rather than "any staff in any classroom"
-- [x] Sorting into houses: the Choosing Stone in the great hall opens a four-question ceremony; the server tallies (`OP_SORT`), balances ties by house population, stores the house once, updates nameplates/HUD/roster; offline runs the same rule locally; placeholder house names/colours
+- [x] Sorting into houses: the Choosing Stone in the great hall opens a four-question ceremony; the server tallies (`OP_SORT`), balances ties by house population, stores the house once, updates nameplates/HUD/roster; offline runs the same rule locally; houses Drakoryn / Grypheon / Phoenara / Hipporys with emblem animals and colours
 - [x] House-gated common rooms: `HouseDoor` on every doorway into a house area (dungeon and kitchen-side common rooms, the two tower landings that now own the stairs up), members open by interacting, others refused; server drops area reports for another house's area
-- [ ] Final house names/colours/crests from the owner; a visible ceremony (others watching in the great hall), house-cup tally
+- [ ] House crests (dragon, griffin, phoenix, hippocampus) on doors and banners; a visible ceremony (others watching in the great hall), house-cup tally
 - [ ] Server-side position sanity for area reports (today the area id is client-reported, validated only against the map)
 - [ ] In-game admin UI for `admin_set_profile` (today: script/console)
 

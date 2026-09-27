@@ -9,8 +9,11 @@ const ROLE_PROFESSOR := "professor"
 const ROLE_ADMIN := "admin"
 const ROLES: Array[String] = [ROLE_STUDENT, ROLE_PROFESSOR, ROLE_ADMIN]
 const MAX_HOUSE := 4
-## Placeholder colours per house (index 0 = unsorted). Final names/colours come from the owner.
-const HOUSE_COLORS: Array[Color] = [Color(0.75, 0.75, 0.78), Color(0.95, 0.6, 0.2), Color(0.25, 0.7, 0.75), Color(0.6, 0.4, 0.85), Color(0.9, 0.4, 0.55)]
+## Houses (index 0 = unsorted): 1 Drakoryn (dragon), 2 Grypheon (griffin),
+## 3 Phoenara (phoenix), 4 Hipporys (hippocampus). Names live in the CSV as
+## HOUSE_<n>_NAME / HOUSE_<n>_ANIMAL; colours: dragon green, griffin gold,
+## phoenix flame, sea blue.
+const HOUSE_COLORS: Array[Color] = [Color(0.75, 0.75, 0.78), Color(0.2, 0.68, 0.38), Color(0.92, 0.72, 0.25), Color(0.95, 0.42, 0.18), Color(0.28, 0.55, 0.92)]
 
 
 static func sanitize_role(role: String) -> String:
@@ -39,7 +42,12 @@ static func sanitize(raw: Dictionary) -> Dictionary:
 	}
 
 
-## Translation key of a house's (placeholder) name; "" for unsorted.
+## Translation key of a house's emblem animal; "" for unsorted.
+static func house_animal_key(house: int) -> String:
+	return "HOUSE_%d_ANIMAL" % house if house >= 1 and house <= MAX_HOUSE else ""
+
+
+## Translation key of a house's name; "" for unsorted.
 static func house_name_key(house: int) -> String:
 	return "HOUSE_%d_NAME" % house if house >= 1 and house <= MAX_HOUSE else ""
 
