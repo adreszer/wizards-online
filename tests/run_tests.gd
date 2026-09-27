@@ -730,6 +730,12 @@ func _test_characters() -> void:
 			if anim_node == null or not ap.has_animation(anim_node.animation):
 				missing.append(state)
 		t.check(missing.is_empty(), "%s: all movement states map to existing clips %s" % [id, str(missing)])
+		var not_looping := []
+		for state in player.animation_controller.looping_states:
+			var anim_node := (tree.tree_root as AnimationNodeBlendTree).get_node(state.capitalize()) as AnimationNodeAnimation
+			if anim_node != null and ap.has_animation(anim_node.animation) and ap.get_animation(anim_node.animation).loop_mode == Animation.LOOP_NONE:
+				not_looping.append(state)
+		t.check(not_looping.is_empty(), "%s: idle/walk/run/fall clips loop %s" % [id, str(not_looping)])
 		player.movement.set_external_move(Vector3(0, 0, -1), false)
 		await _wait(0.4)
 		t.check(player.animation_controller.current_state_name == "walk", "%s: controller reaches walk state" % id)
