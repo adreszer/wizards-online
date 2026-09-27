@@ -14,9 +14,10 @@ const STATE_NAMES: PackedStringArray = ["idle", "walk", "run", "jump", "fall", "
 signal state_changed(new_state: State, old_state: State)
 signal jumped()
 signal landed(impact_speed: float)
-## The body was lifted onto a ledge in one tick; `displacement` is the world-space jump
-## (up and forward). Visuals subtract it and ease back so the climb reads as motion.
-signal stepped(displacement: Vector3)
+## The body was moved onto another tread in one tick; `displacement` is the world-space
+## jump. The body then stands still for `duration` seconds (the time it would have taken
+## to walk that distance), so visuals subtract the jump and close it at constant speed.
+signal stepped(displacement: Vector3, duration: float)
 
 @export_group("Ground")
 @export var walk_speed: float = 4.2
@@ -69,6 +70,10 @@ var _jump_requested_externally: bool = false
 var _external_jump_hold: float = 0.0
 var _external_move: Vector3 = Vector3.ZERO
 var _external_sprint: bool = false
+## Seconds the body still owes for the last step teleport (horizontal motion is held).
+var _step_stall: float = 0.0
+## Horizontal speed the body would have had during the stall (keeps the walk state alive).
+var _stall_speed: float = 0.0
 
 
 func setup(p_body: CharacterBody3D, p_input: PlayerInput) -> void:
@@ -132,7 +137,14 @@ func _physics_process(delta: float) -> void:
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 	var target_speed := run_speed if sprint else walk_speed
 	var desired := move_dir * target_speed
-	if is_grounded:
+	if _step_stall > 0.0:
+		# Pay back the distance a step teleport gave for free: hold the body still.
+		_step_stall -= delta
+		horizontal = Vector3.ZERO
+		if _step_stall <= 0.0:
+			_step_stall = 0.0
+			horizontal = move_dir * _stall_speed
+	elif is_grounded:
 		var accel := acceleration if move_dir.length_squared() > 0.0001 else deceleration
 		horizontal = horizontal.move_toward(desired, accel * delta)
 	else:
@@ -186,7 +198,7 @@ func _physics_process(delta: float) -> void:
 	if is_grounded and grounded_now and not did_jump:
 		var drop := body.global_position.y - y_before_move
 		if drop < -step_down_threshold:
-			stepped.emit(Vector3(0.0, drop, 0.0))
+			stepped.emit(Vector3(0.0, drop, 0.0), 0.1)
 	if grounded_now and not _was_grounded and not did_jump:
 		landed.emit(_peak_fall_speed)
 		if _peak_fall_speed > 3.0:
@@ -223,7 +235,7 @@ func _update_state(sprint: bool, did_jump: bool) -> void:
 	elif _land_timer > 0.0:
 		new_state = State.LAND
 	else:
-		var speed := get_horizontal_speed()
+		var speed := maxf(get_horizontal_speed(), _stall_speed if _step_stall > 0.0 else 0.0)
 		if speed < 0.3:
 			new_state = State.IDLE
 		elif sprint and speed > walk_speed + 0.5:
@@ -278,7 +290,7 @@ func _try_step_down(move_dir: Vector3) -> bool:
 				body.global_position = destination
 				body.velocity.y = 0.0
 				if debug_step: print("step down: OK ", displacement)
-				stepped.emit(displacement)
+				_begin_step(displacement)
 				return true
 		d += 0.05
 	if debug_step: print("step down: no fit")
@@ -336,4 +348,16 @@ func _try_step_up(move_dir: Vector3, delta: float) -> void:
 	var destination := raised.origin + travel + Vector3.UP * 0.01
 	var displacement := destination - from.origin
 	body.global_position = destination
-	stepped.emit(displacement)
+	_begin_step(displacement)
+
+
+## After a step teleport: stop the body for as long as walking the horizontal part
+## would have taken, remember the speed for the animation state, and tell listeners.
+func _begin_step(displacement: Vector3) -> void:
+	var intended := maxf(get_horizontal_speed(), walk_speed)
+	var flat := Vector3(displacement.x, 0.0, displacement.z).length()
+	_stall_speed = intended
+	_step_stall = flat / intended
+	body.velocity.x = 0.0
+	body.velocity.z = 0.0
+	stepped.emit(displacement, maxf(_step_stall, 0.05))

@@ -151,8 +151,16 @@ func _test_movement() -> void:
 	var stair_peak := 0.0
 	var visual_peak := 0.0
 	var visual_dipped := false
-	for i in range(120):  # the step-up hops once per 0.45 m of intended travel, so three steps take ~0.4 s
+	var max_mesh_step := 0.0
+	var prev_mesh_x := player.visual.global_position.x
+	var kept_walking := true
+	for i in range(120):
 		await get_tree().physics_frame
+		if i > 5:
+			max_mesh_step = maxf(max_mesh_step, absf(player.visual.global_position.x - prev_mesh_x))
+			if player.movement.get_state_name() != "walk":
+				kept_walking = false
+		prev_mesh_x = player.visual.global_position.x
 		stair_peak = maxf(stair_peak, player.global_position.y)
 		visual_peak = maxf(visual_peak, player.visual.global_position.y)
 		if player.visual.position.y < -0.1:
@@ -162,6 +170,9 @@ func _test_movement() -> void:
 	t.check(stair_peak > 1.0, "climbs 0.4 m stairs without jumping (peak y=%.2f)" % stair_peak)
 	t.check(visual_dipped, "mesh eases up each step instead of popping with the body")
 	t.check(visual_peak < stair_peak - 0.05, "mesh trails the body during the climb (%.2f < %.2f)" % [visual_peak, stair_peak])
+	var walk_tick := player.movement.walk_speed / 60.0
+	t.check(max_mesh_step < walk_tick * 2.0, "mesh never lurches while climbing (max %.3f m/tick, walk %.3f)" % [max_mesh_step, walk_tick])
+	t.check(kept_walking, "walk animation state holds through the climb")
 	player.movement.set_external_move(Vector3.ZERO)
 	await _wait(0.5)
 	t.check(player.visual.position.length() < 0.01, "mesh settles back onto the body after the stairs")
@@ -169,9 +180,17 @@ func _test_movement() -> void:
 	var left_floor := false
 	var visual_rose := false
 	var bottom_reached := false
+	var start_x := player.global_position.x
+	var ticks := 0
+	max_mesh_step = 0.0
+	prev_mesh_x = player.visual.global_position.x
 	player.movement.set_external_move(Vector3(1, 0, 0), false)
-	for i in range(90):
+	for i in range(120):
 		await get_tree().physics_frame
+		ticks += 1
+		if i > 5:
+			max_mesh_step = maxf(max_mesh_step, absf(player.visual.global_position.x - prev_mesh_x))
+		prev_mesh_x = player.visual.global_position.x
 		if not player.movement.is_grounded or player.movement.state in [PlayerMovement.State.FALL, PlayerMovement.State.LAND]:
 			left_floor = true
 		if player.visual.position.y > 0.1:
@@ -182,6 +201,9 @@ func _test_movement() -> void:
 	t.check(bottom_reached, "walks back down the stairs (y=%.2f)" % player.global_position.y)
 	t.check(not left_floor, "stays grounded going down 0.4 m steps (no fall animation)")
 	t.check(visual_rose, "mesh eases down each step instead of dropping with the body")
+	var avg_speed := (player.global_position.x - start_x) / (ticks / 60.0)
+	t.check(avg_speed < player.movement.walk_speed * 1.1, "descending does not speed you up (avg %.2f m/s, walk %.2f)" % [avg_speed, player.movement.walk_speed])
+	t.check(max_mesh_step < walk_tick * 2.0, "mesh never lurches while descending (max %.3f m/tick)" % max_mesh_step)
 	player.movement.set_external_move(Vector3.ZERO)
 	await _clear(fixtures)
 

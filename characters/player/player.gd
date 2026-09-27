@@ -35,12 +35,13 @@ const LAYER_WORLD := 1 << 0
 @onready var camera_rig: CameraRig = $LocalPlayer/CameraRig
 @onready var interaction_controller: InteractionController = $LocalPlayer/InteractionController
 
-## How fast the mesh eases back after a step-up (1/s). Higher = snappier.
-@export var step_smoothing: float = 26.0
+## Mesh catch-up speed after a step is set per step (distance / stall time); this is the floor.
+@export var min_step_catchup_speed: float = 2.0
 
 var cast_origin: Node3D
 ## World-space offset applied to the mesh so a one-tick step-up reads as a smooth climb.
 var _visual_offset: Vector3 = Vector3.ZERO
+var _visual_catchup_speed: float = 0.0
 ## Off-hand socket the held item (torch…) is parented to.
 var off_hand: Node3D
 
@@ -128,8 +129,10 @@ func _setup_remote() -> void:
 	synchronizer.movement_state_received.connect(animation_controller.set_movement_state_name)
 
 
-func _on_stepped(displacement: Vector3) -> void:
+func _on_stepped(displacement: Vector3, duration: float) -> void:
 	_visual_offset -= displacement
+	# Constant speed so the mesh walks a straight diagonal onto the tread at walking pace.
+	_visual_catchup_speed = maxf(_visual_offset.length() / maxf(duration, 0.01), min_step_catchup_speed)
 
 
 func _process(delta: float) -> void:
@@ -137,9 +140,7 @@ func _process(delta: float) -> void:
 		return
 	if _visual_offset == Vector3.ZERO:
 		return
-	_visual_offset = _visual_offset.lerp(Vector3.ZERO, 1.0 - exp(-step_smoothing * delta))
-	if _visual_offset.length_squared() < 0.00001:
-		_visual_offset = Vector3.ZERO
+	_visual_offset = _visual_offset.move_toward(Vector3.ZERO, _visual_catchup_speed * delta)
 	# The body yaws with facing, so convert the world offset into its local frame.
 	visual.position = global_basis.inverse() * _visual_offset
 	camera_rig.follow_offset = _visual_offset
