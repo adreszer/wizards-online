@@ -717,8 +717,11 @@ func _test_characters() -> void:
 		t.check(_find_light(player) != null and _find_light(player).is_inside_tree(), "%s: held torch lights up in the off hand" % id)
 		await _wait(0.2)
 		var torch := player.held_item_mount.current_node
-		t.check(torch.global_transform.basis.y.dot(Vector3.UP) > 0.99, "%s: held torch points up regardless of the hand pose" % id)
-		t.check(torch.global_position.distance_to(player.off_hand.global_position) < 0.01, "%s: held torch stays in the hand" % id)
+		var up_dot := torch.global_transform.basis.y.dot(Vector3.UP)
+		t.check(up_dot > 0.8 and up_dot < 0.99, "%s: held torch is roughly upright with a lean, regardless of the hand pose" % id)
+		t.check(torch.global_position.distance_to(player.off_hand.global_position) < 0.25, "%s: held torch stays in the hand" % id)
+		var shaft_forward := torch.global_transform.basis.y.dot(-player.global_transform.basis.z)
+		t.check(shaft_forward > 0.3, "%s: held torch leans forward in the character's facing" % id)
 		player.inventory.release_held()
 		var tree: AnimationTree = player.visual.get_node("AnimationTree")
 		t.check(tree.active, "%s: animation tree active" % id)

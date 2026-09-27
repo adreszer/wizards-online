@@ -13,6 +13,7 @@ func _ready() -> void:
 	var player := player_scene.instantiate()
 	player.is_local = true
 	player.display_name = "Inspector"
+	player.character_id = GameSession.character_id
 	player.name = "LocalPlayer"
 	add_child(player)
 	player.global_transform = _start.global_transform

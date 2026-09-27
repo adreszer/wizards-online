@@ -1,42 +1,146 @@
-[gd_scene load_steps=6 format=3 uid="uid://heldtorch0001"]
+[gd_scene load_steps=19 format=3 uid="uid://heldtorch0001"]
 
 [ext_resource type="Script" path="res://objects/items/held_torch.gd" id="1"]
 
 [sub_resource type="CylinderMesh" id="HandleMesh"]
-top_radius = 0.022
-bottom_radius = 0.018
-height = 0.5
+top_radius = 0.028
+bottom_radius = 0.022
+height = 0.56
 
 [sub_resource type="StandardMaterial3D" id="HandleMat"]
-albedo_color = Color(0.32, 0.2, 0.11, 1)
-roughness = 0.9
+albedo_color = Color(0.45, 0.3, 0.17, 1)
+roughness = 0.85
 
-[sub_resource type="SphereMesh" id="FlameMesh"]
-radius = 0.07
+[sub_resource type="CylinderMesh" id="HeadMesh"]
+top_radius = 0.045
+bottom_radius = 0.036
 height = 0.14
 
-[sub_resource type="StandardMaterial3D" id="FlameMat"]
-shading_mode = 0
-albedo_color = Color(1, 0.7, 0.35, 1)
+[sub_resource type="StandardMaterial3D" id="HeadMat"]
+albedo_color = Color(0.16, 0.11, 0.07, 1)
+roughness = 1.0
 emission_enabled = true
-emission = Color(1, 0.6, 0.25, 1)
-emission_energy_multiplier = 4.0
+emission = Color(0.5, 0.15, 0.02, 1)
+emission_energy_multiplier = 0.15
+
+[sub_resource type="Gradient" id="FlameRamp"]
+offsets = PackedFloat32Array(0, 0.25, 0.6, 1)
+colors = PackedColorArray(1, 0.95, 0.6, 1, 1, 0.65, 0.15, 0.95, 0.9, 0.25, 0.03, 0.6, 0.3, 0.05, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="FlameRampTex"]
+gradient = SubResource("FlameRamp")
+
+[sub_resource type="Curve" id="FlameScaleCurve"]
+_data = [Vector2(0, 0.55), 0.0, 0.0, 0, 0, Vector2(0.3, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.15), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="FlameScaleTex"]
+curve = SubResource("FlameScaleCurve")
+
+[sub_resource type="ParticleProcessMaterial" id="FlameProcess"]
+emission_shape = 1
+emission_sphere_radius = 0.03
+direction = Vector3(0, 1, 0)
+spread = 12.0
+initial_velocity_min = 0.35
+initial_velocity_max = 0.6
+gravity = Vector3(0, 0.6, 0)
+damping_min = 0.5
+damping_max = 1.0
+scale_min = 0.8
+scale_max = 1.2
+scale_curve = SubResource("FlameScaleTex")
+color_ramp = SubResource("FlameRampTex")
+turbulence_enabled = true
+turbulence_noise_strength = 0.35
+turbulence_noise_scale = 4.0
+
+[sub_resource type="Gradient" id="SoftDot"]
+offsets = PackedFloat32Array(0, 0.35, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.55, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="SoftDotTex"]
+gradient = SubResource("SoftDot")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="StandardMaterial3D" id="FlameMat"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = SubResource("SoftDotTex")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="FlameQuad"]
+material = SubResource("FlameMat")
+size = Vector2(0.16, 0.2)
+
+[sub_resource type="Gradient" id="EmberRamp"]
+offsets = PackedFloat32Array(0, 0.7, 1)
+colors = PackedColorArray(1, 0.8, 0.4, 1, 1, 0.4, 0.1, 0.8, 0.5, 0.1, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="EmberRampTex"]
+gradient = SubResource("EmberRamp")
+
+[sub_resource type="ParticleProcessMaterial" id="EmberProcess"]
+emission_shape = 1
+emission_sphere_radius = 0.04
+direction = Vector3(0, 1, 0)
+spread = 35.0
+initial_velocity_min = 0.4
+initial_velocity_max = 0.9
+gravity = Vector3(0, 0.8, 0)
+damping_min = 0.6
+damping_max = 1.2
+scale_min = 0.2
+scale_max = 0.5
+color_ramp = SubResource("EmberRampTex")
+turbulence_enabled = true
+turbulence_noise_strength = 0.8
+turbulence_noise_scale = 3.0
+
+[sub_resource type="QuadMesh" id="EmberQuad"]
+material = SubResource("FlameMat")
+size = Vector2(0.05, 0.05)
 
 [node name="HeldTorch" type="Node3D"]
 script = ExtResource("1")
 
 [node name="Handle" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16, 0)
 mesh = SubResource("HandleMesh")
 surface_material_override/0 = SubResource("HandleMat")
 
+[node name="Head" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47, 0)
+mesh = SubResource("HeadMesh")
+surface_material_override/0 = SubResource("HeadMat")
+
 [node name="Flame" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 light_color = Color(1, 0.78, 0.55, 1)
 light_energy = 2.6
 omni_range = 9.0
 omni_attenuation = 1.4
+shadow_enabled = true
 
-[node name="FlameGlow" type="MeshInstance3D" parent="Flame"]
-mesh = SubResource("FlameMesh")
-surface_material_override/0 = SubResource("FlameMat")
+[node name="FlameParticles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.53, 0)
+amount = 48
+lifetime = 0.45
+local_coords = true
+process_material = SubResource("FlameProcess")
+draw_pass_1 = SubResource("FlameQuad")
+
+[node name="Embers" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+amount = 12
+lifetime = 1.1
+local_coords = false
+process_material = SubResource("EmberProcess")
+draw_pass_1 = SubResource("EmberQuad")

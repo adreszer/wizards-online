@@ -142,6 +142,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] `ItemDefinition` resource + `ItemRegistry` (id → `resources/items/<id>.tres`, sanitized ids, starting kit)
 - [x] `Inventory` player component (slots, stacking, hold/release, state serialization, meta registration) + `HeldItemMount` (held scene under the body's `OffHand` socket; both bodies and the build tool ship the socket)
 - [x] Torch item: never expires (`burn_seconds = 0`), `objects/items/held_torch.tscn` with a flickering OmniLight (9 m)
+- [x] Held torch visuals: wooden shaft + wrapped head, particle flame and embers; gripped at the palm and leaned forward/outward from the character's facing so the flame clears the shoulder (was: flat emissive disc at the wrist, shaft along the forearm). `tools/capture_held_item.tscn` renders it.
 - [x] Satchel UI (`Tab`, joypad Back): lists items, click to hold / put away; HUD "In hand" line; spawn hint
 - [x] Server-owned inventories: Nakama storage `inventory/items` per user, starting kit created on first join, `OP_INVENTORY` to the joiner, `OP_HELD_ITEM` validated (owned + holdable) and relayed, `held` in roster entries; offline uses the same starting kit locally
 - [x] Headless tests: inventory data/visuals/panel (run_tests), held torch replication + server-issued inventory (two-client test)

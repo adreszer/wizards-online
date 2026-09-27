@@ -106,6 +106,8 @@ godot --headless --path . -s tools/inspect_model.gd -- res://assets/models/envir
 
 # render the validation scene from fixed viewpoints to PNGs (opens a window)
 godot --path . tools/capture_validation.tscn -- --out=/absolute/output/dir
+# close-ups of a held item (torch by default) on the current body; --character= picks the body
+godot --path . tools/capture_held_item.tscn -- --out=/absolute/output/dir --character=apprentice_f [--item=torch]
 ```
 
 Regenerating the castle after editing its plan (`python3 tools/generate_castle.py` from the project root) rewrites `levels/castle/castle.tscn`; hand edits belong in the generator, in `objects/`, or in `levels/castle/castle.gd`. New rooms need an `AREA_<ID>` row in `localization/translations.csv` (the castle test fails on a missing name).
