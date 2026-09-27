@@ -58,8 +58,6 @@ var facing_yaw: float = 0.0
 var last_move_direction: Vector3 = Vector3.ZERO
 
 var debug_step: bool = false
-## Intended forward travel accumulated while pressed against a step (see _try_step_up).
-var _step_credit: float = 0.0
 var _base_gravity: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
 var _coyote_timer: float = 0.0
 var _jump_buffer_timer: float = 0.0
@@ -308,13 +306,6 @@ func _try_step_up(move_dir: Vector3, delta: float) -> void:
 	# Must be blocked at current height...
 	if not body.test_move(from, motion):
 		if debug_step: print("step: not blocked")
-		_step_credit = 0.0
-		return
-	# A step-up hops the body `step_forward_distance` ahead, so on a long flight it
-	# must only fire once that much intended travel has accumulated; otherwise a
-	# staircase is climbed at one hop per physics tick.
-	_step_credit += motion.length()
-	if _step_credit < step_forward_distance:
 		return
 	var up := Vector3.UP * step_height
 	if body.test_move(from, up):
@@ -344,7 +335,6 @@ func _try_step_up(move_dir: Vector3, delta: float) -> void:
 		if debug_step: print("step: too steep ", result.get_collision_normal())
 		return
 	if debug_step: print("step: OK ", travel)
-	_step_credit = 0.0
 	var destination := raised.origin + travel + Vector3.UP * 0.01
 	var displacement := destination - from.origin
 	body.global_position = destination
