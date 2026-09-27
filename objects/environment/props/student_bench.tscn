@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://studentbench01"]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/student_bench.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="BenchShape"]
+size = Vector3(1.9, 0.54, 0.56)
+
+[node name="StudentBench" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.001, 0.2695, 0.001)
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27, 0)
+shape = SubResource("BenchShape")

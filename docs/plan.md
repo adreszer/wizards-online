@@ -128,6 +128,9 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Doorway module `doorway.glb` → `doorway.tscn` (4 × 4 × 0.35 m, pointed arch ≈3.8 m wide at the base, ≈3.8 m tall; jamb + arch box collision); replaces every greybox lintel (7 doors + training archway)
 - [x] `doorway.glb` remeshed: 9,003 tris + normal map, identical bounds
 - [x] Magic door slab `door_magical_sliding.glb` (7,478 tris + normal map) fitted into `magic_door.tscn` as exactly 3.0 × 3.2 × 0.4 m on the sliding AnimatableBody3D; collision and animation unchanged
+- [x] Student desk `student_desk.glb` (10,071 tris + normal map, 1.90 × 0.76 × 0.83 m at scale 1) → `objects/environment/props/student_desk.tscn` (bottom-centre pivot, box collision); the carved apron is on the model's +Z side, so +Z faces the professor
+- [x] Student bench `student_bench.glb` (10,193 tris + normal map, 1.90 × 0.54 × 0.56 m at scale 1) → `student_bench.tscn`. Known flaw: the seat is two planks with a ragged split between them (floor visible through it up close) — a generation artefact; re-export when convenient, the wrapper needs no change if the bounds stay
+- [x] `tools/capture_model.tscn`: renders any .glb/.tscn from fixed angles (with an X/Z axis gizmo) or a scene from `--eye/--target`, for checking a new prop's orientation and scale
 
 ### Milestone 12 — Localization (Polish primary, English secondary)
 - [x] All player-facing strings moved to `localization/translations.csv` (72 keys: menus, pause, HUD, chat, network/status messages, interaction prompts, notifications, plaques, spell/collectible names)
@@ -158,7 +161,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Occlusion culling: box occluders on wall runs and floor/ceiling tilers, project setting enabled
 - [x] `core/world.tscn` loads the castle; `levels/mvp` stays as the test fixture for the puzzle wiring
 - [x] Headless castle test: areas translated, a floor under every area's centre, walking from the start into the entrance hall fires area events, grand staircase and tower flights climbable
-- [ ] Furnish rooms (benches, tables, beds, bookshelves, cauldrons…) and give each classroom its subject props
+- [x] Classrooms furnished: 13 classrooms get rows of student desks + benches (4 × 3 in the 24 m wing rooms and Elixirs, 3 × 2 in the SW tower rooms) facing the wall opposite the door, rows kept clear of the room centre; practice tomes moved to the lectern spot 2 m ahead of the first row (`CLASSROOM_FRONT` in the generator; 228 props ≈ 2.3 M tris, the castle's largest render cost after the floor tiles — revisit with LODs/impostors if frame time suffers)
+- [ ] Furnish the other rooms (great-hall tables, beds, bookshelves, cauldrons, greenhouse workbenches…) and give each classroom its subject props; a professor's desk/lectern at the front
 - [ ] Windows and outdoor lighting (the grounds are lit like night); glass greenhouse; tower exteriors (rooms currently share one plain exterior)
 - [ ] House names, common-room access rules (server-side house membership), classroom/lesson context from `AreaZone`
 - [ ] Modelled stair asset to replace the generated slab steps; railings on flights; more secret passages and multi-step puzzles

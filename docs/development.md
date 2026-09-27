@@ -127,6 +127,10 @@ godot --headless --path . -s tools/inspect_model.gd -- res://assets/models/envir
 godot --path . tools/capture_validation.tscn -- --out=/absolute/output/dir
 # close-ups of a held item (torch by default) on the current body; --character= picks the body
 godot --path . tools/capture_held_item.tscn -- --out=/absolute/output/dir --character=apprentice_f [--item=torch]
+# a model or wrapper on a floor tile from five angles with an X (red) / Z (blue) gizmo, to check orientation and scale
+godot --path . tools/capture_model.tscn -- --scene=res://assets/models/environment/modular/student_desk.glb --out=/absolute/output/dir
+# one view of a whole scene (e.g. look into a castle room)
+godot --path . tools/capture_model.tscn -- --scene=res://levels/castle/castle.tscn --eye=-22,4.5,-3 --target=-36,0.8,0 --out=/absolute/output/dir
 ```
 
 Regenerating the castle after editing its plan (`python3 tools/generate_castle.py` from the project root) rewrites `levels/castle/castle.tscn` and `nakama/modules/world_areas.lua` (restart Nakama to pick the latter up); hand edits belong in the generator, in `objects/`, or in `levels/castle/castle.gd`. New rooms need an `AREA_<ID>` row in `localization/translations.csv` (the castle test fails on a missing name).

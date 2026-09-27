@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://assetvalid001"]
+[gd_scene load_steps=8 format=3 uid="uid://assetvalid001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/wall_plain.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/greybox/greybox_block.tscn" id="2"]
 [ext_resource type="Script" path="res://levels/dev/asset_validation.gd" id="3"]
 [ext_resource type="PackedScene" path="res://ui/debug/debug_overlay.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/student_desk.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/student_bench.tscn" id="6"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -270,6 +272,22 @@ text = "D  player scale (walk up to any wall)"
 font_size = 72
 outline_size = 12
 
+[node name="E_DeskAndBench" type="Node3D" parent="."]
+
+[node name="Desk" parent="E_DeskAndBench" instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 3)
+
+[node name="Bench" parent="E_DeskAndBench" instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 2.15)
+
+[node name="Label" type="Label3D" parent="E_DeskAndBench"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4, 2.2, 3)
+billboard = 1
+pixel_size = 0.005
+text = "E  student desk + bench (carved apron faces +Z)"
+font_size = 72
+outline_size = 12
+
 [node name="DevInfo" type="CanvasLayer" parent="."]
 
 [node name="Label" type="Label" parent="DevInfo"]
@@ -281,5 +299,5 @@ text = "Wall Plain
 ~3K triangles
 Production Asset Test
 
-A single  |  B 3x tiled  |  C corner  |  D player scale
+A single  |  B 3x tiled  |  C corner  |  D player scale  |  E desk + bench
 Esc: toggle mouse   F3: debug overlay"

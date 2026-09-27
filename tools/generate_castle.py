@@ -663,7 +663,55 @@ def fragment(rid, dx, dz, dy=0.0):
     cx, cz = r.centre()
     inst(uname(f"Fragment_{rid}"), "res://gameplay/collectibles/collectible.tscn", (cx + dx, r.y + dy, cz + dz), parent="Collectibles")
 
-# (room, spell id, offset from the room centre)
+# Classrooms get rows of student desks + benches facing the professor's end of the
+# room ("front" = the wall opposite the entrance door); wall id -> (desks per row, rows).
+CLASSROOM_FRONT = {
+    "class_shapeshaping": "w", "class_sigilcraft": "w", "class_chronicles": "w", "class_glyphs": "w",
+    "class_numeromancy": "w", "class_warding": "w", "class_elixirs": "w",
+    "class_herblore": "e", "class_skyriding": "e", "class_beastlore": "e", "class_stargazing": "e",
+    "tower_sw_2": "w", "tower_sw_3": "w",
+}
+# Desk rows (m from the front wall) keep the room's centre clear: the area test drops the
+# player there, and it is where players naturally cross a room.
+DESK_ROWS_DEEP = (5.0, 7.5, 10.0)         # 24 m deep rooms (wing classrooms, Elixirs)
+DESK_ROWS_TOWER = (4.0, 6.4)              # 16 m tower rooms
+DESK_PITCH = 3.0                          # m between desk centres along a row (desk is 1.9 wide)
+BENCH_BEHIND_DESK = 0.85                  # bench centre this far behind the desk centre
+LECTERN_BEFORE_FIRST_ROW = 2.0            # practice tomes / professor's spot, ahead of the first row
+
+def classroom_frame(r):
+    """(origin on the front wall's centre line, unit vector into the room, unit vector along the
+    front wall, desk yaw). Desk model: carved apron on +Z faces the professor."""
+    front = CLASSROOM_FRONT[r.id]
+    cx, cz = r.centre()
+    if front == "w":   return (r.x0, cz), (1, 0), (0, 1), math.radians(90)
+    if front == "e":   return (r.x1, cz), (-1, 0), (0, 1), math.radians(-90)
+    if front == "n":   return (cx, r.z0), (0, 1), (1, 0), math.radians(180)
+    return (cx, r.z1), (0, -1), (1, 0), 0.0
+
+def classroom_point(r, along, across):
+    (ox, oz), (ix, iz), (sx, sz), _ = classroom_frame(r)
+    return (ox + ix * along + sx * across, r.y, oz + iz * along + sz * across)
+
+def emit_furniture():
+    n = 0
+    for rid in CLASSROOM_FRONT:
+        r = rooms[rid]
+        _, (ix, iz), _, yaw = classroom_frame(r)
+        cross = (r.z1 - r.z0) if ix else (r.x1 - r.x0)
+        per_row = 4 if cross >= 20 else 3
+        rows = DESK_ROWS_TOWER if rid.startswith("tower") else DESK_ROWS_DEEP
+        offsets = [(i - (per_row - 1) / 2) * DESK_PITCH for i in range(per_row)]
+        for a in rows:
+            for b in offsets:
+                inst(uname(f"Desk_{rid}"), "res://objects/environment/props/student_desk.tscn",
+                     classroom_point(r, a, b), parent="Furniture", rot_y=yaw)
+                inst(uname(f"Bench_{rid}"), "res://objects/environment/props/student_bench.tscn",
+                     classroom_point(r, a + BENCH_BEHIND_DESK, b), parent="Furniture", rot_y=yaw)
+                n += 2
+    return n
+
+# (room, spell id, offset: across the lectern for furnished classrooms, else from the room centre)
 PRACTICE_TOMES = [
     ("class_sigilcraft", "arcane_pulse", -2.0, 0.0),
     ("class_sigilcraft", "uplift", 2.0, 0.0),
@@ -707,7 +755,12 @@ def emit_props():
         r = rooms[rid]
         cx, cz = r.centre()
         spell_ext = ext_id("Resource", f"res://resources/spells/{spell_id}.tres")
-        inst(uname(f"Tome_{spell_id}"), "res://objects/interactables/spell_tome.tscn", (cx + dx, r.y, cz + dz),
+        if rid in CLASSROOM_FRONT:
+            first_row = (DESK_ROWS_TOWER if rid.startswith("tower") else DESK_ROWS_DEEP)[0]
+            pos = classroom_point(r, first_row - LECTERN_BEFORE_FIRST_ROW, dx)
+        else:
+            pos = (cx + dx, r.y, cz + dz)
+        inst(uname(f"Tome_{spell_id}"), "res://objects/interactables/spell_tome.tscn", pos,
              parent="Tomes", props={"spell": f'ExtResource("{spell_ext}")'})
     r = rooms["class_sigilcraft"]
     inst("SigilcraftSwitch", "res://objects/puzzles/magic_switch.tscn", (r.x0 + 3, r.y, r.z0 + 3))
@@ -734,6 +787,7 @@ torch_count = emit_torches()
 emit_zones()
 emit_house_gates()
 emit_props()
+furniture_count = emit_furniture()
 emit_area_map("nakama/modules/world_areas.lua")
 
 level_script = ext_id("Script", "res://levels/castle/castle.gd")
@@ -793,8 +847,10 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 
 [node name="Doors" type="Node3D" parent="."]
 
+[node name="Furniture" type="Node3D" parent="."]
+
 '''
 header = f'[gd_scene load_steps={len(ext) + 2} format=3 uid="uid://castle0000001"]\n\n'
 open(OUT, "w").write(header + exts + subs + root + "\n".join(nodes) + "\n")
 print("name keys:", " ".join(sorted({r.name_key for r in rooms.values()})))
-print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  nodes: {len(nodes)}")
+print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  furniture: {furniture_count}  nodes: {len(nodes)}")

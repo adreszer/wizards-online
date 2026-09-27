@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://studentdesk001"]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/student_desk.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="DeskShape"]
+size = Vector3(1.9, 0.76, 0.84)
+
+[node name="StudentDesk" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0.002)
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 0)
+shape = SubResource("DeskShape")
