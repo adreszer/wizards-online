@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://world0000001"]
+[gd_scene load_steps=10 format=3 uid="uid://world0000001"]
 
 [ext_resource type="Script" path="res://core/world.gd" id="1"]
 [ext_resource type="PackedScene" path="res://levels/castle/castle.tscn" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://ui/menus/pause_menu.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://ui/debug/debug_overlay.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://ui/inventory/inventory_panel.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://ui/school/professor_panel.tscn" id="10"]
 
 [node name="World" type="Node"]
 script = ExtResource("1")
@@ -27,6 +28,8 @@ players_root = NodePath("../Players")
 [node name="ChatPanel" parent="." instance=ExtResource("6")]
 
 [node name="InventoryPanel" parent="." instance=ExtResource("9")]
+
+[node name="ProfessorPanel" parent="." instance=ExtResource("10")]
 
 [node name="PauseMenu" parent="." instance=ExtResource("7")]
 

@@ -9,14 +9,21 @@ signal player_state_received(sid: String, state: Dictionary)
 signal spell_cast_received(sid: String, cast: Dictionary)
 signal held_item_received(sid: String, item_id: String)
 signal inventory_received(state: Dictionary)
+signal profile_received(profile: Dictionary)
+## A remote player's role/house changed (also fired for roster entries on join).
+signal player_profile_changed(sid: String, role: String, house: int)
+signal spell_granted(spell_id: String, by_name: String)
+signal grant_result_received(ok: bool, sid: String, spell_id: String, reason: String)
 
 @export var ping_interval: float = 2.0
 
 var session: WorldSession
-## sid -> {uid, name, char, held}
+## sid -> {uid, name, char, held, role, house}
 var players: Dictionary = {}
 ## The local player's server-side inventory ({items, held}); empty until received.
 var local_inventory: Dictionary = {}
+## The local player's server-side character profile ({house, role, spells}); empty until received.
+var local_profile: Dictionary = {}
 var ping_ms: int = -1
 var _ping_timer: float = 0.0
 
@@ -30,12 +37,17 @@ func bind(p_session: WorldSession) -> void:
 	session.spell_cast_received.connect(_on_spell_cast)
 	session.held_item_received.connect(_on_held_item)
 	session.inventory_received.connect(_on_inventory)
+	session.profile_received.connect(_on_profile)
+	session.roster_update_received.connect(_on_roster_update)
+	session.spell_granted.connect(spell_granted.emit)
+	session.grant_result_received.connect(grant_result_received.emit)
 	session.pong_received.connect(_on_pong)
 
 
 func reset() -> void:
 	players.clear()
 	local_inventory = {}
+	local_profile = {}
 	ping_ms = -1
 
 
@@ -52,6 +64,31 @@ func send_spell_cast(cast: Dictionary) -> void:
 func send_held_item(item_id: String) -> void:
 	if session != null:
 		session.send(NetworkProtocol.OP_HELD_ITEM, {"id": item_id})
+
+
+func send_area(area_id: String) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_AREA, {"id": area_id})
+
+
+func send_grant_spell(sid: String, spell_id: String) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_GRANT_SPELL, {"sid": sid, "id": spell_id})
+
+
+func send_spellbook(slots: Array, equipped: String) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_SPELLBOOK, {"slots": slots, "equipped": equipped})
+
+
+func send_study_tome(spell_id: String) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_STUDY_TOME, {"id": spell_id})
+
+
+func get_role(sid: String) -> String:
+	var entry: Dictionary = players.get(sid, {})
+	return str(entry.get("role", CharacterProfile.ROLE_STUDENT))
 
 
 func get_held_item(sid: String) -> String:
@@ -86,14 +123,15 @@ func _on_roster(roster: Array, self_sid: String) -> void:
 		if sid.is_empty() or sid == self_sid:
 			continue
 		if not players.has(sid):
-			players[sid] = {"uid": str(entry.get("uid", "")), "name": str(entry.get("name", "?")), "char": str(entry.get("char", "")), "held": ItemRegistry.sanitize(str(entry.get("held", "")))}
+			players[sid] = {"uid": str(entry.get("uid", "")), "name": str(entry.get("name", "?")), "char": str(entry.get("char", "")), "held": ItemRegistry.sanitize(str(entry.get("held", ""))),
+				"role": CharacterProfile.sanitize_role(str(entry.get("role", ""))), "house": CharacterProfile.sanitize_house(int(entry.get("house", 0)))}
 			player_joined.emit(sid, players[sid]["name"])
 
 
-func _on_player_joined(sid: String, uid: String, display_name: String, character_id: String = "") -> void:
+func _on_player_joined(sid: String, uid: String, display_name: String, character_id: String = "", role: String = "", house: int = 0) -> void:
 	if sid.is_empty() or sid == session.self_session_id or players.has(sid):
 		return
-	players[sid] = {"uid": uid, "name": display_name, "char": character_id, "held": ""}
+	players[sid] = {"uid": uid, "name": display_name, "char": character_id, "held": "", "role": CharacterProfile.sanitize_role(role), "house": CharacterProfile.sanitize_house(house)}
 	player_joined.emit(sid, display_name)
 
 
@@ -126,6 +164,19 @@ func _on_held_item(sid: String, item_id: String) -> void:
 func _on_inventory(state: Dictionary) -> void:
 	local_inventory = state
 	inventory_received.emit(state)
+
+
+func _on_profile(profile: Dictionary) -> void:
+	local_profile = CharacterProfile.sanitize(profile)
+	profile_received.emit(local_profile)
+
+
+func _on_roster_update(sid: String, role: String, house: int) -> void:
+	if not players.has(sid):
+		return
+	players[sid]["role"] = CharacterProfile.sanitize_role(role)
+	players[sid]["house"] = CharacterProfile.sanitize_house(house)
+	player_profile_changed.emit(sid, players[sid]["role"], players[sid]["house"])
 
 
 func _on_pong(sent_ms: int) -> void:

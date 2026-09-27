@@ -10,6 +10,14 @@ const OP_SPELL_CAST := 2
 ## client → server (validated against the server-side inventory) → all other
 ## players: {id} the sender now holds ("" = hands free)
 const OP_HELD_ITEM := 3
+## client → server: {id} the AreaZone the local player is in ("" = none)
+const OP_AREA := 4
+## client (professor/admin) → server: {sid, id} teach a spell to a player in the same classroom
+const OP_GRANT_SPELL := 5
+## client → server: {slots: [ids or ""], equipped: id} hotbar layout to persist
+const OP_SPELLBOOK := 6
+## client → server: {id} learn a practice tome's spell (interim, until lessons only)
+const OP_STUDY_TOME := 7
 ## server → joining player: full roster {players: [{sid, uid, name, char, held}], self_sid}
 const OP_ROSTER := 10
 ## server → others: {sid, uid, name}
@@ -18,10 +26,20 @@ const OP_PLAYER_JOINED := 11
 const OP_PLAYER_LEFT := 12
 ## server → joining player: its own inventory {items: [{id, count}], held}
 const OP_INVENTORY := 13
+## server → same player: its character profile {house, role, spells: {known, slots, equipped}}
+const OP_PROFILE := 14
+## server → others: {sid, role, house} a player's role/house changed
+const OP_ROSTER_UPDATE := 15
+## server → target: {id, by} a spell was taught to you
+const OP_SPELL_GRANTED := 16
+## server → professor: {ok, sid, id, reason} outcome of OP_GRANT_SPELL
+const OP_GRANT_RESULT := 17
 ## client → server → same client: {t: ms} (round-trip latency probe)
 const OP_PING := 20
 
 const CHAT_ROOM := "world"
+## Server RPC that changes a character's role/house (admin or HTTP key).
+const RPC_ADMIN_SET_PROFILE := "admin_set_profile"
 const MAX_CHAT_LENGTH := 200
 
 

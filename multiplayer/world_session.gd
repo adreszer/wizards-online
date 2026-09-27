@@ -5,13 +5,21 @@ extends Node
 
 signal socket_closed()
 signal roster_received(players: Array, self_sid: String)
-signal player_joined(sid: String, uid: String, display_name: String, character_id: String)
+signal player_joined(sid: String, uid: String, display_name: String, character_id: String, role: String, house: int)
 signal player_left(sid: String, uid: String, display_name: String)
 signal state_received(sid: String, state: Dictionary)
 signal spell_cast_received(sid: String, cast: Dictionary)
 signal held_item_received(sid: String, item_id: String)
 ## The local player's own inventory as stored on the server.
 signal inventory_received(state: Dictionary)
+## The local player's own character profile {house, role, spells}.
+signal profile_received(profile: Dictionary)
+## Another player's role/house changed.
+signal roster_update_received(sid: String, role: String, house: int)
+## The server taught the local player a spell.
+signal spell_granted(spell_id: String, by_name: String)
+## Outcome of a grant the local player (professor) requested.
+signal grant_result_received(ok: bool, sid: String, spell_id: String, reason: String)
 signal pong_received(sent_ms: int)
 
 var socket: NakamaSocket
@@ -84,11 +92,19 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 			held_item_received.emit(str(payload.get("sid", sender_sid)), str(payload.get("id", "")))
 		NetworkProtocol.OP_INVENTORY:
 			inventory_received.emit(payload)
+		NetworkProtocol.OP_PROFILE:
+			profile_received.emit(payload)
+		NetworkProtocol.OP_ROSTER_UPDATE:
+			roster_update_received.emit(str(payload.get("sid", "")), str(payload.get("role", "")), int(payload.get("house", 0)))
+		NetworkProtocol.OP_SPELL_GRANTED:
+			spell_granted.emit(str(payload.get("id", "")), str(payload.get("by", "")))
+		NetworkProtocol.OP_GRANT_RESULT:
+			grant_result_received.emit(bool(payload.get("ok", false)), str(payload.get("sid", "")), str(payload.get("id", "")), str(payload.get("reason", "")))
 		NetworkProtocol.OP_ROSTER:
 			self_session_id = str(payload.get("self_sid", self_session_id))
 			roster_received.emit(payload.get("players", []), self_session_id)
 		NetworkProtocol.OP_PLAYER_JOINED:
-			player_joined.emit(str(payload.get("sid", "")), str(payload.get("uid", "")), str(payload.get("name", "")), str(payload.get("char", "")))
+			player_joined.emit(str(payload.get("sid", "")), str(payload.get("uid", "")), str(payload.get("name", "")), str(payload.get("char", "")), str(payload.get("role", "")), int(payload.get("house", 0)))
 		NetworkProtocol.OP_PLAYER_LEFT:
 			player_left.emit(str(payload.get("sid", "")), str(payload.get("uid", "")), str(payload.get("name", "")))
 		NetworkProtocol.OP_PING:

@@ -70,6 +70,13 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "HUD_HELD_NONE"
 
+[node name="RoleLabel" type="Label" parent="TopLeft/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.5, 1)
+text = "HUD_ROLE_PROFESSOR"
+visible = false
+
 [node name="TopRight" type="PanelContainer" parent="."]
 mouse_filter = 2
 anchors_preset = 1

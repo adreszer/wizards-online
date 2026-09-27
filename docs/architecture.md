@@ -44,7 +44,7 @@ Player (CharacterBody3D, player.gd — wiring only)
 ├── Movement            PlayerMovement      walk/run/jump/gravity/slopes/step-up/coyote/buffer
 ├── CharacterVisual     placeholder meshes + AnimationPlayer + AnimationTree
 │   └── AnimationController   state names → AnimationTree parameters
-├── SpellCaster         aim (centre screen + assist), cooldown, projectile spawn
+├── SpellCaster         spellbook (known, quick slots, equipped), aim (centre screen + assist), per-spell cooldowns, projectile spawn
 ├── Health
 ├── RespawnHandler      checkpoint transform, death/fall respawn
 ├── NetworkSynchronizer local: sample+send 12 Hz · remote: buffer+interpolate
@@ -54,6 +54,7 @@ Player (CharacterBody3D, player.gd — wiring only)
 └── LocalPlayer (Node3D) — freed for remote players
     ├── PlayerInput            InputMap → intent (cleared while UI captures input)
     ├── CameraRig              yaw → Pitch → SpringArm3D → Camera3D (top-level)
+    ├── AreaTracker            current AreaZone (nested zones → innermost), reported to the server
     └── InteractionController  Area3D on the "interactable" layer
 ```
 
@@ -96,6 +97,22 @@ SpellEffect (RefCounted)    definition, effect_type, caster, caster_id, hit posi
 
 Aiming: the camera ray from the screen centre is intersected with the world; a cone (`aim_assist_angle_degrees`) around it prefers the nearest `SpellReceiver` in range **that accepts the equipped spell's effect type** with line of sight from the wand. The projectile is fired from the wand tip toward the resolved point. Adding a spell = a new `.tres` + a row in `SpellRegistry.SPELL_IDS` + two translation keys (+ optionally a projectile / burst scene); `SpellCaster` is untouched. Casts replicate by spell id, so remote clients replay any spell in the registry. Until lessons exist, a practice tome per spell stands in the matching classroom (`PRACTICE_TOMES` in `tools/generate_castle.py`); `-- --all-spells` fills the hotbar at spawn for playtesting.
 
+## Character record, roles and lessons
+
+```
+CharacterProfile (static)   ROLE_STUDENT/PROFESSOR/ADMIN, sanitize(), is_staff(), title_key()
+AreaTracker (Node)          local-player component: current AreaZone (innermost of nested zones), area_changed
+ProfessorPanel (CanvasLayer) lesson tools (key L, staff only): students in the room, spell list, teach → server
+nakama/modules/character_profile.lua   storage "character"/"profile": {v, house, role, spells{known, slots, equipped}}
+nakama/modules/world_areas.lua         generated with the castle: area id → {kind, house}
+```
+
+The server owns the character: role (student by default; professor/admin set by an admin), house (0 = unsorted, 1–4 placeholders) and the spellbook. On join the match loads the profile (creating a student record on first join, promoting users listed in the `ADMIN_USER_IDS` runtime env), sends it to the player (`OP_PROFILE`) and puts role/house into every roster entry so nameplates can show titles. `PlayerSpawner` applies the profile to the local `Player` (`set_profile`) and to the caster through `NetworkSynchronizer.apply_server_spellbook()`, which loads the state without echoing it back; hotbar changes go up as `OP_SPELLBOOK` and are persisted.
+
+Lessons: `AreaTracker` reports the local player's current area (`OP_AREA`) whenever it changes. A professor or admin sends `OP_GRANT_SPELL {sid, id}`; the match checks the sender's role, that the sender stands in an area whose kind is `classroom` (from `world_areas.lua`, never from the client), that the target reported the same area and does not already know the spell, then appends the spell to the target's profile, persists it, pushes the new profile plus `OP_SPELL_GRANTED {id, by}` to the target and `OP_GRANT_RESULT` to the professor. Casts are relayed only for spells in the sender's known list, so a client cannot fire what it was never taught. Practice tomes online send `OP_STUDY_TOME` (the interim rule: any registered spell; lessons will replace it); offline they teach locally.
+
+Administration: the `admin_set_profile` RPC (`{user_id | name, role?, house?}`) is allowed for server-to-server calls with the runtime HTTP key, for users in `ADMIN_USER_IDS` and for admins by profile. It signals the live world match (`match_signal`), which updates the online player by user id or display name, saves and broadcasts `OP_ROSTER_UPDATE`; an offline target given by user id is written to storage directly. `tools/set_role.sh` wraps the curl call.
+
 ## Inventory and held items
 
 ```
@@ -120,13 +137,13 @@ All in `objects/`: `MagicSwitch`, `MagicDoor` (AnimatableBody3D panel), `Pushabl
 NetworkManager (autoload)
 ├── NakamaAuthentication   device auth (+ --instance suffix), display name in session vars
 ├── WorldSession           socket, "join_world" RPC → join authoritative match, decodes op codes
-├── StateSynchronizer      roster (sid → name, char, held), local inventory, ping, send/receive state, casts & held items
+├── StateSynchronizer      roster (sid → name, char, held, role, house), local inventory + profile, ping, send/receive state, casts, held items, areas, grants, spellbook
 └── ChatManager            room channel "world", sanitization, sender-name lookup via roster
 ```
 
-Server (`nakama/modules/`): `world.lua` registers the `join_world` RPC (finds the match by label, creates it if missing) and a `ChannelMessageSend` before-hook that rejects empty/oversized chat. `world_match.lua` is the authoritative match handler: it owns the roster (names from join metadata, sanitized), sends the roster to joiners, broadcasts join/leave, relays state and spell casts to everyone else, and echoes pings. It also owns **inventories**: on join it reads the user's `inventory/items` storage object (creating the starting kit, one torch, on first join), sends it to the joining client (`OP_INVENTORY`) and keeps it in match state; a client's `OP_HELD_ITEM` is accepted only for an owned, holdable item, persisted, and then broadcast to the others. Roster entries carry `held` so late joiners see what everyone holds.
+Server (`nakama/modules/`): `world.lua` registers the `join_world` RPC (finds the match by label, creates it if missing), the `admin_set_profile` RPC and a `ChannelMessageSend` before-hook that rejects empty/oversized chat; `character_profile.lua` holds the character record helpers and `world_areas.lua` the generated area map. `world_match.lua` is the authoritative match handler: it owns the roster (names from join metadata, sanitized), sends the roster to joiners, broadcasts join/leave, relays state and spell casts to everyone else, and echoes pings. It also owns **inventories**: on join it reads the user's `inventory/items` storage object (creating the starting kit, one torch, on first join), sends it to the joining client (`OP_INVENTORY`) and keeps it in match state; a client's `OP_HELD_ITEM` is accepted only for an owned, holdable item, persisted, and then broadcast to the others. Roster entries carry `held` so late joiners see what everyone holds.
 
-Op codes are defined once in `multiplayer/network_protocol.gd` and mirrored in the Lua file.
+Op codes are defined once in `multiplayer/network_protocol.gd` and mirrored in the Lua file (1–7 client → server, 10–17 server → client, 20 ping).
 
 ### Authority (MVP)
 
@@ -134,7 +151,9 @@ Op codes are defined once in `multiplayer/network_protocol.gd` and mirrored in t
 |-------|-----------|-------|
 | Player identity, display name, roster, join/leave | **Server** | Clients never trust another client's claims about who is present. |
 | Player transform, velocity, movement state | Client-authoritative (relayed by the server) | The match handler is the place to add rate limits / sanity checks later. |
-| Spell cast events | Client-authoritative, cosmetic on other clients | Carries `caster_id`; a future `target` field + server validation enables duels. |
+| Spell cast events | Client-initiated, **server-filtered** (only known spells are relayed), cosmetic on other clients | Carries `caster_id`; a future `target` field + PvP flag per area enables duels. |
+| Character profile: role, house, spellbook | **Server** | Nakama storage (`character` / `profile`, per user). Roles change only through the admin RPC; spells only through grants (professor in the same classroom) or, interim, practice tomes. Hotbar layout is the one thing the client dictates (validated against known spells). |
+| Current area | Client-reported, server-recorded | `OP_AREA` on zone change; the server maps ids to kinds via `world_areas.lua` and uses it to gate classroom-only actions. Position checks can be added later. |
 | Inventory contents, held item | **Server** | Nakama storage (`inventory` / `items`, per user). Clients only request `hold`; the server validates ownership and relays. Offline mode uses the same starting kit locally. |
 | Puzzle / door / collectible state | **Local only** | Documented MVP limitation; receivers are signal-driven so a server trigger can call the same handlers. |
 | Chat | Server-validated (length), client-rendered | Names resolved through the server roster. |
@@ -163,10 +182,10 @@ assets/audio                   generated placeholder tones
 assets/models                  source models (GLB) as exported by the art pipeline; never edited here
 characters/player, components  player scene + components
 core/                          game root, world, autoloads, Localization helper
-gameplay/{spells,interaction,collectibles,health,checkpoints,inventory}
+gameplay/{spells,interaction,collectibles,health,checkpoints,inventory,school}   school = CharacterProfile
 levels/castle                  the castle (generated by tools/generate_castle.py) + wiring script
 levels/mvp                     old vertical-slice level, kept as a test fixture
-gameplay/world                 AreaZone (named castle areas)
+gameplay/world                 AreaZone (named castle areas), AreaTracker
 levels/dev                     development-only scenes (asset validation)
 localization/                  translations.csv (keys,en,pl) → generated .translation files
 multiplayer/{authentication,synchronization,chat} + network_manager, world_session, player_spawner
@@ -176,5 +195,5 @@ objects/environment            wrapper scenes for imported environment modules (
 tools/                         generate_castle.py, generate_level.py, model inspection, screenshot capture, character build
 resources/{spells,collectibles,items} data resources
 tests/                         headless test runners
-ui/{menus,hud,chat,inventory,debug}
+ui/{menus,hud,chat,inventory,school,debug}   school = lesson tools (ProfessorPanel)
 ```

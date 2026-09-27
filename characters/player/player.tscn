@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://player000001"]
+[gd_scene load_steps=17 format=3 uid="uid://player000001"]
 
 [ext_resource type="Script" path="res://characters/player/player.gd" id="1"]
 [ext_resource type="Script" path="res://characters/player/player_movement.gd" id="2"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://gameplay/interaction/interaction_controller.gd" id="11"]
 [ext_resource type="Script" path="res://gameplay/inventory/inventory.gd" id="12"]
 [ext_resource type="Script" path="res://characters/components/held_item_mount.gd" id="13"]
+[ext_resource type="Script" path="res://gameplay/world/area_tracker.gd" id="14"]
 
 [sub_resource type="CapsuleShape3D" id="BodyShape"]
 radius = 0.35
@@ -71,6 +72,9 @@ script = ExtResource("8")
 script = ExtResource("9")
 
 [node name="CameraRig" parent="LocalPlayer" instance=ExtResource("10")]
+
+[node name="AreaTracker" type="Node" parent="LocalPlayer"]
+script = ExtResource("14")
 
 [node name="InteractionController" type="Area3D" parent="LocalPlayer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

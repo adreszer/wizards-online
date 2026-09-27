@@ -20,6 +20,14 @@ signal spell_cast_received(sid: String, cast: Dictionary)
 signal held_item_received(sid: String, item_id: String)
 ## The server sent the local player's inventory (on join and reconnect).
 signal inventory_received(state: Dictionary)
+## The server sent the local player's character profile {house, role, spells} (join, reconnect, changes).
+signal profile_received(profile: Dictionary)
+## A remote player's role/house changed.
+signal player_profile_changed(sid: String, role: String, house: int)
+## A professor (or a practice tome) taught the local player a spell.
+signal spell_granted(spell_id: String, by_name: String)
+## Outcome of a grant the local player requested as a professor.
+signal grant_result_received(ok: bool, sid: String, spell_id: String, reason: String)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal system_message(text: String)
 
@@ -48,6 +56,10 @@ func _ready() -> void:
 	state_synchronizer.spell_cast_received.connect(spell_cast_received.emit)
 	state_synchronizer.held_item_received.connect(held_item_received.emit)
 	state_synchronizer.inventory_received.connect(inventory_received.emit)
+	state_synchronizer.profile_received.connect(profile_received.emit)
+	state_synchronizer.player_profile_changed.connect(player_profile_changed.emit)
+	state_synchronizer.spell_granted.connect(spell_granted.emit)
+	state_synchronizer.grant_result_received.connect(grant_result_received.emit)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 
@@ -72,6 +84,21 @@ func get_players() -> Dictionary:
 ## or not received yet.
 func get_local_inventory() -> Dictionary:
 	return state_synchronizer.local_inventory if is_online() else {}
+
+
+## The local player's server-side character profile ({house, role, spells});
+## empty when offline or not received yet.
+func get_local_profile() -> Dictionary:
+	return state_synchronizer.local_profile if is_online() else {}
+
+
+## Role of the local character: "student" offline or before the profile arrives.
+func get_local_role() -> String:
+	return str(get_local_profile().get("role", CharacterProfile.ROLE_STUDENT))
+
+
+func is_local_staff() -> bool:
+	return CharacterProfile.is_staff(get_local_role())
 
 
 ## Full connect flow: authenticate → socket → join world match → join chat.
@@ -131,6 +158,50 @@ func send_spell_cast(cast: Dictionary) -> void:
 func send_held_item(item_id: String) -> void:
 	if is_online():
 		state_synchronizer.send_held_item(item_id)
+
+
+## Tells the server which named area the local player is in ("" = none).
+func send_area(area_id: String) -> void:
+	if is_online():
+		state_synchronizer.send_area(area_id)
+
+
+## Professor/admin: teach `spell_id` to the player with session `sid`. The
+## server answers with grant_result_received.
+func send_grant_spell(sid: String, spell_id: String) -> void:
+	if is_online():
+		state_synchronizer.send_grant_spell(sid, spell_id)
+
+
+## Persist the local hotbar layout.
+func send_spellbook(slots: Array, equipped: String) -> void:
+	if is_online():
+		state_synchronizer.send_spellbook(slots, equipped)
+
+
+## Ask the server for a practice tome's spell (it arrives via profile_received).
+func send_study_tome(spell_id: String) -> void:
+	if is_online():
+		state_synchronizer.send_study_tome(spell_id)
+
+
+## Admin RPC: change a player's role and/or house by user id or display name.
+## With `http_key` set the call is server-to-server (dev tooling, tests);
+## otherwise the local session must be an admin. Returns the server's answer
+## or {"error": message}.
+func admin_set_profile(request: Dictionary, http_key: String = "") -> Dictionary:
+	if authentication.client == null:
+		return {"error": tr("HUD_STATUS_OFFLINE")}
+	var rpc: NakamaAPI.ApiRpc
+	if not http_key.is_empty():
+		rpc = await authentication.client.rpc_async_with_key(http_key, NetworkProtocol.RPC_ADMIN_SET_PROFILE, NetworkProtocol.encode(request))
+	elif authentication.session != null:
+		rpc = await authentication.client.rpc_async(authentication.session, NetworkProtocol.RPC_ADMIN_SET_PROFILE, NetworkProtocol.encode(request))
+	else:
+		return {"error": tr("HUD_STATUS_OFFLINE")}
+	if rpc.is_exception():
+		return {"error": rpc.get_exception().message}
+	return NetworkProtocol.decode(rpc.payload)
 
 
 func send_chat(text: String) -> bool:

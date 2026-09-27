@@ -177,6 +177,19 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Spell icons for the hotbar; drag to reorder slots; radial spell wheel for gamepad
 - [ ] Torch lit state replicated (local-only for now, like puzzles)
 
+### Milestone 16 — Character record, roles and live lessons
+- [x] Server-side character profile (`character`/`profile`: house, role, spellbook) created on first join, sent as `OP_PROFILE`, role/house in every roster entry; `ADMIN_USER_IDS` env promotes on join
+- [x] `admin_set_profile` RPC (HTTP key / admin session; by user id or display name; live match signal + offline storage write) and `tools/set_role.sh`
+- [x] Spellbook authority: casts relayed only for known spells; hotbar layout persisted (`OP_SPELLBOOK`); practice tomes request the spell online (`OP_STUDY_TOME`, interim rule)
+- [x] `AreaTracker` + `OP_AREA`; generator emits `nakama/modules/world_areas.lua` so the server knows classroom areas
+- [x] Live lessons v1: `OP_GRANT_SPELL` validated (staff, same classroom, target present, not known) → profile push + taught notification; lesson-tools panel (`L`) lists students in the room and the curriculum, teach one / everyone / self
+- [x] Nameplates show professor/admin titles and colours; HUD role line with the lesson-tools hint
+- [x] Tests: unit (profile sanitising, nested-zone tracker, nameplates, panel) and two-client (promotion by id and name, denied self-promotion, dropped unknown cast, refused grants, successful grant, tome request, persistence of spells and hotbar across reconnect)
+- [ ] Lesson text tools (lecture text to the room, questions), house points award/deduct, timetables; tie grants to a lesson session rather than "any staff in any classroom"
+- [ ] Sorting into houses (UI + rules); house-gated common rooms using the profile's house
+- [ ] Server-side position sanity for area reports (today the area id is client-reported, validated only against the map)
+- [ ] In-game admin UI for `admin_set_profile` (today: script/console)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
@@ -236,14 +249,14 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 ## Known limitations
 
 - Puzzle/door/collectible state is local to each client in online mode (players see each other, not each other's puzzle progress).
-- No PvP, no damage between players. Spell events carry a caster ID so a future server-validated target field can be added.
+- No PvP, no damage between players. Spell events carry a caster ID and are relayed only for known spells; a future server-validated target field enables duels.
 - Remote players are client-authoritative for their own transform (see `docs/architecture.md` → Authority).
 - Chat has length/whitespace sanitization only; no moderation.
 - Placeholder capsule character with procedural placeholder animations.
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (218 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (237 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
@@ -258,7 +271,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Collectibles | counter, no double collect | [x] headless test pass |
 | Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
 | Localization | pl/en load, all keys translated, fallback, name sanitizing | [x] headless test pass; in-game visual check of Polish text (menu, HUD, plaques) pending |
-| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 24 + 17 checks pass |
+| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory and profile, promotion, classroom grant, dropped unknown cast, persistence across reconnect | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 40 + 28 checks pass |
 | Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Offline | playable with backend stopped | [x] `run_offline_fallback_test` with backend stopped: readable error, offline world playable |

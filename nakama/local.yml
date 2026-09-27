@@ -22,6 +22,9 @@ session:
 runtime:
   path: /nakama/data/modules
   http_key: defaulthttpkey
+  env:
+    # Comma-separated Nakama user ids that are always admins (see docs/development.md → Roles).
+    - "ADMIN_USER_IDS="
 
 match:
   input_queue_size: 256

@@ -34,11 +34,15 @@ const LAYER_WORLD := 1 << 0
 @onready var player_input: PlayerInput = $LocalPlayer/PlayerInput
 @onready var camera_rig: CameraRig = $LocalPlayer/CameraRig
 @onready var interaction_controller: InteractionController = $LocalPlayer/InteractionController
+@onready var area_tracker: AreaTracker = $LocalPlayer/AreaTracker
 
 ## Mesh catch-up speed after a step is set per step (distance / stall time); this is the floor.
 @export var min_step_catchup_speed: float = 2.0
 
 var cast_origin: Node3D
+## Server-decided role (CharacterProfile.ROLE_*); students by default.
+var role: String = CharacterProfile.ROLE_STUDENT
+var house: int = 0
 ## World-space offset applied to the mesh so a one-tick step-up reads as a smooth climb.
 var _visual_offset: Vector3 = Vector3.ZERO
 var _visual_catchup_speed: float = 0.0
@@ -113,6 +117,14 @@ func _find_off_hand() -> Node3D:
 ## Remote players: the held item id arrives from the server, already validated.
 func set_remote_held_item(item_id: String) -> void:
 	held_item_mount.show_item(ItemRegistry.load_definition(item_id))
+
+
+## Role and house come from the server (own profile or roster); the nameplate
+## shows the title.
+func set_profile(p_role: String, p_house: int) -> void:
+	role = CharacterProfile.sanitize_role(p_role)
+	house = CharacterProfile.sanitize_house(p_house)
+	nameplate.set_role(role)
 
 
 func _setup_remote() -> void:

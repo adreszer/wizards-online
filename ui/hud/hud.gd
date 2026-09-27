@@ -9,6 +9,7 @@ extends CanvasLayer
 @onready var _spell_label: Label = %SpellLabel
 @onready var _cooldown_bar: ProgressBar = %CooldownBar
 @onready var _held_label: Label = %HeldLabel
+@onready var _role_label: Label = %RoleLabel
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _notification_label: Label = %NotificationLabel
 @onready var _status_label: Label = %StatusLabel
@@ -42,6 +43,7 @@ func _ready() -> void:
 	GameEvents.spell_learned.connect(_on_spell_learned)
 	GameEvents.area_entered.connect(_on_area_entered)
 	NetworkManager.status_changed.connect(_on_status_changed)
+	NetworkManager.profile_received.connect(_on_profile_received)
 	_prompt_label.visible = false
 	_notification_label.visible = false
 	_build_hotbar()
@@ -49,6 +51,7 @@ func _ready() -> void:
 	_on_status_changed(NetworkManager.status, "")
 	_on_spell_learned(null)
 	_on_held_item_changed(null)
+	_refresh_role()
 
 
 func _process(delta: float) -> void:
@@ -213,6 +216,21 @@ func _on_held_item_changed(definition: ItemDefinition) -> void:
 		_held_label.text = tr("HUD_HELD") % tr(definition.display_name)
 
 
+func _on_profile_received(_profile: Dictionary) -> void:
+	_refresh_role()
+
+
+## Students see nothing; staff see their role and the lesson-tools key.
+func _refresh_role() -> void:
+	var role := NetworkManager.get_local_role()
+	match role:
+		CharacterProfile.ROLE_PROFESSOR:
+			_role_label.text = tr("HUD_ROLE_PROFESSOR") + "  " + tr("HUD_LESSON_HINT")
+		CharacterProfile.ROLE_ADMIN:
+			_role_label.text = tr("HUD_ROLE_ADMIN") + "  " + tr("HUD_LESSON_HINT")
+	_role_label.visible = CharacterProfile.is_staff(role)
+
+
 func _on_focus_changed(interactable: Interactable) -> void:
 	_focused = interactable
 	if interactable == null:
@@ -254,6 +272,7 @@ func _notification(what: int) -> void:
 		_update_fragments()
 		_on_spell_learned(_caster.equipped_spell if _caster != null else null)
 		_refresh_hotbar()
+		_refresh_role()
 		_on_held_item_changed(_inventory.held_item if _inventory != null else null)
 		if is_instance_valid(_focused):
 			_on_focus_changed(_focused)

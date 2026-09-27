@@ -3,23 +3,37 @@
 --   1  STATE        client -> others (movement snapshot)
 --   2  SPELL_CAST   client -> others
 --   3  HELD_ITEM    client -> server (validated) -> others  {id}
+--   4  AREA         client -> server  {id}  the area the player is in ("" = none)
+--   5  GRANT_SPELL  client (professor) -> server  {sid, id}
+--   6  SPELLBOOK    client -> server  {slots, equipped}  hotbar layout
+--   7  STUDY_TOME   client -> server  {id}  practice tome (interim, until lessons only)
 --   10 ROSTER       server -> joining client
 --   11 PLAYER_JOINED server -> others
 --   12 PLAYER_LEFT  server -> others
 --   13 INVENTORY    server -> joining client  {items = {{id, count}}, held}
+--   14 PROFILE      server -> same client  {house, role, spells}
+--   15 ROSTER_UPDATE server -> others  {sid, role, house}
+--   16 SPELL_GRANTED server -> target  {id, by}
+--   17 GRANT_RESULT server -> professor  {ok, sid, id, reason}
 --   20 PING         client -> same client (latency probe)
 -- The server owns identity (display names come from join metadata and are
--- sanitized here) and inventories (Nakama storage, collection "inventory",
--- key "items", per user: a new character gets the starting kit). A held-item
--- change is accepted only for an owned, holdable item. Movement is relayed
--- but not yet validated. This is the place where authority can be tightened
--- later (rate limits, sanity checks, duel resolution).
+-- sanitized here), inventories (storage "inventory"/"items") and character
+-- profiles (storage "character"/"profile": house, role, spellbook; see
+-- character_profile.lua). A held-item change is accepted only for an owned,
+-- holdable item; a spell cast only for a known spell; a spell grant only from
+-- a professor/admin standing in the same classroom as the target (areas come
+-- from world_areas.lua, generated with the castle). Movement is relayed but
+-- not yet validated.
 
 local nk = require("nakama")
+local Profile = require("character_profile")
+local AREAS = require("world_areas")
 
-local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM = 1, 2, 3
+local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA, OP_GRANT_SPELL, OP_SPELLBOOK, OP_STUDY_TOME = 1, 2, 3, 4, 5, 6, 7
 local OP_ROSTER, OP_PLAYER_JOINED, OP_PLAYER_LEFT, OP_INVENTORY = 10, 11, 12, 13
+local OP_PROFILE, OP_ROSTER_UPDATE, OP_SPELL_GRANTED, OP_GRANT_RESULT = 14, 15, 16, 17
 local OP_PING = 20
+local MAX_AREA_ID_BYTES = 48
 local TICK_RATE = 15
 -- Bytes, not characters: the client caps names at 16 characters, which with
 -- UTF-8 diacritics (Polish etc.) can take more bytes.
@@ -115,7 +129,48 @@ end
 local function entry_for(state, sid)
   local p = state.presences[sid]
   local inv = state.inventories[sid]
-  return { sid = sid, uid = p.user_id, name = state.names[sid] or p.username, char = state.chars[sid] or "apprentice_m", held = inv and inv.held or "" }
+  local profile = state.profiles[sid]
+  return { sid = sid, uid = p.user_id, name = state.names[sid] or p.username, char = state.chars[sid] or "apprentice_m",
+           held = inv and inv.held or "", role = profile and profile.role or "student", house = profile and profile.house or 0 }
+end
+
+local function send_profile(dispatcher, state, sid)
+  local profile = state.profiles[sid]
+  local p = state.presences[sid]
+  if profile and p then
+    dispatcher.broadcast_message(OP_PROFILE, nk.json_encode({ house = profile.house, role = profile.role, spells = profile.spells }), { p }, nil, true)
+  end
+end
+
+-- Grants a spell to the player at `sid`, persists it and tells the client. Returns true when new.
+local function grant_spell(dispatcher, state, sid, id, by_name)
+  local profile = state.profiles[sid]
+  if not profile then
+    return false
+  end
+  local added = Profile.grant_spell(profile, id)
+  if added then
+    Profile.write(state.presences[sid].user_id, profile)
+    send_profile(dispatcher, state, sid)
+    dispatcher.broadcast_message(OP_SPELL_GRANTED, nk.json_encode({ id = id, by = by_name or "" }), { state.presences[sid] }, nil, true)
+  end
+  return added
+end
+
+local function find_sid(state, user_id, name)
+  for sid, p in pairs(state.presences) do
+    if (user_id and user_id ~= "" and p.user_id == user_id) or (name and name ~= "" and state.names[sid] == name) then
+      return sid
+    end
+  end
+  return nil
+end
+
+local function sanitize_area(id)
+  if type(id) ~= "string" or #id > MAX_AREA_ID_BYTES then
+    return ""
+  end
+  return AREAS[id] and id or ""
 end
 
 local function others(state, except_sid)
@@ -129,7 +184,7 @@ local function others(state, except_sid)
 end
 
 function M.match_init(context, params)
-  local state = { presences = {}, names = {}, chars = {}, inventories = {} }
+  local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {} }
   return state, TICK_RATE, "world"
 end
 
@@ -140,9 +195,17 @@ function M.match_join_attempt(context, dispatcher, tick, state, presence, metada
 end
 
 function M.match_join(context, dispatcher, tick, state, presences)
+  local admins = Profile.env_admins(context.env)
   for _, p in ipairs(presences) do
     state.presences[p.session_id] = p
     state.inventories[p.session_id] = load_inventory(p.user_id)
+    local profile = Profile.load(p.user_id)
+    if admins[p.user_id] and profile.role ~= "admin" then
+      profile.role = "admin"
+      Profile.write(p.user_id, profile)
+    end
+    state.profiles[p.session_id] = profile
+    state.areas[p.session_id] = ""
   end
   for _, p in ipairs(presences) do
     local roster = {}
@@ -151,6 +214,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     end
     dispatcher.broadcast_message(OP_ROSTER, nk.json_encode({ players = roster, self_sid = p.session_id }), { p }, nil, true)
     dispatcher.broadcast_message(OP_INVENTORY, nk.json_encode(state.inventories[p.session_id]), { p }, nil, true)
+    send_profile(dispatcher, state, p.session_id)
     local rest = others(state, p.session_id)
     if #rest > 0 then
       dispatcher.broadcast_message(OP_PLAYER_JOINED, nk.json_encode(entry_for(state, p.session_id)), rest, nil, true)
@@ -168,6 +232,8 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.names[sid] = nil
       state.chars[sid] = nil
       state.inventories[sid] = nil
+      state.profiles[sid] = nil
+      state.areas[sid] = nil
       local rest = others(state, sid)
       if #rest > 0 then
         dispatcher.broadcast_message(OP_PLAYER_LEFT, nk.json_encode(entry), rest, nil, true)
@@ -186,9 +252,62 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         dispatcher.broadcast_message(OP_STATE, message.data, rest, message.sender, false)
       end
     elseif message.op_code == OP_SPELL_CAST then
-      local rest = others(state, sid)
-      if #rest > 0 then
-        dispatcher.broadcast_message(OP_SPELL_CAST, message.data, rest, message.sender, true)
+      -- Only spells the character actually knows leave the server.
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local profile = state.profiles[sid]
+      if ok and type(payload) == "table" and type(payload.id) == "string" and profile and Profile.knows(profile, payload.id) then
+        local rest = others(state, sid)
+        if #rest > 0 then
+          dispatcher.broadcast_message(OP_SPELL_CAST, message.data, rest, message.sender, true)
+        end
+      end
+    elseif message.op_code == OP_AREA then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      if ok and type(payload) == "table" then
+        state.areas[sid] = sanitize_area(payload.id)
+      end
+    elseif message.op_code == OP_GRANT_SPELL then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local target = ok and type(payload) == "table" and type(payload.sid) == "string" and payload.sid or ""
+      local id = ok and type(payload) == "table" and type(payload.id) == "string" and payload.id or ""
+      local profile = state.profiles[sid]
+      local reason = nil
+      if not profile or not Profile.is_staff(profile.role) then
+        reason = "not_staff"
+      elseif not Profile.SPELLS[id] then
+        reason = "unknown_spell"
+      elseif not state.presences[target] then
+        reason = "no_such_player"
+      else
+        local area = state.areas[sid] or ""
+        local info = AREAS[area]
+        if area == "" or not info or info.kind ~= "classroom" then
+          reason = "not_in_classroom"
+        elseif (state.areas[target] or "") ~= area then
+          reason = "target_elsewhere"
+        elseif Profile.knows(state.profiles[target], id) then
+          reason = "already_known"
+        end
+      end
+      if not reason then
+        grant_spell(dispatcher, state, target, id, state.names[sid])
+      end
+      dispatcher.broadcast_message(OP_GRANT_RESULT, nk.json_encode({ ok = reason == nil, sid = target, id = id, reason = reason or "" }), { message.sender }, nil, true)
+    elseif message.op_code == OP_STUDY_TOME then
+      -- Interim: practice tomes teach any registered spell. Lessons will replace this.
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local id = ok and type(payload) == "table" and type(payload.id) == "string" and payload.id or ""
+      if Profile.SPELLS[id] then
+        grant_spell(dispatcher, state, sid, id, "")
+      end
+    elseif message.op_code == OP_SPELLBOOK then
+      -- The player rearranged the hotbar: keep known spells, adopt slots/equipped.
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local profile = state.profiles[sid]
+      if ok and type(payload) == "table" and profile then
+        local spells = Profile.sanitize_spells({ known = profile.spells.known, slots = payload.slots, equipped = payload.equipped })
+        profile.spells = spells
+        Profile.write(message.sender.user_id, profile)
       end
     elseif message.op_code == OP_HELD_ITEM then
       local ok, payload = pcall(nk.json_decode, message.data)
@@ -215,8 +334,32 @@ function M.match_terminate(context, dispatcher, tick, state, grace_seconds)
   return state
 end
 
+-- Signals come from world.lua's admin_set_profile RPC:
+--   { op = "set_profile", user_id | name, role?, house? }
+-- Answers { ok, sid, user_id, role, house } or { ok = false, reason }.
 function M.match_signal(context, dispatcher, tick, state, data)
-  return state, data
+  local ok, request = pcall(nk.json_decode, data or "")
+  if not ok or type(request) ~= "table" or request.op ~= "set_profile" then
+    return state, nk.json_encode({ ok = false, reason = "bad_request" })
+  end
+  local sid = find_sid(state, request.user_id, request.name)
+  if not sid then
+    return state, nk.json_encode({ ok = false, reason = "offline" })
+  end
+  local profile = state.profiles[sid]
+  if type(request.role) == "string" and Profile.ROLES[request.role] then
+    profile.role = request.role
+  end
+  if type(request.house) == "number" and request.house >= 0 and request.house <= Profile.MAX_HOUSE then
+    profile.house = math.floor(request.house)
+  end
+  Profile.write(state.presences[sid].user_id, profile)
+  send_profile(dispatcher, state, sid)
+  local rest = others(state, sid)
+  if #rest > 0 then
+    dispatcher.broadcast_message(OP_ROSTER_UPDATE, nk.json_encode({ sid = sid, role = profile.role, house = profile.house }), rest, nil, true)
+  end
+  return state, nk.json_encode({ ok = true, sid = sid, user_id = state.presences[sid].user_id, role = profile.role, house = profile.house })
 end
 
 return M

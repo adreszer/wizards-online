@@ -173,3 +173,26 @@ SPELL_MENDWEAVE_DESC,"Knits broken things back together: cracked pots, torn page
 SPELL_QUICKSPROUT_NAME,Quicksprout,Rozkwit
 SPELL_QUICKSPROUT_DESC,Coaxes a seed or a wilting plant into sudden growth.,Nakłania nasiono lub więdnącą roślinę do nagłego wzrostu.
 HUD_HOTBAR_HINT,Spells: 1–0 select · Q/R cycle · LMB cast,Czary: 1–0 wybór · Q/R zmiana · LPM rzucanie
+ROLE_PROFESSOR_TITLE,Prof.,prof.
+ROLE_ADMIN_TITLE,Steward,Zarządca
+HUD_ROLE_PROFESSOR,Role: Professor,Rola: Profesor
+HUD_ROLE_ADMIN,Role: Steward (admin),Rola: Zarządca (admin)
+HUD_LESSON_HINT,[L] Lesson tools,[L] Narzędzia lekcji
+LESSON_TITLE,Lesson tools,Narzędzia lekcji
+LESSON_AREA,Room: %s,Sala: %s
+LESSON_NOT_CLASSROOM,You must stand in a classroom to teach.,"Aby uczyć, musisz stać w sali lekcyjnej."
+LESSON_STUDENTS,Students present,Obecni uczniowie
+LESSON_SPELLS,Spell to teach,Czar do nauczenia
+LESSON_GRANT,Teach selected,Naucz wybranego
+LESSON_GRANT_ALL,Teach everyone here,Naucz wszystkich obecnych
+LESSON_GRANT_SELF,Teach myself,Naucz siebie
+LESSON_CLOSE_HINT,Esc / L closes,Esc / L zamyka
+NOTIFY_SPELL_TAUGHT,%s taught you %s.,%s uczy cię czaru %s.
+GRANT_OK,%s learned %s.,%s poznaje czar %s.
+GRANT_FAILED,Could not teach: %s,Nie udało się nauczyć: %s
+GRANT_REASON_not_staff,only professors may teach.,tylko profesorowie mogą uczyć.
+GRANT_REASON_unknown_spell,unknown spell.,nieznany czar.
+GRANT_REASON_no_such_player,that player is no longer here.,tego gracza już tu nie ma.
+GRANT_REASON_not_in_classroom,you must stand in a classroom.,musisz stać w sali lekcyjnej.
+GRANT_REASON_target_elsewhere,the student is not in this classroom.,ucznia nie ma w tej sali.
+GRANT_REASON_already_known,the student already knows that spell.,uczeń już zna ten czar.

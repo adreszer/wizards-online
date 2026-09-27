@@ -23,6 +23,9 @@ func _ready() -> void:
 	NetworkManager.spell_cast_received.connect(_on_spell_cast)
 	NetworkManager.held_item_received.connect(_on_held_item)
 	NetworkManager.inventory_received.connect(_on_inventory)
+	NetworkManager.profile_received.connect(_on_profile)
+	NetworkManager.player_profile_changed.connect(_on_player_profile_changed)
+	NetworkManager.spell_granted.connect(_on_spell_granted)
 	NetworkManager.disconnected.connect(_on_disconnected)
 
 
@@ -33,6 +36,9 @@ func _exit_tree() -> void:
 	NetworkManager.spell_cast_received.disconnect(_on_spell_cast)
 	NetworkManager.held_item_received.disconnect(_on_held_item)
 	NetworkManager.inventory_received.disconnect(_on_inventory)
+	NetworkManager.profile_received.disconnect(_on_profile)
+	NetworkManager.player_profile_changed.disconnect(_on_player_profile_changed)
+	NetworkManager.spell_granted.disconnect(_on_spell_granted)
 	NetworkManager.disconnected.disconnect(_on_disconnected)
 
 
@@ -49,6 +55,7 @@ func spawn_local(display_name: String, peer_id: String) -> Node:
 		player.respawn_handler.set_checkpoint(spawn_point.global_transform)
 	local_player = player
 	_apply_local_inventory()
+	_apply_local_profile()
 	local_player_spawned.emit(player)
 	# Players already in the world before we spawned.
 	for sid in NetworkManager.get_players().keys():
@@ -73,9 +80,11 @@ func _on_player_joined(sid: String, display_name: String) -> void:
 	if spawn_point != null:
 		player.global_transform = spawn_point.global_transform
 	remote_players[sid] = player
-	var held := str(NetworkManager.get_players().get(sid, {}).get("held", ""))
+	var entry: Dictionary = NetworkManager.get_players().get(sid, {})
+	var held := str(entry.get("held", ""))
 	if not held.is_empty():
 		player.set_remote_held_item(held)
+	player.set_profile(str(entry.get("role", "")), int(entry.get("house", 0)))
 	remote_player_spawned.emit(player)
 
 
@@ -128,6 +137,39 @@ func _apply_local_inventory() -> void:
 			inventory.load_state(state)
 	else:
 		inventory.load_state(ItemRegistry.default_state())
+
+
+## Online: the server's profile (role, house, spellbook) is authoritative and
+## arrives right after joining, again on reconnect and after every change.
+## Offline there is no profile: the character is a student and learns from tomes.
+func _on_profile(_profile: Dictionary) -> void:
+	_apply_local_profile()
+
+
+func _apply_local_profile() -> void:
+	if local_player == null or not NetworkManager.is_online():
+		return
+	var profile := NetworkManager.get_local_profile()
+	if profile.is_empty():
+		return
+	local_player.set_profile(str(profile.get("role", "")), int(profile.get("house", 0)))
+	local_player.synchronizer.apply_server_spellbook(profile.get("spells", {}))
+
+
+func _on_player_profile_changed(sid: String, role: String, house: int) -> void:
+	var player: Node = remote_players.get(sid)
+	if player != null:
+		player.set_profile(role, house)
+
+
+func _on_spell_granted(spell_id: String, by_name: String) -> void:
+	var definition := SpellRegistry.load_definition(spell_id)
+	if definition == null:
+		return
+	if by_name.is_empty():
+		GameEvents.notification_requested.emit(tr("NOTIFY_SPELL_LEARNED") % tr(definition.display_name), 6.0)
+	else:
+		GameEvents.notification_requested.emit(tr("NOTIFY_SPELL_TAUGHT") % [by_name, tr(definition.display_name)], 6.0)
 
 
 func _on_disconnected(_reason: String) -> void:

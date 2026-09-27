@@ -18,7 +18,10 @@ func _ready() -> void:
 	# Playtest shortcut: `-- --all-spells` fills the hotbar without touring the tomes.
 	if OS.get_cmdline_user_args().has("--all-spells"):
 		for definition in SpellRegistry.all():
-			player.spell_caster.learn_spell(definition)
+			if NetworkManager.is_online():
+				NetworkManager.send_study_tome(String(definition.id))
+			else:
+				player.spell_caster.learn_spell(definition)
 
 
 ## F1: lock the cursor for classic always-on mouse look (and unlock again).

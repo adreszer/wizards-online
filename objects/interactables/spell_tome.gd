@@ -28,8 +28,12 @@ func _on_interacted(interactor: Node) -> void:
 	var caster: SpellCaster = interactor.get("spell_caster") as SpellCaster
 	if caster == null or spell == null:
 		return
-	caster.learn_spell(spell)
+	if NetworkManager.is_online():
+		# The server owns the spellbook: it grants the spell and the profile comes back.
+		NetworkManager.send_study_tome(String(spell.id))
+	else:
+		caster.learn_spell(spell)
+		GameEvents.notification_requested.emit(tr("NOTIFY_SPELL_LEARNED") % tr(spell.display_name), 6.0)
 	_audio.play()
-	GameEvents.notification_requested.emit(tr("NOTIFY_SPELL_LEARNED") % tr(spell.display_name), 6.0)
 	learned.emit(interactor)
 	set_process(false)

@@ -18,6 +18,7 @@ const INVENTORY_PANEL_SCENE := preload("res://ui/inventory/inventory_panel.tscn"
 const BLOCK_SCENE := preload("res://objects/puzzles/pushable_block.tscn")
 const WALL_TORCH_SCENE := preload("res://objects/environment/props/wall_torch.tscn")
 const HUD_SCENE := preload("res://ui/hud/hud.tscn")
+const PROFESSOR_PANEL_SCENE := preload("res://ui/school/professor_panel.tscn")
 const TestHelpers := preload("res://tests/test_helpers.gd")
 
 var t := TestHelpers.new()
@@ -36,6 +37,7 @@ func _run() -> void:
 	await _test_spell()
 	await _test_spellbook()
 	await _test_spell_effects()
+	await _test_school()
 	await _test_inventory()
 	await _test_interaction()
 	await _test_moving_platform()
@@ -572,6 +574,97 @@ func _test_spell_effects() -> void:
 	t.check(hud.hotbar_selected_index() == 0 and hud.get_node("%Hotbar").get_child_count() == SpellCaster.QUICK_SLOT_COUNT, "hotbar follows selection and has ten slots")
 	hud.queue_free()
 	await _clear([floor_body, aim])
+
+
+# --- School: profiles, areas, lesson tools ------------------------------------------
+
+func _make_zone(id: StringName, kind: String, center: Vector3, size: Vector3) -> AreaZone:
+	var zone := AreaZone.new()
+	zone.area_id = id
+	zone.display_key = "AREA_UNKNOWN"
+	zone.kind = kind
+	zone.size = size
+	add_child(zone)
+	zone.global_position = center
+	return zone
+
+
+func _test_school() -> void:
+	t.section("School")
+	# Profile sanitising mirrors the server record.
+	var p := CharacterProfile.sanitize({"house": 9, "role": "wizard", "spells": {"known": ["glowmote", "bogus"], "slots": ["", "glowmote", "x"], "equipped": "nope"}})
+	t.check(p["house"] == 4 and p["role"] == "student", "profile clamps the house and unknown roles become student")
+	t.check(p["spells"]["known"] == ["glowmote"] and p["spells"]["slots"] == ["", "glowmote", ""] and p["spells"]["equipped"] == "", "profile drops unknown spell ids but keeps slot positions")
+	t.check(CharacterProfile.is_staff("professor") and CharacterProfile.is_staff("admin") and not CharacterProfile.is_staff("student"), "staff = professor or admin")
+	t.check(CharacterProfile.sanitize({})["role"] == "student", "empty profile is a student")
+
+	# Area tracker: nested zones, innermost wins, leaving falls back.
+	var floor_body := TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(80, 1, 80))
+	var outer := _make_zone(&"test_grounds", "outdoor", Vector3(0, 4.5, 0), Vector3(40, 9, 40))
+	var inner := _make_zone(&"test_class", "classroom", Vector3(10, 4.5, 0), Vector3(12, 9, 12))
+	await _spawn_player(Vector3(-15, 0.1, 0))
+	await _wait(0.3)
+	var tracker: AreaTracker = player.area_tracker
+	t.check(tracker.current_zone == outer and tracker.current_area_id() == &"test_grounds", "tracker reports the zone the player spawned in")
+	player.global_position = Vector3(10, 0.1, 0)
+	await _wait(0.3)
+	t.check(tracker.current_zone == inner and tracker.current_kind() == "classroom", "entering a nested zone makes it current")
+	player.global_position = Vector3(-15, 0.1, 0)
+	await _wait(0.3)
+	t.check(tracker.current_zone == outer, "leaving the nested zone falls back to the enclosing one")
+	player.global_position = Vector3(30, 0.1, 0)
+	await _wait(0.3)
+	t.check(tracker.current_zone == null and tracker.current_area_id() == &"", "outside every zone the tracker is empty")
+
+	# Nameplate titles follow the role.
+	var remote: Player = PLAYER_SCENE.instantiate()
+	remote.is_local = false
+	remote.display_name = "Remote"
+	remote.peer_id = "remote-sid-1"
+	add_child(remote)
+	remote.global_position = Vector3(12, 0.1, 2)  # inside the classroom
+	await _wait(0.2)
+	t.check(remote.nameplate.text == "Remote" and remote.role == "student", "students show a bare name")
+	remote.set_profile("professor", 2)
+	t.check(remote.role == "professor" and remote.house == 2 and remote.nameplate.text == tr("ROLE_PROFESSOR_TITLE") + " Remote", "professors get a title on the nameplate")
+	remote.set_profile("garbage", 9)
+	t.check(remote.role == "student" and remote.house == 4, "unknown roles fall back to student")
+	var outsider: Player = PLAYER_SCENE.instantiate()
+	outsider.is_local = false
+	outsider.display_name = "Outsider"
+	add_child(outsider)
+	outsider.global_position = Vector3(-15, 0.1, 5)  # in the grounds, not the classroom
+	await _wait(0.2)
+
+	# Lesson tools: lists students in the room, only enables teaching in a classroom.
+	var panel := PROFESSOR_PANEL_SCENE.instantiate()
+	add_child(panel)
+	panel._bind_player(player)
+	t.check(not panel.can_open(), "offline players are students: lesson tools stay closed")
+	var requests: Array = []
+	panel.grant_requested.connect(func(sid: String, id: String) -> void: requests.append([sid, id]))
+	player.global_position = Vector3(8, 0.1, -2)
+	await _wait(0.3)
+	panel.open()
+	t.check(panel.is_open and panel.in_classroom(), "panel opens and sees the classroom")
+	var present: Array = panel.students_present()
+	t.check(present.size() == 1 and present[0] == remote, "only the player inside the classroom is listed as present")
+	t.check(panel.get_node("%Students").item_count == 1 and panel.get_node("%Spells").item_count == SpellRegistry.SPELL_IDS.size(), "lists show one student and every spell")
+	panel.get_node("%Spells").select(0)
+	panel._update_buttons()
+	t.check(not panel.get_node("%GrantButton").disabled and not panel.get_node("%GrantAllButton").disabled and not panel.get_node("%GrantSelfButton").disabled, "teach buttons enabled with a student and a spell")
+	panel.get_node("%GrantButton").pressed.emit()
+	t.check(requests.size() == 1 and requests[0][0] == "remote-sid-1" and requests[0][1] == "arcane_pulse", "teach asks for the selected student and spell (%s)" % str(requests))
+	player.global_position = Vector3(-15, 0.1, 0)
+	await _wait(0.3)
+	panel.refresh()
+	t.check(not panel.in_classroom() and panel.get_node("%GrantButton").disabled and panel.get_node("%GrantSelfButton").disabled, "outside a classroom teaching is disabled")
+	panel.close()
+	t.check(not panel.is_open and not GameSession.ui_input_captured, "panel close releases UI input")
+	panel.queue_free()
+	remote.queue_free()
+	outsider.queue_free()
+	await _clear([floor_body, outer, inner])
 
 
 # --- Inventory -----------------------------------------------------------------

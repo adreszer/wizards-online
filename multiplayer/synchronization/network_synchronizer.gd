@@ -34,6 +34,10 @@ func setup_local(p_player: Node) -> void:
 	caster.spell_cast.connect(_on_local_spell_cast)
 	var inventory: Inventory = player.inventory
 	inventory.held_item_changed.connect(_on_local_held_item_changed)
+	var tracker: AreaTracker = player.area_tracker
+	tracker.area_changed.connect(_on_local_area_changed)
+	caster.spells_changed.connect(_on_local_spellbook_changed)
+	caster.spell_changed.connect(func(_d: SpellDefinition) -> void: _on_local_spellbook_changed())
 
 
 func setup_remote(p_player: Node) -> void:
@@ -80,6 +84,37 @@ func _on_local_spell_cast(definition: SpellDefinition, origin: Vector3, directio
 
 func _on_local_held_item_changed(definition: ItemDefinition) -> void:
 	NetworkManager.send_held_item(String(definition.id) if definition != null else "")
+
+
+func _on_local_area_changed(zone: AreaZone) -> void:
+	NetworkManager.send_area(String(zone.area_id) if zone != null else "")
+
+
+## The hotbar layout is persisted server-side. Sent once per distinct layout so
+## applying the server's own profile (load_state) does not echo it back.
+var _last_spellbook_sent: String = ""
+var _applying_spellbook: bool = false
+
+func _on_local_spellbook_changed() -> void:
+	if _applying_spellbook:
+		return
+	var caster: SpellCaster = player.spell_caster
+	var state := caster.to_state()
+	var key := JSON.stringify([state["slots"], state["equipped"]])
+	if key == _last_spellbook_sent:
+		return
+	_last_spellbook_sent = key
+	NetworkManager.send_spellbook(state["slots"], state["equipped"])
+
+
+## Applies the server's spellbook to the caster without echoing it back.
+func apply_server_spellbook(spells: Dictionary) -> void:
+	var caster: SpellCaster = player.spell_caster
+	_applying_spellbook = true
+	caster.load_state(spells)
+	_applying_spellbook = false
+	var state := caster.to_state()
+	_last_spellbook_sent = JSON.stringify([state["slots"], state["equipped"]])
 
 
 # --- Remote --------------------------------------------------------------------

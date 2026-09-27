@@ -16,6 +16,11 @@ var system_lines: Array[String] = []
 var casts_seen: int = 0
 var joins: Array[String] = []
 var leaves: Array[String] = []
+var notifications: Array[String] = []
+var grant_results: Array = []
+
+const HTTP_KEY := "defaulthttpkey"
+const CLASSROOM := &"class_sigilcraft"
 
 
 func _ready() -> void:
@@ -27,6 +32,8 @@ func _ready() -> void:
 	NetworkManager.spell_cast_received.connect(func(_sid: String, _c: Dictionary) -> void: casts_seen += 1)
 	NetworkManager.player_joined.connect(func(_sid: String, n: String) -> void: joins.append(n))
 	NetworkManager.player_left.connect(func(_sid: String, n: String) -> void: leaves.append(n))
+	NetworkManager.grant_result_received.connect(func(ok: bool, sid: String, id: String, reason: String) -> void: grant_results.append({"ok": ok, "sid": sid, "id": id, "reason": reason}))
+	GameEvents.notification_requested.connect(func(text: String, _d: float) -> void: notifications.append(text))
 	await _run()
 
 
@@ -47,6 +54,8 @@ func _run() -> void:
 	var inv: Inventory = spawner.local_player.inventory
 	t.check(not NetworkManager.get_local_inventory().is_empty(), "server sent the inventory on join")
 	t.check(inv.has(&"torch"), "local inventory holds the server-issued torch")
+	var got_profile := await _wait_until(func() -> bool: return not NetworkManager.get_local_profile().is_empty(), 10.0)
+	t.check(got_profile, "server sent the character profile on join")
 	if role == "b":
 		await _run_actor(spawner)
 	else:
@@ -81,11 +90,39 @@ func _remote(spawner: PlayerSpawner) -> Node:
 	return spawner.remote_players.values()[0]
 
 
+func _classroom_zone() -> AreaZone:
+	for zone in world.get_node("Level").get_zones():
+		if zone.area_id == CLASSROOM:
+			return zone
+	return null
+
+
+## Teleports the local player onto the classroom floor (server learns the area from the zone event).
+func _enter_classroom(spawner: PlayerSpawner, offset: Vector3) -> void:
+	var zone := _classroom_zone()
+	var floor_y := zone.global_position.y - zone.size.y / 2.0
+	spawner.local_player.global_position = Vector3(zone.global_position.x, floor_y + 0.2, zone.global_position.z) + offset
+
+
+func _known_spells() -> Array:
+	return NetworkManager.get_local_profile().get("spells", {}).get("known", [])
+
+
 # --- Observer (client A) ------------------------------------------------------------
 
 func _run_observer(spawner: PlayerSpawner) -> void:
 	t.section("Observer")
-	var ok := await _wait_until(func() -> bool: return _remote(spawner) != null, 40.0)
+	# Become a professor through the admin RPC (server-to-server key, as dev tooling would).
+	t.check(NetworkManager.get_local_role() == "student", "a fresh character is a student")
+	var answer: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "role": "professor"}, HTTP_KEY)
+	t.check(answer.get("ok", false) == true and answer.get("role", "") == "professor", "admin_set_profile promotes by user id (%s)" % str(answer))
+	var ok := await _wait_until(func() -> bool: return NetworkManager.get_local_role() == "professor", 10.0)
+	t.check(ok and spawner.local_player.role == "professor", "the live match pushed the new role to the player")
+	var by_name: Dictionary = await NetworkManager.admin_set_profile({"name": "ClientA", "house": 2}, HTTP_KEY)
+	t.check(by_name.get("ok", false) == true and int(by_name.get("house", 0)) == 2, "admin_set_profile finds an online player by display name (%s)" % str(by_name))
+	var bad: Dictionary = await NetworkManager.admin_set_profile({"name": "Nobody", "role": "professor"}, HTTP_KEY)
+	t.check(bad.has("error"), "promoting an unknown name is an error (%s)" % str(bad))
+	ok = await _wait_until(func() -> bool: return _remote(spawner) != null, 40.0)
 	if not t.check(ok, "remote player spawns when B joins"):
 		return
 	var remote := _remote(spawner)
@@ -112,7 +149,7 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 		samples.append(remote.global_position)
 		if remote.global_position.distance_to(start_pos) > 2.0:
 			moved = true
-		if moved and (states_seen.has("jump") or states_seen.has("fall")) and casts_seen > 0 and chat_lines.size() > 0:
+		if moved and (states_seen.has("jump") or states_seen.has("fall")) and chat_lines.size() > 0:
 			break
 	t.check(moved, "remote player moves across the network")
 	# Smoothness: no single-frame jump larger than a plausible interpolated step.
@@ -122,13 +159,47 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(max_step < 1.0, "remote movement is interpolated, largest per-frame step %.2f m" % max_step)
 	t.check(states_seen.has("walk") or states_seen.has("run"), "remote animation state shows walking/running (%s)" % str(states_seen.keys()))
 	t.check(states_seen.has("jump") or states_seen.has("fall") or max_y > start_pos.y + 0.5, "remote jump replicates (max y %.2f)" % max_y)
-	t.check(casts_seen > 0, "remote spell cast event received")
+	t.check(remote.role == "student" and remote.nameplate.text == "ClientB", "remote student has a plain nameplate")
 	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.held_item_mount.is_holding(), 10.0)
 	t.check(ok, "remote player's torch shows up when B holds it")
 	t.check(NetworkManager.get_players().values().any(func(e: Dictionary) -> bool: return e.get("held", "") == "torch"), "roster tracks B's held item")
 	t.check(chat_lines.any(func(l: String) -> bool: return l == "[ClientB] hello from B"), "chat message from B received: %s" % str(chat_lines))
 	NetworkManager.send_chat("hello from A")
 	t.check(NetworkManager.get_ping_ms() >= 0, "ping measured (%d ms)" % NetworkManager.get_ping_ms())
+
+	# Lesson: both walk into the Sigilcraft classroom; A teaches B.
+	t.section("Lesson (professor)")
+	_enter_classroom(spawner, Vector3(-2, 0, 0))
+	ok = await _wait_until(func() -> bool: return spawner.local_player.area_tracker.current_area_id() == CLASSROOM, 5.0)
+	t.check(ok, "professor is in the classroom")
+	var panel: Node = world.get_node("ProfessorPanel")
+	t.check(panel.can_open(), "lesson tools are available to a professor")
+	ok = await _wait_until(func() -> bool: return panel.students_present().size() == 1, 30.0)
+	t.check(ok, "the student shows up in the classroom")
+	t.check(casts_seen == 0, "a cast of an unlearned spell was dropped by the server")
+	var b_sid: String = remote.peer_id
+	NetworkManager.send_grant_spell("nobody", "arcane_pulse")
+	ok = await _wait_until(func() -> bool: return grant_results.size() >= 1, 10.0)
+	t.check(ok and grant_results[0]["ok"] == false and grant_results[0]["reason"] == "no_such_player", "grant to an unknown session is refused (%s)" % str(grant_results))
+	NetworkManager.send_grant_spell(b_sid, "bogus")
+	ok = await _wait_until(func() -> bool: return grant_results.size() >= 2, 10.0)
+	t.check(ok and grant_results[1]["ok"] == false and grant_results[1]["reason"] == "unknown_spell", "grant of an unknown spell is refused")
+	await _wait(1.0)  # give B's area report time to land
+	NetworkManager.send_grant_spell(b_sid, "arcane_pulse")
+	ok = await _wait_until(func() -> bool: return grant_results.size() >= 3, 10.0)
+	t.check(ok and grant_results[2]["ok"] == true and grant_results[2]["sid"] == b_sid, "teaching a student in the same classroom succeeds (%s)" % str(grant_results))
+	NetworkManager.send_grant_spell(b_sid, "arcane_pulse")
+	ok = await _wait_until(func() -> bool: return grant_results.size() >= 4, 10.0)
+	t.check(ok and grant_results[3]["ok"] == false and grant_results[3]["reason"] == "already_known", "teaching the same spell twice is refused")
+	panel.open()
+	panel.get_node("%Spells").select(SpellRegistry.SPELL_IDS.find("uplift"))
+	panel.refresh()
+	panel.get_node("%GrantSelfButton").pressed.emit()
+	panel.close()
+	ok = await _wait_until(func() -> bool: return _known_spells().has("uplift"), 10.0)
+	t.check(ok and spawner.local_player.spell_caster.knows(&"uplift"), "a professor can teach themselves through the panel")
+	ok = await _wait_until(func() -> bool: return casts_seen > 0, 20.0)
+	t.check(ok, "remote spell cast event received once the student knows the spell")
 
 	ok = await _wait_until(func() -> bool: return _remote(spawner) == null, 30.0)
 	t.check(ok, "remote player removed when B disconnects")
@@ -148,6 +219,9 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	if ok:
 		t.check(_remote(spawner).display_name == "ClientA", "remote player named ClientA")
 	t.check(player.inventory.hold_id(&"torch"), "holds the torch (sent to the server)")
+	t.check(_remote(spawner) != null and _remote(spawner).role == "professor" and _remote(spawner).nameplate.text.begins_with(tr("ROLE_PROFESSOR_TITLE")), "ClientA arrives as a professor in the roster")
+	var denied: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "role": "admin"})
+	t.check(denied.has("error"), "a student cannot promote themselves (%s)" % str(denied))
 	player.movement.set_external_move(Vector3(0, 0, -1), true)
 	await _wait(1.5)
 	player.movement.request_jump()
@@ -155,14 +229,33 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	player.movement.request_jump()
 	await _wait(1.5)
 	player.movement.set_external_move(Vector3.ZERO)
+	# A locally learned spell is not known to the server: the cast is relayed to nobody.
 	player.spell_caster.learn_spell(ARCANE_PULSE)
-	t.check(player.spell_caster.try_cast(), "local cast succeeds")
-	await _wait(0.6)
-	player.spell_caster.try_cast()
+	t.check(player.spell_caster.try_cast(), "local cast fires (server will drop it)")
 	t.check(NetworkManager.send_chat("hello from B"), "chat send accepted")
 	ok = await _wait_until(func() -> bool: return chat_lines.any(func(l: String) -> bool: return l == "[ClientA] hello from A"), 20.0)
 	t.check(ok, "chat message from A received: %s" % str(chat_lines))
 	t.check(chat_lines.any(func(l: String) -> bool: return l == "[ClientB] hello from B"), "own chat message echoed with own name")
+	await _wait(1.0)
+
+	t.section("Lesson (student)")
+	_enter_classroom(spawner, Vector3(2, 0, 0))
+	ok = await _wait_until(func() -> bool: return player.area_tracker.current_area_id() == CLASSROOM, 5.0)
+	t.check(ok, "student is in the classroom")
+	ok = await _wait_until(func() -> bool: return _known_spells().has("arcane_pulse"), 40.0)
+	t.check(ok, "the professor's grant arrived in the server profile")
+	t.check(player.spell_caster.knows(&"arcane_pulse") and player.spell_caster.equipped_spell == ARCANE_PULSE, "the spellbook applied the granted spell")
+	var taught: String = tr("NOTIFY_SPELL_TAUGHT") % ["ClientA", tr(ARCANE_PULSE.display_name)]
+	t.check(notifications.has(taught), "taught notification names the professor (%s)" % str(notifications))
+	t.check(player.spell_caster.try_cast(), "student casts the granted spell")
+	await _wait(0.6)
+	player.spell_caster.try_cast()
+	NetworkManager.send_study_tome("glowmote")
+	ok = await _wait_until(func() -> bool: return _known_spells().has("glowmote"), 10.0)
+	t.check(ok and player.spell_caster.knows(&"glowmote"), "a practice tome request is granted by the server")
+	var glow := SpellRegistry.load_definition("glowmote")
+	player.spell_caster.assign_slot(5, glow)
+	player.spell_caster.equip(ARCANE_PULSE)
 	await _wait(1.0)
 	await NetworkManager.disconnect_online("test disconnect")
 	t.check(not NetworkManager.is_online(), "disconnect sets offline")
@@ -173,4 +266,8 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(err.is_empty(), "reconnect succeeds (%s)" % err)
 	ok = await _wait_until(func() -> bool: return _remote(spawner) != null, 20.0)
 	t.check(ok, "sees ClientA again after reconnect")
+	ok = await _wait_until(func() -> bool: return _known_spells().has("glowmote"), 10.0)
+	var profile := NetworkManager.get_local_profile()
+	t.check(ok and _known_spells().has("arcane_pulse"), "learned spells persist across reconnect (%s)" % str(_known_spells()))
+	t.check(profile.get("spells", {}).get("slots", [])[5] == "glowmote" and player.spell_caster.quick_slots[5] == glow and player.spell_caster.equipped_spell == ARCANE_PULSE, "hotbar layout persists across reconnect")
 	await _wait(2.0)
