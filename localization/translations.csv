@@ -242,3 +242,6 @@ SORT_Q4_A1,Follow it at once.,Idziesz za głosem natychmiast.
 SORT_Q4_A2,Write down what it says and look for a pattern.,"Zapisujesz, co mówi, i szukasz wzoru."
 SORT_Q4_A3,Wake a friend so neither of you goes alone.,"Budzisz przyjaciela, żeby nikt nie szedł sam."
 SORT_Q4_A4,"Listen, learn what it wants, and decide later.","Słuchasz, poznajesz, czego chce, i decydujesz później."
+ENEMY_CRYSTAL_GUARDIAN_NAME,Crystalstone Guardian,Strażnik Kryształu
+NOTIFY_ENEMY_DEFEATED,%s shatters and falls silent.,%s rozpada się i milknie.
+PLAQUE_CELLARS,Something stirs in the cellars. Spells hurt it; its blows hurt you.,Coś porusza się w piwnicach. Czary je ranią; jego ciosy ranią ciebie.

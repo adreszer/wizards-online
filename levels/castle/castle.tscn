@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://castle0000001"]
+[gd_scene load_steps=36 format=3 uid="uid://castle0000001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/modular_wall_run.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/environment/modular/doorway.tscn" id="2"]
@@ -32,7 +32,8 @@
 [ext_resource type="PackedScene" path="res://gameplay/checkpoints/checkpoint.tscn" id="30"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/student_desk.tscn" id="31"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/student_bench.tscn" id="32"]
-[ext_resource type="Script" path="res://levels/castle/castle.gd" id="33"]
+[ext_resource type="PackedScene" path="res://characters/enemies/crystal_guardian.tscn" id="33"]
+[ext_resource type="Script" path="res://levels/castle/castle.gd" id="34"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -46,7 +47,7 @@ fog_light_color = Color(0.2, 0.18, 0.17, 1)
 fog_density = 0.004
 
 [node name="Castle" type="Node3D"]
-script = ExtResource("33")
+script = ExtResource("34")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env")
@@ -85,6 +86,8 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.0, 0.05, 84.0)
 [node name="Doors" type="Node3D" parent="."]
 
 [node name="Furniture" type="Node3D" parent="."]
+
+[node name="Enemies" type="Node3D" parent="."]
 
 [node name="Wall_x-64_s0_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 0.000, -64.000)
@@ -5595,6 +5598,10 @@ text = "PLAQUE_STAIR_HALL"
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -7.400, -39.775)
 text = "PLAQUE_UNDERCROFT"
 
+[node name="Plaque_cellars" parent="." instance=ExtResource("14")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -20.225, -7.400, -8.000)
+text = "PLAQUE_CELLARS"
+
 [node name="Plaque_hidden_study" parent="." instance=ExtResource("14")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -48.000, 1.600, -23.775)
 text = "PLAQUE_HIDDEN_STUDY"
@@ -6398,4 +6405,13 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 
 [node name="Bench_tower_sw_3_6" parent="Furniture" instance=ExtResource("32")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.750, 27.000, 35.000)
+
+[node name="Guardian_cellars" parent="Enemies" instance=ExtResource("33")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -28.000, -9.000, -12.000)
+
+[node name="Guardian_cellars_2" parent="Enemies" instance=ExtResource("33")]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, -38.000, -9.000, -4.000)
+
+[node name="Guardian_dungeon_corridor" parent="Enemies" instance=ExtResource("33")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -16.000, -9.000, -30.000)
 

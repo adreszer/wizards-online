@@ -726,6 +726,21 @@ PRACTICE_TOMES = [
     ("class_herblore", "quicksprout", 0.0, 0.0),
 ]
 
+# (room, offset from the room centre, yaw in degrees) — dungeon enemies; see characters/enemies/.
+ENEMIES = [
+    ("cellars", 4.0, -4.0, 90.0),
+    ("cellars", -6.0, 4.0, -45.0),
+    ("dungeon_corridor", 0.0, -22.0, 0.0),
+]
+
+def emit_enemies():
+    for rid, dx, dz, yaw in ENEMIES:
+        r = rooms[rid]
+        cx, cz = r.centre()
+        inst(uname(f"Guardian_{rid}"), "res://characters/enemies/crystal_guardian.tscn",
+             (cx + dx, r.y, cz + dz), parent="Enemies", rot_y=math.radians(yaw))
+    return len(ENEMIES)
+
 def emit_house_gates():
     for axis, coord, off, storey, house in house_gates:
         y = storey * STOREY
@@ -745,6 +760,7 @@ def emit_props():
     plaque("class_sigilcraft", "PLAQUE_SIGILCRAFT", "n", 0.5)
     plaque("stair_hall", "PLAQUE_STAIR_HALL", "s", 0.5)
     plaque("undercroft", "PLAQUE_UNDERCROFT", "n", 0.5)
+    plaque("cellars", "PLAQUE_CELLARS", "e", 0.5)
     plaque("hidden_study", "PLAQUE_HIDDEN_STUDY", "n", 0.5)
     plaque("loft", "PLAQUE_LOFT", "n", 0.5)
     plaque("tower_sw_4", "PLAQUE_STARGAZING", "n", 0.5)
@@ -788,6 +804,7 @@ emit_zones()
 emit_house_gates()
 emit_props()
 furniture_count = emit_furniture()
+enemy_count = emit_enemies()
 emit_area_map("nakama/modules/world_areas.lua")
 
 level_script = ext_id("Script", "res://levels/castle/castle.gd")
@@ -849,8 +866,10 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 
 [node name="Furniture" type="Node3D" parent="."]
 
+[node name="Enemies" type="Node3D" parent="."]
+
 '''
 header = f'[gd_scene load_steps={len(ext) + 2} format=3 uid="uid://castle0000001"]\n\n'
 open(OUT, "w").write(header + exts + subs + root + "\n".join(nodes) + "\n")
 print("name keys:", " ".join(sorted({r.name_key for r in rooms.values()})))
-print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  furniture: {furniture_count}  nodes: {len(nodes)}")
+print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  furniture: {furniture_count}  enemies: {enemy_count}  nodes: {len(nodes)}")

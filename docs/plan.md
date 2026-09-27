@@ -196,6 +196,15 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Server-side position sanity for area reports (today the area id is client-reported, validated only against the map)
 - [ ] In-game admin UI for `admin_set_profile` (today: script/console)
 
+### Milestone 17 — Dungeon enemies (first combat)
+- [x] Crystalstone Guardian model (Meshy, Mixamo rig, 8 clips) verified and imported under `assets/models/characters/crystal_guardian/`
+- [x] `Enemy` (`characters/enemies/enemy.gd`): idle / alert / chase / attack / return / dead, line-of-sight detection, leash, melee hit window, knockback from force/wind, hit flash, death shatter + respawn; damage through the existing `Health` + `SpellReceiver` components
+- [x] Three guardians placed by the generator in the dungeons (cellars ×2, dungeon corridor); cellars plaque warns the player
+- [x] Tests: idle at range, detection, chase + blow on the player, spell damage (direct effect and a real projectile), death, respawn; castle test counts the guardians
+- [ ] Server-authoritative enemies (shared position/health, every player a target, loot/house points on a kill)
+- [ ] Hit reaction and death clips (the model ships none; today a flash and a shrink), Block5 as a parry against spells, Angry_Ground_Stomp_2 as an area attack
+- [ ] More enemy kinds and spawn rules (night only, secret rooms), enemy audio
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
@@ -259,6 +268,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 - Remote players are client-authoritative for their own transform (see `docs/architecture.md` → Authority).
 - Chat has length/whitespace sanitization only; no moderation.
 - Placeholder capsule character with procedural placeholder animations.
+- Enemies are local to each client (own copy, own health, only the local player is attacked); no shared combat yet.
 
 ## Testing status
 
@@ -274,6 +284,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Spells | registry, spellbook/quick slots, input actions, per-spell cooldowns, levitate/wind/fire/water/dark/light effects, HUD hotbar, tomes | [x] headless test pass |
 | Interaction | nearest looked-at object selected, prompt | [x] headless test pass |
 | Health | damage, death, checkpoint respawn | [x] headless test pass |
+| Enemies | guardian idles at range, detects, chases, hits the player, takes spell damage (effect + projectile), dies, respawns; guardians placed in the dungeons | [x] headless test pass |
 | Collectibles | counter, no double collect | [x] headless test pass |
 | Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
 | Localization | pl/en load, all keys translated, fallback, name sanitizing | [x] headless test pass; in-game visual check of Polish text (menu, HUD, plaques) pending |

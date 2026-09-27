@@ -181,6 +181,16 @@ Playtesting: `godot --path . -- --all-spells` spawns with every spell on the hot
 
 `--character=<id>` selects a body for one run (handy for two-client tests).
 
+## Adding an enemy
+
+1. Rig and animate in Meshy as for a character (Mixamo rig; at least idle, walk or run, an alert and an attack clip). Save as `assets/models/characters/<id>/<id>.glb`, import once.
+2. Copy `characters/enemies/crystal_guardian.tscn`, point `Model` at the new GLB and set the `clips` map on the root (`Enemy`) to the clip names in the file (`godot --headless --path . -s tools/inspect_model.gd -- res://assets/models/characters/<id>/<id>.glb` lists them). Tune `attack_hit_time` to the frame where the blow lands.
+3. Add an `ENEMY_<ID>_NAME` row to `localization/translations.csv` and set `name_key`.
+4. Place it: add rows to `ENEMIES` in `tools/generate_castle.py` (room, offset from the room centre, yaw) and regenerate the castle.
+5. `godot --headless --path . tests/run_tests.tscn` — the Enemy section drives the guardian through detection, a blow, spell damage, death and respawn; the castle test counts the placed guardians.
+
+Enemies are local per client for now (see docs/architecture.md → Enemies).
+
 ## Project settings of note
 
 `project.godot` → `[game]`:

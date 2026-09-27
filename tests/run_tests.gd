@@ -22,6 +22,7 @@ const PROFESSOR_PANEL_SCENE := preload("res://ui/school/professor_panel.tscn")
 const SORTING_PANEL_SCENE := preload("res://ui/school/sorting_panel.tscn")
 const HOUSE_DOOR_SCENE := preload("res://objects/school/house_door.tscn")
 const SORTING_STONE_SCENE := preload("res://objects/school/sorting_stone.tscn")
+const GUARDIAN_SCENE := preload("res://characters/enemies/crystal_guardian.tscn")
 const TestHelpers := preload("res://tests/test_helpers.gd")
 
 var t := TestHelpers.new()
@@ -36,6 +37,7 @@ func _run() -> void:
 	await _test_movement()
 	await _test_camera()
 	await _test_health_and_checkpoints()
+	await _test_enemy()
 	await _test_collectibles()
 	await _test_spell()
 	await _test_spellbook()
@@ -311,6 +313,73 @@ func _test_health_and_checkpoints() -> void:
 	await _wait(player.respawn_handler.respawn_delay + 0.4)
 	t.check(player.global_position.y > -5.0, "falling below kill height respawns")
 	await _clear([checkpoint])
+
+
+# --- Enemies ----------------------------------------------------------------------
+
+func _test_enemy() -> void:
+	t.section("Enemy")
+	var floor_body := TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(80, 1, 80))
+	await _spawn_player(Vector3(0, 0.1, 0))
+	var enemy: Enemy = GUARDIAN_SCENE.instantiate()
+	add_child(enemy)
+	enemy.global_position = Vector3(0, 0.05, -30)
+	await _wait(0.4)
+	t.check(enemy.state_name() == "idle", "a guardian far from the player stays idle (%s)" % enemy.state_name())
+	t.check(enemy.health.current == enemy.health.max_health, "guardian starts at full health")
+	t.check(enemy.get_meta("health") == enemy.health and SpellReceiver.find_on(enemy) == enemy.spell_receiver, "guardian exposes health and a spell receiver")
+	t.check(enemy.nameplate.text == tr("ENEMY_CRYSTAL_GUARDIAN_NAME") and not enemy.nameplate.text.begins_with("ENEMY_"), "guardian nameplate is translated")
+
+	# Walk into detection range: alert -> chase -> attack lands on the player.
+	player.global_position = Vector3(0, 0.1, -22)
+	var noticed := [false]
+	enemy.target_acquired.connect(func(_target: Node3D) -> void: noticed[0] = true)
+	await _wait(0.4)
+	t.check(noticed[0] and enemy.state_name() == "alert", "guardian notices a player within detection range (%s)" % enemy.state_name())
+	var start_health := player.health.current
+	var swung := [false]
+	enemy.attacked.connect(func(_target: Node3D, _hit: bool) -> void: swung[0] = true)
+	var waited := 0.0
+	while player.health.current == start_health and waited < 8.0:
+		await _wait(0.25)
+		waited += 0.25
+	t.check(swung[0], "guardian chases and swings at the player")
+	t.check(player.health.current == start_health - enemy.attack_damage, "the blow deals attack_damage (%d -> %d)" % [start_health, player.health.current])
+	t.check(enemy.global_position.distance_to(player.global_position) < enemy.attack_range * 1.5, "guardian closed the distance before striking")
+
+	# Spells hurt it: direct effect, then a real projectile from the player.
+	var before := enemy.health.current
+	var effect := SpellEffect.create(ARCANE_PULSE, player, "", enemy.global_position, Vector3.FORWARD)
+	enemy.spell_receiver.receive(effect)
+	t.check(enemy.health.current == before - int(enemy.spell_damage[&"force"]), "a force spell damages the guardian (%d -> %d)" % [before, enemy.health.current])
+	player.global_position = Vector3(0, 0.1, -12)
+	enemy.global_position = Vector3(0, 0.05, -20)
+	enemy.respawn_delay = 1.0
+	await _wait(0.2)
+	var caster := player.spell_caster
+	caster.learn_spell(ARCANE_PULSE)
+	var aim := TestHelpers.FixedAim.new()
+	add_child(aim)
+	caster.aim_source = aim
+	aim.origin = Vector3(0, 1.3, -10)
+	aim.target = enemy.spell_receiver.get_aim_point()
+	before = enemy.health.current
+	t.check(caster.try_cast(), "player can cast at the guardian")
+	await _wait(0.8)
+	t.check(enemy.health.current < before, "the projectile hits the guardian's body (%d -> %d)" % [before, enemy.health.current])
+
+	# Death shatters it, then it comes back at its post.
+	var died := [false]
+	enemy.died.connect(func() -> void: died[0] = true)
+	enemy.health.apply_damage(999, player)
+	await _wait(0.9)
+	t.check(died[0] and enemy.state_name() == "dead", "lethal damage kills the guardian")
+	t.check(enemy.collision_layer == 0 and not enemy.visible, "a dead guardian is gone from the world")
+	t.check(player.health.current == start_health - enemy.attack_damage, "a dead guardian stops attacking")
+	await _wait(enemy.respawn_delay + 1.0)
+	t.check(enemy.state_name() != "dead" and enemy.visible and enemy.health.current == enemy.health.max_health, "guardian respawns with full health (%s)" % enemy.state_name())
+	t.check(enemy.global_position.distance_to(enemy.home_transform.origin) < 0.5, "guardian respawns at its post")
+	await _clear([floor_body, enemy, aim])
 
 
 # --- Collectibles -----------------------------------------------------------------
@@ -931,6 +1000,11 @@ func _test_castle() -> void:
 			gate_houses[door.house] = true
 	t.check(gate_houses.size() == 4, "every house has a gated door (%s)" % str(gate_houses.keys()))
 	t.check(castle.get_node_or_null("SortingStone") is SortingStone, "the Choosing Stone stands in the castle")
+	var guardians := 0
+	for enemy in castle.get_node("Enemies").get_children():
+		if enemy is Enemy and (enemy as Enemy).global_position.y < -5.0:
+			guardians += 1
+	t.check(guardians >= 3, "guardians stand in the dungeons (%d)" % guardians)
 	var landing_houses: Dictionary = {}
 	for z in zones:
 		if z.area_id == &"tower_ne_1" or z.area_id == &"tower_nw_1":
