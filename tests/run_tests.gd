@@ -347,6 +347,34 @@ func _test_enemy() -> void:
 	t.check(player.health.current == start_health - enemy.attack_damage, "the blow deals attack_damage (%d -> %d)" % [start_health, player.health.current])
 	t.check(enemy.global_position.distance_to(player.global_position) < enemy.attack_range * 1.5, "guardian closed the distance before striking")
 
+	# Every third blow on a close target is the ground stomp (area damage).
+	var stomp_hits := [-1]
+	enemy.stomped.connect(func(count: int) -> void: stomp_hits[0] = count)
+	waited = 0.0
+	while stomp_hits[0] < 0 and waited < 12.0:
+		await _wait(0.25)
+		waited += 0.25
+	t.check(stomp_hits[0] == 1, "the third strike is a ground stomp that catches the player (%d)" % stomp_hits[0])
+	t.check(player.health.current == start_health - 2 * enemy.attack_damage - enemy.stomp_damage, "two swings and a stomp add up (%d)" % player.health.current)
+
+	# Shield block: a spell from the front while chasing is parried for a quarter of its damage.
+	player.global_position = Vector3(0, 0.1, -16)
+	waited = 0.0
+	while enemy.state_name() != "chase" and waited < 5.0:  # the current clip finishes first
+		await _wait(0.1)
+		waited += 0.1
+	t.check(enemy.state_name() == "chase", "guardian chases a player who backs off (%s)" % enemy.state_name())
+	enemy.block_chance = 1.0
+	var parried := [false]
+	enemy.blocked.connect(func(_e: SpellEffect) -> void: parried[0] = true)
+	var hp_before_block := enemy.health.current
+	enemy.spell_receiver.receive(SpellEffect.create(ARCANE_PULSE, player, "", enemy.global_position, Vector3.FORWARD))
+	t.check(parried[0] and enemy.state_name() == "block", "guardian raises its shield against a spell from the front (%s)" % enemy.state_name())
+	t.check(enemy.health.current == hp_before_block - int(round(enemy.spell_damage[&"force"] * enemy.block_damage_factor)), "a blocked spell deals reduced damage (%d -> %d)" % [hp_before_block, enemy.health.current])
+	await _wait(enemy.block_duration + 0.3)
+	t.check(enemy.state_name() == "chase", "guardian lowers the shield and resumes the chase (%s)" % enemy.state_name())
+	enemy.block_chance = 0.0
+
 	# Spells hurt it: direct effect, then a real projectile from the player.
 	var before := enemy.health.current
 	var effect := SpellEffect.create(ARCANE_PULSE, player, "", enemy.global_position, Vector3.FORWARD)
@@ -375,7 +403,10 @@ func _test_enemy() -> void:
 	await _wait(0.9)
 	t.check(died[0] and enemy.state_name() == "dead", "lethal damage kills the guardian")
 	t.check(enemy.collision_layer == 0 and not enemy.visible, "a dead guardian is gone from the world")
-	t.check(player.health.current == start_health - enemy.attack_damage, "a dead guardian stops attacking")
+	t.check(enemy.global_position.y > -0.5, "a dead guardian does not fall through the floor (y=%.2f)" % enemy.global_position.y)
+	var hp_at_death := player.health.current
+	await _wait(0.5)
+	t.check(player.health.current == hp_at_death, "a dead guardian stops attacking")
 	await _wait(enemy.respawn_delay + 1.0)
 	t.check(enemy.state_name() != "dead" and enemy.visible and enemy.health.current == enemy.health.max_health, "guardian respawns with full health (%s)" % enemy.state_name())
 	t.check(enemy.global_position.distance_to(enemy.home_transform.origin) < 0.5, "guardian respawns at its post")

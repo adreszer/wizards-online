@@ -12,11 +12,15 @@ extends CharacterBody3D
 
 signal target_acquired(target: Node3D)
 signal attacked(target: Node3D, hit: bool)
+## The ground stomp landed; [param hit_count] players were caught in the ring.
+signal stomped(hit_count: int)
+## A spell was parried with the shield (damage reduced, no knockback).
+signal blocked(effect: SpellEffect)
 signal died()
 signal respawned()
 
-enum State { IDLE, ALERT, CHASE, ATTACK, RETURN, DEAD }
-const STATE_NAMES := ["idle", "alert", "chase", "attack", "return", "dead"]
+enum State { IDLE, ALERT, CHASE, ATTACK, RETURN, DEAD, STOMP, BLOCK }
+const STATE_NAMES := ["idle", "alert", "chase", "attack", "return", "dead", "stomp", "block"]
 
 const LAYER_WORLD := 1 << 0
 const LAYER_PLAYER := 1 << 1
@@ -35,9 +39,24 @@ const LAYER_PLAYER := 1 << 1
 @export var turn_speed: float = 6.0
 @export var attack_damage: int = 20
 ## Seconds into the attack clip at which the blow lands.
-@export var attack_hit_time: float = 1.3
+@export var attack_hit_time: float = 1.1
 ## Seconds the whole swing takes before the next decision.
 @export var attack_duration: float = 2.4
+## Ground stomp: an area attack used every [member stomp_every] strikes when a
+## player stands within [member stomp_range]; everyone within [member stomp_radius] is hit.
+@export var stomp_every: int = 3
+@export var stomp_range: float = 3.0
+@export var stomp_radius: float = 3.5
+@export var stomp_damage: int = 15
+@export var stomp_hit_time: float = 0.8
+@export var stomp_duration: float = 1.7
+## Shield block: chance to parry a spell coming from in front while alert or
+## chasing. Blocked spells deal [member block_damage_factor] of their damage and
+## never shove; the guard stays up for [member block_duration].
+@export var block_chance: float = 0.4
+@export var block_damage_factor: float = 0.25
+@export var block_duration: float = 1.6
+@export var block_arc_degrees: float = 75.0
 ## Time spent on the alert reaction before chasing.
 @export var alert_duration: float = 1.2
 @export var respawn_delay: float = 20.0
@@ -51,6 +70,7 @@ const LAYER_PLAYER := 1 << 1
 ## State name -> clip name in the model's AnimationPlayer.
 @export var clips: Dictionary = {
 	"idle": "Idle_7", "alert": "Alert", "chase": "Running", "attack": "Attack", "return": "Walking",
+	"stomp": "Angry_Ground_Stomp_2", "block": "Block5",
 }
 @export var looping_clips: Array[String] = ["idle", "chase", "return"]
 @export var blend_time: float = 0.2
@@ -70,6 +90,8 @@ var _state_time: float = 0.0
 var _hit_applied: bool = false
 var _knockback: Vector3 = Vector3.ZERO
 var _flash_tween: Tween
+var _strikes_since_stomp: int = 0
+var _rng := RandomNumberGenerator.new()
 var _mesh_materials: Array[StandardMaterial3D] = []
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
@@ -128,6 +150,9 @@ func _physics_process(delta: float) -> void:
 	if not _home_set:
 		set_home(global_transform)
 	_state_time += delta
+	if state == State.DEAD:
+		velocity = Vector3.ZERO
+		return
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 	else:
@@ -144,10 +169,12 @@ func _physics_process(delta: float) -> void:
 			planar = _chase(delta)
 		State.ATTACK:
 			planar = _attack(delta)
+		State.STOMP:
+			planar = _stomp(delta)
+		State.BLOCK:
+			_block(delta)
 		State.RETURN:
 			planar = _return(delta)
-		State.DEAD:
-			pass
 	planar += _knockback
 	_knockback = _knockback.move_toward(Vector3.ZERO, 12.0 * delta)
 	velocity.x = planar.x
@@ -220,10 +247,33 @@ func _chase(delta: float) -> Vector3:
 	var to_target := target.global_position - global_position
 	to_target.y = 0.0
 	if to_target.length() <= attack_range:
-		_enter(State.ATTACK)
+		_strike()
 		return Vector3.ZERO
 	_face(target.global_position, delta)
 	return to_target.normalized() * run_speed
+
+
+## Picks the next blow: the ground stomp every [member stomp_every] strikes when the
+## target is close enough to be caught, the arm swing otherwise.
+func _strike() -> void:
+	var close := is_instance_valid(target) and global_position.distance_to(target.global_position) <= stomp_range
+	if stomp_every > 0 and _strikes_since_stomp >= stomp_every - 1 and close:
+		_strikes_since_stomp = 0
+		_enter(State.STOMP)
+	else:
+		_strikes_since_stomp += 1
+		_enter(State.ATTACK)
+
+
+## After a blow: keep striking, chase, or give up.
+func _after_strike() -> void:
+	if _target_lost():
+		target = null
+		_enter(State.RETURN)
+	elif global_position.distance_to(target.global_position) <= attack_range * 1.25:
+		_strike()
+	else:
+		_enter(State.CHASE)
 
 
 func _attack(delta: float) -> Vector3:
@@ -234,14 +284,58 @@ func _attack(delta: float) -> Vector3:
 		var hit := _try_hit()
 		attacked.emit(target, hit)
 	if _state_time >= attack_duration:
+		_after_strike()
+	return Vector3.ZERO
+
+
+func _stomp(_delta: float) -> Vector3:
+	if not _hit_applied and _state_time >= stomp_hit_time:
+		_hit_applied = true
+		stomped.emit(_stomp_hit())
+	if _state_time >= stomp_duration:
+		_after_strike()
+	return Vector3.ZERO
+
+
+## Damages every living local player inside the stomp ring, whichever way they stand.
+func _stomp_hit() -> int:
+	var count := 0
+	for node in get_tree().get_nodes_in_group("local_player"):
+		var body := node as Node3D
+		if body == null or not _is_alive(body):
+			continue
+		if global_position.distance_to(body.global_position) <= stomp_radius:
+			(body.get_meta("health") as Health).apply_damage(stomp_damage, self)
+			count += 1
+	return count
+
+
+func _block(delta: float) -> void:
+	if is_instance_valid(target):
+		_face(target.global_position, delta)
+	if _state_time >= block_duration:
 		if _target_lost():
 			target = null
 			_enter(State.RETURN)
-		elif global_position.distance_to(target.global_position) <= attack_range * 1.25:
-			_enter(State.ATTACK)
 		else:
 			_enter(State.CHASE)
-	return Vector3.ZERO
+
+
+## Whether a spell from [param caster] can be met with the shield right now.
+func _can_block(caster: Node3D) -> bool:
+	if state == State.BLOCK:
+		return true
+	if state != State.CHASE and state != State.ALERT:
+		return false
+	if caster == null:
+		return false
+	var to_caster := caster.global_position - global_position
+	to_caster.y = 0.0
+	if to_caster.length_squared() < 0.01:
+		return false
+	if (-global_basis.z).angle_to(to_caster.normalized()) > deg_to_rad(block_arc_degrees):
+		return false
+	return _rng.randf() < block_chance
 
 
 func _try_hit() -> bool:
@@ -289,6 +383,12 @@ func _on_spell_received(effect: SpellEffect) -> void:
 	if state == State.DEAD or health == null:
 		return
 	var amount := int(spell_damage.get(effect.effect_type, default_spell_damage))
+	if _can_block(effect.caster as Node3D):
+		if state != State.BLOCK:
+			_enter(State.BLOCK)
+		health.apply_damage(maxi(1, int(round(amount * block_damage_factor))), effect.caster)
+		blocked.emit(effect)
+		return
 	health.apply_damage(amount, effect.caster)
 	if effect.effect_type == &"force" or effect.effect_type == &"wind":
 		var shove := effect.direction
@@ -346,6 +446,7 @@ func respawn() -> void:
 	global_transform = home_transform
 	velocity = Vector3.ZERO
 	_knockback = Vector3.ZERO
+	_strikes_since_stomp = 0
 	if model != null:
 		model.scale = Vector3.ONE
 	visible = true

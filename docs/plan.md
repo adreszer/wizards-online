@@ -202,7 +202,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Three guardians placed by the generator in the dungeons (cellars ×2, dungeon corridor); cellars plaque warns the player
 - [x] Tests: idle at range, detection, chase + blow on the player, spell damage (direct effect and a real projectile), death, respawn; castle test counts the guardians
 - [ ] Server-authoritative enemies (shared position/health, every player a target, loot/house points on a kill)
-- [ ] Hit reaction and death clips (the model ships none; today a flash and a shrink), Block5 as a parry against spells, Angry_Ground_Stomp_2 as an area attack
+- [x] Shield block (Block5): while alert or chasing, a spell from the front is parried with `block_chance` for a quarter of its damage and no shove; ground stomp (Angry_Ground_Stomp_2) every third strike on a close target hits everyone in a 3.5 m ring
+- [ ] Hit reaction and death clips (the model ships none; today a flash and a shrink)
 - [ ] More enemy kinds and spawn rules (night only, secret rooms), enemy audio
 
 ## Production environment asset pipeline (in validation)
@@ -284,7 +285,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Spells | registry, spellbook/quick slots, input actions, per-spell cooldowns, levitate/wind/fire/water/dark/light effects, HUD hotbar, tomes | [x] headless test pass |
 | Interaction | nearest looked-at object selected, prompt | [x] headless test pass |
 | Health | damage, death, checkpoint respawn | [x] headless test pass |
-| Enemies | guardian idles at range, detects, chases, hits the player, takes spell damage (effect + projectile), dies, respawns; guardians placed in the dungeons | [x] headless test pass |
+| Enemies | guardian idles at range, detects, chases, hits the player, stomps on the third strike, blocks a frontal spell, takes spell damage (effect + projectile), dies without falling through the floor, respawns; guardians placed in the dungeons | [x] headless test pass |
 | Collectibles | counter, no double collect | [x] headless test pass |
 | Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
 | Localization | pl/en load, all keys translated, fallback, name sanitizing | [x] headless test pass; in-game visual check of Polish text (menu, HUD, plaques) pending |
