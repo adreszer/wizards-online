@@ -15,6 +15,10 @@ func _ready() -> void:
 	var player: Node = _spawner.spawn_local(GameSession.display_name, NetworkManager.local_user_id)
 	GameEvents.level_completed.connect(_on_level_completed)
 	_show_satchel_hint(player)
+	# Playtest shortcut: `-- --all-spells` fills the hotbar without touring the tomes.
+	if OS.get_cmdline_user_args().has("--all-spells"):
+		for definition in SpellRegistry.all():
+			player.spell_caster.learn_spell(definition)
 
 
 ## F1: lock the cursor for classic always-on mouse look (and unlock again).

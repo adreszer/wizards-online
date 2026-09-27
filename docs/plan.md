@@ -164,6 +164,19 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Modelled stair asset to replace the generated slab steps; railings on flights; more secret passages and multi-step puzzles
 - [ ] Performance pass in-game (torch count is 353 omni lights; cluster limits if many are visible at once)
 
+### Milestone 15 — Spells and quick selection
+- [x] Ten new spells as data (`resources/spells/`): Uplift (levitate), Galewind (wind), Emberkindle (fire), Wellspring (water), Frostbind (frost), Glowmote (light), Duskveil (dark), Unbolt (unlock), Mendweave (mend), Quicksprout (growth); each with its own effect type, colour and PL/EN texts
+- [x] `SpellRegistry` (explicit id list, sanitize, load by id); remote casts resolve through it
+- [x] Spellbook in `SpellCaster`: known spells, ten quick slots, equip/select/cycle/assign, per-spell cooldowns + global lock, `to_state/load_state` (ids) ready for server persistence
+- [x] Quick select input: `spell_slot_1…10` (1–0), `spell_next`/`spell_prev` (R/Q, D-pad); HUD hotbar with key, name, colour, cooldown and the equipped highlight
+- [x] Reactions: PushableBlock floats under Uplift and is shoved by Galewind; WallTorch lit by Emberkindle, put out by Wellspring/Frostbind/Duskveil (relights after 45 s); Glowmote leaves a floating `LightMote` via the new `burst_scene` hook
+- [x] A practice tome per spell in the matching classroom (Sigilcraft ×2, Skyriding, Kitchens, Elixirs, Warding, Library, Stargazing, Glyphs, Shapeshaping, Herblore) + a practice block in Sigilcraft; `-- --all-spells` for playtesting
+- [x] Headless tests: registry/translations, spellbook + input actions, block/torch/mote effects, cooldown rules, HUD hotbar, tomes in the castle
+- [ ] Receivers for unlock / mend / growth (locked doors and chests, breakables, plants) once rooms are furnished
+- [ ] Server-side spellbook: persist `SpellCaster.to_state()` per character in Nakama, grant spells from lessons, validate cast ids server-side (duel groundwork: target field + PvP flag per area)
+- [ ] Spell icons for the hotbar; drag to reorder slots; radial spell wheel for gamepad
+- [ ] Torch lit state replicated (local-only for now, like puzzles)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
@@ -230,7 +243,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (130 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (218 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
@@ -239,6 +252,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Movement | moving platform carries player | [x] headless test pass |
 | Camera | rotation, collision, no wall clipping | [x] headless: yaw/pitch, clamps, spring arm shortens against a wall; manual mouse-look: user playtest found and confirmed the crosshair bug; re-verification pending |
 | Spell | cast works, invalid targets ignored, receivers react, range | [x] headless test pass |
+| Spells | registry, spellbook/quick slots, input actions, per-spell cooldowns, levitate/wind/fire/water/dark/light effects, HUD hotbar, tomes | [x] headless test pass |
 | Interaction | nearest looked-at object selected, prompt | [x] headless test pass |
 | Health | damage, death, checkpoint respawn | [x] headless test pass |
 | Collectibles | counter, no double collect | [x] headless test pass |

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SpellDefinition" load_steps=5 format=3 uid="uid://frostbind0001"]
+
+[ext_resource type="Script" path="res://gameplay/spells/spell_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/spells/spell_projectile.tscn" id="2"]
+[ext_resource type="AudioStream" path="res://assets/audio/cast.wav" id="3"]
+[ext_resource type="AudioStream" path="res://assets/audio/impact.wav" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"frostbind"
+display_name = "SPELL_FROSTBIND_NAME"
+description = "SPELL_FROSTBIND_DESC"
+effect_type = &"frost"
+range = 16.0
+cooldown = 0.9
+projectile_speed = 26.0
+projectile_scene = ExtResource("2")
+strength = 1.0
+aim_assist_angle_degrees = 8.0
+cast_sound = ExtResource("3")
+impact_sound = ExtResource("4")
+color = Color(0.65, 0.9, 1, 1)

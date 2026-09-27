@@ -15,6 +15,9 @@ const CASTLE_SCENE := preload("res://levels/castle/castle.tscn")
 const ARCANE_PULSE := preload("res://resources/spells/arcane_pulse.tres")
 const TORCH := preload("res://resources/items/torch.tres")
 const INVENTORY_PANEL_SCENE := preload("res://ui/inventory/inventory_panel.tscn")
+const BLOCK_SCENE := preload("res://objects/puzzles/pushable_block.tscn")
+const WALL_TORCH_SCENE := preload("res://objects/environment/props/wall_torch.tscn")
+const HUD_SCENE := preload("res://ui/hud/hud.tscn")
 const TestHelpers := preload("res://tests/test_helpers.gd")
 
 var t := TestHelpers.new()
@@ -31,6 +34,8 @@ func _run() -> void:
 	await _test_health_and_checkpoints()
 	await _test_collectibles()
 	await _test_spell()
+	await _test_spellbook()
+	await _test_spell_effects()
 	await _test_inventory()
 	await _test_interaction()
 	await _test_moving_platform()
@@ -387,6 +392,188 @@ func _test_spell() -> void:
 	await _clear([floor_body, switch2, switch3, far, aim])
 
 
+# --- Spellbook / quick select ---------------------------------------------------------
+
+func _test_spellbook() -> void:
+	t.section("Spellbook")
+	var defs := SpellRegistry.all()
+	t.check(defs.size() == SpellRegistry.SPELL_IDS.size() and defs.size() == 11, "registry loads every spell (%d)" % defs.size())
+	var bad: Array[String] = []
+	var types: Dictionary = {}
+	for i in defs.size():
+		var def := defs[i]
+		if String(def.id) != SpellRegistry.SPELL_IDS[i] or def.projectile_scene == null \
+				or tr(def.display_name) == def.display_name or tr(def.description) == def.description:
+			bad.append(String(def.id))
+		types[def.effect_type] = true
+	t.check(bad.is_empty(), "every spell has a matching id, a projectile and translated texts (%s)" % str(bad))
+	t.check(types.size() == defs.size(), "every spell has a distinct effect type")
+	t.check(SpellRegistry.sanitize("glowmote") == "glowmote" and SpellRegistry.sanitize("../x") == "" and SpellRegistry.load_definition("nope") == null, "registry rejects unknown ids")
+
+	var floor_body := TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(20, 1, 20))
+	await _spawn_player(Vector3(0, 0.1, 0))
+	var caster := player.spell_caster
+	var uplift := SpellRegistry.load_definition("uplift")
+	var ember := SpellRegistry.load_definition("emberkindle")
+	var glow := SpellRegistry.load_definition("glowmote")
+	var changes: Array = []
+	caster.spells_changed.connect(func() -> void: changes.append(true))
+	caster.learn_spell(ARCANE_PULSE)
+	caster.learn_spell(uplift)
+	caster.learn_spell(ember)
+	t.check(caster.known_spells.size() == 3 and caster.quick_slots[0] == ARCANE_PULSE and caster.quick_slots[1] == uplift and caster.quick_slots[2] == ember, "learned spells fill slots 1–3 in order")
+	t.check(caster.equipped_spell == ember and caster.equipped_slot() == 2 and changes.size() == 3, "the newest spell is equipped and spells_changed fired per spell")
+	caster.learn_spell(uplift)
+	t.check(caster.known_spells.size() == 3 and caster.equipped_spell == uplift and changes.size() == 3, "re-learning a spell only equips it")
+	t.check(caster.select_slot(0) and caster.equipped_spell == ARCANE_PULSE, "select_slot(0) equips slot 1")
+	t.check(not caster.select_slot(5) and not caster.select_slot(-1) and not caster.select_slot(10) and caster.equipped_spell == ARCANE_PULSE, "empty and invalid slots are ignored")
+	t.check(caster.cycle(-1) and caster.equipped_spell == ember, "cycling backwards wraps to the last spell")
+	t.check(caster.cycle(1) and caster.equipped_spell == ARCANE_PULSE, "cycling forwards wraps to the first spell")
+	t.check(not caster.equip(glow) and caster.equipped_spell == ARCANE_PULSE, "an unknown spell cannot be equipped")
+	t.check(caster.assign_slot(9, uplift) and caster.quick_slots[9] == uplift and caster.quick_slots[1] == null, "assign_slot moves a spell to slot 10")
+	var state := caster.to_state()
+	t.check(state["known"] == ["arcane_pulse", "uplift", "emberkindle"] and state["slots"][9] == "uplift" and state["slots"][1] == "" and state["equipped"] == "arcane_pulse", "to_state serialises ids")
+	caster.load_state({"known": ["glowmote", "bogus", "uplift"], "slots": ["", "glowmote"], "equipped": "uplift"})
+	t.check(caster.known_spells.size() == 2 and caster.quick_slots[1] == glow and caster.quick_slots[0] == uplift and caster.equipped_spell == uplift, "load_state drops unknown ids, keeps slots and fills the rest")
+	caster.forget_spell(&"uplift")
+	t.check(caster.known_spells.size() == 1 and caster.equipped_spell == glow and caster.quick_slots[0] == null, "forget_spell clears the slot and equips the next spell")
+	caster.load_state({})
+	t.check(caster.known_spells.is_empty() and caster.equipped_spell == null and not caster.has_spell(), "empty state clears the spellbook")
+
+	# Input actions → PlayerInput → Player → SpellCaster
+	caster.load_state({"known": ["arcane_pulse", "uplift", "emberkindle"], "slots": [], "equipped": "arcane_pulse"})
+	t.check(caster.equipped_spell == ARCANE_PULSE and caster.quick_slots[2] == ember, "state without slots fills the hotbar in learning order")
+	await _press_action("spell_slot_3")
+	t.check(caster.equipped_spell == ember, "pressing the slot 3 action equips slot 3")
+	await _press_action("spell_prev")
+	t.check(caster.equipped_spell == uplift, "spell_prev steps back one slot")
+	await _press_action("spell_next")
+	await _press_action("spell_next")
+	t.check(caster.equipped_spell == ARCANE_PULSE, "spell_next wraps around to slot 1")
+	await _press_action("spell_slot_10")
+	t.check(caster.equipped_spell == ARCANE_PULSE, "an empty slot key changes nothing")
+	await _clear([floor_body])
+
+
+## Simulates a tap of an InputMap action and lets PlayerInput and the physics
+## step see it (Input state is per frame, so the ordering matters).
+func _press_action(action: StringName) -> void:
+	await get_tree().process_frame
+	Input.action_press(action)
+	await get_tree().process_frame
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	Input.action_release(action)
+	await get_tree().process_frame
+
+
+# --- Spell effects -------------------------------------------------------------------
+
+func _test_spell_effects() -> void:
+	t.section("Spell effects")
+	var floor_body := TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(80, 1, 80))
+	await _spawn_player(Vector3(0, 0.1, 0))
+	var caster := player.spell_caster
+	var aim := TestHelpers.FixedAim.new()
+	add_child(aim)
+	caster.aim_source = aim
+	aim.origin = Vector3(0, 1.3, 2)
+	var uplift := SpellRegistry.load_definition("uplift")
+	var galewind := SpellRegistry.load_definition("galewind")
+	var ember := SpellRegistry.load_definition("emberkindle")
+	var wellspring := SpellRegistry.load_definition("wellspring")
+	var duskveil := SpellRegistry.load_definition("duskveil")
+	var glow := SpellRegistry.load_definition("glowmote")
+
+	# Uplift floats a block, then it settles; Galewind shoves it.
+	var block: PushableBlock = BLOCK_SCENE.instantiate()
+	add_child(block)
+	block.global_position = Vector3(0, 0.75, -6)
+	await _wait(0.6)
+	var rest_y := block.global_position.y
+	caster.learn_spell(uplift)
+	aim.target = block.global_position
+	t.check(caster.try_cast(), "uplift casts at the block")
+	await _wait(0.8)
+	t.check(block.is_floating and block.global_position.y > rest_y + 0.3, "uplift lifts the block (%.2f → %.2f)" % [rest_y, block.global_position.y])
+	await _wait(block.float_seconds + 1.5)
+	t.check(not block.is_floating and block.global_position.y < rest_y + 0.3, "the block lands again after float_seconds (y %.2f)" % block.global_position.y)
+	caster.learn_spell(galewind)
+	aim.target = block.global_position
+	var z0 := block.global_position.z
+	caster.try_cast()
+	await _wait(1.0)
+	t.check(block.global_position.z < z0 - 1.0, "galewind shoves the block along the cast (%.2f → %.2f)" % [z0, block.global_position.z])
+	block.queue_free()
+	await get_tree().process_frame
+
+	# Wall torch: water / dark put it out, fire relights, force is ignored.
+	var torch: WallTorch = WALL_TORCH_SCENE.instantiate()
+	add_child(torch)
+	torch.global_position = Vector3(4, 1.2, -6)
+	await get_tree().process_frame
+	t.check(torch.lit, "torch starts lit")
+	var torch_point: Vector3 = torch.get_node("Target/SpellReceiver").get_aim_point()
+	caster.learn_spell(wellspring)
+	aim.target = torch_point
+	caster.try_cast()
+	await _wait(0.8)
+	t.check(not torch.lit and not torch.get_node("Flame").visible, "wellspring puts the torch out")
+	caster.learn_spell(ember)
+	caster.try_cast()
+	await _wait(0.8)
+	t.check(torch.lit and torch.get_node("Flame").visible, "emberkindle relights it")
+	caster.learn_spell(duskveil)
+	caster.try_cast()
+	await _wait(0.8)
+	t.check(not torch.lit, "duskveil snuffs it again")
+	torch.set_lit(true)
+	caster.learn_spell(ARCANE_PULSE)
+	caster.try_cast()
+	await _wait(0.8)
+	t.check(torch.lit, "a force spell leaves the torch alone")
+	torch.queue_free()
+	await get_tree().process_frame
+
+	# Glowmote leaves a floating light just in front of the surface it hits.
+	var wall := TestHelpers.make_floor(self, Vector3(0, 2, -10), Vector3(10, 4, 0.5))
+	await _wait(0.1)  # let physics pick up the wall's transform before aiming at it
+	caster.learn_spell(glow)
+	aim.target = Vector3(2, 1.3, -10)
+	caster.try_cast()
+	await _wait(1.2)
+	var motes: Array = get_children().filter(func(n: Node) -> bool: return n is LightMote)
+	t.check(motes.size() == 1, "glowmote spawns one light mote")
+	if motes.size() == 1:
+		var mote: LightMote = motes[0]
+		var light: OmniLight3D = mote.get_node("OmniLight3D")
+		t.check(mote.global_position.z > -9.9 and mote.global_position.z < -9.0, "the mote hovers just in front of the wall (z %.2f)" % mote.global_position.z)
+		t.check(light.light_energy > 0.5 and light.light_color.is_equal_approx(glow.color), "the mote glows in the spell's colour")
+		mote.queue_free()
+	wall.queue_free()
+
+	# Per-spell cooldowns with a short global lock.
+	await _wait(1.1)
+	caster.learn_spell(ember)
+	t.check(caster.try_cast(), "emberkindle casts")
+	caster.equip(glow)
+	t.check(not caster.can_cast() and caster.cooldown_remaining > 0.0, "the global cooldown blocks an instant follow-up with another spell")
+	await _wait(SpellCaster.GLOBAL_COOLDOWN + 0.1)
+	t.check(caster.can_cast() and caster.get_cooldown_remaining(ember) > 0.0, "after the global lock the other spell is ready while the first still cools")
+
+	# HUD hotbar mirrors the caster.
+	var hud := HUD_SCENE.instantiate()
+	add_child(hud)
+	hud._bind_player(player)
+	await get_tree().process_frame
+	t.check(hud.get_node("%HotbarRoot").visible and hud.hotbar_selected_index() == caster.equipped_slot(), "HUD hotbar is visible and highlights the equipped slot")
+	caster.select_slot(0)
+	await get_tree().process_frame
+	t.check(hud.hotbar_selected_index() == 0 and hud.get_node("%Hotbar").get_child_count() == SpellCaster.QUICK_SLOT_COUNT, "hotbar follows selection and has ten slots")
+	hud.queue_free()
+	await _clear([floor_body, aim])
+
+
 # --- Inventory -----------------------------------------------------------------
 
 func _test_inventory() -> void:
@@ -559,6 +746,11 @@ func _test_castle() -> void:
 	t.check(castle.get_node_or_null("StartPoint") != null, "castle has a StartPoint")
 	t.check(get_tree().get_nodes_in_group("secret_walls").size() >= 3, "castle has secret passages")
 	t.check(GameSession.get_total(&"arcane_fragment") >= 10, "castle registers its fragments (got %d)" % GameSession.get_total(&"arcane_fragment"))
+	var tome_spells: Dictionary = {}
+	for tome in castle.get_node("Tomes").get_children():
+		if tome is SpellTome and tome.spell != null:
+			tome_spells[tome.spell.id] = true
+	t.check(tome_spells.size() == SpellRegistry.SPELL_IDS.size(), "a practice tome for every spell is placed in the castle (%d)" % tome_spells.size())
 	# Every area has a floor under its centre (rooms with stair holes keep their centre solid).
 	var fell: Array[String] = []
 	for z in zones:

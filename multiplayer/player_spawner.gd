@@ -14,7 +14,6 @@ signal remote_player_removed(player: Node)
 var local_player: Node
 ## sid -> Player
 var remote_players: Dictionary = {}
-var _spell_definitions: Dictionary = {}
 
 
 func _ready() -> void:
@@ -99,7 +98,7 @@ func _on_spell_cast(sid: String, cast: Dictionary) -> void:
 	var player: Node = remote_players.get(sid)
 	if player == null:
 		return
-	var definition := _get_spell_definition(str(cast.get("id", "")))
+	var definition := SpellRegistry.load_definition(str(cast.get("id", "")))
 	if definition == null:
 		return
 	player.synchronizer.receive_spell_cast(definition,
@@ -134,18 +133,3 @@ func _apply_local_inventory() -> void:
 func _on_disconnected(_reason: String) -> void:
 	for sid in remote_players.keys():
 		_on_player_left(sid, "")
-
-
-## Spell definitions are looked up by id from the resources folder; a remote
-## client can only ever replay spells that exist locally.
-func _get_spell_definition(id: String) -> SpellDefinition:
-	if id.is_empty():
-		return null
-	if _spell_definitions.has(id):
-		return _spell_definitions[id]
-	var path := "res://resources/spells/%s.tres" % id
-	if not ResourceLoader.exists(path):
-		return null
-	var def := load(path) as SpellDefinition
-	_spell_definitions[id] = def
-	return def

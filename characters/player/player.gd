@@ -150,6 +150,12 @@ func _process(delta: float) -> void:
 func _physics_process(_delta: float) -> void:
 	if not is_local:
 		return
+	var slot := player_input.consume_spell_slot()
+	if slot >= 0:
+		spell_caster.select_slot(slot)
+	var cycle := player_input.consume_spell_cycle()
+	if cycle != 0:
+		spell_caster.cycle(cycle)
 	if player_input.consume_cast():
 		spell_caster.try_cast()
 	if player_input.consume_interact():

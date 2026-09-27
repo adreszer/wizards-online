@@ -643,6 +643,21 @@ def fragment(rid, dx, dz, dy=0.0):
     cx, cz = r.centre()
     inst(uname(f"Fragment_{rid}"), "res://gameplay/collectibles/collectible.tscn", (cx + dx, r.y + dy, cz + dz), parent="Collectibles")
 
+# (room, spell id, offset from the room centre)
+PRACTICE_TOMES = [
+    ("class_sigilcraft", "arcane_pulse", -2.0, 0.0),
+    ("class_sigilcraft", "uplift", 2.0, 0.0),
+    ("class_skyriding", "galewind", 0.0, 0.0),
+    ("kitchens", "emberkindle", 0.0, 0.0),
+    ("class_elixirs", "wellspring", 0.0, 0.0),
+    ("class_warding", "frostbind", 0.0, 0.0),
+    ("library", "glowmote", 0.0, 0.0),
+    ("class_stargazing", "duskveil", 0.0, 0.0),
+    ("class_glyphs", "unbolt", 0.0, 0.0),
+    ("class_shapeshaping", "mendweave", 0.0, 0.0),
+    ("class_herblore", "quicksprout", 0.0, 0.0),
+]
+
 def emit_props():
     plaque("entrance_hall", "PLAQUE_CASTLE_ENTRANCE", "w", 0.75)
     plaque("great_hall", "PLAQUE_GREAT_HALL", "n", 0.5)
@@ -654,10 +669,17 @@ def emit_props():
     plaque("loft", "PLAQUE_LOFT", "n", 0.5)
     plaque("tower_sw_4", "PLAQUE_STARGAZING", "n", 0.5)
     plaque("grounds", "PLAQUE_GROUNDS", "n", 0.3)
-    # Until lessons grant spells, the Sigilcraft classroom keeps a practice tome.
+    # Until lessons grant spells, each subject keeps a practice tome for the
+    # spell closest to it (ids from resources/spells/, see SpellRegistry).
+    for rid, spell_id, dx, dz in PRACTICE_TOMES:
+        r = rooms[rid]
+        cx, cz = r.centre()
+        spell_ext = ext_id("Resource", f"res://resources/spells/{spell_id}.tres")
+        inst(uname(f"Tome_{spell_id}"), "res://objects/interactables/spell_tome.tscn", (cx + dx, r.y, cz + dz),
+             parent="Tomes", props={"spell": f'ExtResource("{spell_ext}")'})
     r = rooms["class_sigilcraft"]
-    inst("SpellTome", "res://objects/interactables/spell_tome.tscn", (r.centre()[0], r.y, r.centre()[1]))
     inst("SigilcraftSwitch", "res://objects/puzzles/magic_switch.tscn", (r.x0 + 3, r.y, r.z0 + 3))
+    inst("SigilcraftBlock", "res://objects/puzzles/pushable_block.tscn", (r.x1 - 4, r.y + 0.6, r.z0 + 4))
     for rid, pts in {"undercroft": [(-6, -6), (6, -6), (0, 6)], "hidden_study": [(0, -4), (0, 4)],
                      "loft": [(-4, 0), (4, 0)], "tower_sw_4": [(-4, 4)], "tower_ne_3": [(-5, 5)],
                      "tower_nw_3": [(-5, 5)], "cellars": [(-8, 4)], "roost": [(0, 0)]}.items():
@@ -732,6 +754,8 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 [node name="Collectibles" type="Node3D" parent="."]
 
 [node name="Checkpoints" type="Node3D" parent="."]
+
+[node name="Tomes" type="Node3D" parent="."]
 
 '''
 header = f'[gd_scene load_steps={len(ext) + 2} format=3 uid="uid://castle0000001"]\n\n'

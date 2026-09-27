@@ -53,7 +53,7 @@ INTERACT_READ,Read,Czytaj
 INTERACT_PULL_LEVER,Pull lever,Pociągnij dźwignię
 INTERACT_PULL_LEVER_BACK,Pull lever back,Cofnij dźwignię
 INTERACT_STUDY_TOME,Study the tome,Przestudiuj księgę
-NOTIFY_SPELL_LEARNED,Learned %s — aim with the centre of the screen and press Cast (LMB).,Poznajesz czar %s — celuj środkiem ekranu i naciśnij Czar (LPM).
+NOTIFY_SPELL_LEARNED,Learned %s — it sits on your hotbar (keys 1–0). Aim with the centre of the screen and press Cast (LMB).,Poznajesz czar %s — trafił na pasek czarów (klawisze 1–0). Celuj środkiem ekranu i naciśnij Czar (LPM).
 NOTIFY_SECRET_PASSAGE,A hidden passage opens!,Otwiera się ukryte przejście!
 NOTIFY_CHECKPOINT,Checkpoint reached,Punkt kontrolny
 NOTIFY_STATUES_ALIGNED,The statues' gaze aligns. Something unlocked.,Spojrzenia posągów się zbiegają. Coś się odblokowało.
@@ -152,3 +152,24 @@ PLAQUE_HIDDEN_STUDY,"A chronicler once wrote here in secret. The wall answered t
 PLAQUE_LOFT,"Above the Great Hall, forgotten. The dust here has not been disturbed in years.","Nad Wielką Salą, zapomniany. Kurz nie był tu ruszany od lat."
 PLAQUE_STARGAZING,The stargazing platform. Lessons happen after dark; the sky is the classroom.,Taras Gwiazdoznawstwa. Lekcje odbywają się po zmroku; niebo jest salą.
 PLAQUE_GROUNDS,"The school grounds. Greenhouse to the east, the beast paddock to the west, the entrance hall straight ahead.","Błonia szkoły. Szklarnia na wschód, zagroda dla stworzeń na zachód, sień na wprost."
+SPELL_UPLIFT_NAME,Uplift,Wzniesienie
+SPELL_UPLIFT_DESC,Lifts a loose object off the ground and lets it hover for a few heartbeats.,Unosi luźny przedmiot nad ziemię i pozwala mu zawisnąć na kilka uderzeń serca.
+SPELL_GALEWIND_NAME,Galewind,Wichura
+SPELL_GALEWIND_DESC,A hard gust of conjured wind. Shoves loose objects much further than a plain pulse.,Silny podmuch wyczarowanego wiatru. Odpycha luźne przedmioty znacznie dalej niż zwykły impuls.
+SPELL_EMBERKINDLE_NAME,Emberkindle,Żarzenie
+SPELL_EMBERKINDLE_DESC,"A spark of living flame. Lights torches, braziers and anything that should burn.","Iskra żywego płomienia. Zapala pochodnie, kosze ogniowe i wszystko, co powinno płonąć."
+SPELL_WELLSPRING_NAME,Wellspring,Źródło
+SPELL_WELLSPRING_DESC,A burst of clear water. Douses flames and fills what stands empty.,"Strumień czystej wody. Gasi płomienie i napełnia to, co stoi puste."
+SPELL_FROSTBIND_NAME,Frostbind,Mroźne Pęta
+SPELL_FROSTBIND_DESC,Biting cold in a thrown shard. Freezes water and smothers small fires.,Kąsający chłód w rzuconym odłamku. Zamraża wodę i dusi małe ognie.
+SPELL_GLOWMOTE_NAME,Glowmote,Świetlik
+SPELL_GLOWMOTE_DESC,"Conjures a floating mote of light where it lands. It lingers for a while, then fades.","Przywołuje unoszący się świetlny pyłek w miejscu trafienia. Świeci przez chwilę, po czym gaśnie."
+SPELL_DUSKVEIL_NAME,Duskveil,Zmierzchna Zasłona
+SPELL_DUSKVEIL_DESC,A veil of shadow. Snuffs out torches and lamps — useful for those who prefer not to be seen.,"Zasłona cienia. Gasi pochodnie i lampy — przydatna tym, którzy wolą pozostać niezauważeni."
+SPELL_UNBOLT_NAME,Unbolt,Odryglowanie
+SPELL_UNBOLT_DESC,"Slides bolts and turns keys from afar. Opens what is merely locked, never what is warded.","Odsuwa rygle i przekręca klucze z daleka. Otwiera to, co tylko zamknięte, nigdy to, co strzeżone."
+SPELL_MENDWEAVE_NAME,Mendweave,Cerowanie
+SPELL_MENDWEAVE_DESC,"Knits broken things back together: cracked pots, torn pages, snapped wands.","Zszywa rzeczy zepsute: pęknięte dzbany, podarte kartki, złamane różdżki."
+SPELL_QUICKSPROUT_NAME,Quicksprout,Rozkwit
+SPELL_QUICKSPROUT_DESC,Coaxes a seed or a wilting plant into sudden growth.,Nakłania nasiono lub więdnącą roślinę do nagłego wzrostu.
+HUD_HOTBAR_HINT,Spells: 1–0 select · Q/R cycle · LMB cast,Czary: 1–0 wybór · Q/R zmiana · LPM rzucanie

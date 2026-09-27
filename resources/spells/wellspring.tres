@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SpellDefinition" load_steps=5 format=3 uid="uid://wellspring001"]
+
+[ext_resource type="Script" path="res://gameplay/spells/spell_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/spells/spell_projectile.tscn" id="2"]
+[ext_resource type="AudioStream" path="res://assets/audio/cast.wav" id="3"]
+[ext_resource type="AudioStream" path="res://assets/audio/impact.wav" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"wellspring"
+display_name = "SPELL_WELLSPRING_NAME"
+description = "SPELL_WELLSPRING_DESC"
+effect_type = &"water"
+range = 16.0
+cooldown = 0.6
+projectile_speed = 26.0
+projectile_scene = ExtResource("2")
+strength = 1.0
+aim_assist_angle_degrees = 9.0
+cast_sound = ExtResource("3")
+impact_sound = ExtResource("4")
+color = Color(0.3, 0.6, 1, 1)

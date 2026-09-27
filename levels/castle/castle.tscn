@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://castle0000001"]
+[gd_scene load_steps=31 format=3 uid="uid://castle0000001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/modular_wall_run.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/environment/modular/doorway.tscn" id="2"]
@@ -12,11 +12,23 @@
 [ext_resource type="PackedScene" path="res://objects/environment/props/wall_torch.tscn" id="10"]
 [ext_resource type="PackedScene" path="res://gameplay/world/area_zone.tscn" id="11"]
 [ext_resource type="PackedScene" path="res://objects/interactables/plaque.tscn" id="12"]
-[ext_resource type="PackedScene" path="res://objects/interactables/spell_tome.tscn" id="13"]
-[ext_resource type="PackedScene" path="res://objects/puzzles/magic_switch.tscn" id="14"]
-[ext_resource type="PackedScene" path="res://gameplay/collectibles/collectible.tscn" id="15"]
-[ext_resource type="PackedScene" path="res://gameplay/checkpoints/checkpoint.tscn" id="16"]
-[ext_resource type="Script" path="res://levels/castle/castle.gd" id="17"]
+[ext_resource type="Resource" path="res://resources/spells/arcane_pulse.tres" id="13"]
+[ext_resource type="PackedScene" path="res://objects/interactables/spell_tome.tscn" id="14"]
+[ext_resource type="Resource" path="res://resources/spells/uplift.tres" id="15"]
+[ext_resource type="Resource" path="res://resources/spells/galewind.tres" id="16"]
+[ext_resource type="Resource" path="res://resources/spells/emberkindle.tres" id="17"]
+[ext_resource type="Resource" path="res://resources/spells/wellspring.tres" id="18"]
+[ext_resource type="Resource" path="res://resources/spells/frostbind.tres" id="19"]
+[ext_resource type="Resource" path="res://resources/spells/glowmote.tres" id="20"]
+[ext_resource type="Resource" path="res://resources/spells/duskveil.tres" id="21"]
+[ext_resource type="Resource" path="res://resources/spells/unbolt.tres" id="22"]
+[ext_resource type="Resource" path="res://resources/spells/mendweave.tres" id="23"]
+[ext_resource type="Resource" path="res://resources/spells/quicksprout.tres" id="24"]
+[ext_resource type="PackedScene" path="res://objects/puzzles/magic_switch.tscn" id="25"]
+[ext_resource type="PackedScene" path="res://objects/puzzles/pushable_block.tscn" id="26"]
+[ext_resource type="PackedScene" path="res://gameplay/collectibles/collectible.tscn" id="27"]
+[ext_resource type="PackedScene" path="res://gameplay/checkpoints/checkpoint.tscn" id="28"]
+[ext_resource type="Script" path="res://levels/castle/castle.gd" id="29"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -30,7 +42,7 @@ fog_light_color = Color(0.2, 0.18, 0.17, 1)
 fog_density = 0.004
 
 [node name="Castle" type="Node3D"]
-script = ExtResource("17")
+script = ExtResource("29")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env")
@@ -63,6 +75,8 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.0, 0.05, 84.0)
 [node name="Collectibles" type="Node3D" parent="."]
 
 [node name="Checkpoints" type="Node3D" parent="."]
+
+[node name="Tomes" type="Node3D" parent="."]
 
 [node name="Wall_x-64_s0_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 0.000, -64.000)
@@ -5627,63 +5641,107 @@ text = "PLAQUE_STARGAZING"
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -25.600, 1.600, 48.225)
 text = "PLAQUE_GROUNDS"
 
-[node name="SpellTome" parent="." instance=ExtResource("13")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, 0.000, 0.000)
+[node name="Tome_arcane_pulse" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -34.000, 0.000, 0.000)
+spell = ExtResource("13")
 
-[node name="SigilcraftSwitch" parent="." instance=ExtResource("14")]
+[node name="Tome_uplift" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 0.000, 0.000)
+spell = ExtResource("15")
+
+[node name="Tome_galewind" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 0.000, -16.000)
+spell = ExtResource("16")
+
+[node name="Tome_emberkindle" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 0.000, 36.000)
+spell = ExtResource("17")
+
+[node name="Tome_wellspring" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, -9.000, 12.000)
+spell = ExtResource("18")
+
+[node name="Tome_frostbind" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, 9.000, 0.000)
+spell = ExtResource("19")
+
+[node name="Tome_glowmote" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 0.000, -52.000)
+spell = ExtResource("20")
+
+[node name="Tome_duskveil" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 9.000, 0.000)
+spell = ExtResource("21")
+
+[node name="Tome_unbolt" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, 0.000, -32.000)
+spell = ExtResource("22")
+
+[node name="Tome_mendweave" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, 0.000, 16.000)
+spell = ExtResource("23")
+
+[node name="Tome_quicksprout" parent="Tomes" instance=ExtResource("14")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 0.000, 0.000)
+spell = ExtResource("24")
+
+[node name="SigilcraftSwitch" parent="." instance=ExtResource("25")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -41.000, 0.000, -5.000)
 
-[node name="Fragment_undercroft" parent="Collectibles" instance=ExtResource("15")]
+[node name="SigilcraftBlock" parent="." instance=ExtResource("26")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 0.600, -4.000)
+
+[node name="Fragment_undercroft" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, -9.000, -34.000)
 
-[node name="Fragment_undercroft_2" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_undercroft_2" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 6.000, -9.000, -34.000)
 
-[node name="Fragment_undercroft_3" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_undercroft_3" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -9.000, -22.000)
 
-[node name="Fragment_hidden_study" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_hidden_study" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -48.000, 0.000, -20.000)
 
-[node name="Fragment_hidden_study_2" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_hidden_study_2" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -48.000, 0.000, -12.000)
 
-[node name="Fragment_loft" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_loft" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 16.000, 18.000, 36.000)
 
-[node name="Fragment_loft_2" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_loft_2" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 24.000, 18.000, 36.000)
 
-[node name="Fragment_tower_sw_4" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_tower_sw_4" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -48.000, 36.000, 36.000)
 
-[node name="Fragment_tower_ne_3" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_tower_ne_3" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 23.000, 27.000, -43.000)
 
-[node name="Fragment_tower_nw_3" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_tower_nw_3" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -33.000, 27.000, -43.000)
 
-[node name="Fragment_cellars" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_cellars" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -40.000, -9.000, -4.000)
 
-[node name="Fragment_roost" parent="Collectibles" instance=ExtResource("15")]
+[node name="Fragment_roost" parent="Collectibles" instance=ExtResource("27")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 18.000, 44.000)
 
-[node name="Checkpoint_entrance_hall" parent="Checkpoints" instance=ExtResource("16")]
+[node name="Checkpoint_entrance_hall" parent="Checkpoints" instance=ExtResource("28")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 0.000, 40.000)
 
-[node name="Checkpoint_north_hall" parent="Checkpoints" instance=ExtResource("16")]
+[node name="Checkpoint_north_hall" parent="Checkpoints" instance=ExtResource("28")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 0.000, -24.000)
 
-[node name="Checkpoint_library" parent="Checkpoints" instance=ExtResource("16")]
+[node name="Checkpoint_library" parent="Checkpoints" instance=ExtResource("28")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 0.000, -48.000)
 
-[node name="Checkpoint_stair_hall" parent="Checkpoints" instance=ExtResource("16")]
+[node name="Checkpoint_stair_hall" parent="Checkpoints" instance=ExtResource("28")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 0.000, 40.000)
 
-[node name="Checkpoint_dungeon_corridor" parent="Checkpoints" instance=ExtResource("16")]
+[node name="Checkpoint_dungeon_corridor" parent="Checkpoints" instance=ExtResource("28")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -16.000, -9.000, -4.000)
 
-[node name="Checkpoint_gallery" parent="Checkpoints" instance=ExtResource("16")]
+[node name="Checkpoint_gallery" parent="Checkpoints" instance=ExtResource("28")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 18.000, 40.000)
 

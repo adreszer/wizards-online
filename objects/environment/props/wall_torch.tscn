@@ -1,7 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://walltorch0001"]
+[gd_scene load_steps=7 format=3 uid="uid://walltorch0001"]
 
 [ext_resource type="Script" path="res://objects/environment/props/wall_torch.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/spells/spell_receiver.gd" id="3"]
 [ext_resource type="PackedScene" path="res://assets/models/environment/modular/wall-torch.glb" id="2"]
+
+[sub_resource type="SphereShape3D" id="TargetShape"]
+radius = 0.35
 
 [sub_resource type="SphereMesh" id="FlameMesh"]
 radius = 0.09
@@ -30,3 +34,16 @@ omni_attenuation = 1.3
 [node name="FlameGlow" type="MeshInstance3D" parent="Flame"]
 mesh = SubResource("FlameMesh")
 surface_material_override/0 = SubResource("FlameMat")
+
+[node name="Target" type="StaticBody3D" parent="."]
+collision_layer = 8
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="Target"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0.3)
+shape = SubResource("TargetShape")
+
+[node name="SpellReceiver" type="Node" parent="Target"]
+script = ExtResource("3")
+accepted_effect_types = Array[StringName]([&"fire", &"water", &"frost", &"dark"])
+aim_point_offset = Vector3(0, 0.45, 0.3)

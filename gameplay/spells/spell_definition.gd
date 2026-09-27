@@ -8,12 +8,17 @@ extends Resource
 @export var display_name: String = "SPELL_ARCANE_PULSE_NAME"
 @export var description: String = ""
 @export var icon: Texture2D
-## Effect type that SpellReceivers filter on (e.g. &"force").
+## Effect type that SpellReceivers filter on. Current vocabulary (see
+## docs/architecture.md → Spells): force, levitate, wind, fire, water, frost,
+## light, dark, unlock, mend, growth.
 @export var effect_type: StringName = &"force"
 @export var range: float = 18.0
 @export var cooldown: float = 0.5
 @export var projectile_speed: float = 28.0
 @export var projectile_scene: PackedScene
+## Optional scene left where the projectile ends (impact point or max range):
+## a floating light, a scorch mark… Purely cosmetic, spawned on every client.
+@export var burst_scene: PackedScene
 ## Generic magnitude passed to receivers (impulse for movable objects, etc).
 @export var strength: float = 6.0
 @export var aim_assist_angle_degrees: float = 7.0

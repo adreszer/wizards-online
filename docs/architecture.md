@@ -70,14 +70,31 @@ Player (CharacterBody3D, player.gd — wiring only)
 
 ```
 SpellDefinition (Resource)  id, name, description, icon, effect_type, range, cooldown,
-                            projectile_speed, projectile_scene, strength, aim assist, sounds, colour
-SpellCaster (Node3D)        try_cast() / cast_remote() / learn_spell()
-SpellProjectile (Node3D)    ray-swept movement, burst, delivers SpellEffect
+                            projectile_speed, projectile_scene, burst_scene, strength, aim assist, sounds, colour
+SpellRegistry (static)      SPELL_IDS (explicit list) → resources/spells/<id>.tres, sanitize(), all()
+SpellCaster (Node3D)        spellbook (known_spells, quick_slots, equipped_spell) + try_cast() / cast_remote()
+SpellProjectile (Node3D)    ray-swept movement, burst, delivers SpellEffect, leaves burst_scene
 SpellReceiver (Node)        filters effect types, emits spell_received
 SpellEffect (RefCounted)    definition, effect_type, caster, caster_id, hit position, direction, strength
 ```
 
-Aiming: the camera ray from the screen centre is intersected with the world; a cone (`aim_assist_angle_degrees`) around it prefers the nearest `SpellReceiver` in range with line of sight from the wand. The projectile is fired from the wand tip toward the resolved point. Adding a second spell = a new `.tres` (+ optionally a new projectile scene); `SpellCaster` is untouched. Objects react by connecting to their receiver's signal (`MagicSwitch`, `PushableBlock`, `RotatingStatue`, `SecretWall`), never by checking the spell's name.
+**Spellbook and quick select.** `SpellCaster` is also the character's spellbook: `known_spells` (learning order), ten `quick_slots` (the hotbar) and `equipped_spell`. `learn_spell()` appends, drops the spell into the first free slot and equips it; `select_slot(i)`, `cycle(±1)`, `assign_slot(i, def)` and `equip(def)` change what fires; `to_state()/load_state()` serialise ids (`{known, slots, equipped}`), which is the record a server-side character will carry once lessons grant spells. Input: `spell_slot_1…10` (keys 1–9, 0), `spell_next` (R, D-pad right), `spell_prev` (Q, D-pad left) → `PlayerInput` intents → `Player` → caster. The HUD hotbar (`ui/hud/hud.gd`, bottom centre) mirrors the slots, highlights the equipped one and shows per-slot cooldown; it is display only, so it never swallows the mouse. Cooldowns are per spell plus a short global lock (`SpellCaster.GLOBAL_COOLDOWN`), so switching spells never dodges a cooldown — the shape duels will need.
+
+**Effect vocabulary.** Every spell has one `effect_type`; receivers list what they accept and objects branch on the type, never on the spell's name:
+
+| effect_type | spell | reacts today |
+|---|---|---|
+| `force` | Arcane Pulse | MagicSwitch, PushableBlock, RotatingStatue, SecretWall |
+| `levitate` | Uplift | PushableBlock floats for `float_seconds`, then lands |
+| `wind` | Galewind | PushableBlock (a harder shove) |
+| `fire` | Emberkindle | WallTorch lights |
+| `water` / `frost` / `dark` | Wellspring / Frostbind / Duskveil | WallTorch goes out (relights after `relight_after`) |
+| `light` | Glowmote | `burst_scene` leaves a floating `LightMote` where the spell ends |
+| `unlock` / `mend` / `growth` | Unbolt / Mendweave / Quicksprout | reserved: no receiver yet (locks, breakables, plants come with furnishing) |
+
+`burst_scene` is spawned by the projectile where its flight ends (impact or max range), on every client, so purely cosmetic remains (lights, scorch marks) need no receiver. Torch lit state, like puzzle state, is local per client for now.
+
+Aiming: the camera ray from the screen centre is intersected with the world; a cone (`aim_assist_angle_degrees`) around it prefers the nearest `SpellReceiver` in range **that accepts the equipped spell's effect type** with line of sight from the wand. The projectile is fired from the wand tip toward the resolved point. Adding a spell = a new `.tres` + a row in `SpellRegistry.SPELL_IDS` + two translation keys (+ optionally a projectile / burst scene); `SpellCaster` is untouched. Casts replicate by spell id, so remote clients replay any spell in the registry. Until lessons exist, a practice tome per spell stands in the matching classroom (`PRACTICE_TOMES` in `tools/generate_castle.py`); `-- --all-spells` fills the hotbar at spawn for playtesting.
 
 ## Inventory and held items
 
@@ -154,7 +171,7 @@ levels/dev                     development-only scenes (asset validation)
 localization/                  translations.csv (keys,en,pl) → generated .translation files
 multiplayer/{authentication,synchronization,chat} + network_manager, world_session, player_spawner
 nakama/                        local.yml + Lua modules (mounted into the container)
-objects/{greybox,puzzles,platforms,interactables,items}   items = held-item scenes (torch)
+objects/{greybox,puzzles,platforms,interactables,items,spells}   items = held-item scenes (torch); spells = burst scenes (light mote)
 objects/environment            wrapper scenes for imported environment modules (transform, collision, layers)
 tools/                         generate_castle.py, generate_level.py, model inspection, screenshot capture, character build
 resources/{spells,collectibles,items} data resources

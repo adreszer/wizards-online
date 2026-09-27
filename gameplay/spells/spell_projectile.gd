@@ -102,6 +102,8 @@ func _on_hit(collider: Node, position: Vector3, _normal: Vector3) -> void:
 			var effect := SpellEffect.create(definition, caster, caster_id, position, direction)
 			receiver.receive(effect)
 	hit.emit(collider, position)
+	# Leave the burst scene just short of the surface so it is not buried in it.
+	_spawn_burst_scene(position - direction * 0.3)
 	_finish(true)
 
 
@@ -127,7 +129,20 @@ func _lay_trail(from: Vector3, to: Vector3) -> void:
 
 func _fizzle() -> void:
 	expired.emit()
+	_spawn_burst_scene(global_position)
 	_finish(false)
+
+
+## Cosmetic remains of the spell (a floating light, a scorch…), on every client.
+func _spawn_burst_scene(at: Vector3) -> void:
+	if definition == null or definition.burst_scene == null:
+		return
+	var node := definition.burst_scene.instantiate()
+	get_parent().add_child(node)
+	if node is Node3D:
+		(node as Node3D).global_position = at
+	if node.has_method("configure_from_spell"):
+		node.configure_from_spell(definition)
 
 
 func _finish(impact: bool) -> void:

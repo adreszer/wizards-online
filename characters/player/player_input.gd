@@ -14,6 +14,15 @@ var jump_held: bool = false
 var jump_just_pressed: bool = false
 var cast_just_pressed: bool = false
 var interact_just_pressed: bool = false
+## Hotbar slot pressed this frame (0-based), -1 = none.
+var spell_slot_pressed: int = -1
+## +1 / -1 when the next / previous spell action was pressed, 0 = none.
+var spell_cycle: int = 0
+
+const SLOT_ACTIONS: Array[StringName] = [
+	&"spell_slot_1", &"spell_slot_2", &"spell_slot_3", &"spell_slot_4", &"spell_slot_5",
+	&"spell_slot_6", &"spell_slot_7", &"spell_slot_8", &"spell_slot_9", &"spell_slot_10",
+]
 
 var enabled: bool = true
 
@@ -33,6 +42,13 @@ func _process(_delta: float) -> void:
 		cast_just_pressed = true
 	if Input.is_action_just_pressed("interact"):
 		interact_just_pressed = true
+	for i in SLOT_ACTIONS.size():
+		if Input.is_action_just_pressed(SLOT_ACTIONS[i]):
+			spell_slot_pressed = i
+	if Input.is_action_just_pressed("spell_next"):
+		spell_cycle = 1
+	elif Input.is_action_just_pressed("spell_prev"):
+		spell_cycle = -1
 
 
 func clear() -> void:
@@ -42,6 +58,8 @@ func clear() -> void:
 	jump_just_pressed = false
 	cast_just_pressed = false
 	interact_just_pressed = false
+	spell_slot_pressed = -1
+	spell_cycle = 0
 
 
 func consume_jump() -> bool:
@@ -59,4 +77,16 @@ func consume_cast() -> bool:
 func consume_interact() -> bool:
 	var v := interact_just_pressed
 	interact_just_pressed = false
+	return v
+
+
+func consume_spell_slot() -> int:
+	var v := spell_slot_pressed
+	spell_slot_pressed = -1
+	return v
+
+
+func consume_spell_cycle() -> int:
+	var v := spell_cycle
+	spell_cycle = 0
 	return v

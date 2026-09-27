@@ -13,6 +13,15 @@ extends CanvasLayer
 @onready var _notification_label: Label = %NotificationLabel
 @onready var _status_label: Label = %StatusLabel
 @onready var _crosshair: Control = %Crosshair
+@onready var _hotbar_root: Control = %HotbarRoot
+@onready var _hotbar: HBoxContainer = %Hotbar
+
+const SLOT_KEY_LABELS := ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+
+var _slot_style: StyleBox
+var _slot_selected_style: StyleBox
+## One entry per quick slot: {panel, key, name, cooldown}.
+var _slot_views: Array[Dictionary] = []
 
 const FRAGMENT_ID := &"arcane_fragment"
 
@@ -35,6 +44,7 @@ func _ready() -> void:
 	NetworkManager.status_changed.connect(_on_status_changed)
 	_prompt_label.visible = false
 	_notification_label.visible = false
+	_build_hotbar()
 	_update_fragments()
 	_on_status_changed(NetworkManager.status, "")
 	_on_spell_learned(null)
@@ -45,6 +55,7 @@ func _process(delta: float) -> void:
 	if _caster != null and _caster.equipped_spell != null:
 		var cd := _caster.equipped_spell.cooldown
 		_cooldown_bar.value = 1.0 - (_caster.cooldown_remaining / cd if cd > 0.0 else 0.0)
+	_update_hotbar_cooldowns()
 	if _notification_timer > 0.0:
 		_notification_timer -= delta
 		if _notification_timer <= 0.0:
@@ -58,7 +69,9 @@ func _bind_player(player: Node) -> void:
 	_on_health_changed(health.current, health.max_health)
 	_caster = player.spell_caster
 	_caster.spell_changed.connect(_on_spell_learned)
+	_caster.spells_changed.connect(_refresh_hotbar)
 	_on_spell_learned(_caster.equipped_spell)
+	_refresh_hotbar()
 	var interaction: InteractionController = player.interaction_controller
 	interaction.focus_changed.connect(_on_focus_changed)
 	_inventory = player.inventory
@@ -93,6 +106,104 @@ func _on_spell_learned(definition: Resource) -> void:
 		_spell_label.text = tr("HUD_SPELL") % tr(definition.display_name)
 		_cooldown_bar.visible = true
 		_crosshair.visible = true
+	_refresh_hotbar()
+
+
+# --- Hotbar ---------------------------------------------------------------------------
+
+## Ten fixed slots (keys 1–0). Built once; refreshed from the caster's quick_slots.
+## Purely display: selection happens through PlayerInput → SpellCaster so the
+## HUD never swallows mouse clicks meant for casting.
+func _build_hotbar() -> void:
+	_slot_style = _make_slot_style(false)
+	_slot_selected_style = _make_slot_style(true)
+	for i in SpellCaster.QUICK_SLOT_COUNT:
+		var panel := PanelContainer.new()
+		panel.custom_minimum_size = Vector2(68, 56)
+		panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.add_theme_stylebox_override("panel", _slot_style)
+		var vbox := VBoxContainer.new()
+		vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		vbox.add_theme_constant_override("separation", 0)
+		panel.add_child(vbox)
+		var key := Label.new()
+		key.text = SLOT_KEY_LABELS[i]
+		key.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		key.add_theme_font_size_override("font_size", 12)
+		key.add_theme_color_override("font_color", Color(0.75, 0.72, 0.8))
+		vbox.add_child(key)
+		var name_label := Label.new()
+		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		name_label.add_theme_font_size_override("font_size", 13)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.clip_text = true
+		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		name_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		vbox.add_child(name_label)
+		var cooldown := ProgressBar.new()
+		cooldown.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cooldown.custom_minimum_size = Vector2(0, 4)
+		cooldown.max_value = 1.0
+		cooldown.value = 1.0
+		cooldown.show_percentage = false
+		vbox.add_child(cooldown)
+		_hotbar.add_child(panel)
+		_slot_views.append({"panel": panel, "key": key, "name": name_label, "cooldown": cooldown})
+	_hotbar_root.visible = false
+
+
+func _make_slot_style(selected: bool) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.25, 0.18, 0.4, 0.75) if selected else Color(0, 0, 0, 0.5)
+	style.set_border_width_all(2 if selected else 1)
+	style.border_color = Color(1, 0.85, 0.5) if selected else Color(0.45, 0.4, 0.5, 0.7)
+	style.set_corner_radius_all(5)
+	style.content_margin_left = 6
+	style.content_margin_right = 6
+	style.content_margin_top = 4
+	style.content_margin_bottom = 4
+	return style
+
+
+func _refresh_hotbar() -> void:
+	if _caster == null or _slot_views.is_empty():
+		return
+	var any := false
+	var selected := _caster.equipped_slot()
+	for i in _slot_views.size():
+		var view := _slot_views[i]
+		var def: SpellDefinition = _caster.quick_slots[i] if i < _caster.quick_slots.size() else null
+		var name_label: Label = view["name"]
+		var key: Label = view["key"]
+		var panel: PanelContainer = view["panel"]
+		if def == null:
+			name_label.text = ""
+			key.modulate = Color(1, 1, 1, 0.5)
+		else:
+			any = true
+			name_label.text = tr(def.display_name)
+			name_label.add_theme_color_override("font_color", def.color.lightened(0.35))
+			key.modulate = Color.WHITE
+		panel.add_theme_stylebox_override("panel", _slot_selected_style if i == selected else _slot_style)
+		(view["cooldown"] as ProgressBar).visible = def != null
+	_hotbar_root.visible = any
+
+
+func _update_hotbar_cooldowns() -> void:
+	if _caster == null or not _hotbar_root.visible:
+		return
+	for i in _slot_views.size():
+		var def: SpellDefinition = _caster.quick_slots[i] if i < _caster.quick_slots.size() else null
+		if def == null:
+			continue
+		var bar: ProgressBar = _slot_views[i]["cooldown"]
+		var remaining := _caster.get_cooldown_remaining(def)
+		bar.value = 1.0 - (remaining / def.cooldown if def.cooldown > 0.0 else 0.0)
+
+
+## Slot index shown as selected (tests, debug); -1 when nothing is equipped.
+func hotbar_selected_index() -> int:
+	return _caster.equipped_slot() if _caster != null else -1
 
 
 func _on_held_item_changed(definition: ItemDefinition) -> void:
@@ -142,6 +253,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_update_fragments()
 		_on_spell_learned(_caster.equipped_spell if _caster != null else null)
+		_refresh_hotbar()
 		_on_held_item_changed(_inventory.held_item if _inventory != null else null)
 		if is_instance_valid(_focused):
 			_on_focus_changed(_focused)
