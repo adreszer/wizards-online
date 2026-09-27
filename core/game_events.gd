@@ -30,6 +30,11 @@ signal notification_requested(text: String, duration: float)
 ## Emitted by UI when it takes over keyboard input (chat open) and releases it.
 signal ui_input_capture_changed(captured: bool)
 
+## The local player asked to be sorted (the Choosing Stone was used); the sorting panel opens.
+signal sorting_requested()
+## The local player's house changed (sorting or server profile); 0 = unsorted.
+signal house_changed(house: int)
+
 ## The level's end trigger was reached.
 signal level_completed()
 

@@ -18,6 +18,8 @@ const OP_GRANT_SPELL := 5
 const OP_SPELLBOOK := 6
 ## client → server: {id} learn a practice tome's spell (interim, until lessons only)
 const OP_STUDY_TOME := 7
+## client → server: {answers: [1..4 × questions]} the sorting ceremony's answers
+const OP_SORT := 8
 ## server → joining player: full roster {players: [{sid, uid, name, char, held}], self_sid}
 const OP_ROSTER := 10
 ## server → others: {sid, uid, name}
@@ -34,6 +36,8 @@ const OP_ROSTER_UPDATE := 15
 const OP_SPELL_GRANTED := 16
 ## server → professor: {ok, sid, id, reason} outcome of OP_GRANT_SPELL
 const OP_GRANT_RESULT := 17
+## server → same player: {ok, house, reason} outcome of OP_SORT
+const OP_SORT_RESULT := 18
 ## client → server → same client: {t: ms} (round-trip latency probe)
 const OP_PING := 20
 

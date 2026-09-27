@@ -19,6 +19,58 @@ for _, id in ipairs({ "arcane_pulse", "uplift", "galewind", "emberkindle", "well
   M.SPELLS[id] = true
 end
 
+-- Sorting questionnaire: answer index (1-4) -> house, per question. Mirrors
+-- HouseSorting.QUESTIONS in res://gameplay/school/house_sorting.gd.
+M.SORTING = {
+  { 4, 2, 3, 1 },
+  { 3, 1, 2, 4 },
+  { 4, 1, 3, 2 },
+  { 1, 2, 4, 3 },
+}
+M.COUNTS_KEY = "house_counts"
+
+-- Scores per house for a list of answers, or nil when the answers are malformed.
+function M.tally(answers)
+  if type(answers) ~= "table" or #answers ~= #M.SORTING then
+    return nil
+  end
+  local scores = { 0, 0, 0, 0 }
+  for q, mapping in ipairs(M.SORTING) do
+    local a = answers[q]
+    if type(a) ~= "number" or a < 1 or a > #mapping or a ~= math.floor(a) then
+      return nil
+    end
+    scores[mapping[a]] = scores[mapping[a]] + 1
+  end
+  return scores
+end
+
+-- System-owned counter of members per house, used to break ties evenly.
+function M.load_counts()
+  local ok, objects = pcall(nk.storage_read, { { collection = M.COLLECTION, key = M.COUNTS_KEY, user_id = nil } })
+  if ok and objects and objects[1] and objects[1].value and type(objects[1].value.counts) == "table" then
+    return objects[1].value.counts
+  end
+  return { 0, 0, 0, 0 }
+end
+
+function M.write_counts(counts)
+  pcall(nk.storage_write, {
+    { collection = M.COLLECTION, key = M.COUNTS_KEY, user_id = nil, value = { counts = counts }, permission_read = 0, permission_write = 0 },
+  })
+end
+
+-- The house with the highest score; ties go to the emptiest of the tied houses.
+function M.pick_house(scores, counts)
+  local best = 1
+  for h = 2, M.MAX_HOUSE do
+    if scores[h] > scores[best] or (scores[h] == scores[best] and (counts[h] or 0) < (counts[best] or 0)) then
+      best = h
+    end
+  end
+  return best
+end
+
 function M.is_staff(role)
   return role == "professor" or role == "admin"
 end

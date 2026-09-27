@@ -7,6 +7,7 @@
 --   5  GRANT_SPELL  client (professor) -> server  {sid, id}
 --   6  SPELLBOOK    client -> server  {slots, equipped}  hotbar layout
 --   7  STUDY_TOME   client -> server  {id}  practice tome (interim, until lessons only)
+--   8  SORT         client -> server  {answers = {1..4 x4}}  sorting ceremony
 --   10 ROSTER       server -> joining client
 --   11 PLAYER_JOINED server -> others
 --   12 PLAYER_LEFT  server -> others
@@ -15,6 +16,7 @@
 --   15 ROSTER_UPDATE server -> others  {sid, role, house}
 --   16 SPELL_GRANTED server -> target  {id, by}
 --   17 GRANT_RESULT server -> professor  {ok, sid, id, reason}
+--   18 SORT_RESULT  server -> same client  {ok, house, reason}
 --   20 PING         client -> same client (latency probe)
 -- The server owns identity (display names come from join metadata and are
 -- sanitized here), inventories (storage "inventory"/"items") and character
@@ -29,9 +31,9 @@ local nk = require("nakama")
 local Profile = require("character_profile")
 local AREAS = require("world_areas")
 
-local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA, OP_GRANT_SPELL, OP_SPELLBOOK, OP_STUDY_TOME = 1, 2, 3, 4, 5, 6, 7
+local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA, OP_GRANT_SPELL, OP_SPELLBOOK, OP_STUDY_TOME, OP_SORT = 1, 2, 3, 4, 5, 6, 7, 8
 local OP_ROSTER, OP_PLAYER_JOINED, OP_PLAYER_LEFT, OP_INVENTORY = 10, 11, 12, 13
-local OP_PROFILE, OP_ROSTER_UPDATE, OP_SPELL_GRANTED, OP_GRANT_RESULT = 14, 15, 16, 17
+local OP_PROFILE, OP_ROSTER_UPDATE, OP_SPELL_GRANTED, OP_GRANT_RESULT, OP_SORT_RESULT = 14, 15, 16, 17, 18
 local OP_PING = 20
 local MAX_AREA_ID_BYTES = 48
 local TICK_RATE = 15
@@ -126,6 +128,16 @@ local function owns(inventory, id)
   return false
 end
 
+local function others(state, except_sid)
+  local list = {}
+  for sid, p in pairs(state.presences) do
+    if sid ~= except_sid then
+      table.insert(list, p)
+    end
+  end
+  return list
+end
+
 local function entry_for(state, sid)
   local p = state.presences[sid]
   local inv = state.inventories[sid]
@@ -166,21 +178,24 @@ local function find_sid(state, user_id, name)
   return nil
 end
 
-local function sanitize_area(id)
-  if type(id) ~= "string" or #id > MAX_AREA_ID_BYTES then
+-- A player may only report an area that exists and, for house areas, belongs to their house.
+local function sanitize_area(id, profile)
+  if type(id) ~= "string" or #id > MAX_AREA_ID_BYTES or not AREAS[id] then
     return ""
   end
-  return AREAS[id] and id or ""
+  local house = AREAS[id].house or 0
+  if house ~= 0 and (not profile or profile.house ~= house) then
+    return ""
+  end
+  return id
 end
 
-local function others(state, except_sid)
-  local list = {}
-  for sid, p in pairs(state.presences) do
-    if sid ~= except_sid then
-      table.insert(list, p)
-    end
+local function broadcast_profile_change(dispatcher, state, sid)
+  local profile = state.profiles[sid]
+  local rest = others(state, sid)
+  if #rest > 0 then
+    dispatcher.broadcast_message(OP_ROSTER_UPDATE, nk.json_encode({ sid = sid, role = profile.role, house = profile.house }), rest, nil, true)
   end
-  return list
 end
 
 function M.match_init(context, params)
@@ -264,8 +279,30 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     elseif message.op_code == OP_AREA then
       local ok, payload = pcall(nk.json_decode, message.data)
       if ok and type(payload) == "table" then
-        state.areas[sid] = sanitize_area(payload.id)
+        state.areas[sid] = sanitize_area(payload.id, state.profiles[sid])
       end
+    elseif message.op_code == OP_SORT then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local profile = state.profiles[sid]
+      local reason = nil
+      local scores = ok and type(payload) == "table" and Profile.tally(payload.answers) or nil
+      if not profile then
+        reason = "no_profile"
+      elseif profile.house ~= 0 then
+        reason = "already_sorted"
+      elseif not scores then
+        reason = "bad_answers"
+      end
+      if not reason then
+        local counts = Profile.load_counts()
+        profile.house = Profile.pick_house(scores, counts)
+        counts[profile.house] = (counts[profile.house] or 0) + 1
+        Profile.write_counts(counts)
+        Profile.write(message.sender.user_id, profile)
+        send_profile(dispatcher, state, sid)
+        broadcast_profile_change(dispatcher, state, sid)
+      end
+      dispatcher.broadcast_message(OP_SORT_RESULT, nk.json_encode({ ok = reason == nil, house = profile and profile.house or 0, reason = reason or "" }), { message.sender }, nil, true)
     elseif message.op_code == OP_GRANT_SPELL then
       local ok, payload = pcall(nk.json_decode, message.data)
       local target = ok and type(payload) == "table" and type(payload.sid) == "string" and payload.sid or ""
@@ -353,12 +390,12 @@ function M.match_signal(context, dispatcher, tick, state, data)
   if type(request.house) == "number" and request.house >= 0 and request.house <= Profile.MAX_HOUSE then
     profile.house = math.floor(request.house)
   end
+  if request.forget_spells == true then
+    profile.spells = Profile.sanitize_spells(nil)
+  end
   Profile.write(state.presences[sid].user_id, profile)
   send_profile(dispatcher, state, sid)
-  local rest = others(state, sid)
-  if #rest > 0 then
-    dispatcher.broadcast_message(OP_ROSTER_UPDATE, nk.json_encode({ sid = sid, role = profile.role, house = profile.house }), rest, nil, true)
-  end
+  broadcast_profile_change(dispatcher, state, sid)
   return state, nk.json_encode({ ok = true, sid = sid, user_id = state.presences[sid].user_id, role = profile.role, house = profile.house })
 end
 

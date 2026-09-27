@@ -9,6 +9,8 @@ const ROLE_PROFESSOR := "professor"
 const ROLE_ADMIN := "admin"
 const ROLES: Array[String] = [ROLE_STUDENT, ROLE_PROFESSOR, ROLE_ADMIN]
 const MAX_HOUSE := 4
+## Placeholder colours per house (index 0 = unsorted). Final names/colours come from the owner.
+const HOUSE_COLORS: Array[Color] = [Color(0.75, 0.75, 0.78), Color(0.95, 0.6, 0.2), Color(0.25, 0.7, 0.75), Color(0.6, 0.4, 0.85), Color(0.9, 0.4, 0.55)]
 
 
 static func sanitize_role(role: String) -> String:
@@ -35,6 +37,20 @@ static func sanitize(raw: Dictionary) -> Dictionary:
 			"equipped": SpellRegistry.sanitize(str(spells.get("equipped", ""))),
 		},
 	}
+
+
+## Translation key of a house's (placeholder) name; "" for unsorted.
+static func house_name_key(house: int) -> String:
+	return "HOUSE_%d_NAME" % house if house >= 1 and house <= MAX_HOUSE else ""
+
+
+static func house_name(house: int) -> String:
+	var key := house_name_key(house)
+	return TranslationServer.translate(key) if not key.is_empty() else ""
+
+
+static func house_color(house: int) -> Color:
+	return HOUSE_COLORS[sanitize_house(house)]
 
 
 ## Translation key for a role's title shown next to a name ("" for students).

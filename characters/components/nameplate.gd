@@ -10,6 +10,7 @@ const ADMIN_COLOR := Color(0.7, 0.9, 1)
 
 var _display_name: String = ""
 var _role: String = CharacterProfile.ROLE_STUDENT
+var _house: int = 0
 
 
 func set_display_name(display_name: String) -> void:
@@ -22,9 +23,16 @@ func set_role(role: String) -> void:
 	_refresh()
 
 
+func set_house(house: int) -> void:
+	_house = CharacterProfile.sanitize_house(house)
+	_refresh()
+
+
 func _refresh() -> void:
 	var title_key := CharacterProfile.title_key(_role)
 	text = _display_name if title_key.is_empty() else "%s %s" % [tr(title_key), _display_name]
+	if _house != 0:
+		text += "\n" + CharacterProfile.house_name(_house)
 	match _role:
 		CharacterProfile.ROLE_PROFESSOR:
 			modulate = PROFESSOR_COLOR

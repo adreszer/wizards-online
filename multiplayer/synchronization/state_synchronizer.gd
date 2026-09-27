@@ -14,6 +14,7 @@ signal profile_received(profile: Dictionary)
 signal player_profile_changed(sid: String, role: String, house: int)
 signal spell_granted(spell_id: String, by_name: String)
 signal grant_result_received(ok: bool, sid: String, spell_id: String, reason: String)
+signal sort_result_received(ok: bool, house: int, reason: String)
 
 @export var ping_interval: float = 2.0
 
@@ -41,6 +42,7 @@ func bind(p_session: WorldSession) -> void:
 	session.roster_update_received.connect(_on_roster_update)
 	session.spell_granted.connect(spell_granted.emit)
 	session.grant_result_received.connect(grant_result_received.emit)
+	session.sort_result_received.connect(sort_result_received.emit)
 	session.pong_received.connect(_on_pong)
 
 
@@ -84,6 +86,11 @@ func send_spellbook(slots: Array, equipped: String) -> void:
 func send_study_tome(spell_id: String) -> void:
 	if session != null:
 		session.send(NetworkProtocol.OP_STUDY_TOME, {"id": spell_id})
+
+
+func send_sort(answers: Array) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_SORT, {"answers": answers})
 
 
 func get_role(sid: String) -> String:

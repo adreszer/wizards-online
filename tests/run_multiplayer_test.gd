@@ -18,6 +18,7 @@ var joins: Array[String] = []
 var leaves: Array[String] = []
 var notifications: Array[String] = []
 var grant_results: Array = []
+var sort_results: Array = []
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
@@ -34,6 +35,7 @@ func _ready() -> void:
 	NetworkManager.player_left.connect(func(_sid: String, n: String) -> void: leaves.append(n))
 	NetworkManager.grant_result_received.connect(func(ok: bool, sid: String, id: String, reason: String) -> void: grant_results.append({"ok": ok, "sid": sid, "id": id, "reason": reason}))
 	GameEvents.notification_requested.connect(func(text: String, _d: float) -> void: notifications.append(text))
+	NetworkManager.sort_result_received.connect(func(ok: bool, house: int, reason: String) -> void: sort_results.append({"ok": ok, "house": house, "reason": reason}))
 	await _run()
 
 
@@ -56,6 +58,11 @@ func _run() -> void:
 	t.check(inv.has(&"torch"), "local inventory holds the server-issued torch")
 	var got_profile := await _wait_until(func() -> bool: return not NetworkManager.get_local_profile().is_empty(), 10.0)
 	t.check(got_profile, "server sent the character profile on join")
+	# Accounts persist between runs: start from a fresh student record (dev tooling path).
+	var reset: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "role": "student", "house": 0, "forget_spells": true}, HTTP_KEY)
+	t.check(reset.get("ok", false) == true, "test account reset to a fresh student (%s)" % str(reset))
+	got_profile = await _wait_until(func() -> bool: return NetworkManager.get_local_role() == "student" and NetworkManager.get_local_house() == 0 and _known_spells().is_empty(), 10.0)
+	t.check(got_profile and spawner.local_player.spell_caster.known_spells.is_empty(), "reset profile applied to the player")
 	if role == "b":
 		await _run_actor(spawner)
 	else:
@@ -176,6 +183,8 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(panel.can_open(), "lesson tools are available to a professor")
 	ok = await _wait_until(func() -> bool: return panel.students_present().size() == 1, 30.0)
 	t.check(ok, "the student shows up in the classroom")
+	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.house == 3, 10.0)
+	t.check(ok and NetworkManager.get_players().get(remote.peer_id, {}).get("house", 0) == 3, "the roster update carries the student's new house")
 	t.check(casts_seen == 0, "a cast of an unlearned spell was dropped by the server")
 	var b_sid: String = remote.peer_id
 	NetworkManager.send_grant_spell("nobody", "arcane_pulse")
@@ -238,6 +247,25 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(chat_lines.any(func(l: String) -> bool: return l == "[ClientB] hello from B"), "own chat message echoed with own name")
 	await _wait(1.0)
 
+	t.section("Sorting (student)")
+	var answers_for_3: Array = []
+	for q in HouseSorting.QUESTIONS:
+		for i in q["answers"].size():
+			if q["answers"][i]["house"] == 3:
+				answers_for_3.append(i + 1)
+				break
+	NetworkManager.send_sort([1, 2])
+	ok = await _wait_until(func() -> bool: return sort_results.size() >= 1, 10.0)
+	t.check(ok and sort_results[0]["ok"] == false and sort_results[0]["reason"] == "bad_answers", "malformed answers are refused (%s)" % str(sort_results))
+	NetworkManager.send_sort(answers_for_3)
+	ok = await _wait_until(func() -> bool: return sort_results.size() >= 2, 10.0)
+	t.check(ok and sort_results[1]["ok"] == true and sort_results[1]["house"] == 3, "the server sorts the student into house 3 (%s)" % str(sort_results))
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_house() == 3 and player.house == 3, 10.0)
+	t.check(ok and player.nameplate.text.ends_with(tr("HOUSE_3_NAME")), "the profile and nameplate carry the new house")
+	NetworkManager.send_sort(answers_for_3)
+	ok = await _wait_until(func() -> bool: return sort_results.size() >= 3, 10.0)
+	t.check(ok and sort_results[2]["ok"] == false and sort_results[2]["reason"] == "already_sorted", "a second ceremony is refused")
+
 	t.section("Lesson (student)")
 	_enter_classroom(spawner, Vector3(2, 0, 0))
 	ok = await _wait_until(func() -> bool: return player.area_tracker.current_area_id() == CLASSROOM, 5.0)
@@ -270,4 +298,5 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	var profile := NetworkManager.get_local_profile()
 	t.check(ok and _known_spells().has("arcane_pulse"), "learned spells persist across reconnect (%s)" % str(_known_spells()))
 	t.check(profile.get("spells", {}).get("slots", [])[5] == "glowmote" and player.spell_caster.quick_slots[5] == glow and player.spell_caster.equipped_spell == ARCANE_PULSE, "hotbar layout persists across reconnect")
+	t.check(int(profile.get("house", 0)) == 3 and player.house == 3, "house persists across reconnect")
 	await _wait(2.0)

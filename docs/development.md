@@ -64,6 +64,8 @@ tools/set_role.sh Elara professor 2      # role + house (0 = unsorted, 1–4)
 tools/set_role.sh 1c9a…-uuid admin
 ```
 
+Houses: students are sorted once at the Choosing Stone in the Great Hall (four questions; the server tallies and balances ties). `tools/set_role.sh <name> student 0` un-sorts a player for another ceremony; `tools/set_role.sh <name> student 2` assigns a house directly. House names and colours are placeholders (`HOUSE_<n>_NAME` in the CSV, `CharacterProfile.HOUSE_COLORS`) until the owner provides the real ones. House doors admit members only; offline you can still be sorted at the stone (locally) to test them.
+
 The script calls the `admin_set_profile` RPC with `http_key=defaulthttpkey`; the same RPC is available to logged-in admins (the lesson tools do not expose it yet). To make an account an admin permanently, put its user id (console → Accounts) in `ADMIN_USER_IDS` in `nakama/local.yml` (comma-separated) and recreate the container. Only professors and admins can open the lesson tools (`L`) and teach; a grant is accepted only when both stand in the same classroom (`kind = "classroom"` in the generated `nakama/modules/world_areas.lua`). Casts of spells a character does not know are dropped by the server, so promote yourself before expecting to demonstrate anything you have not learned from a tome.
 
 Then launch the game and choose **Play ONLINE**. If the backend is not running you get an error message on the menu and can still play offline.

@@ -10,6 +10,7 @@ extends CanvasLayer
 @onready var _cooldown_bar: ProgressBar = %CooldownBar
 @onready var _held_label: Label = %HeldLabel
 @onready var _role_label: Label = %RoleLabel
+@onready var _house_label: Label = %HouseLabel
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _notification_label: Label = %NotificationLabel
 @onready var _status_label: Label = %StatusLabel
@@ -44,6 +45,7 @@ func _ready() -> void:
 	GameEvents.area_entered.connect(_on_area_entered)
 	NetworkManager.status_changed.connect(_on_status_changed)
 	NetworkManager.profile_received.connect(_on_profile_received)
+	GameEvents.house_changed.connect(func(_h: int) -> void: _refresh_house())
 	_prompt_label.visible = false
 	_notification_label.visible = false
 	_build_hotbar()
@@ -52,6 +54,7 @@ func _ready() -> void:
 	_on_spell_learned(null)
 	_on_held_item_changed(null)
 	_refresh_role()
+	_refresh_house()
 
 
 func _process(delta: float) -> void:
@@ -80,6 +83,7 @@ func _bind_player(player: Node) -> void:
 	_inventory = player.inventory
 	_inventory.held_item_changed.connect(_on_held_item_changed)
 	_on_held_item_changed(_inventory.held_item)
+	_refresh_house()
 
 
 func _on_health_changed(current: int, maximum: int) -> void:
@@ -220,6 +224,16 @@ func _on_profile_received(_profile: Dictionary) -> void:
 	_refresh_role()
 
 
+func _refresh_house() -> void:
+	var house: int = int(_player.get("house")) if _player != null else 0
+	if house == 0:
+		_house_label.text = tr("HUD_HOUSE_NONE")
+		_house_label.remove_theme_color_override("font_color")
+	else:
+		_house_label.text = tr("HUD_HOUSE") % CharacterProfile.house_name(house)
+		_house_label.add_theme_color_override("font_color", CharacterProfile.house_color(house))
+
+
 ## Students see nothing; staff see their role and the lesson-tools key.
 func _refresh_role() -> void:
 	var role := NetworkManager.get_local_role()
@@ -273,6 +287,7 @@ func _notification(what: int) -> void:
 		_on_spell_learned(_caster.equipped_spell if _caster != null else null)
 		_refresh_hotbar()
 		_refresh_role()
+		_refresh_house()
 		_on_held_item_changed(_inventory.held_item if _inventory != null else null)
 		if is_instance_valid(_focused):
 			_on_focus_changed(_focused)

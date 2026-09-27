@@ -196,3 +196,45 @@ GRANT_REASON_no_such_player,that player is no longer here.,tego gracza już tu n
 GRANT_REASON_not_in_classroom,you must stand in a classroom.,musisz stać w sali lekcyjnej.
 GRANT_REASON_target_elsewhere,the student is not in this classroom.,ucznia nie ma w tej sali.
 GRANT_REASON_already_known,the student already knows that spell.,uczeń już zna ten czar.
+HOUSE_1_NAME,First House,Pierwszy Dom
+HOUSE_2_NAME,Second House,Drugi Dom
+HOUSE_3_NAME,Third House,Trzeci Dom
+HOUSE_4_NAME,Fourth House,Czwarty Dom
+HUD_HOUSE,House: %s,Dom: %s
+HUD_HOUSE_NONE,House: not yet sorted,Dom: jeszcze nieprzydzielony
+INTERACT_HOUSE_DOOR,Enter,Wejdź
+INTERACT_SORTING,Touch the Choosing Stone,Dotknij Kamienia Wyboru
+NOTIFY_HOUSE_DOOR_LOCKED,This door opens only for members of %s.,Te drzwi otwierają się tylko przed członkami domu: %s.
+NOTIFY_ALREADY_SORTED,The stone is silent. You already belong to %s.,Kamień milczy. Należysz już do domu: %s.
+NOTIFY_SORTING_HINT,You have not been sorted yet. Touch the Choosing Stone at the head of the Great Hall.,Nie masz jeszcze domu. Dotknij Kamienia Wyboru w głębi Wielkiej Sali.
+PLAQUE_SORTING_STONE,The Choosing Stone. Answer it honestly and it will name your house. It answers each student once.,"Kamień Wyboru. Odpowiedz mu szczerze, a wskaże twój dom. Każdemu uczniowi odpowiada tylko raz."
+SORT_TITLE,The Choosing Stone,Kamień Wyboru
+SORT_PROGRESS,Question %d of %d,Pytanie %d z %d
+SORT_DELIBERATING,The stone hums and considers…,Kamień brzęczy i rozważa…
+SORT_RESULT,The stone speaks: %s!,Kamień przemawia: %s!
+SORT_WELCOME,Your common room will open for you from now on.,Od teraz twój pokój wspólny stoi przed tobą otworem.
+SORT_FAILED,The stone falls silent: %s,Kamień milknie: %s
+SORT_REASON_already_sorted,you already belong to a house.,należysz już do domu.
+SORT_REASON_bad_answers,it did not understand your answers.,nie zrozumiał twoich odpowiedzi.
+SORT_REASON_no_profile,it does not know you yet. Try again in a moment.,jeszcze cię nie zna. Spróbuj za chwilę.
+SORT_CLOSE,Continue,Dalej
+SORT_Q1,A locked door stands between you and something you want. You…,"Zamknięte drzwi dzielą cię od czegoś, czego pragniesz. Ty…"
+SORT_Q1_A1,Find whoever holds the key and ask them.,"Odnajdujesz tego, kto ma klucz, i prosisz."
+SORT_Q1_A2,Study the lock until you understand it.,"Badasz zamek, aż go zrozumiesz."
+SORT_Q1_A3,"Look for another way in, quietly.",Szukasz po cichu innego wejścia.
+SORT_Q1_A4,Push until it gives.,"Napierasz, aż ustąpią."
+SORT_Q2,Which gift would you take from the school's vaults?,Który dar wybierasz ze szkolnych skarbców?
+SORT_Q2_A1,A map that shows every hidden passage.,"Mapę, która pokazuje każde ukryte przejście."
+SORT_Q2_A2,A lantern that never goes out.,"Latarnię, która nigdy nie gaśnie."
+SORT_Q2_A3,A book that answers one question a day.,"Księgę, która odpowiada na jedno pytanie dziennie."
+SORT_Q2_A4,A cloak wide enough to warm your friends too.,"Płaszcz tak szeroki, że ogrzeje też twoich przyjaciół."
+SORT_Q3,A classmate cheats and wins the house cup for you all. You…,Ktoś z klasy oszukuje i zdobywa dla was puchar domów. Ty…
+SORT_Q3_A1,"Tell the professor, whatever it costs.","Mówisz profesorowi, cokolwiek by to kosztowało."
+SORT_Q3_A2,"Confront them alone, face to face.","Stajesz z nim twarzą w twarz, sam na sam."
+SORT_Q3_A3,Keep quiet and remember the favour.,Milczysz i zapamiętujesz przysługę.
+SORT_Q3_A4,"Work out how it was done, then fix the rules.","Rozgryzasz, jak to zrobiono, i poprawiasz zasady."
+SORT_Q4,Late at night the castle whispers your name. You…,Późną nocą zamek szepcze twoje imię. Ty…
+SORT_Q4_A1,Follow it at once.,Idziesz za głosem natychmiast.
+SORT_Q4_A2,Write down what it says and look for a pattern.,"Zapisujesz, co mówi, i szukasz wzoru."
+SORT_Q4_A3,Wake a friend so neither of you goes alone.,"Budzisz przyjaciela, żeby nikt nie szedł sam."
+SORT_Q4_A4,"Listen, learn what it wants, and decide later.","Słuchasz, poznajesz, czego chce, i decydujesz później."

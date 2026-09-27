@@ -186,7 +186,9 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Nameplates show professor/admin titles and colours; HUD role line with the lesson-tools hint
 - [x] Tests: unit (profile sanitising, nested-zone tracker, nameplates, panel) and two-client (promotion by id and name, denied self-promotion, dropped unknown cast, refused grants, successful grant, tome request, persistence of spells and hotbar across reconnect)
 - [ ] Lesson text tools (lecture text to the room, questions), house points award/deduct, timetables; tie grants to a lesson session rather than "any staff in any classroom"
-- [ ] Sorting into houses (UI + rules); house-gated common rooms using the profile's house
+- [x] Sorting into houses: the Choosing Stone in the great hall opens a four-question ceremony; the server tallies (`OP_SORT`), balances ties by house population, stores the house once, updates nameplates/HUD/roster; offline runs the same rule locally; placeholder house names/colours
+- [x] House-gated common rooms: `HouseDoor` on every doorway into a house area (dungeon and kitchen-side common rooms, the two tower landings that now own the stairs up), members open by interacting, others refused; server drops area reports for another house's area
+- [ ] Final house names/colours/crests from the owner; a visible ceremony (others watching in the great hall), house-cup tally
 - [ ] Server-side position sanity for area reports (today the area id is client-reported, validated only against the map)
 - [ ] In-game admin UI for `admin_set_profile` (today: script/console)
 
@@ -256,7 +258,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (237 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (261 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
@@ -271,7 +273,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Collectibles | counter, no double collect | [x] headless test pass |
 | Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
 | Localization | pl/en load, all keys translated, fallback, name sanitizing | [x] headless test pass; in-game visual check of Polish text (menu, HUD, plaques) pending |
-| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory and profile, promotion, classroom grant, dropped unknown cast, persistence across reconnect | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 40 + 28 checks pass |
+| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory and profile, promotion, classroom grant, dropped unknown cast, persistence across reconnect, sorting and roster house update | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 43 + 35 checks pass |
 | Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Offline | playable with backend stopped | [x] `run_offline_fallback_test` with backend stopped: readable error, offline world playable |

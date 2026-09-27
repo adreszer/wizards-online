@@ -41,8 +41,8 @@ local function before_channel_message_send(context, payload)
 end
 nk.register_rt_before(before_channel_message_send, "ChannelMessageSend")
 
--- RPC "admin_set_profile": {user_id | name, role?, house?} → changes a
--- character's role and/or house. Allowed for server-to-server calls (HTTP key,
+-- RPC "admin_set_profile": {user_id | name, role?, house?, forget_spells?} → changes a
+-- character's role and/or house (and can wipe its spellbook for testing). Allowed for server-to-server calls (HTTP key,
 -- no session), for users listed in ADMIN_USER_IDS and for admins by profile.
 -- The change is applied by the world match (so an online player is updated
 -- live and by display name); an offline target is written to storage here.
@@ -66,7 +66,7 @@ local function rpc_admin_set_profile(context, payload)
   if data.house ~= nil and (type(data.house) ~= "number" or data.house < 0 or data.house > Profile.MAX_HOUSE) then
     error({ "house must be 0.." .. Profile.MAX_HOUSE, 3 })
   end
-  local request = { op = "set_profile", user_id = data.user_id, name = data.name, role = data.role, house = data.house }
+  local request = { op = "set_profile", user_id = data.user_id, name = data.name, role = data.role, house = data.house, forget_spells = data.forget_spells == true }
   local match_id = find_or_create_world()
   local result = nk.match_signal(match_id, nk.json_encode(request))
   local decoded = result and select(2, pcall(nk.json_decode, result)) or nil
@@ -81,6 +81,7 @@ local function rpc_admin_set_profile(context, payload)
     local profile = Profile.load(data.user_id)
     if data.role then profile.role = data.role end
     if data.house then profile.house = data.house end
+    if data.forget_spells == true then profile.spells = Profile.sanitize_spells(nil) end
     Profile.write(data.user_id, profile)
     decoded = { ok = true, user_id = data.user_id, role = profile.role, house = profile.house, offline = true }
   end

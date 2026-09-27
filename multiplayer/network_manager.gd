@@ -28,6 +28,8 @@ signal player_profile_changed(sid: String, role: String, house: int)
 signal spell_granted(spell_id: String, by_name: String)
 ## Outcome of a grant the local player requested as a professor.
 signal grant_result_received(ok: bool, sid: String, spell_id: String, reason: String)
+## Outcome of the local player's sorting ceremony (the profile arrives separately).
+signal sort_result_received(ok: bool, house: int, reason: String)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal system_message(text: String)
 
@@ -60,6 +62,7 @@ func _ready() -> void:
 	state_synchronizer.player_profile_changed.connect(player_profile_changed.emit)
 	state_synchronizer.spell_granted.connect(spell_granted.emit)
 	state_synchronizer.grant_result_received.connect(grant_result_received.emit)
+	state_synchronizer.sort_result_received.connect(sort_result_received.emit)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 
@@ -183,6 +186,17 @@ func send_spellbook(slots: Array, equipped: String) -> void:
 func send_study_tome(spell_id: String) -> void:
 	if is_online():
 		state_synchronizer.send_study_tome(spell_id)
+
+
+## Sorting ceremony: the server tallies the answers and assigns the house.
+func send_sort(answers: Array) -> void:
+	if is_online():
+		state_synchronizer.send_sort(answers)
+
+
+## House of the local character: 0 until sorted (or offline before the local ceremony).
+func get_local_house() -> int:
+	return int(get_local_profile().get("house", 0))
 
 
 ## Admin RPC: change a player's role and/or house by user id or display name.

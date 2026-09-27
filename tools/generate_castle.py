@@ -102,6 +102,7 @@ def room(id, x0, x1, z0, z1, storey=0, **kw):
     return r
 
 doors = []      # (axis, coord, off, storey, count)
+house_gates = []  # (axis, coord, off, storey, house): doorways that get a HouseDoor
 secrets = []    # (a, b, axis, coord, off, storey)
 stairs = []     # dicts
 edges = []      # (a, b) connectivity for the reachability check
@@ -141,6 +142,9 @@ def door(a, b, at=None, storey=None, count=1):
     assert storey in A.storeys() and storey in B.storeys(), f"door {a}/{b}: storey {storey}"
     for off in _door_offs(lo, hi, at, count):
         doors.append((axis, coord, off, storey))
+        # A doorway into a house area (common room, dormitory, house landing) gets a gate.
+        if A.house != B.house:
+            house_gates.append((axis, coord, off, storey, A.house or B.house))
     edges.append((a, b))
 
 def door_on(a, side, at, storey=None, count=1, to=None):
@@ -281,7 +285,8 @@ door("stair_hall", "gallery", at=44, storey=2)
 door("stair_hall", "roost", at=44, storey=2)
 
 # Towers (16 × 16, one straight flight per storey along the east wall, arriving in the NE corner)
-def tower(prefix, x0, z0, storeys, kinds):
+def tower(prefix, x0, z0, storeys, kinds, no_stair=()):
+    """`no_stair` lists storeys with no flight up from them (a gated landing above)."""
     ids = []
     for s in storeys:
         rid = f"{prefix}_{s}"
@@ -291,12 +296,16 @@ def tower(prefix, x0, z0, storeys, kinds):
         if s == storeys[-1] and kind == "outdoor":
             r.ceiling = False; r.rows = 1; r.torches = False; r.pillars = False
         ids.append(rid)
-    for a, b in zip(ids, ids[1:]):
-        stair(a, b, "e", "n", z0 + 16 - 0.2)
+    for s, a, b in zip(storeys, ids, ids[1:]):
+        if s not in no_stair:
+            stair(a, b, "e", "n", z0 + 16 - 0.2)
     return ids
 
-tower("tower_ne", 20, -56, [0, 1, 2, 3], {2: ("common_room", 1), 3: ("dormitory", 1)})
-tower("tower_nw", -36, -56, [0, 1, 2, 3], {2: ("common_room", 2), 3: ("dormitory", 2)})
+# House towers: the ground room is public; the first-floor landing already belongs to the house
+# (its door from the records room / hospital wing is the gate) and the stairs to the common room
+# and dormitory start there.
+tower("tower_ne", 20, -56, [0, 1, 2, 3], {1: ("tower", 1), 2: ("common_room", 1), 3: ("dormitory", 1)}, no_stair=(0,))
+tower("tower_nw", -36, -56, [0, 1, 2, 3], {1: ("tower", 2), 2: ("common_room", 2), 3: ("dormitory", 2)}, no_stair=(0,))
 tower("tower_sw", -52, 24, [0, 1, 2, 3, 4], {2: ("classroom", 0), 3: ("classroom", 0), 4: ("outdoor", 0)})
 rooms["tower_sw_3"].name_key = "AREA_CLASS_FARSIGHT"
 rooms["tower_sw_4"].name_key = "AREA_STARGAZING_PLATFORM"
@@ -669,7 +678,19 @@ PRACTICE_TOMES = [
     ("class_herblore", "quicksprout", 0.0, 0.0),
 ]
 
+def emit_house_gates():
+    for axis, coord, off, storey, house in house_gates:
+        y = storey * STOREY
+        centre = off + 2
+        pos = (centre, y, coord) if axis == "x" else (coord, y, centre)
+        rot = 0.0 if axis == "x" else math.radians(90)
+        inst(uname(f"HouseDoor_{house}"), "res://objects/school/house_door.tscn", pos, parent="Doors", rot_y=rot, props={"house": str(house)})
+
 def emit_props():
+    # The sorting ceremony: a stone at the head of the great hall.
+    gh = rooms["great_hall"]
+    inst("SortingStone", "res://objects/school/sorting_stone.tscn", (gh.centre()[0], gh.y, gh.z0 + 5))
+    plaque("great_hall", "PLAQUE_SORTING_STONE", "n", 0.3)
     plaque("entrance_hall", "PLAQUE_CASTLE_ENTRANCE", "w", 0.75)
     plaque("great_hall", "PLAQUE_GREAT_HALL", "n", 0.5)
     plaque("library", "PLAQUE_LIBRARY", "s", 0.25)
@@ -711,6 +732,7 @@ emit_floors_and_ceilings()
 emit_pillars()
 torch_count = emit_torches()
 emit_zones()
+emit_house_gates()
 emit_props()
 emit_area_map("nakama/modules/world_areas.lua")
 
@@ -768,6 +790,8 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 [node name="Checkpoints" type="Node3D" parent="."]
 
 [node name="Tomes" type="Node3D" parent="."]
+
+[node name="Doors" type="Node3D" parent="."]
 
 '''
 header = f'[gd_scene load_steps={len(ext) + 2} format=3 uid="uid://castle0000001"]\n\n'

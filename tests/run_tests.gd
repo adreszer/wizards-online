@@ -19,6 +19,9 @@ const BLOCK_SCENE := preload("res://objects/puzzles/pushable_block.tscn")
 const WALL_TORCH_SCENE := preload("res://objects/environment/props/wall_torch.tscn")
 const HUD_SCENE := preload("res://ui/hud/hud.tscn")
 const PROFESSOR_PANEL_SCENE := preload("res://ui/school/professor_panel.tscn")
+const SORTING_PANEL_SCENE := preload("res://ui/school/sorting_panel.tscn")
+const HOUSE_DOOR_SCENE := preload("res://objects/school/house_door.tscn")
+const SORTING_STONE_SCENE := preload("res://objects/school/sorting_stone.tscn")
 const TestHelpers := preload("res://tests/test_helpers.gd")
 
 var t := TestHelpers.new()
@@ -38,6 +41,7 @@ func _run() -> void:
 	await _test_spellbook()
 	await _test_spell_effects()
 	await _test_school()
+	await _test_houses()
 	await _test_inventory()
 	await _test_interaction()
 	await _test_moving_platform()
@@ -626,7 +630,7 @@ func _test_school() -> void:
 	await _wait(0.2)
 	t.check(remote.nameplate.text == "Remote" and remote.role == "student", "students show a bare name")
 	remote.set_profile("professor", 2)
-	t.check(remote.role == "professor" and remote.house == 2 and remote.nameplate.text == tr("ROLE_PROFESSOR_TITLE") + " Remote", "professors get a title on the nameplate")
+	t.check(remote.role == "professor" and remote.house == 2 and remote.nameplate.text == tr("ROLE_PROFESSOR_TITLE") + " Remote\n" + tr("HOUSE_2_NAME"), "professors get a title and their house on the nameplate")
 	remote.set_profile("garbage", 9)
 	t.check(remote.role == "student" and remote.house == 4, "unknown roles fall back to student")
 	var outsider: Player = PLAYER_SCENE.instantiate()
@@ -665,6 +669,83 @@ func _test_school() -> void:
 	remote.queue_free()
 	outsider.queue_free()
 	await _clear([floor_body, outer, inner])
+
+
+# --- Houses: sorting and gated doors ---------------------------------------------------
+
+func _test_houses() -> void:
+	t.section("Houses")
+	# Questionnaire rule: every house is reachable, ties break toward the emptiest house.
+	for house in range(1, CharacterProfile.MAX_HOUSE + 1):
+		var answers: Array = []
+		for q in HouseSorting.QUESTIONS:
+			for i in q["answers"].size():
+				if q["answers"][i]["house"] == house:
+					answers.append(i + 1)
+					break
+		t.check(answers.size() == HouseSorting.question_count() and HouseSorting.sort_offline(answers) == house, "answering for house %d sorts into house %d" % [house, house])
+	t.check(HouseSorting.sort_offline([1, 1]) == 0 and HouseSorting.sort_offline([9, 1, 1, 1]) == 0, "malformed answers do not sort")
+	var tie := PackedInt32Array([0, 1, 1, 0, 0])
+	t.check(HouseSorting.pick(tie) == 1 and HouseSorting.pick(tie, PackedInt32Array([0, 5, 2, 0, 0])) == 2, "ties go to the emptier house")
+	t.check(CharacterProfile.house_name(2) == tr("HOUSE_2_NAME") and CharacterProfile.house_name(0) == "" and CharacterProfile.house_color(9) == CharacterProfile.HOUSE_COLORS[4], "house names and colours resolve")
+
+	var floor_body := TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(40, 1, 40))
+	await _spawn_player(Vector3(0, 0.1, 0))
+	var houses_seen: Array = []
+	GameEvents.house_changed.connect(func(h: int) -> void: houses_seen.append(h))
+
+	# A house door refuses the unsorted and opens for members.
+	var door: HouseDoor = HOUSE_DOOR_SCENE.instantiate()
+	door.house = 2
+	door.open_seconds = 0.6
+	add_child(door)
+	door.global_position = Vector3(0, 0, -3)
+	await get_tree().process_frame
+	var refusals: Array = []
+	door.refused.connect(func(who: Node) -> void: refusals.append(who))
+	var interactable: Interactable = door.get_node("Panel/Interactable")
+	interactable.interact(player)
+	t.check(not door.is_open and refusals.size() == 1 and refusals[0] == player, "an unsorted player is refused at a house door")
+	player.set_profile("student", 3)
+	interactable.interact(player)
+	t.check(not door.is_open and refusals.size() == 2, "a member of another house is refused too")
+	player.set_profile("student", 2)
+	t.check(houses_seen == [3, 2] and player.nameplate.text.ends_with(tr("HOUSE_2_NAME")), "house changes fire house_changed and show on the nameplate")
+	interactable.interact(player)
+	t.check(door.is_open and refusals.size() == 2, "a member opens the door")
+	await _wait(door.open_seconds + door.open_duration + 0.3)
+	t.check(not door.is_open, "the door closes again after open_seconds")
+	door.queue_free()
+
+	# The Choosing Stone opens the ceremony once; the panel sorts offline.
+	player.set_profile("student", 0)
+	var stone: SortingStone = SORTING_STONE_SCENE.instantiate()
+	add_child(stone)
+	stone.global_position = Vector3(3, 0, -3)
+	var panel := SORTING_PANEL_SCENE.instantiate()
+	add_child(panel)
+	panel._player = player
+	await get_tree().process_frame
+	var completed: Array = []
+	panel.sorting_completed.connect(func(h: int) -> void: completed.append(h))
+	stone.get_node("Interactable").interact(player)
+	t.check(panel.is_open and GameSession.ui_input_captured and panel.current_question == 0, "touching the stone opens the questionnaire")
+	t.check(panel.get_node("%Answers").get_child_count() == 4 and panel.get_node("%Question").text == tr("SORT_Q1"), "the first question shows four answers")
+	# Answer everything toward house 3.
+	for q in HouseSorting.QUESTIONS:
+		for i in q["answers"].size():
+			if q["answers"][i]["house"] == 3:
+				(panel.get_node("%Answers").get_child(i) as Button).pressed.emit()
+				break
+	t.check(completed == [3] and player.house == 3 and panel.get_node("%CloseButton").visible, "answering every question sorts the offline player into house 3")
+	t.check(panel.get_node("%Question").text == tr("SORT_RESULT") % tr("HOUSE_3_NAME"), "the panel announces the house")
+	panel.close()
+	t.check(not panel.is_open and not GameSession.ui_input_captured, "closing the panel releases input")
+	stone.get_node("Interactable").interact(player)
+	t.check(not panel.is_open, "the stone does not sort a player twice")
+	panel.queue_free()
+	stone.queue_free()
+	await _clear([floor_body])
 
 
 # --- Inventory -----------------------------------------------------------------
@@ -844,6 +925,17 @@ func _test_castle() -> void:
 		if tome is SpellTome and tome.spell != null:
 			tome_spells[tome.spell.id] = true
 	t.check(tome_spells.size() == SpellRegistry.SPELL_IDS.size(), "a practice tome for every spell is placed in the castle (%d)" % tome_spells.size())
+	var gate_houses: Dictionary = {}
+	for door in castle.get_node("Doors").get_children():
+		if door is HouseDoor:
+			gate_houses[door.house] = true
+	t.check(gate_houses.size() == 4, "every house has a gated door (%s)" % str(gate_houses.keys()))
+	t.check(castle.get_node_or_null("SortingStone") is SortingStone, "the Choosing Stone stands in the castle")
+	var landing_houses: Dictionary = {}
+	for z in zones:
+		if z.area_id == &"tower_ne_1" or z.area_id == &"tower_nw_1":
+			landing_houses[z.area_id] = z.house
+	t.check(landing_houses.get(&"tower_ne_1", 0) == 1 and landing_houses.get(&"tower_nw_1", 0) == 2, "tower landings belong to their houses")
 	# Every area has a floor under its centre (rooms with stair holes keep their centre solid).
 	var fell: Array[String] = []
 	for z in zones:

@@ -122,9 +122,13 @@ func set_remote_held_item(item_id: String) -> void:
 ## Role and house come from the server (own profile or roster); the nameplate
 ## shows the title.
 func set_profile(p_role: String, p_house: int) -> void:
+	var previous_house := house
 	role = CharacterProfile.sanitize_role(p_role)
 	house = CharacterProfile.sanitize_house(p_house)
 	nameplate.set_role(role)
+	nameplate.set_house(house)
+	if is_local and house != previous_house:
+		GameEvents.house_changed.emit(house)
 
 
 func _setup_remote() -> void:

@@ -20,6 +20,8 @@ signal roster_update_received(sid: String, role: String, house: int)
 signal spell_granted(spell_id: String, by_name: String)
 ## Outcome of a grant the local player (professor) requested.
 signal grant_result_received(ok: bool, sid: String, spell_id: String, reason: String)
+## Outcome of the local player's sorting ceremony.
+signal sort_result_received(ok: bool, house: int, reason: String)
 signal pong_received(sent_ms: int)
 
 var socket: NakamaSocket
@@ -98,6 +100,8 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 			roster_update_received.emit(str(payload.get("sid", "")), str(payload.get("role", "")), int(payload.get("house", 0)))
 		NetworkProtocol.OP_SPELL_GRANTED:
 			spell_granted.emit(str(payload.get("id", "")), str(payload.get("by", "")))
+		NetworkProtocol.OP_SORT_RESULT:
+			sort_result_received.emit(bool(payload.get("ok", false)), int(payload.get("house", 0)), str(payload.get("reason", "")))
 		NetworkProtocol.OP_GRANT_RESULT:
 			grant_result_received.emit(bool(payload.get("ok", false)), str(payload.get("sid", "")), str(payload.get("id", "")), str(payload.get("reason", "")))
 		NetworkProtocol.OP_ROSTER:
