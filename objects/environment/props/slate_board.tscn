@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://slateboard001"]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/slate_board.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="BoardShape"]
+size = Vector3(1.18, 1.71, 1.02)
+
+[node name="SlateBoard" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 0.0004, 0.8562, 0.0026)
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.855, 0)
+shape = SubResource("BoardShape")

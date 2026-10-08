@@ -678,6 +678,8 @@ DESK_ROWS_TOWER = (4.0, 6.4)              # 16 m tower rooms
 DESK_PITCH = 3.0                          # m between desk centres along a row (desk is 1.9 wide)
 BENCH_BEHIND_DESK = 0.85                  # bench centre this far behind the desk centre
 LECTERN_BEFORE_FIRST_ROW = 2.0            # lectern (and the practice tomes beside it) ahead of the first row
+LECTERN_BEFORE_FIRST_ROW_TOWER = 1.4      # tighter in the 16 m tower rooms so the professor fits behind it
+SLATE_BOARD_FROM_FRONT = 1.1              # easel board on the centre line, clear of the corner/mid-wall pillar
 PROFESSOR_DESK_FROM_FRONT = 1.6           # professor's desk, off to one side of the lectern
 PROFESSOR_DESK_ACROSS = 3.5
 TOME_ACROSS = -2.2                        # practice tomes on the other side of the lectern (pitch 2.2 per dx unit)
@@ -698,6 +700,9 @@ def classroom_point(r, along, across):
     (ox, oz), (ix, iz), (sx, sz), _ = classroom_frame(r)
     return (ox + ix * along + sx * across, r.y, oz + iz * along + sz * across)
 
+def lectern_gap(rid):
+    return LECTERN_BEFORE_FIRST_ROW_TOWER if rid.startswith("tower") else LECTERN_BEFORE_FIRST_ROW
+
 def emit_furniture():
     n = 0
     for rid in CLASSROOM_FRONT:
@@ -711,11 +716,14 @@ def emit_furniture():
         # with their +Z side toward the professor, like the student desks).
         tower = rid.startswith("tower")
         inst(uname(f"Lectern_{rid}"), "res://objects/environment/props/lectern.tscn",
-             classroom_point(r, rows[0] - LECTERN_BEFORE_FIRST_ROW, 0.0), parent="Furniture", rot_y=yaw)
+             classroom_point(r, rows[0] - lectern_gap(rid), 0.0), parent="Furniture", rot_y=yaw)
+        # Slate board on an easel by the front wall; its writing face (+Z) turns toward the class.
+        inst(uname(f"SlateBoard_{rid}"), "res://objects/environment/props/slate_board.tscn",
+             classroom_point(r, SLATE_BOARD_FROM_FRONT, 0.0), parent="Furniture", rot_y=yaw + math.pi)
         inst(uname(f"ProfessorDesk_{rid}"), "res://objects/environment/props/professor_desk.tscn",
              classroom_point(r, PROFESSOR_DESK_FROM_FRONT - (0.2 if tower else 0.0), PROFESSOR_DESK_ACROSS - (0.5 if tower else 0.0)),
              parent="Furniture", rot_y=yaw)
-        n += 2
+        n += 3
         for a in rows:
             for b in offsets:
                 inst(uname(f"Desk_{rid}"), "res://objects/environment/props/student_desk.tscn",
@@ -787,7 +795,7 @@ def emit_props():
         spell_ext = ext_id("Resource", f"res://resources/spells/{spell_id}.tres")
         if rid in CLASSROOM_FRONT:
             first_row = (DESK_ROWS_TOWER if rid.startswith("tower") else DESK_ROWS_DEEP)[0]
-            pos = classroom_point(r, first_row - LECTERN_BEFORE_FIRST_ROW, TOME_ACROSS + 1.1 * dx)
+            pos = classroom_point(r, first_row - lectern_gap(rid), TOME_ACROSS + 1.1 * dx)
         else:
             pos = (cx + dx, r.y, cz + dz)
         inst(uname(f"Tome_{spell_id}"), "res://objects/interactables/spell_tome.tscn", pos,
