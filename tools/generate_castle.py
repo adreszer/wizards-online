@@ -575,8 +575,11 @@ def emit_floors_and_ceilings():
 def door_centres(axis, coord, storey):
     return [off + 2 for (a, c, off, s) in units if a == axis and c == coord and s == storey and (units[(a, c, off, s)]["door"] or units[(a, c, off, s)]["secret"])]
 
+pillar_points = set()   # (x, z, storey) of every placed pillar
+torch_points = []       # (x, z, storey) of every placed torch
+
 def emit_pillars():
-    placed = set()
+    placed = pillar_points
     for r in rooms.values():
         if not r.pillars:
             continue
@@ -619,6 +622,7 @@ def emit_torches():
                         if (z - 4) % sp != 0 or any(abs(z - c) < 2.5 for c in dc):
                             continue
                         inst(uname(f"Torch_{r.id}"), "res://objects/environment/props/wall_torch.tscn", (x, y, z), parent="Torches", rot_y=math.radians(rot)); n += 1
+                        torch_points.append((x, z, s))
                 else:
                     z = r.z0 + T / 2 if side == "n" else r.z1 - T / 2
                     rot = 0.0 if side == "n" else 180.0
@@ -628,6 +632,7 @@ def emit_torches():
                         if (x - 4) % sp != 0 or any(abs(x - c) < 2.5 for c in dc):
                             continue
                         inst(uname(f"Torch_{r.id}"), "res://objects/environment/props/wall_torch.tscn", (x, y, z), parent="Torches", rot_y=math.radians(rot)); n += 1
+                        torch_points.append((x, z, s))
     return n
 
 def emit_area_map(path):
@@ -739,6 +744,90 @@ def emit_furniture():
                 n += 2
     return n
 
+# Wall furniture: props lined along a room's wall (back against it), skipping doors,
+# pillars and torches. Wrapper convention: origin at the back face's bottom centre,
+# +Z into the room.
+SHELF_SCENE = "res://objects/environment/props/bookshelf_large.tscn"
+SHELF_W, SHELF_D = 2.85, 0.52
+
+def wall_free_intervals(r, side, width, storey=None):
+    """Free spans along a wall (as coordinates along its axis) between doors, secret walls,
+    pillars and torches, each shrunk so a prop of `width` centred inside clears them."""
+    storey = r.storey if storey is None else storey
+    if side in "we":
+        axis, coord, lo, hi = "z", (r.x0 if side == "w" else r.x1), r.z0, r.z1
+        along = lambda x, z: z; other = lambda x, z: x
+    else:
+        axis, coord, lo, hi = "x", (r.z0 if side == "n" else r.z1), r.x0, r.x1
+        along = lambda x, z: x; other = lambda x, z: z
+    blocked = []
+    for (a, c, off, st), u in units.items():
+        if a == axis and c == coord and st == storey and (u["door"] or u["secret"]):
+            blocked.append((off - 0.3, off + 4.3))
+    for x, z, st in pillar_points:
+        if st == storey and abs(other(x, z) - coord) < 0.01 and lo - 1 <= along(x, z) <= hi + 1:
+            blocked.append((along(x, z) - 0.6, along(x, z) + 0.6))
+    for x, z, st in torch_points:
+        if st == storey and abs(other(x, z) - coord) < 0.5 and lo <= along(x, z) <= hi:
+            blocked.append((along(x, z) - 0.4, along(x, z) + 0.4))
+    blocked.sort()
+    free, cursor = [], lo + T / 2
+    for b0, b1 in blocked:
+        if b0 > cursor:
+            free.append((cursor, b0))
+        cursor = max(cursor, b1)
+    if cursor < hi - T / 2:
+        free.append((cursor, hi - T / 2))
+    return axis, coord, [(a, b) for a, b in free if b - a >= width]
+
+def line_wall(r, side, scene, width, name):
+    """Fill a wall with `scene` instances of `width`, evenly spread within each free span."""
+    axis, coord, free = wall_free_intervals(r, side, width)
+    inner = coord + (T / 2 if side in "wn" else -T / 2)
+    yaw = {"w": 90.0, "e": -90.0, "n": 0.0, "s": 180.0}[side]
+    n = 0
+    for a, b in free:
+        k = int((b - a) // width)
+        gap = (b - a - k * width) / (k + 1)
+        for i in range(k):
+            c = a + gap * (i + 1) + width * (i + 0.5)
+            pos = (inner, r.y, c) if axis == "z" else (c, r.y, inner)
+            inst(uname(f"{name}_{r.id}"), scene, pos, parent="Furniture", rot_y=math.radians(yaw))
+            n += 1
+    return n
+
+def shelf_at(r, side, along, scene=SHELF_SCENE, name="Shelf"):
+    """One wall prop with its back on wall `side` at coordinate `along` the wall."""
+    if side in "we":
+        pos = ((r.x0 + T / 2) if side == "w" else (r.x1 - T / 2), r.y, along)
+    else:
+        pos = (along, r.y, (r.z0 + T / 2) if side == "n" else (r.z1 - T / 2))
+    yaw = {"w": 90.0, "e": -90.0, "n": 0.0, "s": 180.0}[side]
+    inst(uname(f"{name}_{r.id}"), scene, pos, parent="Furniture", rot_y=math.radians(yaw))
+
+def shelf_stack(r, x, z0, count, name="Stack"):
+    """Freestanding double-sided run of shelves along Z starting at z0 (backs meeting on x)."""
+    for i in range(count):
+        z = z0 + SHELF_W * (i + 0.5)
+        inst(uname(f"{name}_{r.id}"), SHELF_SCENE, (x, r.y, z), parent="Furniture", rot_y=math.radians(90))
+        inst(uname(f"{name}_{r.id}"), SHELF_SCENE, (x, r.y, z), parent="Furniture", rot_y=math.radians(-90))
+    return 2 * count
+
+def emit_shelves():
+    """Bookshelves where a library reads as one: the library's back wall is a solid wall of
+    books and three double-sided stacks make reading aisles in its back half, leaving the
+    entrance half open; the records room keeps one archive wall; the hidden study two shelves."""
+    n = 0
+    lib = rooms["library"]
+    n += line_wall(lib, "n", SHELF_SCENE, SHELF_W, "Shelf")
+    for x in (-10.0, 0.0, 10.0):
+        n += shelf_stack(lib, x, lib.z0 + 4.0, 2)   # a walkway between the back wall of books and the stacks
+    n += line_wall(rooms["records_room"], "e", SHELF_SCENE, SHELF_W, "Shelf")
+    study = rooms["hidden_study"]
+    for z in (-18.2, -13.8):   # between the mid-wall pillar and the torches
+        shelf_at(study, "w", z); n += 1
+    return n
+
 # (room, spell id, offset: across the lectern for furnished classrooms, else from the room centre)
 PRACTICE_TOMES = [
     ("class_sigilcraft", "arcane_pulse", 0.0, 0.0),
@@ -831,7 +920,7 @@ torch_count = emit_torches()
 emit_zones()
 emit_house_gates()
 emit_props()
-furniture_count = emit_furniture()
+furniture_count = emit_furniture() + emit_shelves()
 enemy_count = emit_enemies()
 emit_area_map("nakama/modules/world_areas.lua")
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://castle0000001"]
+[gd_scene load_steps=41 format=3 uid="uid://castle0000001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/modular_wall_run.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/environment/modular/doorway.tscn" id="2"]
@@ -36,8 +36,9 @@
 [ext_resource type="PackedScene" path="res://objects/environment/props/wall_board.tscn" id="34"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/student_desk.tscn" id="35"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/student_bench.tscn" id="36"]
-[ext_resource type="PackedScene" path="res://characters/enemies/crystal_guardian.tscn" id="37"]
-[ext_resource type="Script" path="res://levels/castle/castle.gd" id="38"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/bookshelf_large.tscn" id="37"]
+[ext_resource type="PackedScene" path="res://characters/enemies/crystal_guardian.tscn" id="38"]
+[ext_resource type="Script" path="res://levels/castle/castle.gd" id="39"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -51,7 +52,7 @@ fog_light_color = Color(0.2, 0.18, 0.17, 1)
 fog_density = 0.004
 
 [node name="Castle" type="Node3D"]
-script = ExtResource("38")
+script = ExtResource("39")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env")
@@ -6566,12 +6567,90 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 [node name="Bench_tower_sw_3_6" parent="Furniture" instance=ExtResource("36")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -44.750, 27.000, 35.000)
 
-[node name="Guardian_cellars" parent="Enemies" instance=ExtResource("37")]
+[node name="Shelf_library" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -13.900, 0.000, -63.825)
+
+[node name="Shelf_library_2" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -10.100, 0.000, -63.825)
+
+[node name="Shelf_library_3" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -5.900, 0.000, -63.825)
+
+[node name="Shelf_library_4" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -2.100, 0.000, -63.825)
+
+[node name="Shelf_library_5" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 2.100, 0.000, -63.825)
+
+[node name="Shelf_library_6" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 5.900, 0.000, -63.825)
+
+[node name="Shelf_library_7" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 10.100, 0.000, -63.825)
+
+[node name="Shelf_library_8" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 13.900, 0.000, -63.825)
+
+[node name="Stack_library" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -10.000, 0.000, -58.575)
+
+[node name="Stack_library_2" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -10.000, 0.000, -58.575)
+
+[node name="Stack_library_3" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -10.000, 0.000, -55.725)
+
+[node name="Stack_library_4" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -10.000, 0.000, -55.725)
+
+[node name="Stack_library_5" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 0.000, 0.000, -58.575)
+
+[node name="Stack_library_6" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 0.000, 0.000, -58.575)
+
+[node name="Stack_library_7" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 0.000, 0.000, -55.725)
+
+[node name="Stack_library_8" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 0.000, 0.000, -55.725)
+
+[node name="Stack_library_9" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 10.000, 0.000, -58.575)
+
+[node name="Stack_library_10" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 10.000, 0.000, -58.575)
+
+[node name="Stack_library_11" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 10.000, 0.000, -55.725)
+
+[node name="Stack_library_12" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 10.000, 0.000, -55.725)
+
+[node name="Shelf_records_room" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 43.825, 9.000, -37.900)
+
+[node name="Shelf_records_room_2" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 43.825, 9.000, -34.100)
+
+[node name="Shelf_records_room_3" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 43.825, 9.000, -29.900)
+
+[node name="Shelf_records_room_4" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 43.825, 9.000, -26.100)
+
+[node name="Shelf_hidden_study" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -51.825, 0.000, -18.200)
+
+[node name="Shelf_hidden_study_2" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -51.825, 0.000, -13.800)
+
+[node name="Guardian_cellars" parent="Enemies" instance=ExtResource("38")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -28.000, -9.000, -12.000)
 
-[node name="Guardian_cellars_2" parent="Enemies" instance=ExtResource("37")]
+[node name="Guardian_cellars_2" parent="Enemies" instance=ExtResource("38")]
 transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, -38.000, -9.000, -4.000)
 
-[node name="Guardian_dungeon_corridor" parent="Enemies" instance=ExtResource("37")]
+[node name="Guardian_dungeon_corridor" parent="Enemies" instance=ExtResource("38")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -16.000, -9.000, -30.000)
 

@@ -133,6 +133,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Professor's desk `professor_desk.glb` (2,809 tris, 1.90 × 0.76 × 0.96 m at scale 1, drawers on +Z = professor's side) → `professor_desk.tscn`; lectern `lectern.glb` (2,300 tris, exported 1.9 m tall, wrapper scales it ×0.6575 to 0.72 × 1.25 × 0.44 m, slanted top faces +Z) → `lectern.tscn`. Neither ships a normal map (low-poly, fine at this size)
 - [x] Slate board `slate_board.glb` (9,305 tris, A-frame easel, exported 1.9 m tall, wrapper scales ×0.9 to 1.18 × 1.71 × 1.02 m, writing face on +Z) → `slate_board.tscn`
 - [x] Wall-mounted board `wall_mounted_board.glb` (1,434 tris, 1.90 × 1.11 × 0.19 m, writing face on −Z) → `wall_board.tscn` at ×1.4 (2.66 × 1.55 m), origin on the back face so it hangs flush on a wall
+- [x] Large bookshelf `large_bookshelf.glb` (1.90 × 1.60 × 0.35 m, books on +Z) → `bookshelf_large.tscn` at ×1.5 (2.85 × 2.4 × 0.52 m, origin at the back face's bottom centre); remeshed to 10,337 tris (no normal map)
+- [x] Shelving placed deliberately, not on every wall: the library's back wall is a solid run (`line_wall` skips doors, pillars and torches) with three double-sided stacks forming reading aisles in the back half and the entrance half left open; the records room has one archive wall; the hidden study two shelves. Helpers: `line_wall`, `shelf_at`, `shelf_stack`
 - [x] `tools/capture_model.tscn`: renders any .glb/.tscn from fixed angles (with an X/Z axis gizmo) or a scene from `--eye/--target`, for checking a new prop's orientation and scale
 
 ### Milestone 12 — Localization (Polish primary, English secondary)
