@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://castle0000001"]
+[gd_scene load_steps=43 format=3 uid="uid://castle0000001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/modular_wall_run.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/environment/modular/doorway.tscn" id="2"]
@@ -38,8 +38,9 @@
 [ext_resource type="PackedScene" path="res://objects/environment/props/student_desk.tscn" id="36"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/student_bench.tscn" id="37"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/bookshelf_large.tscn" id="38"]
-[ext_resource type="PackedScene" path="res://characters/enemies/crystal_guardian.tscn" id="39"]
-[ext_resource type="Script" path="res://levels/castle/castle.gd" id="40"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/feast_table.tscn" id="39"]
+[ext_resource type="PackedScene" path="res://characters/enemies/crystal_guardian.tscn" id="40"]
+[ext_resource type="Script" path="res://levels/castle/castle.gd" id="41"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -53,7 +54,7 @@ fog_light_color = Color(0.12, 0.11, 0.11, 1)
 fog_density = 0.005
 
 [node name="Castle" type="Node3D"]
-script = ExtResource("40")
+script = ExtResource("41")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env")
@@ -6137,12 +6138,252 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 [node name="Shelf_hidden_study_2" parent="Furniture" instance=ExtResource("38")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -51.825, 0.000, -13.800)
 
-[node name="Guardian_cellars" parent="Enemies" instance=ExtResource("39")]
+[node name="FeastTable_great_hall" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.000, 0.000, 24.350)
+
+[node name="FeastTable_great_hall_2" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.000, 0.000, 30.050)
+
+[node name="FeastTable_great_hall_3" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.000, 0.000, 35.750)
+
+[node name="FeastTable_great_hall_4" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.000, 0.000, 41.450)
+
+[node name="FeastBench_great_hall" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 15.180, 0.000, 22.925)
+
+[node name="FeastBench_great_hall_2" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.820, 0.000, 22.925)
+
+[node name="FeastBench_great_hall_3" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 15.180, 0.000, 25.775)
+
+[node name="FeastBench_great_hall_4" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.820, 0.000, 25.775)
+
+[node name="FeastBench_great_hall_5" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 15.180, 0.000, 28.625)
+
+[node name="FeastBench_great_hall_6" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.820, 0.000, 28.625)
+
+[node name="FeastBench_great_hall_7" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 15.180, 0.000, 31.475)
+
+[node name="FeastBench_great_hall_8" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.820, 0.000, 31.475)
+
+[node name="FeastBench_great_hall_9" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 15.180, 0.000, 34.325)
+
+[node name="FeastBench_great_hall_10" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.820, 0.000, 34.325)
+
+[node name="FeastBench_great_hall_11" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 15.180, 0.000, 37.175)
+
+[node name="FeastBench_great_hall_12" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.820, 0.000, 37.175)
+
+[node name="FeastBench_great_hall_13" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 15.180, 0.000, 40.025)
+
+[node name="FeastBench_great_hall_14" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.820, 0.000, 40.025)
+
+[node name="FeastBench_great_hall_15" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 15.180, 0.000, 42.875)
+
+[node name="FeastBench_great_hall_16" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 16.820, 0.000, 42.875)
+
+[node name="FeastTable_great_hall_5" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.000, 0.000, 24.350)
+
+[node name="FeastTable_great_hall_6" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.000, 0.000, 30.050)
+
+[node name="FeastTable_great_hall_7" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.000, 0.000, 35.750)
+
+[node name="FeastTable_great_hall_8" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.000, 0.000, 41.450)
+
+[node name="FeastBench_great_hall_17" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 23.180, 0.000, 22.925)
+
+[node name="FeastBench_great_hall_18" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.820, 0.000, 22.925)
+
+[node name="FeastBench_great_hall_19" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 23.180, 0.000, 25.775)
+
+[node name="FeastBench_great_hall_20" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.820, 0.000, 25.775)
+
+[node name="FeastBench_great_hall_21" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 23.180, 0.000, 28.625)
+
+[node name="FeastBench_great_hall_22" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.820, 0.000, 28.625)
+
+[node name="FeastBench_great_hall_23" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 23.180, 0.000, 31.475)
+
+[node name="FeastBench_great_hall_24" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.820, 0.000, 31.475)
+
+[node name="FeastBench_great_hall_25" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 23.180, 0.000, 34.325)
+
+[node name="FeastBench_great_hall_26" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.820, 0.000, 34.325)
+
+[node name="FeastBench_great_hall_27" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 23.180, 0.000, 37.175)
+
+[node name="FeastBench_great_hall_28" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.820, 0.000, 37.175)
+
+[node name="FeastBench_great_hall_29" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 23.180, 0.000, 40.025)
+
+[node name="FeastBench_great_hall_30" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.820, 0.000, 40.025)
+
+[node name="FeastBench_great_hall_31" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 23.180, 0.000, 42.875)
+
+[node name="FeastBench_great_hall_32" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 24.820, 0.000, 42.875)
+
+[node name="FeastTable_great_hall_9" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.000, 0.000, 24.350)
+
+[node name="FeastTable_great_hall_10" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.000, 0.000, 30.050)
+
+[node name="FeastTable_great_hall_11" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.000, 0.000, 35.750)
+
+[node name="FeastTable_great_hall_12" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.000, 0.000, 41.450)
+
+[node name="FeastBench_great_hall_33" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 31.180, 0.000, 22.925)
+
+[node name="FeastBench_great_hall_34" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.820, 0.000, 22.925)
+
+[node name="FeastBench_great_hall_35" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 31.180, 0.000, 25.775)
+
+[node name="FeastBench_great_hall_36" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.820, 0.000, 25.775)
+
+[node name="FeastBench_great_hall_37" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 31.180, 0.000, 28.625)
+
+[node name="FeastBench_great_hall_38" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.820, 0.000, 28.625)
+
+[node name="FeastBench_great_hall_39" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 31.180, 0.000, 31.475)
+
+[node name="FeastBench_great_hall_40" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.820, 0.000, 31.475)
+
+[node name="FeastBench_great_hall_41" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 31.180, 0.000, 34.325)
+
+[node name="FeastBench_great_hall_42" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.820, 0.000, 34.325)
+
+[node name="FeastBench_great_hall_43" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 31.180, 0.000, 37.175)
+
+[node name="FeastBench_great_hall_44" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.820, 0.000, 37.175)
+
+[node name="FeastBench_great_hall_45" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 31.180, 0.000, 40.025)
+
+[node name="FeastBench_great_hall_46" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.820, 0.000, 40.025)
+
+[node name="FeastBench_great_hall_47" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 31.180, 0.000, 42.875)
+
+[node name="FeastBench_great_hall_48" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 32.820, 0.000, 42.875)
+
+[node name="FeastTable_great_hall_13" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.000, 0.000, 24.350)
+
+[node name="FeastTable_great_hall_14" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.000, 0.000, 30.050)
+
+[node name="FeastTable_great_hall_15" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.000, 0.000, 35.750)
+
+[node name="FeastTable_great_hall_16" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.000, 0.000, 41.450)
+
+[node name="FeastBench_great_hall_49" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 39.180, 0.000, 22.925)
+
+[node name="FeastBench_great_hall_50" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.820, 0.000, 22.925)
+
+[node name="FeastBench_great_hall_51" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 39.180, 0.000, 25.775)
+
+[node name="FeastBench_great_hall_52" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.820, 0.000, 25.775)
+
+[node name="FeastBench_great_hall_53" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 39.180, 0.000, 28.625)
+
+[node name="FeastBench_great_hall_54" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.820, 0.000, 28.625)
+
+[node name="FeastBench_great_hall_55" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 39.180, 0.000, 31.475)
+
+[node name="FeastBench_great_hall_56" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.820, 0.000, 31.475)
+
+[node name="FeastBench_great_hall_57" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 39.180, 0.000, 34.325)
+
+[node name="FeastBench_great_hall_58" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.820, 0.000, 34.325)
+
+[node name="FeastBench_great_hall_59" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 39.180, 0.000, 37.175)
+
+[node name="FeastBench_great_hall_60" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.820, 0.000, 37.175)
+
+[node name="FeastBench_great_hall_61" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 39.180, 0.000, 40.025)
+
+[node name="FeastBench_great_hall_62" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.820, 0.000, 40.025)
+
+[node name="FeastBench_great_hall_63" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 39.180, 0.000, 42.875)
+
+[node name="FeastBench_great_hall_64" parent="Furniture" instance=ExtResource("37")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.820, 0.000, 42.875)
+
+[node name="Guardian_cellars" parent="Enemies" instance=ExtResource("40")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -28.000, -9.000, -12.000)
 
-[node name="Guardian_cellars_2" parent="Enemies" instance=ExtResource("39")]
+[node name="Guardian_cellars_2" parent="Enemies" instance=ExtResource("40")]
 transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, -38.000, -9.000, -4.000)
 
-[node name="Guardian_dungeon_corridor" parent="Enemies" instance=ExtResource("39")]
+[node name="Guardian_dungeon_corridor" parent="Enemies" instance=ExtResource("40")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -16.000, -9.000, -30.000)
 

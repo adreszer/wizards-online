@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://feasttable001"]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/feast_table.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="TableShape"]
+size = Vector3(5.7, 0.78, 0.79)
+
+[node name="FeastTable" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0.002, 0.394, -0.001)
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39, 0)
+shape = SubResource("TableShape")

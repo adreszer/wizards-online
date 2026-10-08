@@ -844,6 +844,33 @@ def shelf_stack(r, x, z0, count, name="Stack"):
         inst(uname(f"{name}_{r.id}"), SHELF_SCENE, (x, r.y, z), parent="Furniture", rot_y=math.radians(-90))
     return 2 * count
 
+FEAST_TABLE_L = 5.7       # one feast_table.tscn segment (×3 of the Meshy export)
+FEAST_BENCH_PITCH = 2.85   # student benches along each side (1.9 m bench + gap)
+
+def emit_great_hall():
+    """Four long house tables run the length of the great hall, benches down both sides;
+    the head of the hall (sorting stone, plaques) stays clear."""
+    gh = rooms["great_hall"]
+    n = 0
+    segments = 4
+    length = segments * FEAST_TABLE_L
+    z0 = gh.z1 - 3.7 - length          # tables end 3.7 m short of the south wall
+    for i in range(4):
+        x = gh.x0 + (gh.x1 - gh.x0) * (i + 0.5) / 4
+        for k in range(segments):
+            inst(uname("FeastTable_great_hall"), "res://objects/environment/props/feast_table.tscn",
+                 (x, gh.y, z0 + FEAST_TABLE_L * (k + 0.5)), parent="Furniture", rot_y=math.radians(90))
+            n += 1
+        benches = int(length // FEAST_BENCH_PITCH)
+        gap = (length - benches * 1.9) / benches
+        for b in range(benches):
+            z = z0 + gap / 2 + 1.9 / 2 + b * (1.9 + gap)
+            for side, yaw in ((-0.82, -90.0), (0.82, 90.0)):   # bench backs away from the table
+                inst(uname("FeastBench_great_hall"), "res://objects/environment/props/student_bench.tscn",
+                     (x + side, gh.y, z), parent="Furniture", rot_y=math.radians(yaw))
+                n += 1
+    return n
+
 def emit_shelves():
     """Bookshelves where a library reads as one: the library's back wall is a solid wall of
     books and three double-sided stacks make reading aisles in its back half, leaving the
@@ -952,7 +979,7 @@ chandelier_count = emit_chandeliers()
 emit_zones()
 emit_house_gates()
 emit_props()
-furniture_count = emit_furniture() + emit_shelves()
+furniture_count = emit_furniture() + emit_shelves() + emit_great_hall()
 enemy_count = emit_enemies()
 emit_area_map("nakama/modules/world_areas.lua")
 
