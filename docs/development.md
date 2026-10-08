@@ -34,7 +34,7 @@ All commands below assume `godot` resolves.
 
 Choose **Play OFFLINE**. The whole castle is explorable without any backend.
 
-Controls: WASD move · Shift run · Space jump · hold right mouse button and drag to orbit the camera · scroll wheel zoom · left click / F cast · E interact · Tab satchel (inventory; click the torch to hold it) · Enter or T chat · Esc pause · F1 lock the cursor for always-on mouse look · F3 debug overlay.
+Controls: WASD move · Shift run · Space jump · move the mouse to look (cursor captured) · scroll wheel zoom · left click / F cast · E interact · Tab satchel (inventory; click the torch to hold it) · Enter or T chat · Esc pause · F1 free the cursor (and back to mouse look) · F3 debug overlay.
 
 ## Backend (Nakama + PostgreSQL)
 

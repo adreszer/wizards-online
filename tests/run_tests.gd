@@ -247,19 +247,32 @@ func _test_camera() -> void:
 	t.check(dist < rig.distance - 0.5, "spring arm shortens against a wall (%.2f < %.2f)" % [dist, rig.distance])
 	t.check(cam.global_position.z < 1.2, "camera stays on the player's side of the wall")
 	t.check(cam.current, "local camera is the current camera")
-	t.check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "cursor is free by default")
-	rig.start_orbit()
 	# The headless display server has no cursor capture, so only assert the mode on a real one.
 	var headless := DisplayServer.get_name() == "headless"
-	t.check(rig.is_orbiting and (headless or Input.mouse_mode == Input.MOUSE_MODE_CAPTURED), "right button drag captures the cursor")
+	t.check(rig.is_mouse_looking() and (headless or Input.mouse_mode == Input.MOUSE_MODE_CAPTURED), "mouse look is on by default")
 	var yaw_before := rig.get_yaw()
 	rig._unhandled_input(_mouse_motion(Vector2(50, 0)))
-	t.check(absf(rig.get_yaw() - yaw_before) > 0.05, "dragging with the right button orbits the camera")
-	rig.stop_orbit()
-	t.check(not rig.is_orbiting and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "releasing the right button frees the cursor")
+	t.check(absf(rig.get_yaw() - yaw_before) > 0.05, "mouse movement turns the camera without holding a button")
+	GameSession.ui_input_captured = true
+	await _wait(0.05)
+	t.check(not rig.is_mouse_looking() and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "an open UI panel frees the cursor")
 	yaw_before = rig.get_yaw()
 	rig._unhandled_input(_mouse_motion(Vector2(50, 0)))
-	t.check(is_equal_approx(rig.get_yaw(), yaw_before), "mouse motion without the right button leaves the camera alone")
+	t.check(is_equal_approx(rig.get_yaw(), yaw_before), "mouse movement over a UI panel leaves the camera alone")
+	GameSession.ui_input_captured = false
+	await _wait(0.05)
+	t.check(rig.is_mouse_looking(), "closing the panel resumes mouse look")
+	rig._unhandled_input(_action_press("toggle_cursor"))
+	t.check(not rig.is_mouse_looking() and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "F1 frees the cursor")
+	rig._unhandled_input(_action_press("toggle_cursor"))
+	t.check(rig.is_mouse_looking(), "F1 again resumes mouse look")
+	rig._notification(NOTIFICATION_WM_WINDOW_FOCUS_OUT)
+	t.check(not rig.is_mouse_looking() and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "losing window focus frees the cursor")
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	rig._unhandled_input(click)
+	t.check(rig.is_mouse_looking(), "clicking back into the window resumes mouse look")
 	var dist_before: float = rig.distance
 	rig.zoom_by(-rig.zoom_step)
 	await _wait(0.6)
@@ -272,6 +285,13 @@ func _test_camera() -> void:
 	t.check(is_equal_approx(rig.distance, rig.max_distance), "zoom clamps at max distance")
 	rig.set_distance(dist_before)
 	await _clear([floor_body, wall])
+
+
+func _action_press(action: StringName) -> InputEventAction:
+	var event := InputEventAction.new()
+	event.action = action
+	event.pressed = true
+	return event
 
 
 func _mouse_motion(relative: Vector2) -> InputEventMouseMotion:

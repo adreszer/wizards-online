@@ -25,17 +25,6 @@ func _ready() -> void:
 				player.spell_caster.learn_spell(definition)
 
 
-## F1: lock the cursor for classic always-on mouse look (and unlock again).
-## The default is a free cursor with right-button-drag orbiting (see CameraRig).
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("toggle_cursor") and not get_tree().paused and not GameSession.ui_input_captured:
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		else:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		get_viewport().set_input_as_handled()
-
-
 ## First-time nudge toward the torch (the server inventory may arrive a moment
 ## after the spawn, hence the short delay).
 func _show_satchel_hint(player: Node) -> void:

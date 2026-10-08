@@ -6,17 +6,19 @@ extends Node3D
 ## The SpringArm3D keeps the camera out of level geometry. Movement code asks
 ## [method get_yaw] for its reference frame; spell aiming asks [method get_aim_ray].
 ##
-## Look input: the cursor is free by default. Holding the right mouse button
-## captures it and orbits the camera around the character; releasing puts the
-## cursor back where it was. A persistent capture (F1 / [member Input.mouse_mode]
-## set to CAPTURED by something else) also drives the camera, for players who
-## prefer classic mouse look.
+## Look input: classic mouse look. During gameplay the rig keeps the cursor
+## captured and every mouse movement turns the camera; the mouse wheel zooms.
+## The cursor is handed back whenever a UI panel captures input, the game is
+## paused, the window loses focus (a click back into the window recaptures) or
+## the player presses F1 to free it (F1 again resumes mouse look).
 ## Camera "zones"/cinematic constraints can later be layered on by driving
 ## [member yaw]/[member pitch]/[member distance] from an external controller
 ## and setting [member input_enabled] to false.
 
 @export var target: Node3D
-@export var target_height: float = 1.4
+## Pivot height above the feet. Sits above the head so the character is a little
+## below the screen centre and the centre-screen aim points higher.
+@export var target_height: float = 1.85
 @export var distance: float = 4.6
 @export var min_distance: float = 1.6
 @export var max_distance: float = 9.0
@@ -28,17 +30,19 @@ extends Node3D
 @export var min_pitch_degrees: float = -55.0
 @export var max_pitch_degrees: float = 65.0
 @export var position_smoothing: float = 22.0
-@export var initial_pitch_degrees: float = -14.0
+@export var initial_pitch_degrees: float = -9.0
 @export var input_enabled: bool = true
 ## World-space offset added to the follow point (the player sets it while easing a step-up).
 var follow_offset: Vector3 = Vector3.ZERO
 
 var yaw: float = 0.0
 var pitch: float = 0.0
-## True while the right mouse button is held and the rig owns the mouse capture.
-var is_orbiting: bool = false
+## Mouse look wanted by the player (F1 toggles it off to get a free cursor).
+var mouse_look_enabled: bool = true
 
-var _orbit_cursor_position: Vector2 = Vector2.ZERO
+var _active: bool = false
+## Set when the window lost focus; the next click into the window recaptures.
+var _awaiting_click: bool = false
 var _target_distance: float = 0.0
 
 @onready var _pitch_node: Node3D = $Pitch
@@ -60,7 +64,8 @@ func _ready() -> void:
 
 func activate() -> void:
 	_camera.current = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_active = true
+	_sync_mouse_capture()
 
 
 func get_camera() -> Camera3D:
@@ -80,58 +85,61 @@ func get_aim_ray() -> Dictionary:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not _active:
+		return
+	if event.is_action_pressed("toggle_cursor") and _gameplay_has_mouse():
+		mouse_look_enabled = not mouse_look_enabled
+		_awaiting_click = false
+		_sync_mouse_capture()
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseButton:
 		var button := event as InputEventMouseButton
 		if button.button_index == MOUSE_BUTTON_WHEEL_UP or button.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			if button.pressed and input_enabled and not get_tree().paused and not GameSession.ui_input_captured:
+			if button.pressed and input_enabled and _gameplay_has_mouse():
 				var direction := -1.0 if button.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0
 				zoom_by(direction * zoom_step * maxf(button.factor, 0.1))
 				get_viewport().set_input_as_handled()
 			return
-		if button.button_index != MOUSE_BUTTON_RIGHT:
-			return
-		if button.pressed:
-			if _can_start_orbit():
-				start_orbit()
-				get_viewport().set_input_as_handled()
-		elif is_orbiting:
-			stop_orbit()
+		# The click that brings focus back only recaptures; it must not cast.
+		if button.pressed and _awaiting_click and _gameplay_has_mouse():
+			_awaiting_click = false
+			_sync_mouse_capture()
 			get_viewport().set_input_as_handled()
 		return
-	if not input_enabled:
-		return
-	if event is InputEventMouseMotion and (is_orbiting or Input.mouse_mode == Input.MOUSE_MODE_CAPTURED):
+	if event is InputEventMouseMotion and is_mouse_looking():
 		apply_look_delta((event as InputEventMouseMotion).relative)
 
 
-func _can_start_orbit() -> bool:
-	if not input_enabled or is_orbiting or Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		return false
-	if get_tree().paused or GameSession.ui_input_captured:
-		return false
-	return true
+## True while mouse movement turns the camera (the cursor is captured).
+func is_mouse_looking() -> bool:
+	return input_enabled and mouse_look_enabled and not _awaiting_click and _gameplay_has_mouse()
 
 
-## Right button pressed: hide + capture the cursor so the drag can go on forever.
-func start_orbit() -> void:
-	is_orbiting = true
-	_orbit_cursor_position = get_viewport().get_mouse_position()
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+## No pause menu or UI panel currently needs the cursor.
+func _gameplay_has_mouse() -> bool:
+	return _active and not get_tree().paused and not GameSession.ui_input_captured
 
 
-## Right button released (or the window lost focus): give the cursor back where it was.
-func stop_orbit() -> void:
-	if not is_orbiting:
-		return
-	is_orbiting = false
-	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+## Capture the cursor while mouse look is on, free it otherwise. Panels and the
+## pause menu free the cursor themselves; this recaptures once they are gone.
+func _sync_mouse_capture() -> void:
+	if is_mouse_looking():
+		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	elif Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		get_viewport().warp_mouse(_orbit_cursor_position)
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT or what == NOTIFICATION_APPLICATION_FOCUS_OUT:
-		stop_orbit()
+		if _active and mouse_look_enabled:
+			_awaiting_click = true
+			_sync_mouse_capture()
+	elif what == NOTIFICATION_EXIT_TREE and _active:
+		_active = false
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
 ## Move the camera closer (negative) or further (positive); smoothed in _process.
@@ -155,9 +163,8 @@ func apply_look_delta(relative: Vector2) -> void:
 
 
 func _process(delta: float) -> void:
-	# The release can be swallowed while paused or behind a UI panel.
-	if is_orbiting and not Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-		stop_orbit()
+	if _active:
+		_sync_mouse_capture()
 	if target == null:
 		return
 	var desired := target.global_position + follow_offset + Vector3.UP * target_height

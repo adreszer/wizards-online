@@ -8,7 +8,7 @@ MENU_PORT,Nakama port,Port Nakama
 MENU_PLAY_OFFLINE,Play OFFLINE,Graj OFFLINE
 MENU_PLAY_ONLINE,Play ONLINE,Graj ONLINE
 MENU_QUIT,Quit,Wyjdź
-MENU_CONTROLS,WASD move · Shift run · Space jump · RMB drag look · Wheel zoom · LMB cast · E interact · Tab satchel · Enter chat · F1 lock cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · PPM przeciągnij rozglądanie · Kółko zoom · LPM czar · E interakcja · Tab sakwa · Enter czat · F1 zablokuj kursor · F3 debug · Esc pauza
+MENU_CONTROLS,WASD move · Shift run · Space jump · Mouse look · Wheel zoom · LMB cast · E interact · Tab satchel · Enter chat · F1 free cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · Mysz rozglądanie · Kółko zoom · LPM czar · E interakcja · Tab sakwa · Enter czat · F1 uwolnij kursor · F3 debug · Esc pauza
 MENU_CONNECTING,Connecting…,Łączenie…
 MENU_CONNECT_FAILED_HINT,"Start the backend with `docker compose up -d`, or play OFFLINE.",Uruchom backend poleceniem `docker compose up -d` albo graj OFFLINE.
 PAUSE_TITLE,Paused,Pauza
