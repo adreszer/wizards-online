@@ -246,8 +246,8 @@ door("north_hall", "library", at=0, count=2)
 
 # West wing: corridor + classrooms, ground and first floor
 for s in (0, 1):
-    room(f"corridor_w_{s}", -20, -12, -40, 24, storey=s, kind="corridor", torch_spacing=16.0)
-    room(f"corridor_e_{s}", 12, 20, -40, 8, storey=s, kind="corridor", torch_spacing=16.0)
+    room(f"corridor_w_{s}", -20, -12, -40, 24, storey=s, kind="corridor")
+    room(f"corridor_e_{s}", 12, 20, -40, 8, storey=s, kind="corridor")
 west = {0: ["class_shapeshaping", "class_sigilcraft", "class_chronicles", "class_glyphs"],
         1: ["class_numeromancy", "class_warding", "staff_room", "hospital_wing"]}
 east = {0: ["class_herblore", "class_skyriding", "class_beastlore"],
@@ -335,7 +335,7 @@ landing_parapets = [((-24, STOREY + 0.5, 32), (16, 1, 0.25)),
                     ((-26, 2 * STOREY + 0.5, 40), (20, 1, 0.25))]
 
 # Dungeons (storey -1) under the west wing
-room("dungeon_corridor", -20, -12, -40, 24, storey=-1, kind="corridor", torch_spacing=16.0)
+room("dungeon_corridor", -20, -12, -40, 24, storey=-1, kind="corridor")
 room("class_elixirs", -44, -20, 0, 24, storey=-1, kind="classroom", tile="ornate")
 room("cellars", -44, -20, -16, 0, storey=-1, kind="room")
 room("house3_common", -44, -20, -40, -16, storey=-1, kind="common_room", house=3, tile="ornate")
@@ -602,13 +602,44 @@ def emit_pillars():
                 placed.add((x, z, s))
                 inst(uname(f"Pillar_{r.id}"), "res://objects/environment/modular/pillar.tscn", (x, y, z), parent="Pillars")
 
+CHANDELIER_PITCH = 12.0   # one chandelier per ~12 m of room along each axis
+
+CHANDELIER_CANDLE_HEIGHT = 4.3   # candles this high above the floor, whatever the ceiling
+
+def has_chandeliers(r):
+    """Roofed rooms are lit from above; corridors and outdoor areas keep wall torches."""
+    return r.ceiling and r.kind not in ("corridor", "outdoor")
+
+def emit_chandeliers():
+    n = 0
+    for r in rooms.values():
+        if not has_chandeliers(r):
+            continue
+        w, d = r.x1 - r.x0, r.z1 - r.z0
+        nx, nz = max(1, round(w / CHANDELIER_PITCH)), max(1, round(d / CHANDELIER_PITCH))
+        for i in range(nx):
+            for j in range(nz):
+                x = r.x0 + w * (i + 0.5) / nx
+                z = r.z0 + d * (j + 0.5) / nz
+                drop = r.ceiling_y - r.y - CHANDELIER_CANDLE_HEIGHT - 1.7
+                inst(uname(f"Chandelier_{r.id}"), "res://objects/environment/props/chandelier.tscn",
+                     (x, r.ceiling_y, z), parent="Lights", props={"drop": f"{drop:.3f}"})
+                n += 1
+    return n
+
 def emit_torches():
     n = 0
     for r in rooms.values():
         if not r.torches:
             continue
         sp = int(r.torch_spacing)
-        for s in r.storeys():
+        if has_chandeliers(r):
+            if r.bands == 1:
+                continue            # candlelight is enough in an ordinary room
+            sp = 16                 # tall halls: a few wall accents under the chandeliers
+        # Torches light the ground band only: with a 7 m radius, a torch on the upper
+        # band of a tall hall lights nothing anyone walks on.
+        for s in (r.storey,):
             y = s * STOREY + TORCH_HEIGHT
             for side in "wens":
                 if side in r.no_torch_sides:
@@ -917,6 +948,7 @@ for centre, size in landing_parapets:
 emit_floors_and_ceilings()
 emit_pillars()
 torch_count = emit_torches()
+chandelier_count = emit_chandeliers()
 emit_zones()
 emit_house_gates()
 emit_props()
@@ -933,12 +965,12 @@ subs = '''
 background_mode = 1
 background_color = Color(0.05, 0.045, 0.045, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.56, 0.53, 0.5, 1)
-ambient_light_energy = 0.7
+ambient_light_color = Color(0.5, 0.5, 0.56, 1)
+ambient_light_energy = 0.22
 tonemap_mode = 2
 fog_enabled = true
-fog_light_color = Color(0.2, 0.18, 0.17, 1)
-fog_density = 0.004
+fog_light_color = Color(0.12, 0.11, 0.11, 1)
+fog_density = 0.005
 '''
 sx, sy, sz = START
 root = f'''
@@ -950,8 +982,8 @@ environment = SubResource("Env")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
-light_color = Color(0.9, 0.88, 0.85, 1)
-light_energy = 0.15
+light_color = Color(0.85, 0.86, 0.95, 1)
+light_energy = 0.06
 shadow_enabled = false
 
 [node name="StartPoint" type="Marker3D" parent="."]
@@ -971,6 +1003,8 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 
 [node name="Torches" type="Node3D" parent="."]
 
+[node name="Lights" type="Node3D" parent="."]
+
 [node name="Zones" type="Node3D" parent="."]
 
 [node name="Collectibles" type="Node3D" parent="."]
@@ -989,4 +1023,4 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 header = f'[gd_scene load_steps={len(ext) + 2} format=3 uid="uid://castle0000001"]\n\n'
 open(OUT, "w").write(header + exts + subs + root + "\n".join(nodes) + "\n")
 print("name keys:", " ".join(sorted({r.name_key for r in rooms.values()})))
-print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  furniture: {furniture_count}  enemies: {enemy_count}  nodes: {len(nodes)}")
+print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  chandeliers: {chandelier_count}  furniture: {furniture_count}  enemies: {enemy_count}  nodes: {len(nodes)}")

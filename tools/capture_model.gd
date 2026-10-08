@@ -21,6 +21,7 @@ var _out: String = "user://captures"
 var _scene: String = ""
 var _dist: float = 3.5
 var _eye := Vector3.INF
+var _double_sided := false
 var _target := Vector3.INF
 
 
@@ -32,6 +33,8 @@ func _ready() -> void:
 			_scene = arg.trim_prefix("--scene=")
 		elif arg.begins_with("--dist="):
 			_dist = float(arg.trim_prefix("--dist="))
+		elif arg == "--double-sided":
+			_double_sided = true
 		elif arg.begins_with("--eye="):
 			_eye = _vec(arg.trim_prefix("--eye="))
 		elif arg.begins_with("--target="):
@@ -88,6 +91,14 @@ func _run() -> void:
 	add_child(floor_tile)
 	var model := packed.instantiate() as Node3D
 	add_child(model)
+	if _double_sided:
+		for mi in model.find_children("*", "MeshInstance3D", true, false):
+			for i in range((mi as MeshInstance3D).mesh.get_surface_count()):
+				var mat := (mi as MeshInstance3D).mesh.surface_get_material(i) as BaseMaterial3D
+				if mat != null:
+					mat = mat.duplicate()
+					mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+					(mi as MeshInstance3D).set_surface_override_material(i, mat)
 	# Axis gizmo: red +X, blue +Z, so the captures show the model's own frame.
 	_axis(Vector3(1, 0, 0), Color.RED)
 	_axis(Vector3(0, 0, 1), Color.BLUE)

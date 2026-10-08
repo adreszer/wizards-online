@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3 uid="uid://chandelier001"]
+
+[ext_resource type="Script" path="res://objects/environment/props/chandelier.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/chandelier.glb" id="2"]
+
+[sub_resource type="CylinderMesh" id="RodMesh"]
+top_radius = 0.035
+bottom_radius = 0.035
+height = 2.0
+
+[sub_resource type="StandardMaterial3D" id="RodMat"]
+albedo_color = Color(0.12, 0.11, 0.1, 1)
+metallic = 0.6
+roughness = 0.7
+
+[sub_resource type="SphereMesh" id="GlowMesh"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="GlowMat"]
+shading_mode = 0
+albedo_color = Color(1, 0.72, 0.4, 1)
+emission_enabled = true
+emission = Color(1, 0.62, 0.28, 1)
+emission_energy_multiplier = 4.0
+
+[node name="Chandelier" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Rod" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0, 0)
+mesh = SubResource("RodMesh")
+surface_material_override/0 = SubResource("RodMat")
+
+[node name="Model" parent="." instance=ExtResource("2")]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 0, -2.95, 0)
+
+[node name="Candles" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.7, 0)
+light_color = Color(1, 0.8, 0.55, 1)
+light_energy = 4.0
+omni_range = 12.0
+omni_attenuation = 1.6
+
+[node name="Glow" type="MeshInstance3D" parent="Candles"]
+mesh = SubResource("GlowMesh")
+surface_material_override/0 = SubResource("GlowMat")

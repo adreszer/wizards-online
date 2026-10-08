@@ -10,7 +10,7 @@ extends Node3D
 
 signal lit_changed(is_lit: bool)
 
-@export var base_energy: float = 2.2
+@export var base_energy: float = 2.6
 @export var flicker_amount: float = 0.25
 @export var flicker_speed: float = 9.0
 @export var lit: bool = true
