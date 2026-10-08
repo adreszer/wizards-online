@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://assetvalid001"]
+[gd_scene load_steps=12 format=3 uid="uid://assetvalid001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/wall_plain.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/greybox/greybox_block.tscn" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://objects/environment/props/professor_desk.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/lectern.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/slate_board.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/wall_board.tscn" id="10"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -292,11 +293,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 5)
 [node name="SlateBoard" parent="E_DeskAndBench" instance=ExtResource("9")]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 1, 0, 6.5)
 
+[node name="WallBoard" parent="E_DeskAndBench" instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2, -0.175)
+
 [node name="Label" type="Label3D" parent="E_DeskAndBench"]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4, 2.2, 3)
 billboard = 1
 pixel_size = 0.005
-text = "E  student desk + bench, professor's desk, lectern, slate board (+Z toward the professor)"
+text = "E  student desk + bench, professor's desk, lectern, slate board (+Z toward the professor); wall board on wall A"
 font_size = 72
 outline_size = 12
 

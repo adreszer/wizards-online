@@ -680,6 +680,8 @@ BENCH_BEHIND_DESK = 0.85                  # bench centre this far behind the des
 LECTERN_BEFORE_FIRST_ROW = 2.0            # lectern (and the practice tomes beside it) ahead of the first row
 LECTERN_BEFORE_FIRST_ROW_TOWER = 1.4      # tighter in the 16 m tower rooms so the professor fits behind it
 SLATE_BOARD_FROM_FRONT = 1.1              # easel board on the centre line, clear of the corner/mid-wall pillar
+WALL_BOARD_ACROSS = -2.0                  # wall-mounted board beside the mid-wall pillar (and clear of the torch at ±4)
+WALL_BOARD_CENTRE_HEIGHT = 2.0            # centre of the 1.55 m tall board above the floor
 PROFESSOR_DESK_FROM_FRONT = 1.6           # professor's desk, off to one side of the lectern
 PROFESSOR_DESK_ACROSS = 3.5
 TOME_ACROSS = -2.2                        # practice tomes on the other side of the lectern (pitch 2.2 per dx unit)
@@ -696,9 +698,9 @@ def classroom_frame(r):
     if front == "n":   return (cx, r.z0), (0, 1), (1, 0), 0.0
     return (cx, r.z1), (0, -1), (1, 0), math.radians(180)
 
-def classroom_point(r, along, across):
+def classroom_point(r, along, across, height=0.0):
     (ox, oz), (ix, iz), (sx, sz), _ = classroom_frame(r)
-    return (ox + ix * along + sx * across, r.y, oz + iz * along + sz * across)
+    return (ox + ix * along + sx * across, r.y + height, oz + iz * along + sz * across)
 
 def lectern_gap(rid):
     return LECTERN_BEFORE_FIRST_ROW_TOWER if rid.startswith("tower") else LECTERN_BEFORE_FIRST_ROW
@@ -723,7 +725,11 @@ def emit_furniture():
         inst(uname(f"ProfessorDesk_{rid}"), "res://objects/environment/props/professor_desk.tscn",
              classroom_point(r, PROFESSOR_DESK_FROM_FRONT - (0.2 if tower else 0.0), PROFESSOR_DESK_ACROSS - (0.5 if tower else 0.0)),
              parent="Furniture", rot_y=yaw)
-        n += 3
+        # Wall board: origin on its back face, writing face on -Z, so the furniture yaw hangs it
+        # on the front wall's inner face looking into the room.
+        inst(uname(f"WallBoard_{rid}"), "res://objects/environment/props/wall_board.tscn",
+             classroom_point(r, T / 2, WALL_BOARD_ACROSS, WALL_BOARD_CENTRE_HEIGHT), parent="Furniture", rot_y=yaw)
+        n += 4
         for a in rows:
             for b in offsets:
                 inst(uname(f"Desk_{rid}"), "res://objects/environment/props/student_desk.tscn",
