@@ -684,13 +684,15 @@ TOME_ACROSS = -2.2                        # practice tomes on the other side of 
 
 def classroom_frame(r):
     """(origin on the front wall's centre line, unit vector into the room, unit vector along the
-    front wall, desk yaw). Desk model: carved apron on +Z faces the professor."""
+    front wall, prop yaw). Furniture models have their "professor" side on +Z (student
+    desk's carved apron, professor desk's drawers, lectern's slanted top); the yaw turns
+    +Z toward the front wall (xf() writes basis rows, so +Z maps to (sin, 0, cos))."""
     front = CLASSROOM_FRONT[r.id]
     cx, cz = r.centre()
-    if front == "w":   return (r.x0, cz), (1, 0), (0, 1), math.radians(90)
-    if front == "e":   return (r.x1, cz), (-1, 0), (0, 1), math.radians(-90)
-    if front == "n":   return (cx, r.z0), (0, 1), (1, 0), math.radians(180)
-    return (cx, r.z1), (0, -1), (1, 0), 0.0
+    if front == "w":   return (r.x0, cz), (1, 0), (0, 1), math.radians(-90)
+    if front == "e":   return (r.x1, cz), (-1, 0), (0, 1), math.radians(90)
+    if front == "n":   return (cx, r.z0), (0, 1), (1, 0), 0.0
+    return (cx, r.z1), (0, -1), (1, 0), math.radians(180)
 
 def classroom_point(r, along, across):
     (ox, oz), (ix, iz), (sx, sz), _ = classroom_frame(r)
