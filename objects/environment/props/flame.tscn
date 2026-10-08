@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://flame00000001"]
+
+[ext_resource type="Script" path="res://objects/environment/props/flame.gd" id="1"]
+
+[sub_resource type="SphereMesh" id="FlameMesh"]
+radius = 0.035
+height = 0.13
+
+[sub_resource type="StandardMaterial3D" id="FlameMat"]
+shading_mode = 0
+albedo_color = Color(1, 0.72, 0.35, 1)
+emission_enabled = true
+emission = Color(1, 0.6, 0.22, 1)
+emission_energy_multiplier = 5.0
+
+[node name="Flame" type="MeshInstance3D"]
+mesh = SubResource("FlameMesh")
+surface_material_override/0 = SubResource("FlameMat")
+script = ExtResource("1")

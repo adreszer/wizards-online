@@ -22,7 +22,7 @@ func _ready() -> void:
 	rod.mesh = rod_mesh
 	rod.position.y = -drop / 2.0
 	$Model.position.y = -(drop + 0.95)
-	_light.position.y = -(drop + 1.7)
+	_light.position.y = -(drop + 1.3)   # at candle height
 
 
 func _process(delta: float) -> void:

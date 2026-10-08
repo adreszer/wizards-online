@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://chandelier001"]
+[gd_scene load_steps=6 format=3 uid="uid://chandelier001"]
 
 [ext_resource type="Script" path="res://objects/environment/props/chandelier.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/models/environment/modular/chandelier.glb" id="2"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/flame.tscn" id="3"]
 
 [sub_resource type="CylinderMesh" id="RodMesh"]
 top_radius = 0.035
@@ -12,17 +13,6 @@ height = 2.0
 albedo_color = Color(0.12, 0.11, 0.1, 1)
 metallic = 0.6
 roughness = 0.7
-
-[sub_resource type="SphereMesh" id="GlowMesh"]
-radius = 0.1
-height = 0.2
-
-[sub_resource type="StandardMaterial3D" id="GlowMat"]
-shading_mode = 0
-albedo_color = Color(1, 0.72, 0.4, 1)
-emission_enabled = true
-emission = Color(1, 0.62, 0.28, 1)
-emission_energy_multiplier = 4.0
 
 [node name="Chandelier" type="Node3D"]
 script = ExtResource("1")
@@ -35,13 +25,33 @@ surface_material_override/0 = SubResource("RodMat")
 [node name="Model" parent="." instance=ExtResource("2")]
 transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 0, -2.95, 0)
 
+[node name="Flame1" parent="Model" instance=ExtResource("3")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.850, -0.165, 0.018)
+
+[node name="Flame2" parent="Model" instance=ExtResource("3")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.649, -0.311, 0.636)
+
+[node name="Flame3" parent="Model" instance=ExtResource("3")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -0.651, -0.313, 0.640)
+
+[node name="Flame4" parent="Model" instance=ExtResource("3")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -0.864, -0.259, 0.016)
+
+[node name="Flame5" parent="Model" instance=ExtResource("3")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -0.649, -0.329, -0.592)
+
+[node name="Flame6" parent="Model" instance=ExtResource("3")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.003, -0.338, -0.847)
+
+[node name="Flame7" parent="Model" instance=ExtResource("3")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.639, -0.332, -0.594)
+
+[node name="Flame8" parent="Model" instance=ExtResource("3")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.000, -0.345, 0.860)
+
 [node name="Candles" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.7, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.3, 0)
 light_color = Color(1, 0.8, 0.55, 1)
 light_energy = 4.0
 omni_range = 12.0
 omni_attenuation = 1.6
-
-[node name="Glow" type="MeshInstance3D" parent="Candles"]
-mesh = SubResource("GlowMesh")
-surface_material_override/0 = SubResource("GlowMat")
