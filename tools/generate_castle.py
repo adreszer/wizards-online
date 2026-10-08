@@ -677,7 +677,10 @@ DESK_ROWS_DEEP = (5.0, 7.5, 10.0)         # 24 m deep rooms (wing classrooms, El
 DESK_ROWS_TOWER = (4.0, 6.4)              # 16 m tower rooms
 DESK_PITCH = 3.0                          # m between desk centres along a row (desk is 1.9 wide)
 BENCH_BEHIND_DESK = 0.85                  # bench centre this far behind the desk centre
-LECTERN_BEFORE_FIRST_ROW = 2.0            # practice tomes / professor's spot, ahead of the first row
+LECTERN_BEFORE_FIRST_ROW = 2.0            # lectern (and the practice tomes beside it) ahead of the first row
+PROFESSOR_DESK_FROM_FRONT = 1.6           # professor's desk, off to one side of the lectern
+PROFESSOR_DESK_ACROSS = 3.5
+TOME_ACROSS = -2.2                        # practice tomes on the other side of the lectern (pitch 2.2 per dx unit)
 
 def classroom_frame(r):
     """(origin on the front wall's centre line, unit vector into the room, unit vector along the
@@ -702,6 +705,15 @@ def emit_furniture():
         per_row = 4 if cross >= 20 else 3
         rows = DESK_ROWS_TOWER if rid.startswith("tower") else DESK_ROWS_DEEP
         offsets = [(i - (per_row - 1) / 2) * DESK_PITCH for i in range(per_row)]
+        # The professor's end: lectern on the centre line, desk to one side (both face the class
+        # with their +Z side toward the professor, like the student desks).
+        tower = rid.startswith("tower")
+        inst(uname(f"Lectern_{rid}"), "res://objects/environment/props/lectern.tscn",
+             classroom_point(r, rows[0] - LECTERN_BEFORE_FIRST_ROW, 0.0), parent="Furniture", rot_y=yaw)
+        inst(uname(f"ProfessorDesk_{rid}"), "res://objects/environment/props/professor_desk.tscn",
+             classroom_point(r, PROFESSOR_DESK_FROM_FRONT - (0.2 if tower else 0.0), PROFESSOR_DESK_ACROSS - (0.5 if tower else 0.0)),
+             parent="Furniture", rot_y=yaw)
+        n += 2
         for a in rows:
             for b in offsets:
                 inst(uname(f"Desk_{rid}"), "res://objects/environment/props/student_desk.tscn",
@@ -713,8 +725,8 @@ def emit_furniture():
 
 # (room, spell id, offset: across the lectern for furnished classrooms, else from the room centre)
 PRACTICE_TOMES = [
-    ("class_sigilcraft", "arcane_pulse", -2.0, 0.0),
-    ("class_sigilcraft", "uplift", 2.0, 0.0),
+    ("class_sigilcraft", "arcane_pulse", 0.0, 0.0),
+    ("class_sigilcraft", "uplift", -2.0, 0.0),
     ("class_skyriding", "galewind", 0.0, 0.0),
     ("kitchens", "emberkindle", 0.0, 0.0),
     ("class_elixirs", "wellspring", 0.0, 0.0),
@@ -773,13 +785,13 @@ def emit_props():
         spell_ext = ext_id("Resource", f"res://resources/spells/{spell_id}.tres")
         if rid in CLASSROOM_FRONT:
             first_row = (DESK_ROWS_TOWER if rid.startswith("tower") else DESK_ROWS_DEEP)[0]
-            pos = classroom_point(r, first_row - LECTERN_BEFORE_FIRST_ROW, dx)
+            pos = classroom_point(r, first_row - LECTERN_BEFORE_FIRST_ROW, TOME_ACROSS + 1.1 * dx)
         else:
             pos = (cx + dx, r.y, cz + dz)
         inst(uname(f"Tome_{spell_id}"), "res://objects/interactables/spell_tome.tscn", pos,
              parent="Tomes", props={"spell": f'ExtResource("{spell_ext}")'})
     r = rooms["class_sigilcraft"]
-    inst("SigilcraftSwitch", "res://objects/puzzles/magic_switch.tscn", (r.x0 + 3, r.y, r.z0 + 3))
+    inst("SigilcraftSwitch", "res://objects/puzzles/magic_switch.tscn", (r.x0 + 1.5, r.y, r.z0 + 1.5))
     inst("SigilcraftBlock", "res://objects/puzzles/pushable_block.tscn", (r.x1 - 4, r.y + 0.6, r.z0 + 4))
     for rid, pts in {"undercroft": [(-6, -6), (6, -6), (0, 6)], "hidden_study": [(0, -4), (0, 4)],
                      "loft": [(-4, 0), (4, 0)], "tower_sw_4": [(-4, 4)], "tower_ne_3": [(-5, 5)],

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://assetvalid001"]
+[gd_scene load_steps=10 format=3 uid="uid://assetvalid001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/wall_plain.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/greybox/greybox_block.tscn" id="2"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://ui/debug/debug_overlay.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/student_desk.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/student_bench.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/professor_desk.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/lectern.tscn" id="8"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -280,11 +282,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 3)
 [node name="Bench" parent="E_DeskAndBench" instance=ExtResource("6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 2.15)
 
+[node name="ProfessorDesk" parent="E_DeskAndBench" instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 6.5)
+
+[node name="Lectern" parent="E_DeskAndBench" instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 5)
+
 [node name="Label" type="Label3D" parent="E_DeskAndBench"]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4, 2.2, 3)
 billboard = 1
 pixel_size = 0.005
-text = "E  student desk + bench (carved apron faces +Z)"
+text = "E  student desk + bench, professor's desk, lectern (+Z toward the professor)"
 font_size = 72
 outline_size = 12
 
