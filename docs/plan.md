@@ -228,9 +228,11 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Castle test: unique ids in known areas, every placement present
 
 ### Milestone 20 — Server-authoritative world objects
-- [ ] `OP_WORLD_EVENT` / `OP_OBJECT_STATE` / `OP_WORLD_SNAPSHOT`; server validation (object, area, known spell, accepted effect, rate limit)
-- [ ] `WorldObjectSync` on the client; secret walls, switches, doors, torches, levers, statues apply server state; offline unchanged
-- [ ] Multiplayer test: A's change seen by B and by a rejoining client
+- [x] `OP_WORLD_EVENT` / `OP_OBJECT_STATE` / `OP_WORLD_SNAPSHOT`; `nakama/modules/object_rules.lua`: per-kind rules + validation (object, area, known spell, accepted effect, token bucket, per-object cooldown); torches relight server-side
+- [x] `WorldObjectSync` on the client; secret walls, switches, doors, torches, levers, statues apply server state (`apply_world_state`, instant for snapshots); `RotatingStatue.set_state`, `Lever.set_on`; offline unchanged
+- [x] Multiplayer test: B's switch hit (real trigger path) is a request, the server flips it for both clients, dropped events (wrong area, unknown object, unknown spell), the rejoin snapshot carries it; reconnect test checks the snapshot; offline tests for every kind
+- [x] Placement entries take `"set": {property: value}` overrides (the practice switch is toggleable)
+- [ ] Persist world object state across server restarts (today it lives in the match)
 
 ### Milestone 21 — Mysteries as data (server-only)
 - [ ] `nakama/modules/mysteries.lua` step engine (spell, interact, enter/holding, together, ordered, timed); world/house/player scopes
@@ -304,7 +306,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Known limitations
 
-- Puzzle/door/collectible state is local to each client in online mode (players see each other, not each other's puzzle progress).
+- Online, world objects (secret walls, switches, torches, levers, statues) are server-authoritative but kept in match memory (reset on server restart); pushable blocks, pressure plates and fragment pickups are still local to each client.
 - No PvP, no damage between players. Spell events carry a caster ID and are relayed only for known spells; a future server-validated target field enables duels.
 - Remote players are client-authoritative for their own transform (see `docs/architecture.md` → Authority).
 - Chat has length/whitespace sanitization only; no moderation.
@@ -313,7 +315,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (294 gameplay, localization and server-content checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (308 gameplay, localization, server-content and world-object checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
@@ -329,7 +331,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Collectibles | counter, no double collect | [x] headless test pass |
 | Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
 | Localization | pl/en load, all keys translated, fallback, name sanitizing | [x] headless test pass; in-game visual check of Polish text (menu, HUD, plaques) pending |
-| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory and profile, promotion, classroom grant, dropped unknown cast, persistence across reconnect, sorting and roster house update | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 43 + 35 checks pass |
+| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory and profile, promotion, classroom grant, dropped unknown cast, persistence across reconnect, sorting and roster house update | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 44 + 42 checks pass, incl. server-authoritative world objects |
 | Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Offline | playable with backend stopped | [x] `run_offline_fallback_test` with backend stopped: readable error, offline world playable |

@@ -15,6 +15,10 @@ signal player_profile_changed(sid: String, role: String, house: int)
 signal spell_granted(spell_id: String, by_name: String)
 signal grant_result_received(ok: bool, sid: String, spell_id: String, reason: String)
 signal sort_result_received(ok: bool, house: int, reason: String)
+## A world object's server state changed (null = default).
+signal object_state_changed(object_id: String, state: Variant)
+## A full snapshot of world object states arrived (join / reconnect).
+signal world_snapshot_received(objects: Dictionary)
 
 @export var ping_interval: float = 2.0
 
@@ -25,6 +29,8 @@ var players: Dictionary = {}
 var local_inventory: Dictionary = {}
 ## The local player's server-side character profile ({house, role, spells}); empty until received.
 var local_profile: Dictionary = {}
+## Server state of world objects that are not in their default state: object id → state.
+var world_objects: Dictionary = {}
 var ping_ms: int = -1
 var _ping_timer: float = 0.0
 
@@ -44,12 +50,15 @@ func bind(p_session: WorldSession) -> void:
 	session.grant_result_received.connect(grant_result_received.emit)
 	session.sort_result_received.connect(sort_result_received.emit)
 	session.pong_received.connect(_on_pong)
+	session.object_state_received.connect(_on_object_state)
+	session.world_snapshot_received.connect(_on_world_snapshot)
 
 
 func reset() -> void:
 	players.clear()
 	local_inventory = {}
 	local_profile = {}
+	world_objects = {}
 	ping_ms = -1
 
 
@@ -91,6 +100,14 @@ func send_study_tome(spell_id: String) -> void:
 func send_sort(answers: Array) -> void:
 	if session != null:
 		session.send(NetworkProtocol.OP_SORT, {"answers": answers})
+
+
+func send_world_event(object_id: String, event: String, spell_id: String = "") -> void:
+	if session != null:
+		var data := {"o": object_id, "e": event}
+		if not spell_id.is_empty():
+			data["spell"] = spell_id
+		session.send(NetworkProtocol.OP_WORLD_EVENT, data)
 
 
 func get_role(sid: String) -> String:
@@ -188,3 +205,18 @@ func _on_roster_update(sid: String, role: String, house: int) -> void:
 
 func _on_pong(sent_ms: int) -> void:
 	ping_ms = maxi(0, Time.get_ticks_msec() - sent_ms)
+
+
+func _on_object_state(object_id: String, state: Variant) -> void:
+	if object_id.is_empty():
+		return
+	if state == null:
+		world_objects.erase(object_id)
+	else:
+		world_objects[object_id] = state
+	object_state_changed.emit(object_id, state)
+
+
+func _on_world_snapshot(objects: Dictionary) -> void:
+	world_objects = objects.duplicate()
+	world_snapshot_received.emit(world_objects)

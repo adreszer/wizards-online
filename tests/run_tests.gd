@@ -23,6 +23,9 @@ const SORTING_PANEL_SCENE := preload("res://ui/school/sorting_panel.tscn")
 const HOUSE_DOOR_SCENE := preload("res://objects/school/house_door.tscn")
 const SORTING_STONE_SCENE := preload("res://objects/school/sorting_stone.tscn")
 const GUARDIAN_SCENE := preload("res://characters/enemies/crystal_guardian.tscn")
+const SECRET_WALL_SCENE := preload("res://objects/puzzles/secret_wall.tscn")
+const STATUE_SCENE := preload("res://objects/puzzles/rotating_statue.tscn")
+const DOOR_SCENE := preload("res://objects/puzzles/magic_door.tscn")
 const TestHelpers := preload("res://tests/test_helpers.gd")
 
 var t := TestHelpers.new()
@@ -52,6 +55,7 @@ func _run() -> void:
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
+	await _test_world_objects()
 	print(t.summary())
 	get_tree().quit(1 if t.failed > 0 else 0)
 
@@ -1328,3 +1332,60 @@ func _ids_match_dir(ids: Array[String], dir_path: String) -> bool:
 	listed.sort()
 	on_disk.sort()
 	return listed == on_disk
+
+
+## Server state applied to each synced kind, and offline triggers still acting locally.
+func _test_world_objects() -> void:
+	t.section("World objects")
+	var wall: SecretWall = SECRET_WALL_SCENE.instantiate()
+	wall.object_id = "test/secret_wall"
+	add_child(wall)
+	await get_tree().process_frame
+	t.check(not WorldObjectSync.request(wall, "spell", null), "offline, requests are refused so objects act locally")
+	var wall_y: float = wall.get_node("Wall").position.y
+	wall.apply_world_state("revealed", true)
+	t.check(wall.is_revealed and is_equal_approx(wall.get_node("Wall").position.y, wall_y + wall.slide_offset.y), "secret wall: snapshot state reveals it instantly")
+	wall.apply_world_state(null, true)
+	t.check(not wall.is_revealed and is_equal_approx(wall.get_node("Wall").position.y, wall_y), "secret wall: default state closes it again")
+	var switch: MagicSwitch = SWITCH_SCENE.instantiate()
+	add_child(switch)
+	await get_tree().process_frame
+	switch.apply_world_state(true, false)
+	t.check(switch.is_on, "switch: server state turns it on")
+	switch.apply_world_state(null, true)
+	t.check(not switch.is_on, "switch: default state turns it off")
+	var torch: WallTorch = WALL_TORCH_SCENE.instantiate()
+	add_child(torch)
+	await get_tree().process_frame
+	torch.apply_world_state(false, false)
+	t.check(not torch.lit, "torch: server state puts it out")
+	torch.apply_world_state(null, true)
+	t.check(torch.lit, "torch: default state relights it")
+	var lever: Lever = LEVER_SCENE.instantiate()
+	add_child(lever)
+	await get_tree().process_frame
+	var pulled := [0]
+	lever.pulled.connect(func() -> void: pulled[0] += 1)
+	lever.apply_world_state(true, true)
+	t.check(lever.is_on and pulled[0] == 1, "lever: server state pulls it (and emits pulled)")
+	lever.apply_world_state(false, false)
+	t.check(not lever.is_on, "lever: server state puts it back")
+	var statue: RotatingStatue = STATUE_SCENE.instantiate()
+	add_child(statue)
+	await get_tree().process_frame
+	statue.apply_world_state(3, true)
+	t.check(statue.state == 3 and is_equal_approx(wrapf(statue.get_node("Pivot").rotation.y, 0.0, TAU), statue._angle_for(3)), "statue: server state turns it to state 3")
+	statue.advance()
+	t.check(statue.state == 0, "statue: advancing wraps to 0")
+	statue.apply_world_state(null, true)
+	t.check(statue.state == statue.initial_state, "statue: default state is its initial state")
+	var door: MagicDoor = DOOR_SCENE.instantiate()
+	add_child(door)
+	await get_tree().process_frame
+	door.apply_world_state(true, true)
+	t.check(door.is_open, "door: server state opens it instantly")
+	door.apply_world_state(null, true)
+	t.check(not door.is_open, "door: default state closes it")
+	for n: Node in [wall, switch, torch, lever, statue, door]:
+		n.queue_free()
+	await get_tree().process_frame

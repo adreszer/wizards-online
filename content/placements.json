@@ -17,7 +17,7 @@
     {"id": "plaque_sigilcraft", "kind": "plaque", "text": "PLAQUE_SIGILCRAFT", "wall": "n", "along": 0.5},
     {"id": "tome_arcane_pulse", "kind": "spell_tome", "spell": "arcane_pulse", "beside_lectern": 0.0},
     {"id": "tome_uplift", "kind": "spell_tome", "spell": "uplift", "beside_lectern": -2.0},
-    {"id": "practice_switch", "kind": "magic_switch", "corner": "nw", "inset": [1.5, 1.5]},
+    {"id": "practice_switch", "kind": "magic_switch", "corner": "nw", "inset": [1.5, 1.5], "set": {"toggleable": true}},
     {"id": "practice_block", "kind": "pushable_block", "corner": "ne", "inset": [4, 4], "dy": 0.6}
   ],
   "stair_hall": [

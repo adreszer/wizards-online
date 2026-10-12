@@ -29,18 +29,37 @@ func _ready() -> void:
 	_receiver.spell_received.connect(_on_spell_received)
 
 
-func _on_spell_received(_effect: SpellEffect) -> void:
+func _on_spell_received(effect: SpellEffect) -> void:
+	if WorldObjectSync.request(self, "spell", effect):
+		return
 	advance()
 
 
 func advance() -> void:
-	state = (state + 1) % state_count
+	set_state(state + 1)
+
+
+## Turns to state `s` (wrapped), the short way round; `instant` snaps it.
+func set_state(s: int, instant: bool = false) -> void:
+	s = posmod(s, state_count)
+	if s == state:
+		return
+	state = s
 	if _tween != null:
 		_tween.kill()
-	_tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(_pivot, "rotation:y", _pivot.rotation.y + TAU / state_count, rotate_duration)
-	_audio.play()
+	var target := _pivot.rotation.y + wrapf(_angle_for(s) - _pivot.rotation.y, -PI + 0.001, PI + 0.001)
+	if instant:
+		_pivot.rotation.y = target
+	else:
+		_tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		_tween.tween_property(_pivot, "rotation:y", target, rotate_duration)
+		_audio.play()
 	state_changed.emit(state)
+
+
+## Server state: the statue's state index, null = its initial state.
+func apply_world_state(value: Variant, instant: bool) -> void:
+	set_state(int(value) if value != null else initial_state, instant)
 
 
 func _angle_for(s: int) -> float:

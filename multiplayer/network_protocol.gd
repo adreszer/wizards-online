@@ -21,6 +21,10 @@ const OP_SPELLBOOK := 6
 const OP_STUDY_TOME := 7
 ## client → server: {answers: [1..4 × questions]} the sorting ceremony's answers
 const OP_SORT := 8
+## client → server: {o: object id, e: "spell" | "interact", spell?: id} the local
+## player acted on a world object; the server validates it and answers with
+## OP_OBJECT_STATE to everyone (or nothing when refused)
+const OP_WORLD_EVENT := 9
 ## server → joining player: full roster {players: [{sid, uid, name, char, held}], self_sid}
 const OP_ROSTER := 10
 ## server → others: {sid, uid, name}
@@ -39,8 +43,12 @@ const OP_SPELL_GRANTED := 16
 const OP_GRANT_RESULT := 17
 ## server → same player: {ok, house, reason} outcome of OP_SORT
 const OP_SORT_RESULT := 18
+## server → all: {o: object id, s: state} a world object changed
+const OP_OBJECT_STATE := 19
 ## client → server → same client: {t: ms} (round-trip latency probe)
 const OP_PING := 20
+## server → joining player: {objects: {object id: state}} every world object not in its default state
+const OP_WORLD_SNAPSHOT := 21
 
 const CHAT_ROOM := "world"
 ## Server RPC that finds (or creates) the shared world match.

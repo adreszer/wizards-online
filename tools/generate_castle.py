@@ -918,6 +918,7 @@ def emit_house_gates():
 #   "corner": nw|ne|sw|se, "inset": [x, z]   m in from that corner (+ "dy")
 #   "beside_lectern": dx              classrooms: next to the lectern, dx × 1.1 m across
 # Kind fields: spell_tome "spell" (resources/spells/<id>.tres), plaque "text" (translation key).
+# "set": {property: bool | number | string} overrides exported properties of the instance.
 # Each entry gets the object id "<area>/<id>".
 KINDS = {
     # kind: (scene, parent container, world object: gets object_id + the world_objects group)
@@ -960,6 +961,12 @@ def placement_point(r, e):
         return classroom_point(r, first_row - lectern_gap(r.id), TOME_ACROSS + 1.1 * e["beside_lectern"]), 0.0
     raise AssertionError(f"{r.id}/{e['id']}: no position (at, wall, corner or beside_lectern)")
 
+def godot_literal(value):
+    if isinstance(value, bool): return "true" if value else "false"
+    if isinstance(value, (int, float)): return repr(value)
+    if isinstance(value, str): return json.dumps(value)
+    raise AssertionError(f"unsupported property value {value!r}")
+
 def load_placements(path):
     with open(path) as f:
         data = json.load(f)
@@ -988,6 +995,8 @@ def emit_placements(path):
                 props["spell"] = f'ExtResource("{spell_ext}")'
             if e["kind"] == "plaque":
                 props["text"] = f'"{e["text"]}"'
+            for prop, value in e.get("set", {}).items():
+                props[prop] = godot_literal(value)
             if world:
                 props = oid_props(oid, props)
             else:

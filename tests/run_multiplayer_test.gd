@@ -19,9 +19,14 @@ var leaves: Array[String] = []
 var notifications: Array[String] = []
 var grant_results: Array = []
 var sort_results: Array = []
+## [object id, state] for every OP_OBJECT_STATE received
+var object_events: Array = []
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
+## A toggleable switch in the classroom: flips on every valid spell event, so
+## the test works whatever state earlier runs left it in.
+const SWITCH := "class_sigilcraft/practice_switch"
 
 
 func _ready() -> void:
@@ -36,6 +41,7 @@ func _ready() -> void:
 	NetworkManager.grant_result_received.connect(func(ok: bool, sid: String, id: String, reason: String) -> void: grant_results.append({"ok": ok, "sid": sid, "id": id, "reason": reason}))
 	GameEvents.notification_requested.connect(func(text: String, _d: float) -> void: notifications.append(text))
 	NetworkManager.sort_result_received.connect(func(ok: bool, house: int, reason: String) -> void: sort_results.append({"ok": ok, "house": house, "reason": reason}))
+	NetworkManager.object_state_changed.connect(func(oid: String, s: Variant) -> void: object_events.append([oid, s]))
 	await _run()
 
 
@@ -109,6 +115,13 @@ func _enter_classroom(spawner: PlayerSpawner, offset: Vector3) -> void:
 	var zone := _classroom_zone()
 	var floor_y := zone.global_position.y - zone.size.y / 2.0
 	spawner.local_player.global_position = Vector3(zone.global_position.x, floor_y + 0.2, zone.global_position.z) + offset
+
+
+func _world_object(oid: String) -> Node:
+	for node in get_tree().get_nodes_in_group(&"world_objects"):
+		if str(node.get(&"object_id")) == oid:
+			return node
+	return null
 
 
 func _known_spells() -> Array:
@@ -209,6 +222,9 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(ok and spawner.local_player.spell_caster.knows(&"uplift"), "a professor can teach themselves through the panel")
 	ok = await _wait_until(func() -> bool: return casts_seen > 0, 20.0)
 	t.check(ok, "remote spell cast event received once the student knows the spell")
+	ok = await _wait_until(func() -> bool: return object_events.any(func(e: Array) -> bool: return e[0] == SWITCH), 30.0)
+	var switch_node: Node = _world_object(SWITCH)
+	t.check(ok and switch_node is MagicSwitch and switch_node.is_on == (NetworkManager.get_world_object_states().get(SWITCH, false) == true), "the student's switch change reaches the professor's castle")
 
 	ok = await _wait_until(func() -> bool: return _remote(spawner) == null, 30.0)
 	t.check(ok, "remote player removed when B disconnects")
@@ -281,6 +297,23 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	NetworkManager.send_study_tome("glowmote")
 	ok = await _wait_until(func() -> bool: return _known_spells().has("glowmote"), 10.0)
 	t.check(ok and player.spell_caster.knows(&"glowmote"), "a practice tome request is granted by the server")
+	t.section("World objects (student)")
+	var switch_node: Node = _world_object(SWITCH)
+	t.check(switch_node is MagicSwitch, "the classroom switch is a synced world object")
+	var before: bool = NetworkManager.get_world_object_states().get(SWITCH, false) == true
+	t.check(switch_node.is_on == before, "the join snapshot set the switch (%s)" % str(before))
+	var hidden_before: Variant = NetworkManager.get_world_object_states().get("undercroft/secret_wall")
+	NetworkManager.send_world_event("undercroft/secret_wall", "spell", "arcane_pulse")
+	NetworkManager.send_world_event("nowhere/nothing", "interact")
+	NetworkManager.send_world_event(SWITCH, "spell", "frostbind")
+	# The real trigger path: a spell hit on the switch becomes a request, not a local change.
+	switch_node._on_spell_received(SpellEffect.create(ARCANE_PULSE, player, "", switch_node.global_position, Vector3.FORWARD))
+	t.check(switch_node.is_on == before, "online, a hit does not change the switch locally")
+	ok = await _wait_until(func() -> bool: return object_events.any(func(e: Array) -> bool: return e[0] == SWITCH), 10.0)
+	t.check(ok and switch_node.is_on == (not before), "the server flips the switch for everyone (now %s)" % str(switch_node.is_on))
+	await _wait(1.0)
+	t.check(object_events.size() == 1, "events from the wrong area, for unknown objects or with an unknown spell are dropped (%s)" % str(object_events))
+	t.check(NetworkManager.get_world_object_states().get("undercroft/secret_wall") == hidden_before, "the out-of-reach secret wall did not change")
 	var glow := SpellRegistry.load_definition("glowmote")
 	player.spell_caster.assign_slot(5, glow)
 	player.spell_caster.equip(ARCANE_PULSE)
@@ -299,4 +332,5 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(ok and _known_spells().has("arcane_pulse"), "learned spells persist across reconnect (%s)" % str(_known_spells()))
 	t.check(profile.get("spells", {}).get("slots", [])[5] == "glowmote" and player.spell_caster.quick_slots[5] == glow and player.spell_caster.equipped_spell == ARCANE_PULSE, "hotbar layout persists across reconnect")
 	t.check(int(profile.get("house", 0)) == 3 and player.house == 3, "house persists across reconnect")
+	t.check(NetworkManager.get_world_object_states().get(SWITCH, false) == (not before) and switch_node.is_on == (not before), "the rejoin snapshot carries the switch state")
 	await _wait(2.0)

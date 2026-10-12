@@ -31,23 +31,31 @@ func _ready() -> void:
 	_apply_visual()
 
 
-func _on_spell_received(_effect: SpellEffect) -> void:
+func _on_spell_received(effect: SpellEffect) -> void:
 	if is_on and not toggleable:
+		return
+	if WorldObjectSync.request(self, "spell", effect):
 		return
 	set_on(not is_on)
 
 
-func set_on(value: bool) -> void:
+func set_on(value: bool, quiet: bool = false) -> void:
 	if is_on == value:
 		return
 	is_on = value
 	_apply_visual()
-	_audio.play()
+	if not quiet:
+		_audio.play()
 	toggled.emit(is_on)
 	if is_on:
 		activated.emit()
 	else:
 		deactivated.emit()
+
+
+## Server state: true = on, false/null = off.
+func apply_world_state(state: Variant, instant: bool) -> void:
+	set_on(state == true, instant)
 
 
 func _apply_visual() -> void:

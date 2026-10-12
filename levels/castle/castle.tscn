@@ -5183,6 +5183,7 @@ spell = ExtResource("20")
 [node name="MagicSwitch_class_sigilcraft_practice_switch" parent="Puzzles" groups=["world_objects"] instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -42.500, 0.000, -6.500)
 object_id = "class_sigilcraft/practice_switch"
+toggleable = true
 
 [node name="PushableBlock_class_sigilcraft_practice_block" parent="Puzzles" groups=["world_objects"] instance=ExtResource("22")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 0.600, -4.000)

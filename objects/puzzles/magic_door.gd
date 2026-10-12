@@ -58,3 +58,18 @@ func set_open(value: bool) -> void:
 		opened.emit()
 	else:
 		closed.emit()
+
+
+## Server state (set by mysteries): true = open, false/null = the scene's default.
+## `instant` snaps the panel without sound.
+func apply_world_state(state: Variant, instant: bool) -> void:
+	var value: bool = (state == true) if state != null else start_open
+	if not instant:
+		set_open(value)
+		return
+	if is_open == value:
+		return
+	if _tween != null:
+		_tween.kill()
+	is_open = value
+	_panel.position = _closed_position + (Vector3.UP * open_height if is_open else Vector3.ZERO)

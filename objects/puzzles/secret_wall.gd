@@ -30,17 +30,36 @@ func _ready() -> void:
 	_receiver.spell_received.connect(_on_spell_received)
 
 
-func _on_spell_received(_effect: SpellEffect) -> void:
+func _on_spell_received(effect: SpellEffect) -> void:
+	if WorldObjectSync.request(self, "spell", effect):
+		return
 	reveal()
 
 
-func reveal() -> void:
+## Slides the wall aside. `instant` (a late joiner's snapshot) snaps it open
+## without sound or the `revealed` signal.
+func reveal(instant: bool = false) -> void:
 	if is_revealed:
 		return
 	is_revealed = true
 	_receiver.enabled = false
+	if instant:
+		_wall.position += slide_offset
+		_ornament.position += slide_offset
+		return
 	_audio.play()
 	var tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(_wall, "position", _wall.position + slide_offset, slide_duration)
 	tween.parallel().tween_property(_ornament, "position", _ornament.position + slide_offset, slide_duration)
 	revealed.emit()
+
+
+## Server state: "revealed", or null (closed again, e.g. after a server restart).
+func apply_world_state(state: Variant, instant: bool) -> void:
+	if state == "revealed":
+		reveal(instant)
+	elif is_revealed:
+		is_revealed = false
+		_receiver.enabled = true
+		_wall.position -= slide_offset
+		_ornament.position -= slide_offset

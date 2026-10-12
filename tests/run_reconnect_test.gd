@@ -6,11 +6,13 @@ extends Node
 const TestHelpers := preload("res://tests/test_helpers.gd")
 var t := TestHelpers.new()
 var messages: Array[String] = []
+var snapshots: int = 0
 
 
 func _ready() -> void:
 	NetworkManager.system_message.connect(func(m: String) -> void: messages.append(m); print("SYS: " + m))
 	NetworkManager.status_changed.connect(func(s: int, m: String) -> void: print("STATUS: %s %s" % [NetworkManager.Status.keys()[s], m]))
+	NetworkManager.world_snapshot_received.connect(func(_o: Dictionary) -> void: snapshots += 1)
 	GameSession.play_mode = GameSession.PlayMode.ONLINE
 	var err: String = await NetworkManager.connect_online("Reconnector")
 	t.check(err.is_empty(), "initial connect (%s)" % err)
@@ -22,5 +24,10 @@ func _ready() -> void:
 	t.check(messages.has(tr("CHAT_CONNECTION_LOST")), "connection loss detected")
 	t.check(messages.has(tr("CHAT_RECONNECTED")), "reconnected automatically")
 	t.check(NetworkManager.is_online(), "online after reconnect")
+	var waited := 0.0
+	while snapshots < 2 and waited < 5.0:
+		await get_tree().create_timer(0.25).timeout
+		waited += 0.25
+	t.check(snapshots >= 2, "a world object snapshot arrives on join and again after reconnect (%d)" % snapshots)
 	print(t.summary())
 	get_tree().quit(1 if t.failed > 0 else 0)

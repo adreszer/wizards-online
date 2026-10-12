@@ -7,6 +7,7 @@ return {
   OP_GRANT_SPELL = 5,
   OP_HELD_ITEM = 3,
   OP_INVENTORY = 13,
+  OP_OBJECT_STATE = 19,
   OP_PING = 20,
   OP_PLAYER_JOINED = 11,
   OP_PLAYER_LEFT = 12,
@@ -20,6 +21,8 @@ return {
   OP_SPELL_GRANTED = 16,
   OP_STATE = 1,
   OP_STUDY_TOME = 7,
+  OP_WORLD_EVENT = 9,
+  OP_WORLD_SNAPSHOT = 21,
   RPC_ADMIN_SET_PROFILE = "admin_set_profile",
   RPC_JOIN_WORLD = "join_world",
 }

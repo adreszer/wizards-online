@@ -153,10 +153,10 @@ Estimates assume part-time solo work. Each milestone keeps `tests/run_tests.tscn
 - [x] Generator refuses duplicate ids, unknown areas and unknown scenes
 - **Done when:** a tome or enemy can be moved by editing JSON and regenerating, and every interactable in `castle.tscn` has a unique id.
 
-### Milestone 20 — Server-authoritative world objects (≈2 weeks)
-- [ ] `OP_WORLD_EVENT` / `OP_OBJECT_STATE` + join snapshot; server validation (area, effect type, known spell, rate limit)
-- [ ] Doors, secret walls, levers, torches, statues apply server state; offline path unchanged
-- [ ] Multiplayer test: client A opens a door and client B sees it open; a late joiner sees it open
+### Milestone 20 — Server-authoritative world objects (≈2 weeks) — done
+- [x] `OP_WORLD_EVENT` / `OP_OBJECT_STATE` + join snapshot; server validation (area, effect type, known spell, rate limit)
+- [x] Doors, secret walls, levers, torches, statues apply server state; offline path unchanged
+- [x] Multiplayer test: client B flips a switch and client A sees it; the rejoining client sees it
 - **Done when:** "Puzzle / door / collectible state: local only" is removed from the Authority table.
 
 ### Milestone 21 — Mysteries as data (≈2–3 weeks)

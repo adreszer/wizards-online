@@ -23,6 +23,10 @@ signal grant_result_received(ok: bool, sid: String, spell_id: String, reason: St
 ## Outcome of the local player's sorting ceremony.
 signal sort_result_received(ok: bool, house: int, reason: String)
 signal pong_received(sent_ms: int)
+## A world object changed state on the server (null = back to its default).
+signal object_state_received(object_id: String, state: Variant)
+## Every world object not in its default state, sent on join.
+signal world_snapshot_received(objects: Dictionary)
 
 var socket: NakamaSocket
 var match_id: String = ""
@@ -113,6 +117,12 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 			player_left.emit(str(payload.get("sid", "")), str(payload.get("uid", "")), str(payload.get("name", "")))
 		NetworkProtocol.OP_PING:
 			pong_received.emit(int(payload.get("t", 0)))
+		NetworkProtocol.OP_OBJECT_STATE:
+			object_state_received.emit(str(payload.get("o", "")), payload.get("s"))
+		NetworkProtocol.OP_WORLD_SNAPSHOT:
+			# An empty Lua table encodes as [], so anything but a dictionary is "nothing changed".
+			var objects: Variant = payload.get("objects", {})
+			world_snapshot_received.emit(objects if objects is Dictionary else {})
 
 
 ## The server module is the source of truth for the roster, so raw presence

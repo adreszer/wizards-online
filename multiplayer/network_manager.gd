@@ -30,6 +30,10 @@ signal spell_granted(spell_id: String, by_name: String)
 signal grant_result_received(ok: bool, sid: String, spell_id: String, reason: String)
 ## Outcome of the local player's sorting ceremony (the profile arrives separately).
 signal sort_result_received(ok: bool, house: int, reason: String)
+## A world object's server-side state changed (null = default). See WorldObjectSync.
+signal object_state_changed(object_id: String, state: Variant)
+## The server's world object states arrived in full (join and reconnect).
+signal world_snapshot_received(objects: Dictionary)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal system_message(text: String)
 
@@ -63,12 +67,26 @@ func _ready() -> void:
 	state_synchronizer.spell_granted.connect(spell_granted.emit)
 	state_synchronizer.grant_result_received.connect(grant_result_received.emit)
 	state_synchronizer.sort_result_received.connect(sort_result_received.emit)
+	state_synchronizer.object_state_changed.connect(object_state_changed.emit)
+	state_synchronizer.world_snapshot_received.connect(world_snapshot_received.emit)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 
 
 func is_online() -> bool:
 	return status == Status.ONLINE
+
+
+## True while the local player is in the shared world match: world objects then
+## follow the server instead of local triggers.
+func is_in_world() -> bool:
+	return is_online() and world_session.is_active()
+
+
+## Server state of world objects not in their default state (object id → state);
+## empty offline.
+func get_world_object_states() -> Dictionary:
+	return state_synchronizer.world_objects if is_online() else {}
 
 
 func get_ping_ms() -> int:
@@ -186,6 +204,13 @@ func send_spellbook(slots: Array, equipped: String) -> void:
 func send_study_tome(spell_id: String) -> void:
 	if is_online():
 		state_synchronizer.send_study_tome(spell_id)
+
+
+## Ask the server to apply an event to a world object ("spell" with the spell id,
+## or "interact"). The new state arrives through object_state_changed.
+func send_world_event(object_id: String, event: String, spell_id: String = "") -> void:
+	if is_online():
+		state_synchronizer.send_world_event(object_id, event, spell_id)
 
 
 ## Sorting ceremony: the server tallies the answers and assigns the house.

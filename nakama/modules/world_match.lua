@@ -7,12 +7,17 @@
 -- character_profile.lua). A held-item change is accepted only for an owned,
 -- holdable item; a spell cast only for a known spell; a spell grant only from
 -- a professor/admin standing in the same classroom as the target (areas come
--- from world_areas.lua, generated with the castle). Movement is relayed but
--- not yet validated.
+-- from world_areas.lua, generated with the castle). World objects (secret
+-- walls, switches, torches, levers, statues) are server-authoritative: a
+-- client's OP_WORLD_EVENT is checked by object_rules.lua (object exists, the
+-- sender stands in its area, knows the spell, the object accepts its effect,
+-- rate limit) and the new state goes to everyone; joiners get a snapshot.
+-- Movement is relayed but not yet validated.
 
 local nk = require("nakama")
 local Profile = require("character_profile")
 local AREAS = require("world_areas")
+local Objects = require("object_rules")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -20,6 +25,7 @@ local OP_GRANT_SPELL, OP_SPELLBOOK, OP_STUDY_TOME, OP_SORT = P.OP_GRANT_SPELL, P
 local OP_ROSTER, OP_PLAYER_JOINED, OP_PLAYER_LEFT, OP_INVENTORY = P.OP_ROSTER, P.OP_PLAYER_JOINED, P.OP_PLAYER_LEFT, P.OP_INVENTORY
 local OP_PROFILE, OP_ROSTER_UPDATE, OP_SPELL_GRANTED = P.OP_PROFILE, P.OP_ROSTER_UPDATE, P.OP_SPELL_GRANTED
 local OP_GRANT_RESULT, OP_SORT_RESULT, OP_PING = P.OP_GRANT_RESULT, P.OP_SORT_RESULT, P.OP_PING
+local OP_WORLD_EVENT, OP_OBJECT_STATE, OP_WORLD_SNAPSHOT = P.OP_WORLD_EVENT, P.OP_OBJECT_STATE, P.OP_WORLD_SNAPSHOT
 local MAX_AREA_ID_BYTES = 48
 local TICK_RATE = 15
 -- Bytes, not characters: the client caps names at 16 characters, which with
@@ -188,7 +194,7 @@ local function broadcast_profile_change(dispatcher, state, sid)
 end
 
 function M.match_init(context, params)
-  local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {} }
+  local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {}, world = Objects.new_world() }
   return state, TICK_RATE, "world"
 end
 
@@ -219,6 +225,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     dispatcher.broadcast_message(OP_ROSTER, nk.json_encode({ players = roster, self_sid = p.session_id }), { p }, nil, true)
     dispatcher.broadcast_message(OP_INVENTORY, nk.json_encode(state.inventories[p.session_id]), { p }, nil, true)
     send_profile(dispatcher, state, p.session_id)
+    dispatcher.broadcast_message(OP_WORLD_SNAPSHOT, nk.json_encode({ objects = state.world.objects }), { p }, nil, true)
     local rest = others(state, p.session_id)
     if #rest > 0 then
       dispatcher.broadcast_message(OP_PLAYER_JOINED, nk.json_encode(entry_for(state, p.session_id)), rest, nil, true)
@@ -238,6 +245,7 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.inventories[sid] = nil
       state.profiles[sid] = nil
       state.areas[sid] = nil
+      Objects.forget_player(state.world, sid)
       local rest = others(state, sid)
       if #rest > 0 then
         dispatcher.broadcast_message(OP_PLAYER_LEFT, nk.json_encode(entry), rest, nil, true)
@@ -247,7 +255,15 @@ function M.match_leave(context, dispatcher, tick, state, presences)
   return state
 end
 
+local function broadcast_object(dispatcher, oid, value)
+  dispatcher.broadcast_message(OP_OBJECT_STATE, nk.json_encode({ o = oid, s = value }), nil, nil, true)
+end
+
 function M.match_loop(context, dispatcher, tick, state, messages)
+  local now = tick / TICK_RATE
+  for _, change in ipairs(Objects.tick(state.world, now)) do
+    broadcast_object(dispatcher, change[1], change[2])
+  end
   for _, message in ipairs(messages) do
     local sid = message.sender.session_id
     if message.op_code == OP_STATE then
@@ -347,6 +363,18 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         local rest = others(state, sid)
         if #rest > 0 then
           dispatcher.broadcast_message(OP_HELD_ITEM, nk.json_encode({ sid = sid, id = id }), rest, message.sender, true)
+        end
+      end
+    elseif message.op_code == OP_WORLD_EVENT then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local profile = state.profiles[sid]
+      if ok and profile then
+        local ctx = { sid = sid, area = state.areas[sid], knows = function(id) return Profile.knows(profile, id) end }
+        local oid, value = Objects.handle(state.world, ctx, payload, now)
+        if oid then
+          broadcast_object(dispatcher, oid, value)
+        else
+          nk.logger_debug(string.format("world event from %s refused: %s", sid, tostring(value)))
         end
       end
     elseif message.op_code == OP_PING then
