@@ -24,7 +24,7 @@ Storeys are 9 m apart: walls 0–8 m (two 4 m rows), ceiling tile at 8 m, next f
 
 `AreaZone` (`gameplay/world/area_zone.gd`) is an Area3D per room with `area_id`, `display_key` (translation key), `kind` (hall, corridor, classroom, common_room, dormitory, tower, outdoor, secret…) and `house` (1 Drakoryn, 2 Grypheon, 3 Phoenara, 4 Hipporys). It emits `GameEvents.area_entered/area_exited` for the local player; the HUD shows the area name, and proximity chat, house access and classroom context will key off the same zones. `Castle.get_zones()` lists them.
 
-Rendering: `ModularWallRun` and `ModularFloor` add a slightly shrunken `BoxOccluder3D` and the project enables occlusion culling, so rooms behind walls, floors and ceilings are culled — the castle has ~6,000 module instances and this is what keeps it cheap.
+Rendering: `ModularWallRun` and `ModularFloor` add a slightly shrunken `BoxOccluder3D` and the project enables occlusion culling, so rooms behind walls, floors and ceilings are culled — the castle has ~6,000 module instances and this is what keeps it cheap. Castle lights cast no shadows, so walls use `wall_stone.tres` (`wall_stone.gdshader`): its `light()` ignores any light on the far side of the wall's plane from the camera, which stops torches in the next room lighting the bevelled stone edges at module seams. `ModularWallRun` also adds a dark mortar slab behind the stone faces so the model's edge slivers are never see-through.
 
 ## Autoloads (and why)
 
