@@ -10,7 +10,8 @@ extends Node3D
 ## captured and every mouse movement turns the camera; the mouse wheel zooms.
 ## The cursor is handed back whenever a UI panel captures input, the game is
 ## paused, the window loses focus (a click back into the window recaptures) or
-## the player presses F1 to free it (F1 again resumes mouse look).
+## the player presses ` or F1 to free it (again resumes mouse look; on Mac
+## keyboards F1 needs Fn, so ` is the everyday key).
 ## Camera "zones"/cinematic constraints can later be layered on by driving
 ## [member yaw]/[member pitch]/[member distance] from an external controller
 ## and setting [member input_enabled] to false.
@@ -37,7 +38,7 @@ var follow_offset: Vector3 = Vector3.ZERO
 
 var yaw: float = 0.0
 var pitch: float = 0.0
-## Mouse look wanted by the player (F1 toggles it off to get a free cursor).
+## Mouse look wanted by the player (` or F1 toggles it off to get a free cursor).
 var mouse_look_enabled: bool = true
 
 var _active: bool = false

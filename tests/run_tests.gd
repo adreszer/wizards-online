@@ -272,6 +272,9 @@ func _test_camera() -> void:
 	t.check(not rig.is_mouse_looking() and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "F1 frees the cursor")
 	rig._unhandled_input(_action_press("toggle_cursor"))
 	t.check(rig.is_mouse_looking(), "F1 again resumes mouse look")
+	var backquote := InputEventKey.new()
+	backquote.physical_keycode = KEY_QUOTELEFT
+	t.check(InputMap.event_is_action(backquote, "toggle_cursor"), "the ` key also frees the cursor (Mac F1 needs Fn)")
 	rig._notification(NOTIFICATION_WM_WINDOW_FOCUS_OUT)
 	t.check(not rig.is_mouse_looking() and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "losing window focus frees the cursor")
 	var click := InputEventMouseButton.new()
