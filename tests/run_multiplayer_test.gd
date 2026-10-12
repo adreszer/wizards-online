@@ -249,7 +249,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 
 	t.section("Sorting (student)")
 	var answers_for_3: Array = []
-	for q in HouseSorting.QUESTIONS:
+	for q in HouseSorting.questions():
 		for i in q["answers"].size():
 			if q["answers"][i]["house"] == 3:
 				answers_for_3.append(i + 1)

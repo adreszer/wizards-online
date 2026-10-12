@@ -214,6 +214,37 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Hit reaction and death clips (the model ships none; today a flash and a shrink)
 - [ ] More enemy kinds and spawn rules (night only, secret rooms), enemy audio
 
+### Milestone 18 — One source for shared lists (content pipeline, see docs/content-pipeline.md)
+- [x] `tools/export_server_content.gd` (+ `ServerContentExporter`): spells, items, sorting, characters, protocol constants → `nakama/modules/generated/*.lua`, loaded with `require("generated.<name>")`
+- [x] Sorting questions moved into `resources/school/sorting.tres` (`SortingQuestionnaire`); `ItemRegistry.ITEM_IDS` is an explicit list like `SPELL_IDS`
+- [x] `character_profile.lua`, `world_match.lua`, `world.lua` use the generated modules (op codes, RPC names, chat cap, spell ids, sorting, item catalogue, character ids); no hand-kept mirror lists remain
+- [x] Freshness: `run_tests.tscn` "Server content" section fails on a stale export or a registry that does not match its `.tres` files; `tools/check.sh` regenerates castle + content, fails on an uncommitted diff, then runs the script check and gameplay tests (opt-in pre-push hook: `git config core.hooksPath tools/hooks`)
+- [ ] Race: two `join_world` calls in quick succession on a fresh server can create two world matches (the label index lags `match_create`); seen once in the two-client test right after a server start
+
+### Milestone 19 — Placement data and stable object ids
+- [ ] `content/placements.json` read by the castle generator (tomes, enemies, plaques, fragments, checkpoints, sorting stone, switch/block)
+- [ ] `object_id` (`<area>/<name>`) on every interactable; generator refuses duplicate ids, unknown areas/kinds/spells
+- [ ] Exporter writes `generated/world_objects.lua` from `castle.tscn` (kind, areas, position, accepted effect types)
+
+### Milestone 20 — Server-authoritative world objects
+- [ ] `OP_WORLD_EVENT` / `OP_OBJECT_STATE` / `OP_WORLD_SNAPSHOT`; server validation (object, area, known spell, accepted effect, rate limit)
+- [ ] `WorldObjectSync` on the client; secret walls, switches, doors, torches, levers, statues apply server state; offline unchanged
+- [ ] Multiplayer test: A's change seen by B and by a rejoining client
+
+### Milestone 21 — Mysteries as data (server-only)
+- [ ] `nakama/modules/mysteries.lua` step engine (spell, interact, enter/holding, together, ordered, timed); world/house/player scopes
+- [ ] Server-only `strings.json`, locale in join metadata, `OP_SERVER_TEXT`; discoveries on the profile
+- [ ] The three secret passages rebuilt as mysteries + one two-player mystery
+
+### Milestone 22 — Subjects, lesson sessions, house points
+- [ ] `SubjectDefinition` resources + `generated/subjects.lua`
+- [ ] Lesson sessions gate spell grants; attendance
+- [ ] House points ledger, professor award/deduct, HUD tally; lesson plans and lecture text
+
+### Milestone 23 — Release hygiene
+- [ ] Client export preset with include/exclude filters; `.pck` leak check
+- [ ] Offline practice mysteries
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
@@ -281,7 +312,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (261 gameplay + localization checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-09-26, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (292 gameplay, localization and server-content checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
 
 | Area | Check | Status |
 |------|-------|--------|

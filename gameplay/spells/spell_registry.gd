@@ -6,6 +6,7 @@ extends RefCounted
 ##
 ## The list is explicit rather than a directory scan so exported builds (where
 ## .tres files become remapped resources) behave exactly like the editor.
+## tools/export_server_content.gd exports it to the server (generated/spells.lua).
 
 const SPELLS_DIR := "res://resources/spells/"
 ## Every spell in the game, in curriculum order (also the default hotbar order

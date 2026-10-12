@@ -4,9 +4,10 @@
 
 local nk = require("nakama")
 local Profile = require("character_profile")
+local P = require("generated.protocol")
 
 local WORLD_LABEL = "world"
-local MAX_CHAT_LENGTH = 200
+local MAX_CHAT_LENGTH = P.MAX_CHAT_LENGTH
 
 local function find_or_create_world()
   local matches = nk.match_list(1, true, WORLD_LABEL, 0, 200, "")
@@ -21,7 +22,7 @@ local function rpc_join_world(context, payload)
   local match_id = find_or_create_world()
   return nk.json_encode({ match_id = match_id })
 end
-nk.register_rpc(rpc_join_world, "join_world")
+nk.register_rpc(rpc_join_world, P.RPC_JOIN_WORLD)
 
 -- Reject oversized or empty chat messages before they are stored/broadcast.
 local function before_channel_message_send(context, payload)
@@ -90,4 +91,4 @@ local function rpc_admin_set_profile(context, payload)
   end
   return nk.json_encode(decoded)
 end
-nk.register_rpc(rpc_admin_set_profile, "admin_set_profile")
+nk.register_rpc(rpc_admin_set_profile, P.RPC_ADMIN_SET_PROFILE)

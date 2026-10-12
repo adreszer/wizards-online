@@ -1,0 +1,67 @@
+[gd_resource type="Resource" script_class="SortingQuestionnaire" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/school/sorting_questionnaire.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+questions = Array[Dictionary]([{
+"answers": [{
+"house": 4,
+"key": "SORT_Q1_A1"
+}, {
+"house": 2,
+"key": "SORT_Q1_A2"
+}, {
+"house": 3,
+"key": "SORT_Q1_A3"
+}, {
+"house": 1,
+"key": "SORT_Q1_A4"
+}],
+"key": "SORT_Q1"
+}, {
+"answers": [{
+"house": 3,
+"key": "SORT_Q2_A1"
+}, {
+"house": 1,
+"key": "SORT_Q2_A2"
+}, {
+"house": 2,
+"key": "SORT_Q2_A3"
+}, {
+"house": 4,
+"key": "SORT_Q2_A4"
+}],
+"key": "SORT_Q2"
+}, {
+"answers": [{
+"house": 4,
+"key": "SORT_Q3_A1"
+}, {
+"house": 1,
+"key": "SORT_Q3_A2"
+}, {
+"house": 3,
+"key": "SORT_Q3_A3"
+}, {
+"house": 2,
+"key": "SORT_Q3_A4"
+}],
+"key": "SORT_Q3"
+}, {
+"answers": [{
+"house": 1,
+"key": "SORT_Q4_A1"
+}, {
+"house": 2,
+"key": "SORT_Q4_A2"
+}, {
+"house": 4,
+"key": "SORT_Q4_A3"
+}, {
+"house": 3,
+"key": "SORT_Q4_A4"
+}],
+"key": "SORT_Q4"
+}])

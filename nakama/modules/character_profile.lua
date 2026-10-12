@@ -2,10 +2,12 @@
 -- Storage: collection "character", key "profile", one object per user:
 --   { v = 1, house = 0..4, role = "student"|"professor"|"admin",
 --     spells = { known = {ids}, slots = {ids or ""}, equipped = id } }
--- The spell id list mirrors SpellRegistry.SPELL_IDS (res://gameplay/spells/
--- spell_registry.gd); keep the two in sync.
+-- Spell ids and the sorting questionnaire come from generated modules
+-- (tools/export_server_content.gd), so the client's lists are the only source.
 
 local nk = require("nakama")
+local SPELLS = require("generated.spells")
+local SORTING = require("generated.sorting")
 
 local M = {}
 
@@ -14,19 +16,12 @@ M.ROLES = { student = true, professor = true, admin = true }
 M.MAX_HOUSE = 4
 M.QUICK_SLOTS = 10
 M.SPELLS = {}
-for _, id in ipairs({ "arcane_pulse", "uplift", "galewind", "emberkindle", "wellspring", "frostbind",
-                      "glowmote", "duskveil", "unbolt", "mendweave", "quicksprout" }) do
+for _, id in ipairs(SPELLS.ids) do
   M.SPELLS[id] = true
 end
 
--- Sorting questionnaire: answer index (1-4) -> house, per question. Mirrors
--- HouseSorting.QUESTIONS in res://gameplay/school/house_sorting.gd.
-M.SORTING = {
-  { 4, 2, 3, 1 },
-  { 3, 1, 2, 4 },
-  { 4, 1, 3, 2 },
-  { 1, 2, 4, 3 },
-}
+-- Sorting questionnaire: answer index (1-4) -> house, per question.
+M.SORTING = SORTING.questions
 M.COUNTS_KEY = "house_counts"
 
 -- Scores per house for a list of answers, or nil when the answers are malformed.
@@ -108,7 +103,7 @@ function M.sanitize_spells(raw)
   else
     for i = 1, M.QUICK_SLOTS do slots[i] = "" end
   end
-  -- Known but unslotted spells take the first free slot (mirrors SpellCaster.load_state).
+  -- Known but unslotted spells take the first free slot (same rule as SpellCaster.load_state).
   for _, id in ipairs(known) do
     if not slotted[id] then
       for i = 1, M.QUICK_SLOTS do

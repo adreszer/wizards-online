@@ -1,23 +1,6 @@
 -- Authoritative match handler for the shared world.
--- Op codes mirror res://multiplayer/network_protocol.gd:
---   1  STATE        client -> others (movement snapshot)
---   2  SPELL_CAST   client -> others
---   3  HELD_ITEM    client -> server (validated) -> others  {id}
---   4  AREA         client -> server  {id}  the area the player is in ("" = none)
---   5  GRANT_SPELL  client (professor) -> server  {sid, id}
---   6  SPELLBOOK    client -> server  {slots, equipped}  hotbar layout
---   7  STUDY_TOME   client -> server  {id}  practice tome (interim, until lessons only)
---   8  SORT         client -> server  {answers = {1..4 x4}}  sorting ceremony
---   10 ROSTER       server -> joining client
---   11 PLAYER_JOINED server -> others
---   12 PLAYER_LEFT  server -> others
---   13 INVENTORY    server -> joining client  {items = {{id, count}}, held}
---   14 PROFILE      server -> same client  {house, role, spells}
---   15 ROSTER_UPDATE server -> others  {sid, role, house}
---   16 SPELL_GRANTED server -> target  {id, by}
---   17 GRANT_RESULT server -> professor  {ok, sid, id, reason}
---   18 SORT_RESULT  server -> same client  {ok, house, reason}
---   20 PING         client -> same client (latency probe)
+-- Op codes and payloads are documented in res://multiplayer/network_protocol.gd;
+-- their numbers come from generated.protocol (tools/export_server_content.gd).
 -- The server owns identity (display names come from join metadata and are
 -- sanitized here), inventories (storage "inventory"/"items") and character
 -- profiles (storage "character"/"profile": house, role, spellbook; see
@@ -31,10 +14,12 @@ local nk = require("nakama")
 local Profile = require("character_profile")
 local AREAS = require("world_areas")
 
-local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA, OP_GRANT_SPELL, OP_SPELLBOOK, OP_STUDY_TOME, OP_SORT = 1, 2, 3, 4, 5, 6, 7, 8
-local OP_ROSTER, OP_PLAYER_JOINED, OP_PLAYER_LEFT, OP_INVENTORY = 10, 11, 12, 13
-local OP_PROFILE, OP_ROSTER_UPDATE, OP_SPELL_GRANTED, OP_GRANT_RESULT, OP_SORT_RESULT = 14, 15, 16, 17, 18
-local OP_PING = 20
+local P = require("generated.protocol")
+local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
+local OP_GRANT_SPELL, OP_SPELLBOOK, OP_STUDY_TOME, OP_SORT = P.OP_GRANT_SPELL, P.OP_SPELLBOOK, P.OP_STUDY_TOME, P.OP_SORT
+local OP_ROSTER, OP_PLAYER_JOINED, OP_PLAYER_LEFT, OP_INVENTORY = P.OP_ROSTER, P.OP_PLAYER_JOINED, P.OP_PLAYER_LEFT, P.OP_INVENTORY
+local OP_PROFILE, OP_ROSTER_UPDATE, OP_SPELL_GRANTED = P.OP_PROFILE, P.OP_ROSTER_UPDATE, P.OP_SPELL_GRANTED
+local OP_GRANT_RESULT, OP_SORT_RESULT, OP_PING = P.OP_GRANT_RESULT, P.OP_SORT_RESULT, P.OP_PING
 local MAX_AREA_ID_BYTES = 48
 local TICK_RATE = 15
 -- Bytes, not characters: the client caps names at 16 characters, which with
@@ -47,7 +32,7 @@ local function sanitize_name(name, fallback)
   if type(name) ~= "string" then
     return fallback
   end
-  -- Mirrors GameSession.sanitize_display_name: ASCII letters/digits, space,
+  -- Same rule as GameSession.sanitize_display_name: ASCII letters/digits, space,
   -- "_" and "-", plus any multi-byte UTF-8 sequence (accented Latin letters).
   name = name:gsub("[^%w _%-\128-\255]", ""):gsub("^%s+", ""):gsub("%s+$", "")
   if #name > MAX_NAME_BYTES then
@@ -64,19 +49,23 @@ local function sanitize_name(name, fallback)
   return name
 end
 
-local CHARACTERS = { apprentice_m = true, apprentice_f = true, placeholder = true }
+local CHARACTER_LIST = require("generated.characters")
+local CHARACTERS = {}
+for _, id in ipairs(CHARACTER_LIST.ids) do
+  CHARACTERS[id] = true
+end
 
 local function sanitize_character(id)
   if type(id) == "string" and CHARACTERS[id] then
     return id
   end
-  return "apprentice_m"
+  return CHARACTER_LIST.default
 end
 
--- Item catalogue; mirrors res://resources/items/*.tres (ItemRegistry).
-local ITEMS = { torch = { holdable = true, max_stack = 1 } }
--- What a brand-new character owns.
-local STARTING_ITEMS = { { id = "torch", count = 1 } }
+-- Item catalogue (ItemRegistry) and what a brand-new character owns.
+local ITEM_LIST = require("generated.items")
+local ITEMS = ITEM_LIST.by_id
+local STARTING_ITEMS = ITEM_LIST.starting
 local INVENTORY_COLLECTION, INVENTORY_KEY = "inventory", "items"
 
 local function sanitize_inventory(raw)

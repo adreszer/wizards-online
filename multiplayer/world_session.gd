@@ -44,7 +44,7 @@ func connect_socket(client: NakamaClient, session: NakamaSession) -> String:
 
 ## Asks the server module for the shared world match and joins it.
 func join_world(client: NakamaClient, session: NakamaSession, display_name: String, character_id: String = "") -> String:
-	var rpc: NakamaAPI.ApiRpc = await client.rpc_async(session, "join_world", "{}")
+	var rpc: NakamaAPI.ApiRpc = await client.rpc_async(session, NetworkProtocol.RPC_JOIN_WORLD, "{}")
 	if rpc.is_exception():
 		return tr("NET_JOIN_RPC_FAILED") % rpc.get_exception().message
 	var payload := NetworkProtocol.decode(rpc.payload)

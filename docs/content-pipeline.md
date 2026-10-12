@@ -4,6 +4,12 @@ Goal: make new spells, subjects, lessons, placed objects and **mysteries** mostl
 
 Proposed milestones 18–23 continue `docs/plan.md`.
 
+**Implementation decisions** (taken while planning the build; `docs/plan.md` tracks progress):
+- `world_objects.lua` is written by the Godot exporter from the built `castle.tscn`, not by the Python generator, so the accepted effect types stay on each scene's `SpellReceiver`.
+- Server-only strings are `strings.json` (`{key: {pl, en}}`), not CSV; the same validator rules apply.
+- Server content goes under `nakama/modules/content/` if `nk.file_read` cannot read outside the runtime path.
+- Generated modules are required as `require("generated.<name>")` (Nakama names modules in subfolders with dots; verified).
+
 ## What is already data-driven
 
 A lot. Keep these patterns:
@@ -135,10 +141,10 @@ This replaces the "puzzle / door state: local only" limitation and is what myste
 
 Estimates assume part-time solo work. Each milestone keeps `tests/run_tests.tscn` and the multiplayer tests passing.
 
-### Milestone 18 — One source for shared lists (≈1 week)
-- [ ] `tools/export_server_content.gd`: spells, items, sorting, protocol → `nakama/modules/generated/*.lua`
-- [ ] Sorting questions into a resource; `character_profile.lua` / `world_match.lua` require the generated modules
-- [ ] Freshness check (exporter + castle generator + `git diff --exit-code`) in the test script
+### Milestone 18 — One source for shared lists (≈1 week) — done
+- [x] `tools/export_server_content.gd`: spells, items, sorting, characters, protocol → `nakama/modules/generated/*.lua`
+- [x] Sorting questions into a resource; `character_profile.lua` / `world_match.lua` / `world.lua` require the generated modules
+- [x] Freshness check (exporter + castle generator + `git diff --exit-code`) in `tools/check.sh`, plus a stale-export test in `run_tests.tscn`
 - **Done when:** no "mirrors X" comments remain. Adding a spell is one `.tres` + translation keys, and the server accepts it without editing Lua.
 
 ### Milestone 19 — Placement data and object ids (≈1–2 weeks)

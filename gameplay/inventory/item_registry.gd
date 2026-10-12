@@ -2,10 +2,16 @@ class_name ItemRegistry
 extends RefCounted
 ## Looks item definitions up by id. Ids travel over the network and live in
 ## Nakama storage, so anything received from outside goes through
-## [method sanitize] before it is used. Mirrors `ITEMS` in
-## nakama/modules/world_match.lua; keep the two in sync.
+## [method sanitize] before it is used. tools/export_server_content.gd exports
+## the catalogue and the starting kit to the server.
+##
+## The list is explicit rather than a directory scan, like SpellRegistry.
 
 const ITEMS_DIR := "res://resources/items/"
+## Every item in the game.
+const ITEM_IDS: Array[String] = [
+	"torch",
+]
 ## Items every new character owns (offline default; the server creates the
 ## same set on first join).
 const STARTING_ITEMS := [{"id": "torch", "count": 1}]
@@ -14,7 +20,7 @@ static var _cache: Dictionary = {}
 
 
 static func exists(id: String) -> bool:
-	return _is_safe_id(id) and ResourceLoader.exists(ITEMS_DIR + id + ".tres")
+	return ITEM_IDS.has(id)
 
 
 ## Returns the id if it names a known item, otherwise "".
@@ -37,12 +43,3 @@ static func load_definition(id: String) -> ItemDefinition:
 static func default_state() -> Dictionary:
 	return {"items": STARTING_ITEMS.duplicate(true), "held": ""}
 
-
-static func _is_safe_id(id: String) -> bool:
-	if id.is_empty() or id.length() > 32:
-		return false
-	for ch in id:
-		var c := ch.unicode_at(0)
-		if not ((c >= 97 and c <= 122) or (c >= 48 and c <= 57) or c == 95):
-			return false
-	return true

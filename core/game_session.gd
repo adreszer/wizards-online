@@ -51,7 +51,7 @@ func is_online() -> bool:
 
 ## Keeps ASCII letters/digits, space, "_", "-" and Latin letters with
 ## diacritics (Latin-1 Supplement + Latin Extended-A/B: Polish, German, Czech…).
-## Mirrors sanitize_name in nakama/modules/world_match.lua.
+## Same rule as sanitize_name in nakama/modules/world_match.lua.
 func sanitize_display_name(raw: String) -> String:
 	var cleaned := raw.strip_edges()
 	var out := ""

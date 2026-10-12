@@ -1,7 +1,8 @@
 class_name NetworkProtocol
 extends RefCounted
-## Op codes and payload helpers shared by the client and mirrored in
-## `nakama/modules/world_match.lua`. Keep both in sync.
+## Op codes and payload helpers. tools/export_server_content.gd exports every
+## OP_* / RPC_* constant to nakama/modules/generated/protocol.lua, which the
+## match handler uses; add an op here, re-export, and both sides agree.
 
 ## client → server → all other players: movement snapshot
 const OP_STATE := 1
@@ -42,6 +43,8 @@ const OP_SORT_RESULT := 18
 const OP_PING := 20
 
 const CHAT_ROOM := "world"
+## Server RPC that finds (or creates) the shared world match.
+const RPC_JOIN_WORLD := "join_world"
 ## Server RPC that changes a character's role/house (admin or HTTP key).
 const RPC_ADMIN_SET_PROFILE := "admin_set_profile"
 const MAX_CHAT_LENGTH := 200

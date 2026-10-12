@@ -51,6 +51,7 @@ func _run() -> void:
 	await _test_castle()
 	_test_localization()
 	await _test_characters()
+	_test_server_content()
 	print(t.summary())
 	get_tree().quit(1 if t.failed > 0 else 0)
 
@@ -798,7 +799,7 @@ func _test_houses() -> void:
 	# Questionnaire rule: every house is reachable, ties break toward the emptiest house.
 	for house in range(1, CharacterProfile.MAX_HOUSE + 1):
 		var answers: Array = []
-		for q in HouseSorting.QUESTIONS:
+		for q in HouseSorting.questions():
 			for i in q["answers"].size():
 				if q["answers"][i]["house"] == house:
 					answers.append(i + 1)
@@ -852,7 +853,7 @@ func _test_houses() -> void:
 	t.check(panel.is_open and GameSession.ui_input_captured and panel.current_question == 0, "touching the stone opens the questionnaire")
 	t.check(panel.get_node("%Answers").get_child_count() == 4 and panel.get_node("%Question").text == tr("SORT_Q1"), "the first question shows four answers")
 	# Answer everything toward house 3.
-	for q in HouseSorting.QUESTIONS:
+	for q in HouseSorting.questions():
 		for i in q["answers"].size():
 			if q["answers"][i]["house"] == 3:
 				(panel.get_node("%Answers").get_child(i) as Button).pressed.emit()
@@ -1271,3 +1272,37 @@ func _test_characters() -> void:
 		t.check(bool(tree.get("parameters/Cast/active")), "%s: cast one-shot plays" % id)
 		player.movement.set_external_move(Vector3.ZERO)
 	await _clear([floor_body])
+
+
+## The server's generated content modules must match a fresh export, and the
+## explicit registries must list exactly the definitions on disk.
+func _test_server_content() -> void:
+	t.section("Server content")
+	var stale := ServerContentExporter.stale()
+	t.check(stale.is_empty(), "nakama/modules/generated is up to date (stale: %s; run tools/export_server_content.gd)" % ", ".join(stale))
+	t.check(_ids_match_dir(SpellRegistry.SPELL_IDS, SpellRegistry.SPELLS_DIR), "SPELL_IDS lists exactly resources/spells/*.tres")
+	t.check(_ids_match_dir(ItemRegistry.ITEM_IDS, ItemRegistry.ITEMS_DIR), "ITEM_IDS lists exactly resources/items/*.tres")
+	for id in ItemRegistry.ITEM_IDS:
+		var def := ItemRegistry.load_definition(id)
+		t.check(def != null and str(def.id) == id, "item %s loads with a matching id" % id)
+	var codes := {}
+	var duplicate := false
+	var constants: Dictionary = (NetworkProtocol as Script).get_script_constant_map()
+	for name: String in constants:
+		if name.begins_with("OP_"):
+			duplicate = duplicate or codes.has(constants[name])
+			codes[constants[name]] = name
+	t.check(not duplicate and not codes.is_empty(), "protocol op codes are unique")
+	t.check(HouseSorting.question_count() == 4, "sorting questionnaire loads from its resource")
+
+
+func _ids_match_dir(ids: Array[String], dir_path: String) -> bool:
+	var on_disk: Array[String] = []
+	for file_name in DirAccess.get_files_at(dir_path):
+		var clean := file_name.trim_suffix(".remap")
+		if clean.ends_with(".tres"):
+			on_disk.append(clean.trim_suffix(".tres"))
+	var listed := ids.duplicate()
+	listed.sort()
+	on_disk.sort()
+	return listed == on_disk

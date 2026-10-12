@@ -65,7 +65,7 @@ func _show_question() -> void:
 	for child in _answers.get_children():
 		_answers.remove_child(child)
 		child.queue_free()
-	var q: Dictionary = HouseSorting.QUESTIONS[current_question]
+	var q: Dictionary = HouseSorting.questions()[current_question]
 	_progress.text = tr("SORT_PROGRESS") % [current_question + 1, HouseSorting.question_count()]
 	_question.text = tr(q["key"])
 	for i in q["answers"].size():
