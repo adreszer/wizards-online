@@ -52,6 +52,23 @@ const OP_WORLD_SNAPSHOT := 21
 ## server → one player: {text, seconds} text already resolved in the player's
 ## locale (mystery clues and rewards, which never ship in the client)
 const OP_SERVER_TEXT := 22
+## client (professor/admin) → server: {action: "open" | "close"} a lesson in the
+## sender's classroom; spell grants need an open lesson of that room's subject
+const OP_LESSON := 23
+## server → all (and joiners): {lessons: {area: {subject, by, sid}}} every open lesson
+const OP_LESSON_STATE := 24
+## server → sender: {ok, action, reason} outcome of OP_LESSON
+const OP_LESSON_RESULT := 25
+## client (professor/admin) → server: {house: 1–4, delta: ±points, reason}
+const OP_HOUSE_POINTS := 26
+## server → all (and joiners): {totals: [house 1, 2, 3, 4]} the house points tally
+const OP_HOUSE_TOTALS := 27
+## server → sender: {ok, house, delta, reason} outcome of OP_HOUSE_POINTS
+const OP_HOUSE_POINTS_RESULT := 28
+## client (professor in an open lesson) → server: {text} lecture text for the room
+const OP_LECTURE := 29
+## server → everyone in that classroom: {by, text}
+const OP_LECTURE_TEXT := 30
 
 const CHAT_ROOM := "world"
 ## Server RPC that finds (or creates) the shared world match.
@@ -60,6 +77,12 @@ const RPC_JOIN_WORLD := "join_world"
 const RPC_ADMIN_SET_PROFILE := "admin_set_profile"
 ## Server RPC that resets world objects and shared mysteries (admin or HTTP key; dev and tests).
 const RPC_ADMIN_RESET_WORLD := "admin_reset_world"
+## Admin RPC: {limit?} → {records: [{house, delta, reason, by_name, source, subject, at}], totals}
+const RPC_HOUSE_POINTS_LEDGER := "house_points_ledger"
+## Staff RPC: {id?, title, lines: [text]} → {id} stores a lesson plan for the caller
+const RPC_LESSON_PLAN_SAVE := "lesson_plan_save"
+## Staff RPC: {} → {plans: [{id, title, lines}]} the caller's lesson plans
+const RPC_LESSON_PLAN_LIST := "lesson_plan_list"
 const MAX_CHAT_LENGTH := 200
 
 

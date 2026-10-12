@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SubjectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/school/subject_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"beastlore"
+display_name = "SUBJECT_BEASTLORE_NAME"
+classrooms = PackedStringArray("class_beastlore")
+spells_by_year = Array[PackedStringArray]([])
+color = Color(0.7, 0.55, 0.4, 1)

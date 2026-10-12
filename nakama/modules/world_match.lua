@@ -15,6 +15,10 @@
 -- Every validated event (and every area change) also feeds the mystery
 -- engine (mysteries.lua, content in nakama/content/), whose clues and
 -- rewards are sent as resolved text in the player's locale (OP_SERVER_TEXT).
+-- Lessons (school.lua): a professor opens a lesson in a classroom; spell
+-- grants need an open lesson there and a spell of the room's subject, the
+-- lesson records attendance and carries the lecture text. House points go
+-- through a stored ledger and a running total broadcast to everyone.
 -- Movement is relayed but not yet validated.
 
 local nk = require("nakama")
@@ -22,6 +26,7 @@ local Profile = require("character_profile")
 local AREAS = require("world_areas")
 local Objects = require("object_rules")
 local Mysteries = require("mysteries")
+local School = require("school")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -31,6 +36,9 @@ local OP_PROFILE, OP_ROSTER_UPDATE, OP_SPELL_GRANTED = P.OP_PROFILE, P.OP_ROSTER
 local OP_GRANT_RESULT, OP_SORT_RESULT, OP_PING = P.OP_GRANT_RESULT, P.OP_SORT_RESULT, P.OP_PING
 local OP_WORLD_EVENT, OP_OBJECT_STATE, OP_WORLD_SNAPSHOT = P.OP_WORLD_EVENT, P.OP_OBJECT_STATE, P.OP_WORLD_SNAPSHOT
 local OP_SERVER_TEXT = P.OP_SERVER_TEXT
+local OP_LESSON, OP_LESSON_STATE, OP_LESSON_RESULT = P.OP_LESSON, P.OP_LESSON_STATE, P.OP_LESSON_RESULT
+local OP_HOUSE_POINTS, OP_HOUSE_TOTALS, OP_HOUSE_POINTS_RESULT = P.OP_HOUSE_POINTS, P.OP_HOUSE_TOTALS, P.OP_HOUSE_POINTS_RESULT
+local OP_LECTURE, OP_LECTURE_TEXT = P.OP_LECTURE, P.OP_LECTURE_TEXT
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
 local MAX_AREA_ID_BYTES = 48
@@ -233,10 +241,53 @@ local function players_in(state, area)
   return out
 end
 
--- House points come from professors and mysteries; the ledger arrives with
--- lesson sessions (Milestone 22). Until then awards are only logged.
-local function award_house_points(dispatcher, state, house, delta, reason, by_sid)
-  nk.logger_info(string.format("house points (no ledger yet): house %d %+d (%s)", house, delta, reason))
+local function send_house_totals(dispatcher, state, presences)
+  dispatcher.broadcast_message(OP_HOUSE_TOTALS, nk.json_encode({ totals = state.totals }), presences, nil, true)
+end
+
+-- The only way house points change (professors and mysteries): one ledger
+-- record per change, then the new totals to everyone. Returns true when stored.
+local function award_house_points(dispatcher, state, house, delta, reason, by_sid, source, subject)
+  local p = state.presences[by_sid]
+  local record = { house = house, delta = delta, reason = reason, by = p and p.user_id or "", by_name = state.names[by_sid] or "",
+                   source = source or "mystery", subject = subject or "" }
+  if not School.record_points(state.totals, record) then
+    return false
+  end
+  send_house_totals(dispatcher, state, nil)
+  return true
+end
+
+local function lessons_payload(state)
+  local out = {}
+  for area, lesson in pairs(state.lessons) do
+    out[area] = { subject = lesson.subject, by = lesson.by_name, sid = lesson.by_sid }
+  end
+  return nk.json_encode({ lessons = out })
+end
+
+local function send_lessons(dispatcher, state, presences)
+  dispatcher.broadcast_message(OP_LESSON_STATE, lessons_payload(state), presences, nil, true)
+end
+
+local function close_lesson(dispatcher, state, area, why)
+  local lesson = state.lessons[area]
+  if not lesson then return end
+  state.lessons[area] = nil
+  local count = 0
+  for _ in pairs(lesson.attendance) do count = count + 1 end
+  nk.logger_info(string.format("lesson %s in %s by %s closed (%s), %d attended, %d points", lesson.subject, area, lesson.by_name, why, count, lesson.points))
+  send_lessons(dispatcher, state, nil)
+end
+
+-- The open lesson in `sid`'s area that `sid` may run (its opener, or any admin).
+local function own_lesson(state, sid)
+  local lesson = state.lessons[state.areas[sid] or ""]
+  local profile = state.profiles[sid]
+  if lesson and profile and (lesson.by_sid == sid or profile.role == "admin") then
+    return lesson
+  end
+  return nil
 end
 
 local function broadcast_object(dispatcher, oid, value)
@@ -260,7 +311,7 @@ local function run_actions(dispatcher, state, actions)
         send_profile(dispatcher, state, a[2])
       end
     elseif kind == "house_points" then
-      award_house_points(dispatcher, state, a[2], a[3], a[4], a[5])
+      award_house_points(dispatcher, state, a[2], a[3], a[4], a[5], "mystery")
     end
   end
 end
@@ -285,7 +336,8 @@ end
 
 function M.match_init(context, params)
   local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {}, locales = {},
-                  progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load() }
+                  progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
+                  lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {} }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -321,6 +373,8 @@ function M.match_join(context, dispatcher, tick, state, presences)
     dispatcher.broadcast_message(OP_INVENTORY, nk.json_encode(state.inventories[p.session_id]), { p }, nil, true)
     send_profile(dispatcher, state, p.session_id)
     dispatcher.broadcast_message(OP_WORLD_SNAPSHOT, nk.json_encode({ objects = state.world.objects }), { p }, nil, true)
+    send_lessons(dispatcher, state, { p })
+    send_house_totals(dispatcher, state, { p })
     local rest = others(state, p.session_id)
     if #rest > 0 then
       dispatcher.broadcast_message(OP_PLAYER_JOINED, nk.json_encode(entry_for(state, p.session_id)), rest, nil, true)
@@ -341,6 +395,12 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.profiles[sid] = nil
       state.areas[sid] = nil
       state.locales[sid] = nil
+      state.points_at[sid] = nil
+      for area, lesson in pairs(state.lessons) do
+        if lesson.by_sid == sid then
+          close_lesson(dispatcher, state, area, "professor left")
+        end
+      end
       if not find_sid(state, p.user_id, nil) then
         state.progress[p.user_id] = nil
       end
@@ -360,6 +420,11 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     broadcast_object(dispatcher, change[1], change[2])
   end
   if tick % TICK_RATE == 0 then
+    for area, lesson in pairs(state.lessons) do
+      if now - lesson.opened_at > state.rules.session_max_minutes * 60 then
+        close_lesson(dispatcher, state, area, "time")
+      end
+    end
     local occupied = function(area) return #players_in(state, area) > 0 end
     run_actions(dispatcher, state, Mysteries.tick(state.engine, state.mysteries, nk.time() / 1000, occupied))
   end
@@ -387,6 +452,10 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         local changed = area ~= state.areas[sid]
         state.areas[sid] = area
         if changed and area ~= "" then
+          local lesson = state.lessons[area]
+          if lesson and lesson.by_sid ~= sid then
+            lesson.attendance[message.sender.user_id] = state.names[sid] or ""
+          end
           feed_mysteries(dispatcher, state, sid, { event = "enter", area = area })
         end
       end
@@ -429,6 +498,12 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         local info = AREAS[area]
         if area == "" or not info or info.kind ~= "classroom" then
           reason = "not_in_classroom"
+        elseif not state.lessons[area] then
+          reason = "no_lesson"
+        elseif not own_lesson(state, sid) then
+          reason = "not_your_lesson"
+        elseif not School.teaches(state.lessons[area].subject, id) then
+          reason = "not_in_subject"
         elseif (state.areas[target] or "") ~= area then
           reason = "target_elsewhere"
         elseif Profile.knows(state.profiles[target], id) then
@@ -440,10 +515,11 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       end
       dispatcher.broadcast_message(OP_GRANT_RESULT, nk.json_encode({ ok = reason == nil, sid = target, id = id, reason = reason or "" }), { message.sender }, nil, true)
     elseif message.op_code == OP_STUDY_TOME then
-      -- Interim: practice tomes teach any registered spell. Lessons will replace this.
+      -- Interim: practice tomes teach any registered spell while the school
+      -- rules allow it (practice_tomes_enabled); lessons are the real path.
       local ok, payload = pcall(nk.json_decode, message.data)
       local id = ok and type(payload) == "table" and type(payload.id) == "string" and payload.id or ""
-      if Profile.SPELLS[id] then
+      if state.rules.practice_tomes_enabled and Profile.SPELLS[id] then
         grant_spell(dispatcher, state, sid, id, "")
       end
     elseif message.op_code == OP_SPELLBOOK then
@@ -484,6 +560,74 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         else
           nk.logger_debug(string.format("world event from %s refused: %s", sid, tostring(reason)))
         end
+      end
+    elseif message.op_code == OP_LESSON then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local action = ok and type(payload) == "table" and payload.action or ""
+      local profile = state.profiles[sid]
+      local area = state.areas[sid] or ""
+      local reason = nil
+      if not profile or not Profile.is_staff(profile.role) then
+        reason = "not_staff"
+      elseif action == "open" then
+        local subject = School.subject_for_area(area)
+        if not subject then
+          reason = "not_in_classroom"
+        elseif state.lessons[area] then
+          reason = "already_open"
+        else
+          state.lessons[area] = { subject = subject, by_sid = sid, by_name = state.names[sid] or "", opened_at = now, attendance = {}, points = 0 }
+          for _, pl in ipairs(players_in(state, area)) do
+            if pl.sid ~= sid then state.lessons[area].attendance[pl.uid] = state.names[pl.sid] or "" end
+          end
+          send_lessons(dispatcher, state, nil)
+        end
+      elseif action == "close" then
+        if not own_lesson(state, sid) then
+          reason = "no_lesson"
+        else
+          close_lesson(dispatcher, state, area, "closed")
+        end
+      else
+        reason = "bad_action"
+      end
+      dispatcher.broadcast_message(OP_LESSON_RESULT, nk.json_encode({ ok = reason == nil, action = action, reason = reason or "" }), { message.sender }, nil, true)
+    elseif message.op_code == OP_HOUSE_POINTS then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local profile = state.profiles[sid]
+      local house, delta = payload.house, payload.delta
+      local text = School.clean_text(payload.reason, state.rules.max_reason_bytes)
+      local reason = nil
+      local lesson = own_lesson(state, sid)
+      if not profile or not Profile.is_staff(profile.role) then
+        reason = "not_staff"
+      elseif type(house) ~= "number" or house ~= math.floor(house) or house < 1 or house > School.HOUSES then
+        reason = "bad_house"
+      elseif type(delta) ~= "number" or delta ~= math.floor(delta) or delta == 0 or math.abs(delta) > state.rules.max_points_per_award then
+        reason = "bad_amount"
+      elseif text == "" then
+        reason = "no_reason"
+      elseif state.points_at[sid] and now - state.points_at[sid] < state.rules.points_cooldown_seconds then
+        reason = "too_soon"
+      elseif lesson and lesson.points + math.abs(delta) > state.rules.max_points_per_session then
+        reason = "session_cap"
+      elseif not award_house_points(dispatcher, state, house, delta, text, sid, "professor", lesson and lesson.subject or "") then
+        reason = "storage"
+      else
+        state.points_at[sid] = now
+        if lesson then lesson.points = lesson.points + math.abs(delta) end
+      end
+      dispatcher.broadcast_message(OP_HOUSE_POINTS_RESULT, nk.json_encode({ ok = reason == nil, house = house, delta = delta, reason = reason or "" }), { message.sender }, nil, true)
+    elseif message.op_code == OP_LECTURE then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local text = School.clean_text(ok and type(payload) == "table" and payload.text or nil, state.rules.max_lecture_bytes)
+      if text ~= "" and own_lesson(state, sid) then
+        local listeners = {}
+        for _, pl in ipairs(players_in(state, state.areas[sid])) do
+          table.insert(listeners, state.presences[pl.sid])
+        end
+        dispatcher.broadcast_message(OP_LECTURE_TEXT, nk.json_encode({ by = state.names[sid] or "", text = text }), listeners, nil, true)
       end
     elseif message.op_code == OP_PING then
       dispatcher.broadcast_message(OP_PING, message.data, { message.sender }, nil, false)

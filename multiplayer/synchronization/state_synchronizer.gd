@@ -20,6 +20,11 @@ signal object_state_changed(object_id: String, state: Variant)
 ## A full snapshot of world object states arrived (join / reconnect).
 signal world_snapshot_received(objects: Dictionary)
 signal server_text_received(text: String, seconds: float)
+signal lessons_changed(lessons: Dictionary)
+signal lesson_result_received(ok: bool, action: String, reason: String)
+signal house_totals_changed(totals: PackedInt32Array)
+signal house_points_result_received(ok: bool, house: int, delta: int, reason: String)
+signal lecture_received(by_name: String, text: String)
 
 @export var ping_interval: float = 2.0
 
@@ -32,6 +37,10 @@ var local_inventory: Dictionary = {}
 var local_profile: Dictionary = {}
 ## Server state of world objects that are not in their default state: object id → state.
 var world_objects: Dictionary = {}
+## Open lessons: area id → {subject, by, sid}.
+var lessons: Dictionary = {}
+## House points, index 0 = house 1; empty until received.
+var house_totals: PackedInt32Array = PackedInt32Array()
 var ping_ms: int = -1
 var _ping_timer: float = 0.0
 
@@ -54,6 +63,11 @@ func bind(p_session: WorldSession) -> void:
 	session.object_state_received.connect(_on_object_state)
 	session.world_snapshot_received.connect(_on_world_snapshot)
 	session.server_text_received.connect(server_text_received.emit)
+	session.lessons_received.connect(_on_lessons)
+	session.lesson_result_received.connect(lesson_result_received.emit)
+	session.house_totals_received.connect(_on_house_totals)
+	session.house_points_result_received.connect(house_points_result_received.emit)
+	session.lecture_received.connect(lecture_received.emit)
 
 
 func reset() -> void:
@@ -61,6 +75,8 @@ func reset() -> void:
 	local_inventory = {}
 	local_profile = {}
 	world_objects = {}
+	lessons = {}
+	house_totals = PackedInt32Array()
 	ping_ms = -1
 
 
@@ -110,6 +126,21 @@ func send_world_event(object_id: String, event: String, spell_id: String = "") -
 		if not spell_id.is_empty():
 			data["spell"] = spell_id
 		session.send(NetworkProtocol.OP_WORLD_EVENT, data)
+
+
+func send_lesson(action: String) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_LESSON, {"action": action})
+
+
+func send_house_points(house: int, delta: int, reason: String) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_HOUSE_POINTS, {"house": house, "delta": delta, "reason": reason})
+
+
+func send_lecture(text: String) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_LECTURE, {"text": text})
 
 
 func get_role(sid: String) -> String:
@@ -222,3 +253,16 @@ func _on_object_state(object_id: String, state: Variant) -> void:
 func _on_world_snapshot(objects: Dictionary) -> void:
 	world_objects = objects.duplicate()
 	world_snapshot_received.emit(world_objects)
+
+
+func _on_lessons(p_lessons: Dictionary) -> void:
+	lessons = p_lessons.duplicate(true)
+	lessons_changed.emit(lessons)
+
+
+func _on_house_totals(totals: Array) -> void:
+	var clean := PackedInt32Array()
+	for h in CharacterProfile.MAX_HOUSE:
+		clean.append(int(totals[h]) if h < totals.size() else 0)
+	house_totals = clean
+	house_totals_changed.emit(house_totals)

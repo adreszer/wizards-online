@@ -197,7 +197,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Live lessons v1: `OP_GRANT_SPELL` validated (staff, same classroom, target present, not known) → profile push + taught notification; lesson-tools panel (`L`) lists students in the room and the curriculum, teach one / everyone / self
 - [x] Nameplates show professor/admin titles and colours; HUD role line with the lesson-tools hint
 - [x] Tests: unit (profile sanitising, nested-zone tracker, nameplates, panel) and two-client (promotion by id and name, denied self-promotion, dropped unknown cast, refused grants, successful grant, tome request, persistence of spells and hotbar across reconnect)
-- [ ] Lesson text tools (lecture text to the room, questions), house points award/deduct, timetables; tie grants to a lesson session rather than "any staff in any classroom"
+- [x] Lecture text to the room, house points award/deduct, grants tied to a lesson session (Milestone 22)
+- [ ] Questions to students, timetables
 - [x] Sorting into houses: the Choosing Stone in the great hall opens a four-question ceremony; the server tallies (`OP_SORT`), balances ties by house population, stores the house once, updates nameplates/HUD/roster; offline runs the same rule locally; houses Drakoryn / Grypheon / Phoenara / Hipporys with emblem animals and colours
 - [x] House-gated common rooms: `HouseDoor` on every doorway into a house area (dungeon and kitchen-side common rooms, the two tower landings that now own the stairs up), members open by interacting, others refused; server drops area reports for another house's area
 - [ ] House crests (dragon, griffin, phoenix, hippocampus) on doors and banners; a visible ceremony (others watching in the great hall), house-cup tally
@@ -243,9 +244,12 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] House points from mysteries are only logged until the ledger exists (Milestone 22)
 
 ### Milestone 22 — Subjects, lesson sessions, house points
-- [ ] `SubjectDefinition` resources + `generated/subjects.lua`
-- [ ] Lesson sessions gate spell grants; attendance
-- [ ] House points ledger, professor award/deduct, HUD tally; lesson plans and lecture text
+- [x] `SubjectDefinition` resources (12 subjects with placeholder names from the classrooms; every spell in exactly one) + `generated/subjects.lua`; `subject` on each exported spell
+- [x] Lesson sessions (`OP_LESSON`/`OP_LESSON_STATE`): grants need an open lesson the sender runs and a spell of the room's subject; attendance from area reports; lessons close on request, when the professor leaves or after the time limit; rules in `nakama/content/school_rules.json`
+- [x] House points ledger (`school.lua`: one record per change + totals in one write), professor award/deduct with reason/caps/cooldown, mystery awards, `house_points_ledger` RPC, HUD tally
+- [x] Lecture text (`OP_LECTURE` → everyone in the room, shown in chat) and lesson plans stored per professor (`lesson_plan_save`/`lesson_plan_list`), read out line by line from the panel
+- [x] Two-client test: no lesson → refused, open lesson, other subject → refused, grant, lecture received, points checks and tally on both clients, ledger sums equal totals, plan stored
+- [ ] Final subject names from the owner; attendance is recorded but not shown anywhere yet
 
 ### Milestone 23 — Release hygiene
 - [ ] Client export preset with include/exclude filters; `.pck` leak check
@@ -318,7 +322,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (312 gameplay, localization, server-content, world-object and mystery-content checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (315 gameplay, localization, server-content, world-object, mystery-content and subject checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
@@ -334,7 +338,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Collectibles | counter, no double collect | [x] headless test pass |
 | Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
 | Localization | pl/en load, all keys translated, fallback, name sanitizing | [x] headless test pass; in-game visual check of Polish text (menu, HUD, plaques) pending |
-| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory and profile, promotion, classroom grant, dropped unknown cast, persistence across reconnect, sorting and roster house update | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 48 + 57 checks pass, incl. server-authoritative world objects and two mysteries |
+| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory and profile, promotion, classroom grant, dropped unknown cast, persistence across reconnect, sorting and roster house update | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 61 + 61 checks pass, incl. world objects, two mysteries, lessons and house points |
 | Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Offline | playable with backend stopped | [x] `run_offline_fallback_test` with backend stopped: readable error, offline world playable |

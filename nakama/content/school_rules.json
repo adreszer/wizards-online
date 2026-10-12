@@ -1,0 +1,9 @@
+{
+  "max_points_per_award": 20,
+  "max_points_per_session": 50,
+  "points_cooldown_seconds": 5,
+  "session_max_minutes": 120,
+  "practice_tomes_enabled": true,
+  "max_reason_bytes": 120,
+  "max_lecture_bytes": 400
+}

@@ -22,6 +22,9 @@ var sort_results: Array = []
 ## [object id, state] for every OP_OBJECT_STATE received
 var object_events: Array = []
 var server_texts: Array[String] = []
+var lesson_results: Array = []
+var points_results: Array = []
+var lectures: Array[String] = []
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
@@ -48,6 +51,9 @@ func _ready() -> void:
 	NetworkManager.sort_result_received.connect(func(ok: bool, house: int, reason: String) -> void: sort_results.append({"ok": ok, "house": house, "reason": reason}))
 	NetworkManager.object_state_changed.connect(func(oid: String, s: Variant) -> void: object_events.append([oid, s]))
 	NetworkManager.server_text_received.connect(func(text: String, _s: float) -> void: server_texts.append(text))
+	NetworkManager.lesson_result_received.connect(func(ok: bool, action: String, reason: String) -> void: lesson_results.append({"ok": ok, "action": action, "reason": reason}))
+	NetworkManager.house_points_result_received.connect(func(ok: bool, house: int, delta: int, reason: String) -> void: points_results.append({"ok": ok, "house": house, "delta": delta, "reason": reason}))
+	NetworkManager.lecture_received.connect(func(by: String, text: String) -> void: lectures.append("%s: %s" % [by, text]))
 	await _run()
 
 
@@ -238,12 +244,51 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	await _wait(1.0)  # give B's area report time to land
 	NetworkManager.send_grant_spell(b_sid, "arcane_pulse")
 	ok = await _wait_until(func() -> bool: return grant_results.size() >= 3, 10.0)
-	t.check(ok and grant_results[2]["ok"] == true and grant_results[2]["sid"] == b_sid, "teaching a student in the same classroom succeeds (%s)" % str(grant_results))
-	NetworkManager.send_grant_spell(b_sid, "arcane_pulse")
+	t.check(ok and grant_results[2]["reason"] == "no_lesson", "teaching without an open lesson is refused (%s)" % str(grant_results.back()))
+	panel.refresh()
+	t.check(panel.current_subject() == "sigilcraft" and panel.spell_index("galewind") == -1 and panel.spell_index("uplift") >= 0, "the panel lists only the classroom subject's spells")
+	NetworkManager.send_lesson("open")
+	ok = await _wait_until(func() -> bool: return lesson_results.size() >= 1 and NetworkManager.get_lessons().has(str(CLASSROOM)), 10.0)
+	t.check(ok and lesson_results[0]["ok"] == true and NetworkManager.get_lessons()[str(CLASSROOM)]["subject"] == "sigilcraft", "the professor opens a Sigilcraft lesson (%s)" % str(lesson_results))
+	NetworkManager.send_lesson("open")
+	ok = await _wait_until(func() -> bool: return lesson_results.size() >= 2, 10.0)
+	t.check(ok and lesson_results[1]["reason"] == "already_open", "a second lesson in the same room is refused")
+	NetworkManager.send_grant_spell(b_sid, "galewind")
 	ok = await _wait_until(func() -> bool: return grant_results.size() >= 4, 10.0)
-	t.check(ok and grant_results[3]["ok"] == false and grant_results[3]["reason"] == "already_known", "teaching the same spell twice is refused")
+	t.check(ok and grant_results[3]["reason"] == "not_in_subject", "a spell of another subject cannot be taught here (%s)" % str(grant_results.back()))
+	NetworkManager.send_grant_spell(b_sid, "arcane_pulse")
+	ok = await _wait_until(func() -> bool: return grant_results.size() >= 5, 10.0)
+	t.check(ok and grant_results[4]["ok"] == true and grant_results[4]["sid"] == b_sid, "teaching a student in the same classroom succeeds (%s)" % str(grant_results))
+	NetworkManager.send_grant_spell(b_sid, "arcane_pulse")
+	ok = await _wait_until(func() -> bool: return grant_results.size() >= 6, 10.0)
+	t.check(ok and grant_results[5]["ok"] == false and grant_results[5]["reason"] == "already_known", "teaching the same spell twice is refused")
+	NetworkManager.send_lecture("Today we draw the first sigil.")
+	# House points: an award with a reason lands in the ledger and the tally.
+	var totals_before := NetworkManager.get_house_totals()
+	t.check(totals_before.size() == 4, "the house points tally arrived on join (%s)" % str(totals_before))
+	NetworkManager.send_house_points(3, 99, "too many")
+	NetworkManager.send_house_points(3, 5, "  ")
+	NetworkManager.send_house_points(3, 5, "a clean first sigil")
+	ok = await _wait_until(func() -> bool: return points_results.size() >= 3, 10.0)
+	t.check(ok and points_results[0]["reason"] == "bad_amount" and points_results[1]["reason"] == "no_reason" and points_results[2]["ok"] == true, "awards are checked: amount cap, a reason, then accepted (%s)" % str(points_results))
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_house_totals().size() == 4 and NetworkManager.get_house_totals()[2] == totals_before[2] + 5, 10.0)
+	t.check(ok, "the tally shows the award (%s → %s)" % [str(totals_before), str(NetworkManager.get_house_totals())])
+	NetworkManager.send_house_points(3, -1, "talking in class")
+	ok = await _wait_until(func() -> bool: return points_results.size() >= 4, 10.0)
+	t.check(ok and points_results[3]["reason"] == "too_soon", "a second change right away waits for the cooldown")
+	var ledger: Dictionary = await NetworkManager.house_points_ledger(500, HTTP_KEY)
+	var records: Array = ledger.get("records", [])
+	var sums := [0, 0, 0, 0]
+	for r: Dictionary in records:
+		sums[int(r["house"]) - 1] += int(r["delta"])
+	var totals_now: Array = ledger.get("totals", []).map(func(v: Variant) -> int: return int(v))
+	t.check(not records.is_empty() and records[0]["reason"] == "a clean first sigil" and records[0]["by_name"] == "ClientA" and records[0]["subject"] == "sigilcraft", "the newest ledger record explains the award (%s)" % str(records.slice(0, 1)))
+	t.check(records.size() < 500 and sums == totals_now, "every house total equals the sum of its ledger records (%s vs %s)" % [str(sums), str(totals_now)])
+	var saved: Dictionary = await NetworkManager.save_lesson_plan("", "Sigils, week one", PackedStringArray(["Welcome.", "Draw the first sigil."]))
+	var plans: Array = await NetworkManager.list_lesson_plans()
+	t.check(saved.has("id") and plans.any(func(pl: Dictionary) -> bool: return pl.get("id") == saved["id"] and pl.get("lines", []).size() == 2), "a lesson plan is stored for the professor (%s)" % str(saved))
 	panel.open()
-	panel.get_node("%Spells").select(SpellRegistry.SPELL_IDS.find("uplift"))
+	panel.get_node("%Spells").select(panel.spell_index("uplift"))
 	panel.refresh()
 	panel.get_node("%GrantSelfButton").pressed.emit()
 	panel.close()
@@ -251,6 +296,9 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(ok and spawner.local_player.spell_caster.knows(&"uplift"), "a professor can teach themselves through the panel")
 	ok = await _wait_until(func() -> bool: return casts_seen > 0, 20.0)
 	t.check(ok, "remote spell cast event received once the student knows the spell")
+	NetworkManager.send_lesson("close")
+	ok = await _wait_until(func() -> bool: return not NetworkManager.get_lessons().has(str(CLASSROOM)), 10.0)
+	t.check(ok, "the professor ends the lesson")
 	ok = await _wait_until(func() -> bool: return object_events.any(func(e: Array) -> bool: return e[0] == SWITCH), 30.0)
 	var switch_node: Node = _world_object(SWITCH)
 	t.check(ok and switch_node is MagicSwitch and switch_node.is_on == (NetworkManager.get_world_object_states().get(SWITCH, false) == true), "the student's switch change reaches the professor's castle")
@@ -320,6 +368,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(ok and sort_results[2]["ok"] == false and sort_results[2]["reason"] == "already_sorted", "a second ceremony is refused")
 
 	t.section("Lesson (student)")
+	var my_house_points := NetworkManager.get_house_totals()[2] if NetworkManager.get_house_totals().size() == 4 else 0
 	_enter_classroom(spawner, Vector3(2, 0, 0))
 	ok = await _wait_until(func() -> bool: return player.area_tracker.current_area_id() == CLASSROOM, 5.0)
 	t.check(ok, "student is in the classroom")
@@ -328,6 +377,9 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(player.spell_caster.knows(&"arcane_pulse") and player.spell_caster.equipped_spell == ARCANE_PULSE, "the spellbook applied the granted spell")
 	var taught: String = tr("NOTIFY_SPELL_TAUGHT") % ["ClientA", tr(ARCANE_PULSE.display_name)]
 	t.check(notifications.has(taught), "taught notification names the professor (%s)" % str(notifications))
+	t.check(NetworkManager.get_lessons().get(str(CLASSROOM), {}).get("by", "") == "ClientA", "the student sees the professor's open lesson")
+	ok = await _wait_until(func() -> bool: return lectures.has("ClientA: Today we draw the first sigil."), 15.0)
+	t.check(ok, "the professor's lecture reaches the student in the room (%s)" % str(lectures))
 	t.check(player.spell_caster.try_cast(), "student casts the granted spell")
 	await _wait(0.6)
 	player.spell_caster.try_cast()
@@ -382,6 +434,10 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("loft"), 10.0)
 	t.check(ok, "the solver gets the loft discovery")
 	await _enter_classroom(spawner, Vector3(2, 0, 0))
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_house_totals().size() == 4 and NetworkManager.get_house_totals()[2] >= my_house_points + 5, 20.0)
+	t.check(ok, "the student's house tally shows the professor's award (%d → %s)" % [my_house_points, str(NetworkManager.get_house_totals())])
+	var hud := world.get_node_or_null("HUD")
+	t.check(hud == null or hud.house_tally_text().contains(str(NetworkManager.get_house_totals()[2])), "the HUD tally shows the totals")
 	var glow := SpellRegistry.load_definition("glowmote")
 	player.spell_caster.assign_slot(5, glow)
 	player.spell_caster.equip(ARCANE_PULSE)

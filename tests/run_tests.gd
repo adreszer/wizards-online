@@ -1321,6 +1321,44 @@ func _test_server_content() -> void:
 			codes[constants[name]] = name
 	t.check(not duplicate and not codes.is_empty(), "protocol op codes are unique")
 	t.check(HouseSorting.question_count() == 4, "sorting questionnaire loads from its resource")
+	# Subjects: explicit list matches the files; every spell belongs to exactly one
+	# subject; a classroom hosts at most one subject; names are translated.
+	var subject_files: Array[String] = []
+	for file_name in DirAccess.get_files_at(SubjectRegistry.SUBJECTS_DIR):
+		if file_name.trim_suffix(".remap").ends_with(".tres"):
+			subject_files.append(file_name.trim_suffix(".remap").trim_suffix(".tres"))
+	var listed := SubjectRegistry.SUBJECT_IDS.duplicate()
+	listed.sort()
+	subject_files.sort()
+	t.check(listed == subject_files, "SUBJECT_IDS lists exactly resources/school/subjects/*.tres")
+	var owners := {}
+	var rooms := {}
+	var problems: Array[String] = []
+	for def in SubjectRegistry.all():
+		if str(def.id) + ".tres" != def.resource_path.get_file():
+			problems.append("%s: id does not match its file" % def.id)
+		if tr(def.display_name) == def.display_name:
+			problems.append("%s: untranslated name" % def.id)
+		for spell in def.spells():
+			if not SpellRegistry.exists(spell) or owners.has(spell):
+				problems.append("%s: spell %s unknown or taught twice" % [def.id, spell])
+			owners[spell] = def.id
+		for room in def.classrooms:
+			if rooms.has(room):
+				problems.append("%s: classroom %s already hosts %s" % [def.id, room, rooms[room]])
+			rooms[room] = def.id
+	for spell in SpellRegistry.SPELL_IDS:
+		if not owners.has(spell):
+			problems.append("spell %s belongs to no subject" % spell)
+	var classroom_areas := {}
+	var lua := FileAccess.get_file_as_string("res://nakama/modules/world_areas.lua")
+	for m in RegEx.create_from_string('\\["([a-z0-9_]+)"\\] = \\{ kind = "classroom"').search_all(lua):
+		classroom_areas[m.get_string(1)] = true
+	for room: String in rooms:
+		if not classroom_areas.has(room):
+			problems.append("%s is not a classroom area" % room)
+	t.check(problems.is_empty(), "subjects: each spell in one subject, classrooms are real and unshared (%s)" % "; ".join(problems))
+	t.check(SubjectRegistry.for_area("greenhouse") == SubjectRegistry.load_definition("herblore") and SubjectRegistry.for_spell("uplift").id == &"sigilcraft", "subjects resolve by classroom and by spell")
 
 
 func _ids_match_dir(ids: Array[String], dir_path: String) -> bool:

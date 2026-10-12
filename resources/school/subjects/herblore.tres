@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SubjectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/school/subject_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"herblore"
+display_name = "SUBJECT_HERBLORE_NAME"
+classrooms = PackedStringArray("class_herblore", "greenhouse")
+spells_by_year = Array[PackedStringArray]([PackedStringArray("quicksprout")])
+color = Color(0.5, 0.75, 0.3, 1)

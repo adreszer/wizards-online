@@ -245,3 +245,59 @@ SORT_Q4_A4,"Listen, learn what it wants, and decide later.","Słuchasz, poznajes
 ENEMY_CRYSTAL_GUARDIAN_NAME,Crystalstone Guardian,Strażnik Kryształu
 NOTIFY_ENEMY_DEFEATED,%s shatters and falls silent.,%s rozpada się i milknie.
 PLAQUE_CELLARS,Something stirs in the cellars. Spells hurt it; its blows hurt you.,Coś porusza się w piwnicach. Czary je ranią; jego ciosy ranią ciebie.
+SUBJECT_SIGILCRAFT_NAME,Sigilcraft,Sigilistyka
+SUBJECT_SHAPESHAPING_NAME,Shapeshaping,Przekształcenia
+SUBJECT_CHRONICLES_NAME,Chronicles of Magic,Kroniki Magii
+SUBJECT_GLYPHS_NAME,Glyph Lore,Glify
+SUBJECT_NUMEROMANCY_NAME,Numeromancy,Numeromancja
+SUBJECT_WARDING_NAME,Warding,Sztuki Ochronne
+SUBJECT_ELIXIRS_NAME,Elixirs,Eliksiry
+SUBJECT_HERBLORE_NAME,Herb Lore,Zielnictwo
+SUBJECT_SKYRIDING_NAME,Skyriding,Jazda Podniebna
+SUBJECT_BEASTLORE_NAME,Beastlore,Bestiologia
+SUBJECT_STARGAZING_NAME,Stargazing,Gwiazdoznawstwo
+SUBJECT_FARSIGHT_NAME,Farsight,Dalekowidzenie
+LESSON_NONE,No lesson,Brak lekcji
+LESSON_OPEN,Open lesson,Rozpocznij lekcję
+LESSON_CLOSE,End lesson,Zakończ lekcję
+LESSON_RUNNING,%s lesson in progress (%s),Trwa lekcja: %s (%s)
+LESSON_READY,This room teaches %s. No lesson yet.,W tej sali uczy się: %s. Lekcja jeszcze się nie zaczęła.
+LESSON_NO_SUBJECT,No subject is taught in this room.,W tej sali nie uczy się żadnego przedmiotu.
+LESSON_OPENED,The lesson has begun.,Lekcja się rozpoczęła.
+LESSON_CLOSED,The lesson has ended.,Lekcja dobiegła końca.
+LESSON_FAILED,Could not do that: %s,Nie udało się: %s
+LESSON_REASON_not_staff,only professors run lessons.,tylko profesorowie prowadzą lekcje.
+LESSON_REASON_not_in_classroom,no subject is taught here.,tu nie uczy się żadnego przedmiotu.
+LESSON_REASON_already_open,a lesson is already running here.,tu już trwa lekcja.
+LESSON_REASON_no_lesson,you are not running a lesson here.,nie prowadzisz tu lekcji.
+LESSON_REASON_bad_action,unknown request.,nieznane polecenie.
+GRANT_REASON_no_lesson,open a lesson first.,najpierw rozpocznij lekcję.
+GRANT_REASON_not_your_lesson,another professor is running this lesson.,tę lekcję prowadzi inny profesor.
+GRANT_REASON_not_in_subject,that spell belongs to another subject.,ten czar należy do innego przedmiotu.
+POINTS_TITLE,House points:,Punkty domów:
+POINTS_REASON,Reason,Powód
+POINTS_AWARD,Award,Przyznaj
+POINTS_DEDUCT,Deduct,Odejmij
+POINTS_AWARDED,%d points to %s.,%d pkt dla domu %s.
+POINTS_DEDUCTED,%d points taken from %s.,Odjęto %d pkt domowi %s.
+POINTS_FAILED,Points not changed: %s,Punkty bez zmian: %s
+POINTS_REASON_not_staff,only professors award points.,tylko profesorowie przyznają punkty.
+POINTS_REASON_bad_house,choose a house.,wybierz dom.
+POINTS_REASON_bad_amount,that amount is not allowed.,taka liczba punktów jest niedozwolona.
+POINTS_REASON_no_reason,give a reason.,podaj powód.
+POINTS_REASON_too_soon,wait a moment before the next change.,odczekaj chwilę przed kolejną zmianą.
+POINTS_REASON_session_cap,this lesson has reached its points limit.,ta lekcja wyczerpała limit punktów.
+POINTS_REASON_storage,the server could not save it.,serwer nie zdołał tego zapisać.
+LECTURE_PLACEHOLDER,Say to the class…,Powiedz do klasy…
+LECTURE_SEND,Say,Powiedz
+LECTURE_SENDER,%s (lecture),%s (wykład)
+PLAN_TITLE,Plan title,Tytuł planu
+PLAN_SAVE,Save plan,Zapisz plan
+PLAN_NEXT_LINE,Next line,Następna linia
+PLAN_PLACEHOLDER,Lesson plan: one line of lecture per row,Plan lekcji: jedna linia wykładu w wierszu
+PLAN_NEW,New plan,Nowy plan
+PLAN_SAVED,"Plan ""%s"" saved.",Zapisano plan „%s”.
+PLAN_SAVE_FAILED,Could not save the plan: %s,Nie udało się zapisać planu: %s
+PLAN_NEEDS_TITLE,Give the plan a title.,Nadaj planowi tytuł.
+PLAN_LINE_SENT,Line %d of %d said.,Wypowiedziano linię %d z %d.
+HUD_HOUSE_POINTS,%s %d,%s %d

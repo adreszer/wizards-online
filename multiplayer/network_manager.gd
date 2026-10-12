@@ -37,6 +37,16 @@ signal world_snapshot_received(objects: Dictionary)
 ## Server-only text (a mystery's clue or reward) in the player's language; also
 ## shown as a HUD notification.
 signal server_text_received(text: String, seconds: float)
+## The set of open lessons changed (area id → {subject, by, sid}).
+signal lessons_changed(lessons: Dictionary)
+## Outcome of the local professor's lesson open/close request.
+signal lesson_result_received(ok: bool, action: String, reason: String)
+## The house points tally changed (index 0 = house 1).
+signal house_totals_changed(totals: PackedInt32Array)
+## Outcome of the local professor's award/deduction.
+signal house_points_result_received(ok: bool, house: int, delta: int, reason: String)
+## A professor spoke to the local player's classroom (also shown in chat).
+signal lecture_received(by_name: String, text: String)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal system_message(text: String)
 
@@ -73,6 +83,11 @@ func _ready() -> void:
 	state_synchronizer.object_state_changed.connect(object_state_changed.emit)
 	state_synchronizer.world_snapshot_received.connect(world_snapshot_received.emit)
 	state_synchronizer.server_text_received.connect(_on_server_text)
+	state_synchronizer.lessons_changed.connect(lessons_changed.emit)
+	state_synchronizer.lesson_result_received.connect(lesson_result_received.emit)
+	state_synchronizer.house_totals_changed.connect(house_totals_changed.emit)
+	state_synchronizer.house_points_result_received.connect(house_points_result_received.emit)
+	state_synchronizer.lecture_received.connect(_on_lecture)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 
@@ -217,6 +232,54 @@ func send_world_event(object_id: String, event: String, spell_id: String = "") -
 		state_synchronizer.send_world_event(object_id, event, spell_id)
 
 
+## Professor/admin: open or close the lesson in the current classroom.
+func send_lesson(action: String) -> void:
+	if is_online():
+		state_synchronizer.send_lesson(action)
+
+
+## Professor/admin: award (delta > 0) or deduct house points, with a reason.
+func send_house_points(house: int, delta: int, reason: String) -> void:
+	if is_online():
+		state_synchronizer.send_house_points(house, delta, reason)
+
+
+## Professor running a lesson: one line of lecture text for the room.
+func send_lecture(text: String) -> void:
+	if is_online():
+		state_synchronizer.send_lecture(text)
+
+
+## Open lessons (area id → {subject, by, sid}); empty offline.
+func get_lessons() -> Dictionary:
+	return state_synchronizer.lessons if is_online() else {}
+
+
+## House points tally (index 0 = house 1); empty offline or before it arrives.
+func get_house_totals() -> PackedInt32Array:
+	return state_synchronizer.house_totals if is_online() else PackedInt32Array()
+
+
+## Staff RPC: the local professor's lesson plans [{id, title, lines}].
+func list_lesson_plans() -> Array:
+	var answer := await _session_rpc(NetworkProtocol.RPC_LESSON_PLAN_LIST, {})
+	var plans: Variant = answer.get("plans", [])
+	return plans if plans is Array else []
+
+
+## Staff RPC: store a lesson plan (new when `id` is empty). Returns {id} or {error}.
+func save_lesson_plan(id: String, title: String, lines: PackedStringArray) -> Dictionary:
+	var request := {"title": title, "lines": Array(lines)}
+	if not id.is_empty():
+		request["id"] = id
+	return await _session_rpc(NetworkProtocol.RPC_LESSON_PLAN_SAVE, request)
+
+
+## Admin RPC: recent house points records, newest first.
+func house_points_ledger(limit: int = 50, http_key: String = "") -> Dictionary:
+	return await _admin_rpc(NetworkProtocol.RPC_HOUSE_POINTS_LEDGER, {"limit": limit}, http_key)
+
+
 ## Sorting ceremony: the server tallies the answers and assigns the house.
 func send_sort(answers: Array) -> void:
 	if is_online():
@@ -240,6 +303,10 @@ func admin_set_profile(request: Dictionary, http_key: String = "") -> Dictionary
 ## (dev tooling and tests). Same access rules as admin_set_profile.
 func admin_reset_world(http_key: String = "") -> Dictionary:
 	return await _admin_rpc(NetworkProtocol.RPC_ADMIN_RESET_WORLD, {}, http_key)
+
+
+func _session_rpc(rpc_id: String, request: Dictionary) -> Dictionary:
+	return await _admin_rpc(rpc_id, request, "")
 
 
 func _admin_rpc(rpc_id: String, request: Dictionary, http_key: String) -> Dictionary:
@@ -270,6 +337,14 @@ func _on_server_text(text: String, seconds: float) -> void:
 		return
 	server_text_received.emit(clean, seconds)
 	GameEvents.notification_requested.emit(clean, clampf(seconds, 1.0, 15.0))
+
+
+func _on_lecture(by_name: String, text: String) -> void:
+	var clean := NetworkProtocol.sanitize_chat(text)
+	if clean.is_empty():
+		return
+	lecture_received.emit(by_name, clean)
+	chat_message_received.emit(tr("LECTURE_SENDER") % by_name, clean, by_name == local_display_name)
 
 
 func _teardown() -> void:

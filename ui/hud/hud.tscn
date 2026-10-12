@@ -93,11 +93,21 @@ offset_right = -16.0
 grow_horizontal = 0
 theme_override_styles/panel = SubResource("PanelStyle")
 
-[node name="StatusLabel" type="Label" parent="TopRight"]
+[node name="VBox" type="VBoxContainer" parent="TopRight"]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="TopRight/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "HUD_STATUS_OFFLINE"
 horizontal_alignment = 2
+
+[node name="HouseTally" type="HBoxContainer" parent="TopRight/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 2
 
 [node name="Crosshair" type="Control" parent="."]
 unique_name_in_owner = true

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SubjectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/school/subject_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sigilcraft"
+display_name = "SUBJECT_SIGILCRAFT_NAME"
+classrooms = PackedStringArray("class_sigilcraft")
+spells_by_year = Array[PackedStringArray]([PackedStringArray("arcane_pulse", "uplift")])
+color = Color(0.62, 0.5, 1, 1)

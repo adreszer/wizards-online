@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SubjectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/school/subject_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"warding"
+display_name = "SUBJECT_WARDING_NAME"
+classrooms = PackedStringArray("class_warding")
+spells_by_year = Array[PackedStringArray]([PackedStringArray("frostbind")])
+color = Color(0.6, 0.85, 1, 1)

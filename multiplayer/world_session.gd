@@ -29,6 +29,14 @@ signal object_state_received(object_id: String, state: Variant)
 signal world_snapshot_received(objects: Dictionary)
 ## Text the server resolved in the player's locale (mystery clues, rewards).
 signal server_text_received(text: String, seconds: float)
+## Every open lesson: area id → {subject, by, sid}.
+signal lessons_received(lessons: Dictionary)
+signal lesson_result_received(ok: bool, action: String, reason: String)
+## House points tally, index 0 = house 1.
+signal house_totals_received(totals: Array)
+signal house_points_result_received(ok: bool, house: int, delta: int, reason: String)
+## A professor's lecture line in the local player's classroom.
+signal lecture_received(by_name: String, text: String)
 
 var socket: NakamaSocket
 var match_id: String = ""
@@ -123,6 +131,18 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 			object_state_received.emit(str(payload.get("o", "")), payload.get("s"))
 		NetworkProtocol.OP_SERVER_TEXT:
 			server_text_received.emit(str(payload.get("text", "")), float(payload.get("seconds", 5.0)))
+		NetworkProtocol.OP_LESSON_STATE:
+			var lessons: Variant = payload.get("lessons", {})
+			lessons_received.emit(lessons if lessons is Dictionary else {})
+		NetworkProtocol.OP_LESSON_RESULT:
+			lesson_result_received.emit(bool(payload.get("ok", false)), str(payload.get("action", "")), str(payload.get("reason", "")))
+		NetworkProtocol.OP_HOUSE_TOTALS:
+			var totals: Variant = payload.get("totals", [])
+			house_totals_received.emit(totals if totals is Array else [])
+		NetworkProtocol.OP_HOUSE_POINTS_RESULT:
+			house_points_result_received.emit(bool(payload.get("ok", false)), int(payload.get("house", 0)), int(payload.get("delta", 0)), str(payload.get("reason", "")))
+		NetworkProtocol.OP_LECTURE_TEXT:
+			lecture_received.emit(str(payload.get("by", "")), str(payload.get("text", "")))
 		NetworkProtocol.OP_WORLD_SNAPSHOT:
 			# An empty Lua table encodes as [], so anything but a dictionary is "nothing changed".
 			var objects: Variant = payload.get("objects", {})

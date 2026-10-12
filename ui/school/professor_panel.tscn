@@ -39,10 +39,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -300.0
-offset_top = -240.0
-offset_right = 300.0
-offset_bottom = 240.0
+offset_left = -390.0
+offset_top = -330.0
+offset_right = 390.0
+offset_bottom = 330.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("PanelStyle")
@@ -63,6 +63,24 @@ layout_mode = 2
 text = "LESSON_AREA"
 horizontal_alignment = 1
 autowrap_mode = 3
+
+[node name="LessonRow" type="HBoxContainer" parent="Root/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="LessonLabel" type="Label" parent="Root/Panel/VBox/LessonRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "LESSON_NONE"
+autowrap_mode = 3
+
+[node name="LessonButton" type="Button" parent="Root/Panel/VBox/LessonRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "LESSON_OPEN"
 
 [node name="Columns" type="HBoxContainer" parent="Root/Panel/VBox"]
 layout_mode = 2
@@ -119,6 +137,97 @@ unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "LESSON_GRANT_SELF"
+
+[node name="PointsRow" type="HBoxContainer" parent="Root/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PointsTitle" type="Label" parent="Root/Panel/VBox/PointsRow"]
+layout_mode = 2
+text = "POINTS_TITLE"
+
+[node name="HouseOption" type="OptionButton" parent="Root/Panel/VBox/PointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+
+[node name="Amount" type="SpinBox" parent="Root/Panel/VBox/PointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 20.0
+value = 5.0
+
+[node name="Reason" type="LineEdit" parent="Root/Panel/VBox/PointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "POINTS_REASON"
+max_length = 60
+
+[node name="AwardButton" type="Button" parent="Root/Panel/VBox/PointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "POINTS_AWARD"
+
+[node name="DeductButton" type="Button" parent="Root/Panel/VBox/PointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "POINTS_DEDUCT"
+
+[node name="LectureRow" type="HBoxContainer" parent="Root/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LectureLine" type="LineEdit" parent="Root/Panel/VBox/LectureRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "LECTURE_PLACEHOLDER"
+max_length = 200
+
+[node name="SendLectureButton" type="Button" parent="Root/Panel/VBox/LectureRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "LECTURE_SEND"
+
+[node name="PlanRow" type="HBoxContainer" parent="Root/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PlanOption" type="OptionButton" parent="Root/Panel/VBox/PlanRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+
+[node name="PlanTitle" type="LineEdit" parent="Root/Panel/VBox/PlanRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "PLAN_TITLE"
+max_length = 60
+
+[node name="SavePlanButton" type="Button" parent="Root/Panel/VBox/PlanRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "PLAN_SAVE"
+
+[node name="NextLineButton" type="Button" parent="Root/Panel/VBox/PlanRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "PLAN_NEXT_LINE"
+
+[node name="PlanText" type="TextEdit" parent="Root/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+placeholder_text = "PLAN_PLACEHOLDER"
 
 [node name="ResultLabel" type="Label" parent="Root/Panel/VBox"]
 unique_name_in_owner = true

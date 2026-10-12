@@ -166,11 +166,11 @@ Estimates assume part-time solo work. Each milestone keeps `tests/run_tests.tscn
 - [x] Discovery records on the character profile
 - **Done when:** a new mystery that uses existing object kinds needs no code, and none of its text or solution is in the client project's shipped files.
 
-### Milestone 22 — Subjects, lesson sessions, house points (≈2–3 weeks)
-- [ ] `SubjectDefinition` resources for the existing classrooms; exported to `subjects.lua`
-- [ ] Lesson sessions (open/close, grants only inside an open session in the subject's classroom, attendance)
-- [ ] House points ledger + award/deduct in `ProfessorPanel` + a visible tally
-- [ ] Professor lesson plans stored in Nakama
+### Milestone 22 — Subjects, lesson sessions, house points (≈2–3 weeks) — done
+- [x] `SubjectDefinition` resources for the existing classrooms; exported to `subjects.lua`
+- [x] Lesson sessions (open/close, grants only inside an open session in the subject's classroom, attendance)
+- [x] House points ledger + award/deduct in `ProfessorPanel` + a visible tally
+- [x] Professor lesson plans stored in Nakama
 - **Done when:** the M16 open item "tie grants to a lesson session" is closed, and house points can be explained record by record.
 
 ### Milestone 23 — Release hygiene (≈1 week, before the first Steam build)

@@ -20,6 +20,7 @@ static func build_all() -> Dictionary:
 		"items.lua": _module("resources/items (ItemRegistry)", _items()),
 		"sorting.lua": _module("resources/school/sorting.tres (HouseSorting)", _sorting()),
 		"characters.lua": _module("characters/character_registry.gd", _characters()),
+		"subjects.lua": _module("resources/school/subjects (SubjectRegistry)", _subjects()),
 		"protocol.lua": _module("multiplayer/network_protocol.gd", _protocol()),
 		"world_objects.lua": _module("levels/castle/castle.tscn (world_objects group)", world_objects(CASTLE_SCENE)),
 	}
@@ -58,7 +59,9 @@ static func stale() -> PackedStringArray:
 static func _spells() -> Dictionary:
 	var by_id := {}
 	for def in SpellRegistry.all():
+		var subject := SubjectRegistry.for_spell(str(def.id))
 		by_id[str(def.id)] = {
+			"subject": str(subject.id) if subject != null else "",
 			"effect_type": str(def.effect_type),
 			"cooldown": def.cooldown,
 			"range": def.range,
@@ -86,6 +89,16 @@ static func _sorting() -> Dictionary:
 			houses.append(int(a["house"]))
 		questions.append(houses)
 	return {"questions": questions}
+
+
+static func _subjects() -> Dictionary:
+	var by_id := {}
+	var by_area := {}
+	for def in SubjectRegistry.all():
+		by_id[str(def.id)] = {"name_key": def.display_name, "classrooms": Array(def.classrooms), "spells": Array(def.spells())}
+		for area in def.classrooms:
+			by_area[area] = str(def.id)
+	return {"ids": SubjectRegistry.SUBJECT_IDS.duplicate(), "by_id": by_id, "by_area": by_area}
 
 
 static func _characters() -> Dictionary:

@@ -17,6 +17,7 @@ extends CanvasLayer
 @onready var _crosshair: Control = %Crosshair
 @onready var _hotbar_root: Control = %HotbarRoot
 @onready var _hotbar: HBoxContainer = %Hotbar
+@onready var _house_tally: HBoxContainer = %HouseTally
 
 const SLOT_KEY_LABELS := ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 
@@ -45,6 +46,7 @@ func _ready() -> void:
 	GameEvents.area_entered.connect(_on_area_entered)
 	NetworkManager.status_changed.connect(_on_status_changed)
 	NetworkManager.profile_received.connect(_on_profile_received)
+	NetworkManager.house_totals_changed.connect(set_house_totals)
 	GameEvents.house_changed.connect(func(_h: int) -> void: _refresh_house())
 	_prompt_label.visible = false
 	_notification_label.visible = false
@@ -55,6 +57,7 @@ func _ready() -> void:
 	_on_held_item_changed(null)
 	_refresh_role()
 	_refresh_house()
+	set_house_totals(NetworkManager.get_house_totals())
 
 
 func _process(delta: float) -> void:
@@ -222,6 +225,30 @@ func _on_held_item_changed(definition: ItemDefinition) -> void:
 
 func _on_profile_received(_profile: Dictionary) -> void:
 	_refresh_role()
+
+
+## House points tally (index 0 = house 1), one coloured "<name> <points>" per
+## house; hidden while there is none (offline).
+func set_house_totals(totals: PackedInt32Array) -> void:
+	for child in _house_tally.get_children():
+		child.queue_free()
+	_house_tally.visible = totals.size() >= CharacterProfile.MAX_HOUSE
+	if not _house_tally.visible:
+		return
+	for h in range(1, CharacterProfile.MAX_HOUSE + 1):
+		var label := Label.new()
+		label.text = tr("HUD_HOUSE_POINTS") % [CharacterProfile.house_name(h), totals[h - 1]]
+		label.add_theme_color_override("font_color", CharacterProfile.HOUSE_COLORS[h])
+		_house_tally.add_child(label)
+
+
+## Text of the tally labels, for tests.
+func house_tally_text() -> String:
+	var parts := PackedStringArray()
+	for child in _house_tally.get_children():
+		if child is Label and not child.is_queued_for_deletion():
+			parts.append((child as Label).text)
+	return " ".join(parts)
 
 
 func _refresh_house() -> void:

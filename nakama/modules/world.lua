@@ -5,6 +5,7 @@
 local nk = require("nakama")
 local Profile = require("character_profile")
 local P = require("generated.protocol")
+local School = require("school")
 
 local WORLD_LABEL = "world"
 local MAX_CHAT_LENGTH = P.MAX_CHAT_LENGTH
@@ -113,3 +114,42 @@ local function rpc_admin_reset_world(context, payload)
   return nk.json_encode(decoded)
 end
 nk.register_rpc(rpc_admin_reset_world, P.RPC_ADMIN_RESET_WORLD)
+
+-- RPC "house_points_ledger": {limit?} → {records, totals}: the stored record of
+-- every house points change, newest first (admins or the HTTP key).
+local function rpc_house_points_ledger(context, payload)
+  require_admin(context)
+  local ok, data = pcall(nk.json_decode, payload ~= "" and payload or "{}")
+  local limit = ok and type(data) == "table" and tonumber(data.limit) or 50
+  return nk.json_encode({ records = School.list_ledger(math.max(1, math.min(500, math.floor(limit)))), totals = School.load_totals() })
+end
+nk.register_rpc(rpc_house_points_ledger, P.RPC_HOUSE_POINTS_LEDGER)
+
+local function require_staff(context)
+  if not context.user_id or context.user_id == "" then
+    error({ "lesson plans belong to a professor's session", 3 })
+  end
+  if not Profile.env_admins(context.env)[context.user_id] and not Profile.is_staff(Profile.load(context.user_id).role) then
+    error({ "only professors keep lesson plans", 7 })
+  end
+end
+
+-- RPC "lesson_plan_save": {id?, title, lines} → {id}. Plans are stored per
+-- professor (owner-readable, written only here), never in the game build.
+local function rpc_lesson_plan_save(context, payload)
+  require_staff(context)
+  local ok, data = pcall(nk.json_decode, payload or "")
+  local id, err = School.save_plan(context.user_id, ok and data or nil, School.load_rules().max_lecture_bytes)
+  if not id then
+    error({ err, 3 })
+  end
+  return nk.json_encode({ id = id })
+end
+nk.register_rpc(rpc_lesson_plan_save, P.RPC_LESSON_PLAN_SAVE)
+
+-- RPC "lesson_plan_list": {} → {plans = {{id, title, lines}}} for the caller.
+local function rpc_lesson_plan_list(context, payload)
+  require_staff(context)
+  return nk.json_encode({ plans = School.list_plans(context.user_id) })
+end
+nk.register_rpc(rpc_lesson_plan_list, P.RPC_LESSON_PLAN_LIST)

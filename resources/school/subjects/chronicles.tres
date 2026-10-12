@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SubjectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/school/subject_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"chronicles"
+display_name = "SUBJECT_CHRONICLES_NAME"
+classrooms = PackedStringArray("class_chronicles")
+spells_by_year = Array[PackedStringArray]([PackedStringArray("glowmote")])
+color = Color(0.8, 0.7, 0.45, 1)

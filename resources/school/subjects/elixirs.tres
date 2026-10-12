@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SubjectDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://gameplay/school/subject_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"elixirs"
+display_name = "SUBJECT_ELIXIRS_NAME"
+classrooms = PackedStringArray("class_elixirs")
+spells_by_year = Array[PackedStringArray]([PackedStringArray("wellspring", "emberkindle")])
+color = Color(0.45, 0.85, 0.5, 1)
