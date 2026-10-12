@@ -301,3 +301,5 @@ PLAN_SAVE_FAILED,Could not save the plan: %s,Nie udało się zapisać planu: %s
 PLAN_NEEDS_TITLE,Give the plan a title.,Nadaj planowi tytuł.
 PLAN_LINE_SENT,Line %d of %d said.,Wypowiedziano linię %d z %d.
 HUD_HOUSE_POINTS,%s %d,%s %d
+OFFLINE_MYST_UNDERCROFT_CLUE,"The plaque mentions a crypt beneath the dungeon corridor, sealed behind a carved stone.","Tablica wspomina kryptę pod korytarzem lochów, zamkniętą za rzeźbionym kamieniem."
+OFFLINE_MYST_STUDY_CLUE,The reader's statue turns toward the western wall.,Posąg czytelnika obraca się ku zachodniej ścianie.

@@ -1,0 +1,28 @@
+{
+  "mysteries": [
+    {
+      "id": "offline_undercroft",
+      "steps": [
+        {"event": "interact", "object": "cellars/plaque_cellars", "text": "OFFLINE_MYST_UNDERCROFT_CLUE"},
+        {"event": "spell", "object": "undercroft/secret_wall", "effect_type": "force"}
+      ],
+      "on_solved": {"set_state": {"undercroft/secret_wall": "revealed"}}
+    },
+    {
+      "id": "offline_study",
+      "reset_on_wrong": true,
+      "steps": [
+        {"event": "spell", "object": "class_chronicles/statue_reader", "state": 1, "text": "OFFLINE_MYST_STUDY_CLUE"},
+        {"event": "spell", "object": "hidden_study/secret_wall", "effect_type": "force"}
+      ],
+      "on_solved": {"set_state": {"hidden_study/secret_wall": "revealed"}}
+    },
+    {
+      "id": "offline_loft",
+      "steps": [
+        {"event": "spell", "object": "loft/secret_wall", "effect_type": "force"}
+      ],
+      "on_solved": {"set_state": {"loft/secret_wall": "revealed"}}
+    }
+  ]
+}

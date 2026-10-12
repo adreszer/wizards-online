@@ -179,6 +179,10 @@ Multi-step secrets are data in `nakama/content/mysteries.json`, their text in `n
 
 Every validated `OP_WORLD_EVENT` (spell or interaction, including plaque reads, which plaques report online without waiting for an answer) and every area change feeds the engine. A mystery is an ordered list of steps (`spell` on an object, optionally with an effect type and the object's resulting state; `interact`; `enter` an area, optionally holding an item; `together`: N players in an area), with optional per-step time limits and `reset_on_wrong`. Scopes: `world` (one shared progress, re-armed `reset_after_minutes` after a solve once nobody stands where it would change something), `house` (per house) and `player` (stored per user in `mysteries/progress`, server-only permissions). A solve sets object states (objects named there are *mystery-driven*: the object rules ignore direct events for them), sends text, records a discovery on each contributor's profile (`discoveries`, sent in `OP_PROFILE`) and awards house points to the final actor's house (logged until the ledger exists, Milestone 22). Text reaches a player as `OP_SERVER_TEXT`, already resolved in the locale the client sent in its join metadata. `admin_reset_world` (and `tools/reset_world.sh`) re-arms everything for playtesting.
 
+### Offline practice mysteries and release builds
+
+Offline, `WorldObjectSync` starts an `OfflineMysteryEngine` with the public `content/offline_mysteries.json` (the server format's spell / interact / enter steps). Objects its solutions set (the secret walls) hand their triggers to it instead of opening on any hit; other objects act locally and only report. The client export presets exclude `nakama/`, `tools/`, `tests/`, `docs/` and dev levels; `tools/check_build.sh` proves it on an exported pack.
+
 ### Authority (MVP)
 
 | State | Authority | Notes |

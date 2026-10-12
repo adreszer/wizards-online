@@ -194,7 +194,11 @@ Playtesting: `godot --path . -- --all-spells` spawns with every spell on the hot
 3. `tools/check.sh`: the "Mysteries" test section checks objects, areas, effect types, items and texts, and that no server text is in the CSV.
 4. Restart Nakama; the log says `mysteries: N loaded` (and names any mystery it refused). `tools/reset_world.sh` re-arms shared mysteries and objects while playtesting.
 
-Offline mode has no server, so mysteries do not run there (offline, secret walls still open on a direct hit until the offline practice set exists).
+Offline mode has no server, so the real mysteries do not run there. Instead `content/offline_mysteries.json` (public, ships with the game, text via `OFFLINE_MYST_*` keys in the CSV) gives the secret walls their own simpler practice solutions, run by `OfflineMysteryEngine`. Never reuse an online solution offline: the offline file can be read by anyone.
+
+## Release builds
+
+`export_presets.cfg` holds the client presets (Windows Desktop, macOS) with the filters that keep server content out: `nakama/`, `tools/`, `tests/`, `docs/`, the dev/test levels and the placement source are excluded; `content/offline_mysteries.json` is included explicitly. Signing settings are added locally and never committed. Before shipping a build run `tools/check_build.sh` (needs the export templates): it exports a pack, lists its files (`tools/list_pck.py`) and fails if any server or dev file is inside or if any server-only text or mystery id appears in its bytes.
 
 ## Adding an enemy
 

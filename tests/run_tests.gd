@@ -1067,6 +1067,44 @@ func _test_castle() -> void:
 				if not object_ids.has(area + "/" + str(entry["id"])):
 					missing_placed.append(area + "/" + str(entry["id"]))
 	t.check(placements is Dictionary and missing_placed.is_empty(), "every world object in content/placements.json is in the castle (missing: %s)" % ", ".join(missing_placed))
+	# Offline practice mysteries: the secret walls follow the public offline set.
+	var engine: OfflineMysteryEngine = castle.world_object_sync.offline_engine
+	t.check(engine != null and engine.mystery_count() == 3 and engine.drives("undercroft/secret_wall"), "offline, the castle runs the practice mysteries")
+	var offline_problems: Array[String] = []
+	var offline_data: Variant = JSON.parse_string(FileAccess.get_file_as_string(OfflineMysteryEngine.CONTENT_PATH))
+	for m: Dictionary in offline_data.get("mysteries", []):
+		for step: Dictionary in m.get("steps", []):
+			if step.has("object") and not object_ids.has(str(step["object"])):
+				offline_problems.append("unknown object %s" % step["object"])
+			if step.has("area") and not area_ids.has(str(step["area"])):
+				offline_problems.append("unknown area %s" % step["area"])
+			if step.has("text") and tr(str(step["text"])) == str(step["text"]):
+				offline_problems.append("untranslated %s" % step["text"])
+			if str(step.get("event", "")) == "together":
+				offline_problems.append("%s: together needs other players" % m.get("id"))
+		for oid: String in m.get("on_solved", {}).get("set_state", {}):
+			if not object_ids.has(oid):
+				offline_problems.append("sets unknown object %s" % oid)
+	t.check(offline_problems.is_empty(), "the offline set refers to real objects and translated text (%s)" % "; ".join(offline_problems))
+	var undercroft: SecretWall = null
+	var cellar_plaque: Plaque = null
+	for node in get_tree().get_nodes_in_group("world_objects"):
+		if node.get("object_id") == "undercroft/secret_wall":
+			undercroft = node
+		elif node.get("object_id") == "cellars/plaque_cellars":
+			cellar_plaque = node
+	var hit := SpellEffect.create(ARCANE_PULSE, null, "", undercroft.global_position, Vector3.FORWARD)
+	undercroft._on_spell_received(hit)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	t.check(not undercroft.is_revealed, "offline, a bare hit no longer opens the undercroft")
+	cellar_plaque._on_interacted(null)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	undercroft._on_spell_received(hit)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	t.check(undercroft.is_revealed, "reading the cellar plaque first, then striking the wall, opens it offline")
 	t.check(GameSession.get_total(&"arcane_fragment") >= 10, "castle registers its fragments (got %d)" % GameSession.get_total(&"arcane_fragment"))
 	var tome_spells: Dictionary = {}
 	for tome in castle.get_node("Tomes").get_children():
@@ -1485,9 +1523,12 @@ func _test_mysteries() -> void:
 			missing.append(key)
 	t.check(missing.is_empty(), "every mystery text has pl and en (missing: %s)" % ", ".join(missing))
 	var csv := FileAccess.get_file_as_string("res://localization/translations.csv")
+	var csv_keys := {}
+	for line in csv.split("\n"):
+		csv_keys[line.get_slice(",", 0)] = true
 	var leaked: Array[String] = []
 	for key: String in strings:
-		if csv.contains(key):
+		if csv_keys.has(key):
 			leaked.append(key)
 		for loc in ["pl", "en"]:
 			var text := str(strings[key].get(loc, ""))

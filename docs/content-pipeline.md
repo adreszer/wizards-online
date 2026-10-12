@@ -173,10 +173,10 @@ Estimates assume part-time solo work. Each milestone keeps `tests/run_tests.tscn
 - [x] Professor lesson plans stored in Nakama
 - **Done when:** the M16 open item "tie grants to a lesson session" is closed, and house points can be explained record by record.
 
-### Milestone 23 — Release hygiene (≈1 week, before the first Steam build)
-- [ ] Client export preset with include/exclude filters; server content never in the `.pck`
-- [ ] `.pck` leak check in CI
-- [ ] Offline practice mysteries
+### Milestone 23 — Release hygiene (≈1 week, before the first Steam build) — done
+- [x] Client export preset with include/exclude filters; server content never in the `.pck`
+- [x] `.pck` leak check (`tools/check_build.sh`; to be wired into CI when it exists)
+- [x] Offline practice mysteries
 - **Done when:** the leak check passes on an exported build.
 
 **Total: about 9–12 weeks part-time.** M18 pays off immediately and is low-risk. M20 is the foundation for everything secret-related, so it's worth doing before adding more puzzles.

@@ -252,8 +252,10 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Final subject names from the owner; attendance is recorded but not shown anywhere yet
 
 ### Milestone 23 — Release hygiene
-- [ ] Client export preset with include/exclude filters; `.pck` leak check
-- [ ] Offline practice mysteries
+- [x] Client export presets (Windows Desktop, macOS) with include/exclude filters, committed without signing secrets
+- [x] `tools/check_build.sh` + `tools/list_pck.py`: exports a pack, fails on server/dev files or any server-only text or mystery id in its bytes (verified to catch a deliberate leak)
+- [x] Offline practice mysteries (`content/offline_mysteries.json`, `OfflineMysteryEngine`): the secret walls get their own public offline solutions; the online ones stay server-only
+- [ ] Run `tools/check_build.sh` in CI once there is CI
 
 ## Production environment asset pipeline (in validation)
 
@@ -322,7 +324,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (315 gameplay, localization, server-content, world-object, mystery-content and subject checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (319 gameplay, localization, server-content, world-object, mystery-content, subject and offline-mystery checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
