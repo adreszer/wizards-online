@@ -7,7 +7,7 @@ Proposed milestones 18–23 continue `docs/plan.md`.
 **Implementation decisions** (taken while planning the build; `docs/plan.md` tracks progress):
 - `world_objects.lua` is written by the Godot exporter from the built `castle.tscn`, not by the Python generator, so the accepted effect types stay on each scene's `SpellReceiver`.
 - Server-only strings are `strings.json` (`{key: {pl, en}}`), not CSV; the same validator rules apply.
-- Server content goes under `nakama/modules/content/` if `nk.file_read` cannot read outside the runtime path.
+- Server content stays in `nakama/content/` as planned: `nk.file_read` resolves paths relative to the module directory, so the match reads `../content/<file>` (verified).
 - Generated modules are required as `require("generated.<name>")` (Nakama names modules in subfolders with dots; verified).
 
 ## What is already data-driven
@@ -159,11 +159,11 @@ Estimates assume part-time solo work. Each milestone keeps `tests/run_tests.tscn
 - [x] Multiplayer test: client B flips a switch and client A sees it; the rejoining client sees it
 - **Done when:** "Puzzle / door / collectible state: local only" is removed from the Authority table.
 
-### Milestone 21 — Mysteries as data (≈2–3 weeks)
-- [ ] `nakama/modules/mysteries.lua` step engine (spell, interact, enter, holding, sequence, N players); scopes world/player/house
-- [ ] `nakama/content/strings.csv`, locale in session vars, server sends resolved text
-- [ ] The three existing secret passages rebuilt as mysteries; one new multi-step, two-player mystery
-- [ ] Discovery records on the character profile
+### Milestone 21 — Mysteries as data (≈2–3 weeks) — done
+- [x] `nakama/modules/mysteries.lua` step engine (spell, interact, enter, holding, sequence, N players); scopes world/player/house
+- [x] `nakama/content/strings.json`, locale in the join metadata, server sends resolved text
+- [x] The three existing secret passages rebuilt as mysteries (the loft is the two-player one), plus a player-scoped plaque tale
+- [x] Discovery records on the character profile
 - **Done when:** a new mystery that uses existing object kinds needs no code, and none of its text or solution is in the client project's shipped files.
 
 ### Milestone 22 — Subjects, lesson sessions, house points (≈2–3 weeks)

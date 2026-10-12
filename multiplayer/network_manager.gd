@@ -34,6 +34,9 @@ signal sort_result_received(ok: bool, house: int, reason: String)
 signal object_state_changed(object_id: String, state: Variant)
 ## The server's world object states arrived in full (join and reconnect).
 signal world_snapshot_received(objects: Dictionary)
+## Server-only text (a mystery's clue or reward) in the player's language; also
+## shown as a HUD notification.
+signal server_text_received(text: String, seconds: float)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal system_message(text: String)
 
@@ -69,6 +72,7 @@ func _ready() -> void:
 	state_synchronizer.sort_result_received.connect(sort_result_received.emit)
 	state_synchronizer.object_state_changed.connect(object_state_changed.emit)
 	state_synchronizer.world_snapshot_received.connect(world_snapshot_received.emit)
+	state_synchronizer.server_text_received.connect(_on_server_text)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 
@@ -229,13 +233,23 @@ func get_local_house() -> int:
 ## otherwise the local session must be an admin. Returns the server's answer
 ## or {"error": message}.
 func admin_set_profile(request: Dictionary, http_key: String = "") -> Dictionary:
+	return await _admin_rpc(NetworkProtocol.RPC_ADMIN_SET_PROFILE, request, http_key)
+
+
+## Admin RPC: every world object back to its default, shared mysteries unsolved
+## (dev tooling and tests). Same access rules as admin_set_profile.
+func admin_reset_world(http_key: String = "") -> Dictionary:
+	return await _admin_rpc(NetworkProtocol.RPC_ADMIN_RESET_WORLD, {}, http_key)
+
+
+func _admin_rpc(rpc_id: String, request: Dictionary, http_key: String) -> Dictionary:
 	if authentication.client == null:
 		return {"error": tr("HUD_STATUS_OFFLINE")}
 	var rpc: NakamaAPI.ApiRpc
 	if not http_key.is_empty():
-		rpc = await authentication.client.rpc_async_with_key(http_key, NetworkProtocol.RPC_ADMIN_SET_PROFILE, NetworkProtocol.encode(request))
+		rpc = await authentication.client.rpc_async_with_key(http_key, rpc_id, NetworkProtocol.encode(request))
 	elif authentication.session != null:
-		rpc = await authentication.client.rpc_async(authentication.session, NetworkProtocol.RPC_ADMIN_SET_PROFILE, NetworkProtocol.encode(request))
+		rpc = await authentication.client.rpc_async(authentication.session, rpc_id, NetworkProtocol.encode(request))
 	else:
 		return {"error": tr("HUD_STATUS_OFFLINE")}
 	if rpc.is_exception():
@@ -248,6 +262,14 @@ func send_chat(text: String) -> bool:
 		system_message.emit(tr("CHAT_OFFLINE"))
 		return false
 	return chat_manager.send(text)
+
+
+func _on_server_text(text: String, seconds: float) -> void:
+	var clean := text.strip_edges()
+	if clean.is_empty():
+		return
+	server_text_received.emit(clean, seconds)
+	GameEvents.notification_requested.emit(clean, clampf(seconds, 1.0, 15.0))
 
 
 func _teardown() -> void:

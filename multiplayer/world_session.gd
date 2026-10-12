@@ -27,6 +27,8 @@ signal pong_received(sent_ms: int)
 signal object_state_received(object_id: String, state: Variant)
 ## Every world object not in its default state, sent on join.
 signal world_snapshot_received(objects: Dictionary)
+## Text the server resolved in the player's locale (mystery clues, rewards).
+signal server_text_received(text: String, seconds: float)
 
 var socket: NakamaSocket
 var match_id: String = ""
@@ -55,7 +57,7 @@ func join_world(client: NakamaClient, session: NakamaSession, display_name: Stri
 	match_id = str(payload.get("match_id", ""))
 	if match_id.is_empty():
 		return tr("NET_JOIN_NO_MATCH")
-	var joined: NakamaRTAPI.Match = await socket.join_match_async(match_id, {"display_name": display_name, "character": character_id})
+	var joined: NakamaRTAPI.Match = await socket.join_match_async(match_id, {"display_name": display_name, "character": character_id, "locale": TranslationServer.get_locale().substr(0, 2)})
 	if joined.is_exception():
 		return tr("NET_JOIN_FAILED") % joined.get_exception().message
 	if joined.self_user != null:
@@ -119,6 +121,8 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 			pong_received.emit(int(payload.get("t", 0)))
 		NetworkProtocol.OP_OBJECT_STATE:
 			object_state_received.emit(str(payload.get("o", "")), payload.get("s"))
+		NetworkProtocol.OP_SERVER_TEXT:
+			server_text_received.emit(str(payload.get("text", "")), float(payload.get("seconds", 5.0)))
 		NetworkProtocol.OP_WORLD_SNAPSHOT:
 			# An empty Lua table encodes as [], so anything but a dictionary is "nothing changed".
 			var objects: Variant = payload.get("objects", {})

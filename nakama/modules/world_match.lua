@@ -12,12 +12,16 @@
 -- client's OP_WORLD_EVENT is checked by object_rules.lua (object exists, the
 -- sender stands in its area, knows the spell, the object accepts its effect,
 -- rate limit) and the new state goes to everyone; joiners get a snapshot.
+-- Every validated event (and every area change) also feeds the mystery
+-- engine (mysteries.lua, content in nakama/content/), whose clues and
+-- rewards are sent as resolved text in the player's locale (OP_SERVER_TEXT).
 -- Movement is relayed but not yet validated.
 
 local nk = require("nakama")
 local Profile = require("character_profile")
 local AREAS = require("world_areas")
 local Objects = require("object_rules")
+local Mysteries = require("mysteries")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -26,6 +30,9 @@ local OP_ROSTER, OP_PLAYER_JOINED, OP_PLAYER_LEFT, OP_INVENTORY = P.OP_ROSTER, P
 local OP_PROFILE, OP_ROSTER_UPDATE, OP_SPELL_GRANTED = P.OP_PROFILE, P.OP_ROSTER_UPDATE, P.OP_SPELL_GRANTED
 local OP_GRANT_RESULT, OP_SORT_RESULT, OP_PING = P.OP_GRANT_RESULT, P.OP_SORT_RESULT, P.OP_PING
 local OP_WORLD_EVENT, OP_OBJECT_STATE, OP_WORLD_SNAPSHOT = P.OP_WORLD_EVENT, P.OP_OBJECT_STATE, P.OP_WORLD_SNAPSHOT
+local OP_SERVER_TEXT = P.OP_SERVER_TEXT
+local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
+local TEXT_SECONDS = 6
 local MAX_AREA_ID_BYTES = 48
 local TICK_RATE = 15
 -- Bytes, not characters: the client caps names at 16 characters, which with
@@ -145,7 +152,7 @@ local function send_profile(dispatcher, state, sid)
   local profile = state.profiles[sid]
   local p = state.presences[sid]
   if profile and p then
-    dispatcher.broadcast_message(OP_PROFILE, nk.json_encode({ house = profile.house, role = profile.role, spells = profile.spells }), { p }, nil, true)
+    dispatcher.broadcast_message(OP_PROFILE, nk.json_encode({ house = profile.house, role = profile.role, spells = profile.spells, discoveries = profile.discoveries }), { p }, nil, true)
   end
 end
 
@@ -193,14 +200,101 @@ local function broadcast_profile_change(dispatcher, state, sid)
   end
 end
 
+-- Per-player mystery progress (storage "mysteries"/"progress", server-only).
+local function load_progress(uid)
+  local ok, objects = pcall(nk.storage_read, { { collection = PROGRESS_COLLECTION, key = PROGRESS_KEY, user_id = uid } })
+  if ok and objects and objects[1] and type(objects[1].value) == "table" then
+    return objects[1].value
+  end
+  return {}
+end
+
+local function save_progress(uid, progress)
+  pcall(nk.storage_write, {
+    { collection = PROGRESS_COLLECTION, key = PROGRESS_KEY, user_id = uid, value = progress, permission_read = 0, permission_write = 0 },
+  })
+end
+
+local function send_text(dispatcher, state, sid, key)
+  local p = state.presences[sid]
+  if p then
+    local text = Mysteries.text(state.engine, key, state.locales[sid])
+    dispatcher.broadcast_message(OP_SERVER_TEXT, nk.json_encode({ text = text, seconds = TEXT_SECONDS }), { p }, nil, true)
+  end
+end
+
+local function players_in(state, area)
+  local out = {}
+  for sid, a in pairs(state.areas) do
+    if a == area and state.presences[sid] then
+      table.insert(out, { sid = sid, uid = state.presences[sid].user_id, house = state.profiles[sid] and state.profiles[sid].house or 0 })
+    end
+  end
+  return out
+end
+
+-- House points come from professors and mysteries; the ledger arrives with
+-- lesson sessions (Milestone 22). Until then awards are only logged.
+local function award_house_points(dispatcher, state, house, delta, reason, by_sid)
+  nk.logger_info(string.format("house points (no ledger yet): house %d %+d (%s)", house, delta, reason))
+end
+
+local function broadcast_object(dispatcher, oid, value)
+  dispatcher.broadcast_message(OP_OBJECT_STATE, nk.json_encode({ o = oid, s = value }), nil, nil, true)
+end
+
+local function run_actions(dispatcher, state, actions)
+  local now = nk.time() / 1000
+  for _, a in ipairs(actions) do
+    local kind = a[1]
+    if kind == "text" then
+      send_text(dispatcher, state, a[2], a[3])
+    elseif kind == "set_state" then
+      if Objects.set(state.world, a[2], a[3], now) then
+        broadcast_object(dispatcher, a[2], a[3] == nil and Objects.state_of(state.world, a[2]) or a[3])
+      end
+    elseif kind == "discovery" then
+      local profile = state.profiles[a[2]]
+      if profile and Profile.discover(profile, a[3]) then
+        Profile.write(state.presences[a[2]].user_id, profile)
+        send_profile(dispatcher, state, a[2])
+      end
+    elseif kind == "house_points" then
+      award_house_points(dispatcher, state, a[2], a[3], a[4], a[5])
+    end
+  end
+end
+
+-- Feeds one validated event from `sid` to the mystery engine and runs the result.
+local function feed_mysteries(dispatcher, state, sid, ev)
+  local p, profile = state.presences[sid], state.profiles[sid]
+  if not p or not profile then
+    return
+  end
+  local inv = state.inventories[sid]
+  ev.sid, ev.uid, ev.house, ev.held = sid, p.user_id, profile.house, inv and inv.held or ""
+  ev.area = ev.area or state.areas[sid]
+  ev.now = nk.time() / 1000
+  local ctx = {
+    players_in = function(area) return players_in(state, area) end,
+    player_progress = function(uid) return state.progress[uid] end,
+    progress_changed = function(uid) save_progress(uid, state.progress[uid]) end,
+  }
+  run_actions(dispatcher, state, Mysteries.on_event(state.engine, state.mysteries, ev, ctx))
+end
+
 function M.match_init(context, params)
-  local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {}, world = Objects.new_world() }
+  local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {}, locales = {},
+                  progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load() }
+  state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
 
 function M.match_join_attempt(context, dispatcher, tick, state, presence, metadata)
   state.names[presence.session_id] = sanitize_name(metadata and metadata.display_name, presence.username)
   state.chars[presence.session_id] = sanitize_character(metadata and metadata.character)
+  local locale = metadata and metadata.locale
+  state.locales[presence.session_id] = (locale == "en" or locale == "pl") and locale or Mysteries.FALLBACK_LOCALE
   return state, true
 end
 
@@ -216,6 +310,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     end
     state.profiles[p.session_id] = profile
     state.areas[p.session_id] = ""
+    state.progress[p.user_id] = load_progress(p.user_id)
   end
   for _, p in ipairs(presences) do
     local roster = {}
@@ -245,6 +340,10 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.inventories[sid] = nil
       state.profiles[sid] = nil
       state.areas[sid] = nil
+      state.locales[sid] = nil
+      if not find_sid(state, p.user_id, nil) then
+        state.progress[p.user_id] = nil
+      end
       Objects.forget_player(state.world, sid)
       local rest = others(state, sid)
       if #rest > 0 then
@@ -255,14 +354,14 @@ function M.match_leave(context, dispatcher, tick, state, presences)
   return state
 end
 
-local function broadcast_object(dispatcher, oid, value)
-  dispatcher.broadcast_message(OP_OBJECT_STATE, nk.json_encode({ o = oid, s = value }), nil, nil, true)
-end
-
 function M.match_loop(context, dispatcher, tick, state, messages)
-  local now = tick / TICK_RATE
+  local now = nk.time() / 1000
   for _, change in ipairs(Objects.tick(state.world, now)) do
     broadcast_object(dispatcher, change[1], change[2])
+  end
+  if tick % TICK_RATE == 0 then
+    local occupied = function(area) return #players_in(state, area) > 0 end
+    run_actions(dispatcher, state, Mysteries.tick(state.engine, state.mysteries, nk.time() / 1000, occupied))
   end
   for _, message in ipairs(messages) do
     local sid = message.sender.session_id
@@ -284,7 +383,12 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     elseif message.op_code == OP_AREA then
       local ok, payload = pcall(nk.json_decode, message.data)
       if ok and type(payload) == "table" then
-        state.areas[sid] = sanitize_area(payload.id, state.profiles[sid])
+        local area = sanitize_area(payload.id, state.profiles[sid])
+        local changed = area ~= state.areas[sid]
+        state.areas[sid] = area
+        if changed and area ~= "" then
+          feed_mysteries(dispatcher, state, sid, { event = "enter", area = area })
+        end
       end
     elseif message.op_code == OP_SORT then
       local ok, payload = pcall(nk.json_decode, message.data)
@@ -370,11 +474,15 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       local profile = state.profiles[sid]
       if ok and profile then
         local ctx = { sid = sid, area = state.areas[sid], knows = function(id) return Profile.knows(profile, id) end }
-        local oid, value = Objects.handle(state.world, ctx, payload, now)
-        if oid then
-          broadcast_object(dispatcher, oid, value)
+        local ev, reason = Objects.validate(state.world, ctx, payload, now)
+        if ev then
+          local value = Objects.apply(state.world, ev, now)
+          if value ~= nil then
+            broadcast_object(dispatcher, ev.oid, value)
+          end
+          feed_mysteries(dispatcher, state, sid, { event = ev.event, object = ev.oid, effect_type = ev.effect_type, state = Objects.state_of(state.world, ev.oid) })
         else
-          nk.logger_debug(string.format("world event from %s refused: %s", sid, tostring(value)))
+          nk.logger_debug(string.format("world event from %s refused: %s", sid, tostring(reason)))
         end
       end
     elseif message.op_code == OP_PING then
@@ -388,11 +496,20 @@ function M.match_terminate(context, dispatcher, tick, state, grace_seconds)
   return state
 end
 
--- Signals come from world.lua's admin_set_profile RPC:
---   { op = "set_profile", user_id | name, role?, house? }
+-- Signals come from world.lua's admin RPCs:
+--   { op = "set_profile", user_id | name, role?, house?, forget_spells?, forget_mysteries? }
+--   { op = "reset_world" }  every object to its default, world/house mysteries unsolved
 -- Answers { ok, sid, user_id, role, house } or { ok = false, reason }.
 function M.match_signal(context, dispatcher, tick, state, data)
   local ok, request = pcall(nk.json_decode, data or "")
+  if ok and type(request) == "table" and request.op == "reset_world" then
+    local driven = state.world.driven
+    state.world = Objects.new_world()
+    state.world.driven = driven
+    state.mysteries = Mysteries.new_state()
+    dispatcher.broadcast_message(OP_WORLD_SNAPSHOT, nk.json_encode({ objects = state.world.objects }), nil, nil, true)
+    return state, nk.json_encode({ ok = true })
+  end
   if not ok or type(request) ~= "table" or request.op ~= "set_profile" then
     return state, nk.json_encode({ ok = false, reason = "bad_request" })
   end
@@ -409,6 +526,12 @@ function M.match_signal(context, dispatcher, tick, state, data)
   end
   if request.forget_spells == true then
     profile.spells = Profile.sanitize_spells(nil)
+  end
+  if request.forget_mysteries == true then
+    profile.discoveries = {}
+    local uid = state.presences[sid].user_id
+    state.progress[uid] = {}
+    save_progress(uid, state.progress[uid])
   end
   Profile.write(state.presences[sid].user_id, profile)
   send_profile(dispatcher, state, sid)

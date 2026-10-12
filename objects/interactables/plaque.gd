@@ -23,3 +23,5 @@ func _ready() -> void:
 
 func _on_interacted(_interactor: Node) -> void:
 	GameEvents.notification_requested.emit(tr(text), display_seconds)
+	# Reading a plaque can be a mystery step; the server only hears about it.
+	WorldObjectSync.report(self, "interact")

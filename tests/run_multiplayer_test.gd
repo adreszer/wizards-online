@@ -21,12 +21,17 @@ var grant_results: Array = []
 var sort_results: Array = []
 ## [object id, state] for every OP_OBJECT_STATE received
 var object_events: Array = []
+var server_texts: Array[String] = []
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
 ## A toggleable switch in the classroom: flips on every valid spell event, so
 ## the test works whatever state earlier runs left it in.
 const SWITCH := "class_sigilcraft/practice_switch"
+## Two-player mystery: both clients in the gallery, then a force spell on the wall.
+const LOFT_WALL := "loft/secret_wall"
+## Player-scoped mystery: these plaques read in order.
+const TALE := [["great_hall", "great_hall/plaque_great_hall"], ["library", "library/plaque_library"], ["stair_hall", "stair_hall/plaque_stair_hall"]]
 
 
 func _ready() -> void:
@@ -42,6 +47,7 @@ func _ready() -> void:
 	GameEvents.notification_requested.connect(func(text: String, _d: float) -> void: notifications.append(text))
 	NetworkManager.sort_result_received.connect(func(ok: bool, house: int, reason: String) -> void: sort_results.append({"ok": ok, "house": house, "reason": reason}))
 	NetworkManager.object_state_changed.connect(func(oid: String, s: Variant) -> void: object_events.append([oid, s]))
+	NetworkManager.server_text_received.connect(func(text: String, _s: float) -> void: server_texts.append(text))
 	await _run()
 
 
@@ -65,7 +71,7 @@ func _run() -> void:
 	var got_profile := await _wait_until(func() -> bool: return not NetworkManager.get_local_profile().is_empty(), 10.0)
 	t.check(got_profile, "server sent the character profile on join")
 	# Accounts persist between runs: start from a fresh student record (dev tooling path).
-	var reset: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "role": "student", "house": 0, "forget_spells": true}, HTTP_KEY)
+	var reset: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "role": "student", "house": 0, "forget_spells": true, "forget_mysteries": true}, HTTP_KEY)
 	t.check(reset.get("ok", false) == true, "test account reset to a fresh student (%s)" % str(reset))
 	got_profile = await _wait_until(func() -> bool: return NetworkManager.get_local_role() == "student" and NetworkManager.get_local_house() == 0 and _known_spells().is_empty(), 10.0)
 	t.check(got_profile and spawner.local_player.spell_caster.known_spells.is_empty(), "reset profile applied to the player")
@@ -112,9 +118,30 @@ func _classroom_zone() -> AreaZone:
 
 ## Teleports the local player onto the classroom floor (server learns the area from the zone event).
 func _enter_classroom(spawner: PlayerSpawner, offset: Vector3) -> void:
-	var zone := _classroom_zone()
+	await _enter_zone(spawner, CLASSROOM, offset)
+
+
+func _zone(area_id: StringName) -> AreaZone:
+	for zone in world.get_node("Level").get_zones():
+		if zone.area_id == area_id:
+			return zone
+	return null
+
+
+## Teleports the local player into an area and waits until the tracker (and so
+## the server, via OP_AREA) knows it. Returns whether it got there.
+func _enter_zone(spawner: PlayerSpawner, area_id: StringName, offset: Vector3 = Vector3.ZERO) -> bool:
+	var zone := _zone(area_id)
 	var floor_y := zone.global_position.y - zone.size.y / 2.0
 	spawner.local_player.global_position = Vector3(zone.global_position.x, floor_y + 0.2, zone.global_position.z) + offset
+	return await _wait_until(func() -> bool: return spawner.local_player.area_tracker.current_area_id() == area_id, 5.0)
+
+
+func _inside(node: Node3D, area_id: StringName) -> bool:
+	var zone := _zone(area_id)
+	var local := node.global_position - zone.global_position
+	# Feet rest on the zone's bottom face, so allow a little slack vertically.
+	return absf(local.x) < zone.size.x / 2.0 and absf(local.y) <= zone.size.y / 2.0 + 0.5 and absf(local.z) < zone.size.z / 2.0
 
 
 func _world_object(oid: String) -> Node:
@@ -132,6 +159,8 @@ func _known_spells() -> Array:
 
 func _run_observer(spawner: PlayerSpawner) -> void:
 	t.section("Observer")
+	var reset_world: Dictionary = await NetworkManager.admin_reset_world(HTTP_KEY)
+	t.check(reset_world.get("ok", false) == true, "world objects and shared mysteries reset for the test (%s)" % str(reset_world))
 	# Become a professor through the admin RPC (server-to-server key, as dev tooling would).
 	t.check(NetworkManager.get_local_role() == "student", "a fresh character is a student")
 	var answer: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "role": "professor"}, HTTP_KEY)
@@ -226,6 +255,14 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	var switch_node: Node = _world_object(SWITCH)
 	t.check(ok and switch_node is MagicSwitch and switch_node.is_on == (NetworkManager.get_world_object_states().get(SWITCH, false) == true), "the student's switch change reaches the professor's castle")
 
+	t.section("Mystery (professor)")
+	t.check(await _enter_zone(spawner, &"gallery", Vector3(-2, 0, 0)), "the professor waits in the gallery")
+	var loft: Node = _world_object(LOFT_WALL)
+	ok = await _wait_until(func() -> bool: return loft is SecretWall and loft.is_revealed, 90.0)
+	t.check(ok, "the two-player mystery opens the loft for the professor too")
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("loft"), 10.0)
+	t.check(ok, "both players of a cooperative mystery get the discovery")
+
 	ok = await _wait_until(func() -> bool: return _remote(spawner) == null, 30.0)
 	t.check(ok, "remote player removed when B disconnects")
 	t.check(leaves.has("ClientB"), "leave event received for ClientB")
@@ -314,6 +351,37 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	await _wait(1.0)
 	t.check(object_events.size() == 1, "events from the wrong area, for unknown objects or with an unknown spell are dropped (%s)" % str(object_events))
 	t.check(NetworkManager.get_world_object_states().get("undercroft/secret_wall") == hidden_before, "the out-of-reach secret wall did not change")
+
+	t.section("Mysteries (student)")
+	# Player scope: three plaques in order; the server answers each with a clue.
+	for i in TALE.size():
+		var area: StringName = StringName(TALE[i][0])
+		t.check(await _enter_zone(spawner, area), "reached %s" % area)
+		await _wait(0.5)
+		var plaque: Node = _world_object(TALE[i][1])
+		var texts_before := server_texts.size()
+		plaque._on_interacted(player)
+		ok = await _wait_until(func() -> bool: return server_texts.size() > texts_before, 10.0)
+		t.check(ok, "reading %s earns a server text (%s)" % [TALE[i][1], str(server_texts.slice(texts_before))])
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("founders_tale"), 10.0)
+	t.check(ok, "solving a mystery records a discovery on the profile")
+	t.check(server_texts.size() >= 3 and not server_texts.any(func(x: String) -> bool: return x.begins_with("MYST_")), "clues arrive as resolved text, not keys (%s)" % str(server_texts))
+	# World scope, two players: the loft opens only with someone else in the gallery.
+	var loft: Node = _world_object(LOFT_WALL)
+	t.check(loft is SecretWall and not loft.is_revealed, "the loft is closed after the reset")
+	loft._on_spell_received(SpellEffect.create(ARCANE_PULSE, player, "", loft.global_position, Vector3.FORWARD))
+	await _wait(1.0)
+	t.check(not loft.is_revealed, "a mystery-driven wall ignores a direct spell")
+	t.check(await _enter_zone(spawner, &"gallery", Vector3(2, 0, 0)), "the student reaches the gallery")
+	ok = await _wait_until(func() -> bool: return _remote(spawner) != null and _inside(_remote(spawner), &"gallery"), 60.0)
+	t.check(ok, "the professor is in the gallery too")
+	await _wait(1.0)
+	loft._on_spell_received(SpellEffect.create(ARCANE_PULSE, player, "", loft.global_position, Vector3.FORWARD))
+	ok = await _wait_until(func() -> bool: return loft.is_revealed, 10.0)
+	t.check(ok, "with two players present the spell solves the mystery and opens the loft")
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("loft"), 10.0)
+	t.check(ok, "the solver gets the loft discovery")
+	await _enter_classroom(spawner, Vector3(2, 0, 0))
 	var glow := SpellRegistry.load_definition("glowmote")
 	player.spell_caster.assign_slot(5, glow)
 	player.spell_caster.equip(ARCANE_PULSE)
@@ -333,4 +401,5 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(profile.get("spells", {}).get("slots", [])[5] == "glowmote" and player.spell_caster.quick_slots[5] == glow and player.spell_caster.equipped_spell == ARCANE_PULSE, "hotbar layout persists across reconnect")
 	t.check(int(profile.get("house", 0)) == 3 and player.house == 3, "house persists across reconnect")
 	t.check(NetworkManager.get_world_object_states().get(SWITCH, false) == (not before) and switch_node.is_on == (not before), "the rejoin snapshot carries the switch state")
+	t.check(NetworkManager.get_world_object_states().get(LOFT_WALL) == "revealed" and _world_object(LOFT_WALL).is_revealed, "the solved mystery's wall is still open after rejoining")
 	await _wait(2.0)

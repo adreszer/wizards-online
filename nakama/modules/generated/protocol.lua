@@ -14,6 +14,7 @@ return {
   OP_PROFILE = 14,
   OP_ROSTER = 10,
   OP_ROSTER_UPDATE = 15,
+  OP_SERVER_TEXT = 22,
   OP_SORT = 8,
   OP_SORT_RESULT = 18,
   OP_SPELLBOOK = 6,
@@ -23,6 +24,7 @@ return {
   OP_STUDY_TOME = 7,
   OP_WORLD_EVENT = 9,
   OP_WORLD_SNAPSHOT = 21,
+  RPC_ADMIN_RESET_WORLD = "admin_reset_world",
   RPC_ADMIN_SET_PROFILE = "admin_set_profile",
   RPC_JOIN_WORLD = "join_world",
 }

@@ -929,6 +929,8 @@ KINDS = {
     "crystal_guardian": ("res://characters/enemies/crystal_guardian.tscn", "Enemies", False),
     "magic_switch": ("res://objects/puzzles/magic_switch.tscn", "Puzzles", True),
     "pushable_block": ("res://objects/puzzles/pushable_block.tscn", "Puzzles", True),
+    "rotating_statue": ("res://objects/puzzles/rotating_statue.tscn", "Puzzles", True),
+    "lever": ("res://objects/interactables/lever.tscn", "Puzzles", True),
     "sorting_stone": ("res://objects/school/sorting_stone.tscn", ".", True),
 }
 PLAQUE_HEIGHT = 1.6

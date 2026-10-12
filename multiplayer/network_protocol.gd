@@ -49,12 +49,17 @@ const OP_OBJECT_STATE := 19
 const OP_PING := 20
 ## server → joining player: {objects: {object id: state}} every world object not in its default state
 const OP_WORLD_SNAPSHOT := 21
+## server → one player: {text, seconds} text already resolved in the player's
+## locale (mystery clues and rewards, which never ship in the client)
+const OP_SERVER_TEXT := 22
 
 const CHAT_ROOM := "world"
 ## Server RPC that finds (or creates) the shared world match.
 const RPC_JOIN_WORLD := "join_world"
 ## Server RPC that changes a character's role/house (admin or HTTP key).
 const RPC_ADMIN_SET_PROFILE := "admin_set_profile"
+## Server RPC that resets world objects and shared mysteries (admin or HTTP key; dev and tests).
+const RPC_ADMIN_RESET_WORLD := "admin_reset_world"
 const MAX_CHAT_LENGTH := 200
 
 

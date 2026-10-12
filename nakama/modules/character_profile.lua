@@ -1,7 +1,8 @@
 -- Character record shared by world.lua (admin RPC) and world_match.lua.
 -- Storage: collection "character", key "profile", one object per user:
 --   { v = 1, house = 0..4, role = "student"|"professor"|"admin",
---     spells = { known = {ids}, slots = {ids or ""}, equipped = id } }
+--     spells = { known = {ids}, slots = {ids or ""}, equipped = id },
+--     discoveries = {mystery discovery ids} }
 -- Spell ids and the sorting questionnaire come from generated modules
 -- (tools/export_server_content.gd), so the client's lists are the only source.
 
@@ -124,8 +125,32 @@ function M.sanitize_spells(raw)
   return { known = known, slots = slots, equipped = equipped }
 end
 
+M.MAX_DISCOVERIES = 256
+
+function M.sanitize_discoveries(raw)
+  local out, seen = {}, {}
+  if type(raw) == "table" then
+    for _, id in ipairs(raw) do
+      if type(id) == "string" and #id > 0 and #id <= 64 and not seen[id] and #out < M.MAX_DISCOVERIES then
+        seen[id] = true
+        table.insert(out, id)
+      end
+    end
+  end
+  return out
+end
+
+-- Records a discovery (a solved mystery's reward). Returns true when new.
+function M.discover(profile, id)
+  if contains(profile.discoveries, id) then
+    return false
+  end
+  table.insert(profile.discoveries, id)
+  return true
+end
+
 function M.sanitize(raw)
-  local profile = { v = 1, house = 0, role = "student", spells = nil }
+  local profile = { v = 1, house = 0, role = "student", spells = nil, discoveries = {} }
   if type(raw) == "table" then
     local house = math.floor(tonumber(raw.house) or 0)
     if house >= 0 and house <= M.MAX_HOUSE then
@@ -135,6 +160,7 @@ function M.sanitize(raw)
       profile.role = raw.role
     end
     profile.spells = M.sanitize_spells(raw.spells)
+    profile.discoveries = M.sanitize_discoveries(raw.discoveries)
   else
     profile.spells = M.sanitize_spells(nil)
   end

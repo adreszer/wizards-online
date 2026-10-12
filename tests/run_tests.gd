@@ -56,6 +56,7 @@ func _run() -> void:
 	await _test_characters()
 	_test_server_content()
 	await _test_world_objects()
+	_test_mysteries()
 	print(t.summary())
 	get_tree().quit(1 if t.failed > 0 else 0)
 
@@ -1389,3 +1390,69 @@ func _test_world_objects() -> void:
 	for n: Node in [wall, switch, torch, lever, statue, door]:
 		n.queue_free()
 	await get_tree().process_frame
+
+
+## Server-only mystery content (nakama/content/) refers only to things that
+## exist, has both languages, and none of its text is in the shipped CSV.
+func _test_mysteries() -> void:
+	t.section("Mysteries (server content)")
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/mysteries.json"))
+	var strings: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/strings.json"))
+	if not t.check(data is Dictionary and strings is Dictionary, "mysteries.json and strings.json parse"):
+		return
+	var objects := ServerContentExporter.world_objects(ServerContentExporter.CASTLE_SCENE)
+	var areas := {}
+	var area_re := RegEx.create_from_string('\\["([a-z0-9_]+)"\\] = \\{')
+	for m in area_re.search_all(FileAccess.get_file_as_string("res://nakama/modules/world_areas.lua")):
+		areas[m.get_string(1)] = true
+	var effects := {}
+	for def in SpellRegistry.all():
+		effects[str(def.effect_type)] = true
+	var problems: Array[String] = []
+	var keys: Array[String] = []
+	var ids := {}
+	for m: Dictionary in data.get("mysteries", []):
+		var mid := str(m.get("id", ""))
+		if mid.is_empty() or ids.has(mid):
+			problems.append("bad or duplicate id %s" % mid)
+		ids[mid] = true
+		for step: Dictionary in m.get("steps", []):
+			var ev := str(step.get("event", ""))
+			if ev in ["spell", "interact"]:
+				var obj: Dictionary = objects.get(str(step.get("object", "")), {})
+				if obj.is_empty():
+					problems.append("%s: unknown object %s" % [mid, step.get("object")])
+				elif ev == "spell" and step.has("effect_type") and not (effects.has(step["effect_type"]) and (obj["accepts"].has(step["effect_type"]) or obj["accepts"].has("any"))):
+					problems.append("%s: %s does not take %s" % [mid, step["object"], step["effect_type"]])
+			elif ev in ["enter", "together"]:
+				if not areas.has(str(step.get("area", ""))):
+					problems.append("%s: unknown area %s" % [mid, step.get("area")])
+				if step.has("holding") and not ItemRegistry.exists(str(step["holding"])):
+					problems.append("%s: unknown item %s" % [mid, step["holding"]])
+			else:
+				problems.append("%s: unknown event %s" % [mid, ev])
+			if step.has("text"):
+				keys.append(str(step["text"]))
+		var solved: Dictionary = m.get("on_solved", {})
+		for oid: String in solved.get("set_state", {}):
+			if not objects.has(oid):
+				problems.append("%s: on_solved sets unknown object %s" % [mid, oid])
+		if solved.has("text"):
+			keys.append(str(solved["text"]))
+	t.check(problems.is_empty() and ids.size() >= 4, "%d mysteries refer only to existing objects, areas, effects and items (%s)" % [ids.size(), "; ".join(problems)])
+	var missing: Array[String] = []
+	for key in keys:
+		var entry: Variant = strings.get(key)
+		if not (entry is Dictionary and str(entry.get("pl", "")) != "" and str(entry.get("en", "")) != ""):
+			missing.append(key)
+	t.check(missing.is_empty(), "every mystery text has pl and en (missing: %s)" % ", ".join(missing))
+	var csv := FileAccess.get_file_as_string("res://localization/translations.csv")
+	var leaked: Array[String] = []
+	for key: String in strings:
+		if csv.contains(key):
+			leaked.append(key)
+		for loc in ["pl", "en"]:
+			var text := str(strings[key].get(loc, ""))
+			if text.length() > 12 and csv.contains(text):
+				leaked.append("%s.%s" % [key, loc])
+	t.check(leaked.is_empty(), "no server-only text is in the shipped translations.csv (%s)" % ", ".join(leaked))

@@ -1,0 +1,38 @@
+{
+  "MYST_UNDERCROFT_CLUE": {
+    "pl": "W blasku pochodni widać zadrapania wokół jednego kamienia we wschodniej ścianie.",
+    "en": "By torchlight you notice scratch marks around one stone in the east wall."
+  },
+  "MYST_UNDERCROFT_SOLVED": {
+    "pl": "Kamień ustępuje z jękiem. Za nim czeka zapomniana krypta.",
+    "en": "The stone gives way with a groan. A forgotten crypt waits behind it."
+  },
+  "MYST_STUDY_CLUE": {
+    "pl": "Posąg czytelnika patrzy teraz na jedną rzeźbioną płytę przy zachodniej ścianie.",
+    "en": "The reader's statue now gazes at a single carved panel on the west wall."
+  },
+  "MYST_STUDY_SOLVED": {
+    "pl": "Płyta odsuwa się. Ktoś urządził tu sobie cichą pracownię.",
+    "en": "The panel slides away. Someone kept a quiet study here."
+  },
+  "MYST_LOFT_CLUE": {
+    "pl": "Dwa głosy niosą się pod sklepieniem galerii. Coś nad wami odpowiada echem.",
+    "en": "Two voices carry under the gallery vault. Something above you echoes back."
+  },
+  "MYST_LOFT_SOLVED": {
+    "pl": "Echo milknie, a w ścianie otwiera się przejście na strych.",
+    "en": "The echo fades and a passage to the loft opens in the wall."
+  },
+  "MYST_TALE_1": {
+    "pl": "Pod tablicą ktoś dopisał drobnym pismem: „Dalszy ciąg spisano między księgami”.",
+    "en": "Someone has added in small letters under the plaque: \"The tale goes on among the books.\""
+  },
+  "MYST_TALE_2": {
+    "pl": "Na marginesie tablicy: „Koniec opowieści stoi tam, gdzie schody się spotykają”.",
+    "en": "In the plaque's margin: \"The tale ends where the stairs meet.\""
+  },
+  "MYST_TALE_SOLVED": {
+    "pl": "Poznajesz całą opowieść o założycielach zamku.",
+    "en": "You have pieced together the tale of the castle's founders."
+  }
+}

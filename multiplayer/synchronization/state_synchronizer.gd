@@ -19,6 +19,7 @@ signal sort_result_received(ok: bool, house: int, reason: String)
 signal object_state_changed(object_id: String, state: Variant)
 ## A full snapshot of world object states arrived (join / reconnect).
 signal world_snapshot_received(objects: Dictionary)
+signal server_text_received(text: String, seconds: float)
 
 @export var ping_interval: float = 2.0
 
@@ -52,6 +53,7 @@ func bind(p_session: WorldSession) -> void:
 	session.pong_received.connect(_on_pong)
 	session.object_state_received.connect(_on_object_state)
 	session.world_snapshot_received.connect(_on_world_snapshot)
+	session.server_text_received.connect(server_text_received.emit)
 
 
 func reset() -> void:

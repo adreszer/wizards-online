@@ -187,6 +187,15 @@ Playtesting: `godot --path . -- --all-spells` spawns with every spell on the hot
 
 `--character=<id>` selects a body for one run (handy for two-client tests).
 
+## Adding a mystery
+
+1. Make sure every object it uses exists with a stable id: place new statues, levers, plaques… in `content/placements.json` (kinds in `KINDS`, `tools/generate_castle.py`), regenerate the castle and re-export (`tools/export_server_content.tscn`).
+2. Add the mystery to `nakama/content/mysteries.json` (format documented at the top of `nakama/modules/mysteries.lua`) and its text to `nakama/content/strings.json`, both languages. Never put mystery text in `localization/translations.csv`: it ships with the game.
+3. `tools/check.sh`: the "Mysteries" test section checks objects, areas, effect types, items and texts, and that no server text is in the CSV.
+4. Restart Nakama; the log says `mysteries: N loaded` (and names any mystery it refused). `tools/reset_world.sh` re-arms shared mysteries and objects while playtesting.
+
+Offline mode has no server, so mysteries do not run there (offline, secret walls still open on a direct hit until the offline practice set exists).
+
 ## Adding an enemy
 
 1. Rig and animate in Meshy as for a character (Mixamo rig; at least idle, walk or run, an alert and an attack clip). Save as `assets/models/characters/<id>/<id>.glb`, import once.

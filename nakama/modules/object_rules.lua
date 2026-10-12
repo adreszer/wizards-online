@@ -113,25 +113,29 @@ end
 -- Returns true when the state changed.
 function M.set(world, oid, value, now)
   local obj = OBJECTS[oid]
-  if not obj or world.objects[oid] == value then
+  if not obj then
+    return false
+  end
+  if value == M.state_of({ objects = {} }, oid) then
+    value = nil -- the default is stored as "no entry"
+  end
+  if world.objects[oid] == value then
     return false
   end
   world.objects[oid] = value
   world.last[oid] = now
   world.relight[oid] = nil
-  if obj.kind == "wall_torch" then
-    if value == true then
-      world.objects[oid] = nil -- lit is the default
-    elseif (obj.relight_after or 0) > 0 then
-      world.relight[oid] = now + obj.relight_after
-    end
+  if obj.kind == "wall_torch" and value == false and (obj.relight_after or 0) > 0 then
+    world.relight[oid] = now + obj.relight_after
   end
   return true
 end
 
--- Validates a client event. `ctx` = { sid, area, knows = fn(spell_id) -> bool }.
--- Returns oid, new_state on success; nil, reason when refused.
-function M.handle(world, ctx, payload, now)
+-- Checks a client event. `ctx` = { sid, area, knows = fn(spell_id) -> bool }.
+-- Returns ev = { oid, obj, event, spell, effect_type } on success; nil, reason when refused.
+-- A valid event may still change nothing (static kinds, mystery-driven objects);
+-- it is then only seen by the mystery engine.
+function M.validate(world, ctx, payload, now)
   if type(payload) ~= "table" then return nil, "bad_payload" end
   local oid, event = payload.o, payload.e
   if type(oid) ~= "string" or #oid > M.MAX_ID_BYTES then return nil, "bad_object" end
@@ -139,27 +143,43 @@ function M.handle(world, ctx, payload, now)
   if not obj then return nil, "unknown_object" end
   if not take_token(world, ctx.sid, now) then return nil, "rate_limited" end
   if not in_reach(obj, ctx.area) then return nil, "out_of_reach" end
-  if world.driven[oid] then return nil, "mystery_driven" end
-  if world.last[oid] and now - world.last[oid] < M.OBJECT_COOLDOWN then return nil, "cooldown" end
-  local rule = M.KINDS[obj.kind]
-  if not rule then return nil, "static_kind" end
-  local new_state
+  local ev = { oid = oid, obj = obj, event = event }
   if event == "spell" then
     local spell = payload.spell
     if type(spell) ~= "string" or not SPELLS.by_id[spell] then return nil, "unknown_spell" end
     if not ctx.knows(spell) then return nil, "spell_not_known" end
-    local effect_type = SPELLS.by_id[spell].effect_type
-    if not accepts(obj, effect_type) or not rule.spell then return nil, "not_accepted" end
-    new_state = rule.spell(world, oid, obj, effect_type)
-  elseif event == "interact" then
-    if not rule.interact then return nil, "not_accepted" end
-    new_state = rule.interact(world, oid, obj)
-  else
+    ev.spell, ev.effect_type = spell, SPELLS.by_id[spell].effect_type
+    if not accepts(obj, ev.effect_type) then return nil, "not_accepted" end
+  elseif event ~= "interact" then
     return nil, "bad_event"
   end
+  return ev
+end
+
+-- Applies the kind's rule to a validated event. Returns the new state, or nil, reason.
+function M.apply(world, ev, now)
+  local oid, obj = ev.oid, ev.obj
+  if world.driven[oid] then return nil, "mystery_driven" end
+  local rule = M.KINDS[obj.kind]
+  local fn = rule and rule[ev.event]
+  if not fn then return nil, "no_rule" end
+  if world.last[oid] and now - world.last[oid] < M.OBJECT_COOLDOWN then return nil, "cooldown" end
+  local new_state = fn(world, oid, obj, ev.effect_type)
   if new_state == nil then return nil, "no_change" end
   M.set(world, oid, new_state, now)
-  return oid, new_state
+  return new_state
+end
+
+-- The object's current state, defaults included (lit torch, a statue's initial state…).
+function M.state_of(world, oid)
+  local s = world.objects[oid]
+  if s ~= nil then return s end
+  local obj = OBJECTS[oid]
+  if not obj then return nil end
+  if obj.kind == "wall_torch" then return obj.lit ~= false end
+  if obj.kind == "rotating_statue" then return math.floor(obj.initial_state or 0) end
+  if obj.kind == "magic_switch" or obj.kind == "lever" then return false end
+  return nil
 end
 
 -- Timed changes due at `now` (torches relighting). Returns a list of {oid, state}.

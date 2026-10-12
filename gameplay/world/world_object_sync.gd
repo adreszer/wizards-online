@@ -52,6 +52,13 @@ static func request(obj: Node, event: String, effect: SpellEffect = null) -> boo
 	return true
 
 
+## Tells the server about an event that also acts locally (reading a plaque):
+## mysteries may count it, but nothing waits for an answer.
+static func report(obj: Node, event: String) -> void:
+	if is_synced(obj):
+		NetworkManager.send_world_event(str(obj.get(&"object_id")), event)
+
+
 func _on_object_state(object_id: String, state: Variant) -> void:
 	var node: Node = _objects.get(object_id)
 	if node != null and is_instance_valid(node):

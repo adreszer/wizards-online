@@ -39,6 +39,7 @@ static func sanitize(raw: Dictionary) -> Dictionary:
 			"slots": _ids(spells.get("slots", []), true),
 			"equipped": SpellRegistry.sanitize(str(spells.get("equipped", ""))),
 		},
+		"discoveries": _strings(raw.get("discoveries", [])),
 	}
 
 
@@ -78,4 +79,14 @@ static func _ids(raw: Variant, keep_empty: bool = false) -> Array:
 			var id := SpellRegistry.sanitize(str(v))
 			if not id.is_empty() or keep_empty:
 				out.append(id)
+	return out
+
+
+## Discovery ids from the server (solved mysteries); anything else is dropped.
+static func _strings(raw: Variant) -> Array:
+	var out: Array = []
+	if raw is Array:
+		for v: Variant in raw:
+			if v is String and not (v as String).is_empty() and not out.has(v):
+				out.append(v)
 	return out

@@ -235,9 +235,12 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Persist world object state across server restarts (today it lives in the match)
 
 ### Milestone 21 — Mysteries as data (server-only)
-- [ ] `nakama/modules/mysteries.lua` step engine (spell, interact, enter/holding, together, ordered, timed); world/house/player scopes
-- [ ] Server-only `strings.json`, locale in join metadata, `OP_SERVER_TEXT`; discoveries on the profile
-- [ ] The three secret passages rebuilt as mysteries + one two-player mystery
+- [x] `nakama/modules/mysteries.lua` step engine (spell with effect/state, interact, enter/holding, together, ordered, timed, reset_on_wrong); world/house/player scopes; validation at load; world mysteries re-arm after a while once nobody would be trapped
+- [x] Server-only `nakama/content/strings.json`, locale in join metadata, `OP_SERVER_TEXT`; discoveries on the profile; plaques report reads online
+- [x] Content: the undercroft (enter the dungeon holding a torch, then strike the wall), the hidden study (turn the new reader statue to the right state, then strike the wall), the loft (two players in the gallery, then strike the wall), and a player-scoped tale read from three plaques in order
+- [x] `admin_reset_world` RPC + `tools/reset_world.sh`; `admin_set_profile` takes `forget_mysteries`
+- [x] Tests: content validation (objects, areas, effects, items, both languages, nothing in the CSV); two-client test solves the plaque tale and the two-player loft
+- [ ] House points from mysteries are only logged until the ledger exists (Milestone 22)
 
 ### Milestone 22 — Subjects, lesson sessions, house points
 - [ ] `SubjectDefinition` resources + `generated/subjects.lua`
@@ -315,7 +318,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (308 gameplay, localization, server-content and world-object checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (312 gameplay, localization, server-content, world-object and mystery-content checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
 
 | Area | Check | Status |
 |------|-------|--------|
@@ -331,7 +334,7 @@ Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (l
 | Collectibles | counter, no double collect | [x] headless test pass |
 | Level | full offline playthrough | [x] headless level-wiring test (every mechanism, 11 fragments, end trigger); full manual playthrough by the user still pending |
 | Localization | pl/en load, all keys translated, fallback, name sanitizing | [x] headless test pass; in-game visual check of Polish text (menu, HUD, plaques) pending |
-| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory and profile, promotion, classroom grant, dropped unknown cast, persistence across reconnect, sorting and roster house update | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 44 + 42 checks pass, incl. server-authoritative world objects |
+| Multiplayer | two clients connect, see each other, movement/jump/spell/held torch replicate, server issues the inventory and profile, promotion, classroom grant, dropped unknown cast, persistence across reconnect, sorting and roster house update | [x] two headless clients vs local Nakama (`tests/run_multiplayer_test.tscn`): 48 + 57 checks pass, incl. server-authoritative world objects and two mysteries |
 | Multiplayer | disconnect removes player, reconnect works | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Chat | messages between clients | [x] two-client test + `run_reconnect_test` (Nakama restarted mid-session → auto reconnect) |
 | Offline | playable with backend stopped | [x] `run_offline_fallback_test` with backend stopped: readable error, offline world playable |

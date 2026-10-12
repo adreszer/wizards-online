@@ -36,6 +36,9 @@
     {"id": "guardian_east", "kind": "crystal_guardian", "at": [4, -4], "yaw": 90},
     {"id": "guardian_west", "kind": "crystal_guardian", "at": [-6, 4], "yaw": -45}
   ],
+  "class_chronicles": [
+    {"id": "statue_reader", "kind": "rotating_statue", "corner": "se", "inset": [2.5, 2.0], "yaw": -90}
+  ],
   "hidden_study": [
     {"id": "plaque_hidden_study", "kind": "plaque", "text": "PLAQUE_HIDDEN_STUDY", "wall": "n", "along": 0.5},
     {"id": "fragment_a", "kind": "fragment", "at": [0, -4]},

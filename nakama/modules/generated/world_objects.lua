@@ -14,6 +14,15 @@ return {
     kind = "plaque",
     pos = { -20.23, -7.4, -8 },
   },
+  ["class_chronicles/statue_reader"] = {
+    accepts = { "force" },
+    area = "class_chronicles",
+    areas = { "class_chronicles" },
+    initial_state = 0,
+    kind = "rotating_statue",
+    pos = { -22.5, 0, -10 },
+    state_count = 4,
+  },
   ["class_elixirs/tome_wellspring"] = {
     accepts = {},
     area = "class_elixirs",

@@ -1,0 +1,64 @@
+{
+  "mysteries": [
+    {
+      "id": "undercroft_passage",
+      "scope": "world",
+      "steps": [
+        {"event": "enter", "area": "dungeon_corridor", "holding": "torch", "text": "MYST_UNDERCROFT_CLUE"},
+        {"event": "spell", "object": "undercroft/secret_wall", "effect_type": "force", "within_seconds": 120}
+      ],
+      "on_solved": {
+        "set_state": {"undercroft/secret_wall": "revealed"},
+        "text": "MYST_UNDERCROFT_SOLVED",
+        "discovery": "undercroft",
+        "house_points": 5
+      },
+      "reset_after_minutes": 30
+    },
+    {
+      "id": "reader_study",
+      "scope": "world",
+      "reset_on_wrong": true,
+      "steps": [
+        {"event": "spell", "object": "class_chronicles/statue_reader", "state": 2, "text": "MYST_STUDY_CLUE"},
+        {"event": "spell", "object": "hidden_study/secret_wall", "effect_type": "force", "within_seconds": 90}
+      ],
+      "on_solved": {
+        "set_state": {"hidden_study/secret_wall": "revealed"},
+        "text": "MYST_STUDY_SOLVED",
+        "discovery": "hidden_study",
+        "house_points": 5
+      },
+      "reset_after_minutes": 30
+    },
+    {
+      "id": "gallery_echo",
+      "scope": "world",
+      "steps": [
+        {"event": "together", "area": "gallery", "players": 2, "text": "MYST_LOFT_CLUE"},
+        {"event": "spell", "object": "loft/secret_wall", "effect_type": "force", "within_seconds": 60}
+      ],
+      "on_solved": {
+        "set_state": {"loft/secret_wall": "revealed"},
+        "text": "MYST_LOFT_SOLVED",
+        "discovery": "loft",
+        "house_points": 10
+      },
+      "reset_after_minutes": 30
+    },
+    {
+      "id": "founders_tale",
+      "scope": "player",
+      "steps": [
+        {"event": "interact", "object": "great_hall/plaque_great_hall", "text": "MYST_TALE_1"},
+        {"event": "interact", "object": "library/plaque_library", "text": "MYST_TALE_2", "within_seconds": 900},
+        {"event": "interact", "object": "stair_hall/plaque_stair_hall", "within_seconds": 900}
+      ],
+      "on_solved": {
+        "text": "MYST_TALE_SOLVED",
+        "discovery": "founders_tale",
+        "house_points": 2
+      }
+    }
+  ]
+}
