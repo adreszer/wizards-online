@@ -20,6 +20,7 @@ light_color = Color(1, 0.78, 0.55, 1)
 light_energy = 2.6
 omni_range = 7.0
 omni_attenuation = 1.8
+shadow_enabled = true
 
 [node name="FlameGlow" parent="Flame" instance=ExtResource("4")]
 transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 2.2, 0, -0.06, 0)

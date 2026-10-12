@@ -14,6 +14,7 @@ emission = Color(1, 0.6, 0.22, 1)
 emission_energy_multiplier = 5.0
 
 [node name="Flame" type="MeshInstance3D"]
+cast_shadow = 0
 mesh = SubResource("FlameMesh")
 surface_material_override/0 = SubResource("FlameMat")
 script = ExtResource("1")
