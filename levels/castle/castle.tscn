@@ -1294,9 +1294,93 @@ approach_area = "gallery"
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 8.500, -64.000)
 size = Vector3(40.000, 1.000, 0.350)
 
+[node name="BandFill_x-64_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 17.500, -64.000)
+size = Vector3(40.000, 1.000, 0.350)
+
+[node name="BandFill_x-56_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 8.500, -56.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-56_s0_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 8.500, -56.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-56_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 17.500, -56.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-56_s1_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 17.500, -56.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-56_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 26.500, -56.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-56_s2_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 26.500, -56.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-56_s3" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 35.500, -56.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-56_s3_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 35.500, -56.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-40_s-1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, -0.500, -40.000)
+size = Vector3(72.000, 1.000, 0.350)
+
 [node name="BandFill_x-40_s0" parent="Geometry" instance=ExtResource("3")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 8.500, -40.000)
+size = Vector3(88.000, 1.000, 0.350)
+
+[node name="BandFill_x-40_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 17.500, -40.000)
+size = Vector3(88.000, 1.000, 0.350)
+
+[node name="BandFill_x-40_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 26.500, -40.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-40_s2_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 26.500, -40.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-40_s3" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 35.500, -40.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-40_s3_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 35.500, -40.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x-24_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 8.500, -24.000)
+size = Vector3(32.000, 1.000, 0.350)
+
+[node name="BandFill_x-24_s0_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 8.500, -24.000)
+size = Vector3(24.000, 1.000, 0.350)
+
+[node name="BandFill_x-24_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, 17.500, -24.000)
+size = Vector3(24.000, 1.000, 0.350)
+
+[node name="BandFill_x-24_s1_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 17.500, -24.000)
+size = Vector3(24.000, 1.000, 0.350)
+
+[node name="BandFill_x-16_s-1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -40.000, -0.500, -16.000)
 size = Vector3(40.000, 1.000, 0.350)
+
+[node name="BandFill_x-16_s-1_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -0.500, -16.000)
+size = Vector3(24.000, 1.000, 0.350)
 
 [node name="BandFill_x-16_s0" parent="Geometry" instance=ExtResource("3")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 8.500, -16.000)
@@ -1306,61 +1390,269 @@ size = Vector3(24.000, 1.000, 0.350)
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 17.500, -16.000)
 size = Vector3(24.000, 1.000, 0.350)
 
+[node name="BandFill_x-16_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 26.500, -16.000)
+size = Vector3(24.000, 1.000, 0.350)
+
+[node name="BandFill_x-8_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 8.500, -8.000)
+size = Vector3(32.000, 1.000, 0.350)
+
+[node name="BandFill_x-8_s0_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 8.500, -8.000)
+size = Vector3(24.000, 1.000, 0.350)
+
+[node name="BandFill_x-8_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, 17.500, -8.000)
+size = Vector3(24.000, 1.000, 0.350)
+
+[node name="BandFill_x-8_s1_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 17.500, -8.000)
+size = Vector3(24.000, 1.000, 0.350)
+
+[node name="BandFill_x+0_s-1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, -0.500, 0.000)
+size = Vector3(24.000, 1.000, 0.350)
+
 [node name="BandFill_x+8_s0" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 8.500, 8.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, 8.500, 8.000)
+size = Vector3(24.000, 1.000, 0.350)
+
+[node name="BandFill_x+8_s0_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 44.000, 8.500, 8.000)
+size = Vector3(64.000, 1.000, 0.350)
+
+[node name="BandFill_x+8_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -32.000, 17.500, 8.000)
+size = Vector3(24.000, 1.000, 0.350)
+
+[node name="BandFill_x+8_s1_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 17.500, 8.000)
+size = Vector3(32.000, 1.000, 0.350)
+
+[node name="BandFill_x+24_s-1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, -0.500, 24.000)
 size = Vector3(32.000, 1.000, 0.350)
 
 [node name="BandFill_x+24_s0" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 8.500, 24.000)
-size = Vector3(48.000, 1.000, 0.350)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 8.500, 24.000)
+size = Vector3(64.000, 1.000, 0.350)
+
+[node name="BandFill_x+24_s0_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 60.000, 8.500, 24.000)
+size = Vector3(32.000, 1.000, 0.350)
 
 [node name="BandFill_x+24_s1" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 17.500, 24.000)
-size = Vector3(48.000, 1.000, 0.350)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 17.500, 24.000)
+size = Vector3(64.000, 1.000, 0.350)
 
-[node name="BandFill_x+48_s0" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 8.500, 48.000)
+[node name="BandFill_x+24_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 26.500, 24.000)
 size = Vector3(80.000, 1.000, 0.350)
 
+[node name="BandFill_x+24_s3" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 35.500, 24.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x+40_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 8.500, 40.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x+40_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 17.500, 40.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x+40_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 26.500, 40.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x+40_s3" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 35.500, 40.000)
+size = Vector3(16.000, 1.000, 0.350)
+
+[node name="BandFill_x+48_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 12.000, 8.500, 48.000)
+size = Vector3(96.000, 1.000, 0.350)
+
 [node name="BandFill_x+48_s1" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 17.500, 48.000)
-size = Vector3(24.000, 1.000, 0.350)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 17.500, 48.000)
+size = Vector3(80.000, 1.000, 0.350)
+
+[node name="BandFill_x+48_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 26.500, 48.000)
+size = Vector3(80.000, 1.000, 0.350)
+
+[node name="BandFill_z-60_s-1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, -0.500, -28.000)
+size = Vector3(0.350, 1.000, 24.000)
+
+[node name="BandFill_z-52_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 8.500, -16.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-52_s0_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 8.500, 32.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-52_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 17.500, 32.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-52_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 26.500, 36.000)
+size = Vector3(0.350, 1.000, 24.000)
+
+[node name="BandFill_z-52_s3" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 35.500, 32.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-44_s-1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, -0.500, -8.000)
+size = Vector3(0.350, 1.000, 64.000)
+
+[node name="BandFill_z-44_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 8.500, -8.000)
+size = Vector3(0.350, 1.000, 64.000)
+
+[node name="BandFill_z-44_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 17.500, -8.000)
+size = Vector3(0.350, 1.000, 64.000)
 
 [node name="BandFill_z-36_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 8.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-36_s0_2" parent="Geometry" instance=ExtResource("3")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 8.500, 36.000)
 size = Vector3(0.350, 1.000, 24.000)
 
 [node name="BandFill_z-36_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 17.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-36_s1_2" parent="Geometry" instance=ExtResource("3")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 17.500, 36.000)
 size = Vector3(0.350, 1.000, 24.000)
 
-[node name="BandFill_z-20_s0" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 8.500, -52.000)
+[node name="BandFill_z-36_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 26.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-36_s2_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 26.500, 36.000)
 size = Vector3(0.350, 1.000, 24.000)
 
-[node name="BandFill_z-12_s0" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 8.500, 16.000)
+[node name="BandFill_z-36_s3" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 35.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-36_s3_2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 35.500, 32.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-20_s-1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, -0.500, -8.000)
 size = Vector3(0.350, 1.000, 64.000)
+
+[node name="BandFill_z-20_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 8.500, -20.000)
+size = Vector3(0.350, 1.000, 88.000)
+
+[node name="BandFill_z-20_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 17.500, -20.000)
+size = Vector3(0.350, 1.000, 88.000)
+
+[node name="BandFill_z-20_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 26.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-20_s3" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 35.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z-12_s-1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, -0.500, -8.000)
+size = Vector3(0.350, 1.000, 64.000)
+
+[node name="BandFill_z-12_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 8.500, 4.000)
+size = Vector3(0.350, 1.000, 88.000)
 
 [node name="BandFill_z-12_s1" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 17.500, 16.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 17.500, 4.000)
+size = Vector3(0.350, 1.000, 88.000)
+
+[node name="BandFill_z-12_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 26.500, 16.000)
 size = Vector3(0.350, 1.000, 64.000)
 
+[node name="BandFill_z+12_s-1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 12.000, -0.500, -28.000)
+size = Vector3(0.350, 1.000, 24.000)
+
 [node name="BandFill_z+12_s0" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 12.000, 8.500, 16.000)
-size = Vector3(0.350, 1.000, 64.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 12.000, 8.500, 4.000)
+size = Vector3(0.350, 1.000, 88.000)
 
 [node name="BandFill_z+12_s1" parent="Geometry" instance=ExtResource("3")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 12.000, 17.500, 4.000)
-size = Vector3(0.350, 1.000, 40.000)
+size = Vector3(0.350, 1.000, 88.000)
+
+[node name="BandFill_z+12_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 12.000, 26.500, 16.000)
+size = Vector3(0.350, 1.000, 64.000)
 
 [node name="BandFill_z+20_s0" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 8.500, -52.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 8.500, -28.000)
+size = Vector3(0.350, 1.000, 72.000)
+
+[node name="BandFill_z+20_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 17.500, -28.000)
+size = Vector3(0.350, 1.000, 72.000)
+
+[node name="BandFill_z+20_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 26.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z+20_s3" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 35.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z+28_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 26.500, 36.000)
 size = Vector3(0.350, 1.000, 24.000)
 
+[node name="BandFill_z+36_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 8.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z+36_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 17.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z+36_s2" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 26.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
+[node name="BandFill_z+36_s3" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 35.500, -48.000)
+size = Vector3(0.350, 1.000, 16.000)
+
 [node name="BandFill_z+44_s0" parent="Geometry" instance=ExtResource("3")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 44.000, 8.500, 28.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 44.000, 8.500, 4.000)
+size = Vector3(0.350, 1.000, 88.000)
+
+[node name="BandFill_z+44_s1" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 44.000, 17.500, 4.000)
+size = Vector3(0.350, 1.000, 88.000)
+
+[node name="BandFill_z+60_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 60.000, 8.500, 28.000)
 size = Vector3(0.350, 1.000, 40.000)
+
+[node name="BandFill_z+76_s0" parent="Geometry" instance=ExtResource("3")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 76.000, 8.500, 16.000)
+size = Vector3(0.350, 1.000, 16.000)
 
 [node name="Stairs_tower_ne_1" parent="Stairs" instance=ExtResource("5")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 33.975, 9.000, -40.200)

@@ -480,16 +480,10 @@ def emit_secret_walls():
              props=oid_props(oid, {"approach_area": f'"{a}"'}), groups=["secret_walls", "world_objects"])
 
 def emit_band_fillers():
-    """Tall rooms show the 1 m gap between a storey's wall top (8 m) and the next floor (9 m)."""
-    fill = set()
-    for r in rooms.values():
-        if r.bands < 2:
-            continue
-        for s in list(r.storeys())[:-1]:
-            for off in range(r.z0, r.z1, 4):
-                fill.add(("z", r.x0, off, s)); fill.add(("z", r.x1, off, s))
-            for off in range(r.x0, r.x1, 4):
-                fill.add(("x", r.z0, off, s)); fill.add(("x", r.z1, off, s))
+    """Close the 1 m band between a storey's wall top (8 m) and the next floor (9 m) on every
+    full-height wall. Tall rooms would show it from inside; everywhere else the outer face
+    would show the ceiling tiles' openwork edges, lit by the room behind."""
+    fill = {key for key, u in units.items() if u["rows"] >= 2}
     by_line = defaultdict(list)
     for axis, coord, off, s in fill:
         by_line[(axis, coord, s)].append(off)
