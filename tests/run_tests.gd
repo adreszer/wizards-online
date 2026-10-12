@@ -1040,6 +1040,28 @@ func _test_castle() -> void:
 	t.check(untranslated.is_empty(), "every area has a translated name (missing: %s)" % ", ".join(untranslated))
 	t.check(castle.get_node_or_null("StartPoint") != null, "castle has a StartPoint")
 	t.check(get_tree().get_nodes_in_group("secret_walls").size() >= 3, "castle has secret passages")
+	# Stable object ids: unique "<area>/<name>", the area exists, and every placement is in the scene.
+	var area_ids: Dictionary = {}
+	for z in zones:
+		area_ids[str(z.area_id)] = true
+	var object_ids: Dictionary = {}
+	var bad_ids: Array[String] = []
+	for node in get_tree().get_nodes_in_group("world_objects"):
+		var oid: String = str(node.get("object_id"))
+		if oid.is_empty() or object_ids.has(oid) or not area_ids.has(oid.get_slice("/", 0)):
+			bad_ids.append("%s (%s)" % [oid, node.name])
+		object_ids[oid] = true
+	t.check(bad_ids.is_empty() and object_ids.size() >= 90, "%d world objects with unique ids in known areas (bad: %s)" % [object_ids.size(), ", ".join(bad_ids)])
+	var placements: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://content/placements.json"))
+	var missing_placed: Array[String] = []
+	if placements is Dictionary:
+		for area: String in placements:
+			for entry: Dictionary in placements[area]:
+				if entry["kind"] in ["checkpoint", "crystal_guardian"]:
+					continue
+				if not object_ids.has(area + "/" + str(entry["id"])):
+					missing_placed.append(area + "/" + str(entry["id"]))
+	t.check(placements is Dictionary and missing_placed.is_empty(), "every world object in content/placements.json is in the castle (missing: %s)" % ", ".join(missing_placed))
 	t.check(GameSession.get_total(&"arcane_fragment") >= 10, "castle registers its fragments (got %d)" % GameSession.get_total(&"arcane_fragment"))
 	var tome_spells: Dictionary = {}
 	for tome in castle.get_node("Tomes").get_children():
@@ -1051,7 +1073,7 @@ func _test_castle() -> void:
 		if door is HouseDoor:
 			gate_houses[door.house] = true
 	t.check(gate_houses.size() == 4, "every house has a gated door (%s)" % str(gate_houses.keys()))
-	t.check(castle.get_node_or_null("SortingStone") is SortingStone, "the Choosing Stone stands in the castle")
+	t.check(get_tree().get_nodes_in_group("world_objects").any(func(n: Node) -> bool: return n is SortingStone), "the Choosing Stone stands in the castle")
 	var guardians := 0
 	for enemy in castle.get_node("Enemies").get_children():
 		if enemy is Enemy and (enemy as Enemy).global_position.y < -5.0:
@@ -1279,7 +1301,7 @@ func _test_characters() -> void:
 func _test_server_content() -> void:
 	t.section("Server content")
 	var stale := ServerContentExporter.stale()
-	t.check(stale.is_empty(), "nakama/modules/generated is up to date (stale: %s; run tools/export_server_content.gd)" % ", ".join(stale))
+	t.check(stale.is_empty(), "nakama/modules/generated is up to date (stale: %s; run tools/export_server_content.tscn)" % ", ".join(stale))
 	t.check(_ids_match_dir(SpellRegistry.SPELL_IDS, SpellRegistry.SPELLS_DIR), "SPELL_IDS lists exactly resources/spells/*.tres")
 	t.check(_ids_match_dir(ItemRegistry.ITEM_IDS, ItemRegistry.ITEMS_DIR), "ITEM_IDS lists exactly resources/items/*.tres")
 	for id in ItemRegistry.ITEM_IDS:

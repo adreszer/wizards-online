@@ -10,6 +10,13 @@ extends Node3D
 
 signal lit_changed(is_lit: bool)
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "wall_torch"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+
 @export var base_energy: float = 2.6
 @export var flicker_amount: float = 0.25
 @export var flicker_speed: float = 9.0

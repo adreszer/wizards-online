@@ -3,6 +3,13 @@ extends RigidBody3D
 ## Loose object moved by spells via its SpellReceiver: force and wind shove it
 ## along the cast direction, levitate lifts it and lets it hover for a while.
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "pushable_block"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+
 @export var impulse_multiplier: float = 1.0
 ## Keep the push horizontal so blocks slide rather than hop.
 @export var flatten_direction: bool = true

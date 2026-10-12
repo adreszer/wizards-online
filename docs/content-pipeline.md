@@ -41,7 +41,7 @@ A lot. Keep these patterns:
 
 ### A. One source for shared lists (exporter)
 
-`tools/export_server_content.gd` runs headless (`godot --headless -s tools/export_server_content.gd`). It loads the client-side sources and writes `nakama/modules/generated/*.lua`:
+`tools/export_server_content.gd` runs headless (`godot --headless tools/export_server_content.tscn`). It loads the client-side sources and writes `nakama/modules/generated/*.lua`:
 
 | Source (client, editable in Godot) | Generated for the server |
 |---|---|
@@ -147,10 +147,10 @@ Estimates assume part-time solo work. Each milestone keeps `tests/run_tests.tscn
 - [x] Freshness check (exporter + castle generator + `git diff --exit-code`) in `tools/check.sh`, plus a stale-export test in `run_tests.tscn`
 - **Done when:** no "mirrors X" comments remain. Adding a spell is one `.tres` + translation keys, and the server accepts it without editing Lua.
 
-### Milestone 19 — Placement data and object ids (≈1–2 weeks)
-- [ ] `content/placements.json`; generator reads it instead of `PRACTICE_TOMES` / `ENEMIES` / plaques / fragments
-- [ ] `object_id` on every interactable; generator writes `world_objects.lua`
-- [ ] Generator refuses duplicate ids, unknown areas and unknown scenes
+### Milestone 19 — Placement data and object ids (≈1–2 weeks) — done
+- [x] `content/placements.json`; generator reads it instead of `PRACTICE_TOMES` / `ENEMIES` / plaques / fragments
+- [x] `object_id` on every interactable; the exporter writes `world_objects.lua` from the built scene
+- [x] Generator refuses duplicate ids, unknown areas and unknown scenes
 - **Done when:** a tome or enemy can be moved by editing JSON and regenerating, and every interactable in `castle.tscn` has a unique id.
 
 ### Milestone 20 — Server-authoritative world objects (≈2 weeks)

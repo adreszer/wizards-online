@@ -6,6 +6,13 @@ extends StaticBody3D
 
 signal ceremony_requested(interactor: Node)
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "sorting_stone"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+
 @onready var _interactable: Interactable = $Interactable
 @onready var _crystal: MeshInstance3D = $Crystal
 var _phase: float = 0.0

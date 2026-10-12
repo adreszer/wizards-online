@@ -9,6 +9,13 @@ signal opened()
 signal closed()
 signal refused(interactor: Node)
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "house_door"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+
 @export_range(0, 4) var house: int = 1
 @export var open_height: float = 3.2
 @export var open_duration: float = 1.0

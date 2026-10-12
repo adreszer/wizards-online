@@ -15,6 +15,7 @@ Conventions (see docs/plan.md, "Production environment asset pipeline"):
   - a room spanning `bands` storeys is that many bands tall (great hall: 17 m)
   - stairs: 25 steps of 0.36 m (PlayerMovement.step_height is 0.42)
 """
+import json
 import math
 import os
 import sys
@@ -32,6 +33,7 @@ STAIR_WIDTH = 3.6
 STAIR_HOLE_FROM_HEIGHT = 5.6   # part of a flight above this needs the ceiling/floor above cut open
 
 OUT = "levels/castle/castle.tscn"
+PLACEMENTS = "content/placements.json"
 
 # --------------------------------------------------------------------------- scene writer
 ext = {}
@@ -59,6 +61,20 @@ def inst(name, path, pos, parent=".", rot_y=0.0, props=None, groups=None):
     for k, v in (props or {}).items():
         body += f'{k} = {v}\n'
     nodes.append(body)
+
+object_ids = set()
+def oid_props(oid, extra=None):
+    """Props for a world object: its stable id ("<area>/<name>"), checked for uniqueness."""
+    area, _, name = oid.partition("/")
+    assert area in rooms and name, f"object id {oid!r}: needs <known area>/<name>"
+    assert oid not in object_ids, f"duplicate object id {oid!r}"
+    object_ids.add(oid)
+    props = {"object_id": f'"{oid}"'}
+    props.update(extra or {})
+    return props
+
+def node_name(oid):
+    return "".join(ch if ch.isalnum() or ch == "_" else "_" for ch in oid)
 
 _names = defaultdict(int)
 def uname(base):
@@ -102,8 +118,8 @@ def room(id, x0, x1, z0, z1, storey=0, **kw):
     return r
 
 doors = []      # (axis, coord, off, storey, count)
-house_gates = []  # (axis, coord, off, storey, house): doorways that get a HouseDoor
-secrets = []    # (a, b, axis, coord, off, storey)
+house_gates = []  # (axis, coord, off, storey, house, area): doorways that get a HouseDoor
+secrets = []    # (a, b, axis, coord, off, storey, name)
 stairs = []     # dicts
 edges = []      # (a, b) connectivity for the reachability check
 door_units = set()
@@ -144,7 +160,7 @@ def door(a, b, at=None, storey=None, count=1):
         doors.append((axis, coord, off, storey))
         # A doorway into a house area (common room, dormitory, house landing) gets a gate.
         if A.house != B.house:
-            house_gates.append((axis, coord, off, storey, A.house or B.house))
+            house_gates.append((axis, coord, off, storey, A.house or B.house, a if A.house else b))
     edges.append((a, b))
 
 def door_on(a, side, at, storey=None, count=1, to=None):
@@ -159,14 +175,15 @@ def door_on(a, side, at, storey=None, count=1, to=None):
         doors.append((axis, coord, off, storey))
     edges.append((a, to or A.inside))
 
-def secret(a, b, at=None, storey=None):
-    """A SecretWall in the wall between a (where the ornament is seen) and b (hidden room)."""
+def secret(a, b, at=None, storey=None, name="secret_wall"):
+    """A SecretWall in the wall between a (where the ornament is seen) and b (hidden room).
+    Its object id is "<b>/<name>"."""
     A, B = rooms[a], rooms[b]
     axis, coord, lo, hi = shared_edge(A, B)
     if storey is None:
         storey = max(A.storey, B.storey)
     off = _door_offs(lo, hi, at, 1)[0]
-    secrets.append((a, b, axis, coord, off, storey))
+    secrets.append((a, b, axis, coord, off, storey, name))
     edges.append((a, b))
 
 def stair(lo, hi, side, direction, start, run=STAIR_RUN, width=STAIR_WIDTH, rise=STOREY, hole=True):
@@ -400,7 +417,7 @@ for axis, coord, off, storey in doors:
     assert (axis, coord, off, storey) in units, ("door on no wall", axis, coord, off, storey)
     units[(axis, coord, off, storey)]["door"] = True
     door_units.add((axis, coord, off, storey))
-for a, b, axis, coord, off, storey in secrets:
+for a, b, axis, coord, off, storey, _name in secrets:
     units[(axis, coord, off, storey)]["secret"] = True
 
 def run_start(axis, coord, lo, hi, y):
@@ -450,7 +467,7 @@ def emit_walls():
                 block(uname(f"SecretFill_{axis}{coord:+d}_s{storey}"), (pos[0], y + 3.4 + (MODULE_H - 3.4) / 2, pos[2]), size)
 
 def emit_secret_walls():
-    for a, b, axis, coord, off, storey in secrets:
+    for a, b, axis, coord, off, storey, name in secrets:
         A = rooms[a]
         y = storey * STOREY
         centre = off + 2
@@ -458,7 +475,9 @@ def emit_secret_walls():
             pos = (coord, y, centre); rot = -90.0 if coord == A.x1 else 90.0
         else:
             pos = (centre, y, coord); rot = 180.0 if coord == A.z1 else 0.0
-        inst(uname(f"Secret_{a}_{b}"), "res://objects/puzzles/secret_wall.tscn", pos, rot_y=math.radians(rot), groups=["secret_walls"])
+        oid = f"{b}/{name}"
+        inst(f"Secret_{node_name(oid)}", "res://objects/puzzles/secret_wall.tscn", pos, rot_y=math.radians(rot),
+             props=oid_props(oid, {"approach_area": f'"{a}"'}), groups=["secret_walls", "world_objects"])
 
 def emit_band_fillers():
     """Tall rooms show the 1 m gap between a storey's wall top (8 m) and the next floor (9 m)."""
@@ -652,7 +671,7 @@ def emit_torches():
                     for z in range(r.z0 + 4, r.z1, 4):
                         if (z - 4) % sp != 0 or any(abs(z - c) < 2.5 for c in dc):
                             continue
-                        inst(uname(f"Torch_{r.id}"), "res://objects/environment/props/wall_torch.tscn", (x, y, z), parent="Torches", rot_y=math.radians(rot)); n += 1
+                        wall_torch(r, (x, y, z), rot); n += 1
                         torch_points.append((x, z, s))
                 else:
                     z = r.z0 + T / 2 if side == "n" else r.z1 - T / 2
@@ -662,9 +681,17 @@ def emit_torches():
                     for x in range(r.x0 + 4, r.x1, 4):
                         if (x - 4) % sp != 0 or any(abs(x - c) < 2.5 for c in dc):
                             continue
-                        inst(uname(f"Torch_{r.id}"), "res://objects/environment/props/wall_torch.tscn", (x, y, z), parent="Torches", rot_y=math.radians(rot)); n += 1
+                        wall_torch(r, (x, y, z), rot); n += 1
                         torch_points.append((x, z, s))
     return n
+
+def wall_torch(r, pos, rot):
+    """Rule-placed torch. Its id counts per room in emit order, so it shifts when a room's
+    layout changes: mysteries should only reference objects placed in content/placements.json."""
+    oid = f"{r.id}/torch_{_names['torch:' + r.id] + 1}"
+    _names['torch:' + r.id] += 1
+    inst(f"Torch_{node_name(oid)}", "res://objects/environment/props/wall_torch.tscn", pos, parent="Torches",
+         rot_y=math.radians(rot), props=oid_props(oid), groups=["world_objects"])
 
 def emit_area_map(path):
     """Server-side copy of the area metadata (nakama/modules/world_areas.lua) so the
@@ -685,20 +712,6 @@ def emit_zones():
                     "house": str(r.house), "size": f"Vector3({r.x1 - r.x0:.1f}, {h:.1f}, {r.z1 - r.z0:.1f})"})
 
 # --------------------------------------------------------------------------- props and secrets' rewards
-def plaque(rid, text_key, side="n", along=0.5):
-    r = rooms[rid]
-    y = r.y + 1.6
-    if side == "n": pos, rot = (r.x0 + (r.x1 - r.x0) * along, y, r.z0 + T / 2 + 0.05), 0.0
-    elif side == "s": pos, rot = (r.x0 + (r.x1 - r.x0) * along, y, r.z1 - T / 2 - 0.05), 180.0
-    elif side == "w": pos, rot = (r.x0 + T / 2 + 0.05, y, r.z0 + (r.z1 - r.z0) * along), 90.0
-    else: pos, rot = (r.x1 - T / 2 - 0.05, y, r.z0 + (r.z1 - r.z0) * along), -90.0
-    inst(uname(f"Plaque_{rid}"), "res://objects/interactables/plaque.tscn", pos, rot_y=math.radians(rot), props={"text": f'"{text_key}"'})
-
-def fragment(rid, dx, dz, dy=0.0):
-    r = rooms[rid]
-    cx, cz = r.centre()
-    inst(uname(f"Fragment_{rid}"), "res://gameplay/collectibles/collectible.tscn", (cx + dx, r.y + dy, cz + dz), parent="Collectibles")
-
 # Classrooms get rows of student desks + benches facing the professor's end of the
 # room ("front" = the wall opposite the entrance door); wall id -> (desks per row, rows).
 CLASSROOM_FRONT = {
@@ -886,84 +899,104 @@ def emit_shelves():
         shelf_at(study, "w", z); n += 1
     return n
 
-# (room, spell id, offset: across the lectern for furnished classrooms, else from the room centre)
-PRACTICE_TOMES = [
-    ("class_sigilcraft", "arcane_pulse", 0.0, 0.0),
-    ("class_sigilcraft", "uplift", -2.0, 0.0),
-    ("class_skyriding", "galewind", 0.0, 0.0),
-    ("kitchens", "emberkindle", 0.0, 0.0),
-    ("class_elixirs", "wellspring", 0.0, 0.0),
-    ("class_warding", "frostbind", 0.0, 0.0),
-    ("library", "glowmote", 0.0, 0.0),
-    ("class_stargazing", "duskveil", 0.0, 0.0),
-    ("class_glyphs", "unbolt", 0.0, 0.0),
-    ("class_shapeshaping", "mendweave", 0.0, 0.0),
-    ("class_herblore", "quicksprout", 0.0, 0.0),
-]
-
-# (room, offset from the room centre, yaw in degrees) — dungeon enemies; see characters/enemies/.
-ENEMIES = [
-    ("cellars", 4.0, -4.0, 90.0),
-    ("cellars", -6.0, 4.0, -45.0),
-    ("dungeon_corridor", 0.0, -22.0, 0.0),
-]
-
-def emit_enemies():
-    for rid, dx, dz, yaw in ENEMIES:
-        r = rooms[rid]
-        cx, cz = r.centre()
-        inst(uname(f"Guardian_{rid}"), "res://characters/enemies/crystal_guardian.tscn",
-             (cx + dx, r.y, cz + dz), parent="Enemies", rot_y=math.radians(yaw))
-    return len(ENEMIES)
-
 def emit_house_gates():
-    for axis, coord, off, storey, house in house_gates:
+    for axis, coord, off, storey, house, area in house_gates:
         y = storey * STOREY
         centre = off + 2
         pos = (centre, y, coord) if axis == "x" else (coord, y, centre)
         rot = 0.0 if axis == "x" else math.radians(90)
-        inst(uname(f"HouseDoor_{house}"), "res://objects/school/house_door.tscn", pos, parent="Doors", rot_y=rot, props={"house": str(house)})
+        oid = f"{area}/house_door"
+        inst(f"HouseDoor_{node_name(oid)}", "res://objects/school/house_door.tscn", pos, parent="Doors", rot_y=rot,
+             props=oid_props(oid, {"house": str(house)}), groups=["world_objects"])
 
-def emit_props():
-    # The sorting ceremony: a stone at the head of the great hall.
-    gh = rooms["great_hall"]
-    inst("SortingStone", "res://objects/school/sorting_stone.tscn", (gh.centre()[0], gh.y, gh.z0 + 5))
-    plaque("great_hall", "PLAQUE_SORTING_STONE", "n", 0.3)
-    plaque("entrance_hall", "PLAQUE_CASTLE_ENTRANCE", "w", 0.75)
-    plaque("great_hall", "PLAQUE_GREAT_HALL", "n", 0.5)
-    plaque("library", "PLAQUE_LIBRARY", "s", 0.25)
-    plaque("class_sigilcraft", "PLAQUE_SIGILCRAFT", "n", 0.5)
-    plaque("stair_hall", "PLAQUE_STAIR_HALL", "s", 0.5)
-    plaque("undercroft", "PLAQUE_UNDERCROFT", "n", 0.5)
-    plaque("cellars", "PLAQUE_CELLARS", "e", 0.5)
-    plaque("hidden_study", "PLAQUE_HIDDEN_STUDY", "n", 0.5)
-    plaque("loft", "PLAQUE_LOFT", "n", 0.5)
-    plaque("tower_sw_4", "PLAQUE_STARGAZING", "n", 0.5)
-    plaque("grounds", "PLAQUE_GROUNDS", "n", 0.3)
-    # Until lessons grant spells, each subject keeps a practice tome for the
-    # spell closest to it (ids from resources/spells/, see SpellRegistry).
-    for rid, spell_id, dx, dz in PRACTICE_TOMES:
-        r = rooms[rid]
-        cx, cz = r.centre()
-        spell_ext = ext_id("Resource", f"res://resources/spells/{spell_id}.tres")
-        if rid in CLASSROOM_FRONT:
-            first_row = (DESK_ROWS_TOWER if rid.startswith("tower") else DESK_ROWS_DEEP)[0]
-            pos = classroom_point(r, first_row - lectern_gap(rid), TOME_ACROSS + 1.1 * dx)
-        else:
-            pos = (cx + dx, r.y, cz + dz)
-        inst(uname(f"Tome_{spell_id}"), "res://objects/interactables/spell_tome.tscn", pos,
-             parent="Tomes", props={"spell": f'ExtResource("{spell_ext}")'})
-    r = rooms["class_sigilcraft"]
-    inst("SigilcraftSwitch", "res://objects/puzzles/magic_switch.tscn", (r.x0 + 1.5, r.y, r.z0 + 1.5))
-    inst("SigilcraftBlock", "res://objects/puzzles/pushable_block.tscn", (r.x1 - 4, r.y + 0.6, r.z0 + 4))
-    for rid, pts in {"undercroft": [(-6, -6), (6, -6), (0, 6)], "hidden_study": [(0, -4), (0, 4)],
-                     "loft": [(-4, 0), (4, 0)], "tower_sw_4": [(-4, 4)], "tower_ne_3": [(-5, 5)],
-                     "tower_nw_3": [(-5, 5)], "cellars": [(-8, 4)], "roost": [(0, 0)]}.items():
-        for dx, dz in pts:
-            fragment(rid, dx, dz)
-    for rid in ("entrance_hall", "north_hall", "library", "stair_hall", "dungeon_corridor", "gallery"):
-        cx, cz = rooms[rid].centre()
-        inst(uname(f"Checkpoint_{rid}"), "res://gameplay/checkpoints/checkpoint.tscn", (cx, rooms[rid].y, cz + 4), parent="Checkpoints")
+# --------------------------------------------------------------------------- placed gameplay objects
+# content/placements.json: area id -> list of entries {id, kind, <position>, <kind fields>}.
+# Position (relative to the area's room):
+#   "at": [dx, dz]                    offset from the room centre (+ "dy"), "yaw" in degrees
+#   "wall": n|s|e|w, "along": 0..1    on that wall, facing into the room; "inset" m from the
+#                                     wall (default: flush), "height" above the floor
+#   "corner": nw|ne|sw|se, "inset": [x, z]   m in from that corner (+ "dy")
+#   "beside_lectern": dx              classrooms: next to the lectern, dx × 1.1 m across
+# Kind fields: spell_tome "spell" (resources/spells/<id>.tres), plaque "text" (translation key).
+# Each entry gets the object id "<area>/<id>".
+KINDS = {
+    # kind: (scene, parent container, world object: gets object_id + the world_objects group)
+    "spell_tome": ("res://objects/interactables/spell_tome.tscn", "Tomes", True),
+    "plaque": ("res://objects/interactables/plaque.tscn", "Props", True),
+    "fragment": ("res://gameplay/collectibles/collectible.tscn", "Collectibles", True),
+    "checkpoint": ("res://gameplay/checkpoints/checkpoint.tscn", "Checkpoints", False),
+    "crystal_guardian": ("res://characters/enemies/crystal_guardian.tscn", "Enemies", False),
+    "magic_switch": ("res://objects/puzzles/magic_switch.tscn", "Puzzles", True),
+    "pushable_block": ("res://objects/puzzles/pushable_block.tscn", "Puzzles", True),
+    "sorting_stone": ("res://objects/school/sorting_stone.tscn", ".", True),
+}
+PLAQUE_HEIGHT = 1.6
+WALL_FLUSH = T / 2 + 0.05
+
+def placement_point(r, e):
+    """(position, yaw radians) of a placement entry in room r."""
+    cx, cz = r.centre()
+    if "at" in e:
+        dx, dz = e["at"]
+        return (cx + dx, r.y + e.get("dy", 0.0), cz + dz), math.radians(e.get("yaw", 0.0))
+    if "wall" in e:
+        side, along = e["wall"], e.get("along", 0.5)
+        d = e.get("inset", WALL_FLUSH)
+        y = r.y + e.get("height", PLAQUE_HEIGHT if e["kind"] == "plaque" else 0.0)
+        if side == "n": return (r.x0 + (r.x1 - r.x0) * along, y, r.z0 + d), 0.0
+        if side == "s": return (r.x0 + (r.x1 - r.x0) * along, y, r.z1 - d), math.radians(180)
+        if side == "w": return (r.x0 + d, y, r.z0 + (r.z1 - r.z0) * along), math.radians(90)
+        if side == "e": return (r.x1 - d, y, r.z0 + (r.z1 - r.z0) * along), math.radians(-90)
+        raise AssertionError(f"{r.id}/{e['id']}: unknown wall {side!r}")
+    if "corner" in e:
+        corner, (ix, iz) = e["corner"], e["inset"]
+        assert corner in ("nw", "ne", "sw", "se"), f"{r.id}/{e['id']}: unknown corner {corner!r}"
+        x = r.x0 + ix if corner[1] == "w" else r.x1 - ix
+        z = r.z0 + iz if corner[0] == "n" else r.z1 - iz
+        return (x, r.y + e.get("dy", 0.0), z), math.radians(e.get("yaw", 0.0))
+    if "beside_lectern" in e:
+        assert r.id in CLASSROOM_FRONT, f"{r.id}/{e['id']}: beside_lectern needs a furnished classroom"
+        first_row = (DESK_ROWS_TOWER if r.id.startswith("tower") else DESK_ROWS_DEEP)[0]
+        return classroom_point(r, first_row - lectern_gap(r.id), TOME_ACROSS + 1.1 * e["beside_lectern"]), 0.0
+    raise AssertionError(f"{r.id}/{e['id']}: no position (at, wall, corner or beside_lectern)")
+
+def load_placements(path):
+    with open(path) as f:
+        data = json.load(f)
+    for area, entries in data.items():
+        assert area in rooms, f"{path}: unknown area {area!r}"
+        for e in entries:
+            assert isinstance(e.get("id"), str) and e["id"] and "/" not in e["id"], f"{path}: {area}: entry without a plain id: {e}"
+            assert e.get("kind") in KINDS, f"{path}: {area}/{e['id']}: unknown kind {e.get('kind')!r}"
+            if e["kind"] == "spell_tome":
+                assert os.path.exists(f"resources/spells/{e.get('spell')}.tres"), f"{area}/{e['id']}: unknown spell {e.get('spell')!r}"
+            if e["kind"] == "plaque":
+                assert isinstance(e.get("text"), str), f"{area}/{e['id']}: plaque without text"
+    return data
+
+def emit_placements(path):
+    counts = defaultdict(int)
+    for area, entries in load_placements(path).items():
+        r = rooms[area]
+        for e in entries:
+            scene, parent, world = KINDS[e["kind"]]
+            oid = f"{area}/{e['id']}"
+            pos, yaw = placement_point(r, e)
+            props = {}
+            if e["kind"] == "spell_tome":
+                spell_ext = ext_id("Resource", "res://resources/spells/" + e["spell"] + ".tres")
+                props["spell"] = f'ExtResource("{spell_ext}")'
+            if e["kind"] == "plaque":
+                props["text"] = f'"{e["text"]}"'
+            if world:
+                props = oid_props(oid, props)
+            else:
+                assert oid not in object_ids, f"duplicate object id {oid!r}"
+                object_ids.add(oid)
+            inst(f"{e['kind'].title().replace('_', '')}_{node_name(oid)}", scene, pos, parent=parent, rot_y=yaw,
+                 props=props, groups=["world_objects"] if world else None)
+            counts[e["kind"]] += 1
+    return counts
 
 # --------------------------------------------------------------------------- build
 emit_walls()
@@ -978,9 +1011,9 @@ torch_count = emit_torches()
 chandelier_count = emit_chandeliers()
 emit_zones()
 emit_house_gates()
-emit_props()
+placed = emit_placements(PLACEMENTS)
 furniture_count = emit_furniture() + emit_shelves() + emit_great_hall()
-enemy_count = emit_enemies()
+enemy_count = placed["crystal_guardian"]
 emit_area_map("nakama/modules/world_areas.lua")
 
 level_script = ext_id("Script", "res://levels/castle/castle.gd")
@@ -1045,6 +1078,10 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 [node name="Furniture" type="Node3D" parent="."]
 
 [node name="Enemies" type="Node3D" parent="."]
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Puzzles" type="Node3D" parent="."]
 
 '''
 header = f'[gd_scene load_steps={len(ext) + 2} format=3 uid="uid://castle0000001"]\n\n'

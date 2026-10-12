@@ -5,6 +5,13 @@ extends StaticBody3D
 signal pulled()
 signal toggled(is_on: bool)
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "lever"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+
 @export var one_shot: bool = true
 
 var is_on: bool = false

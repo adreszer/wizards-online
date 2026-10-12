@@ -7,6 +7,13 @@ signal activated()
 signal deactivated()
 signal toggled(is_on: bool)
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "magic_switch"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+
 @export var toggleable: bool = false
 @export var on_color: Color = Color(0.4, 1.0, 0.6)
 @export var off_color: Color = Color(0.6, 0.3, 0.3)

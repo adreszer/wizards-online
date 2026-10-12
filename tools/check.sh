@@ -27,7 +27,7 @@ step "generate castle"
 python3 tools/generate_castle.py >"$LOGS/castle.log" 2>&1 || fail "castle generator" "$LOGS/castle.log"
 
 step "export server content"
-"$GODOT" --headless --path . -s tools/export_server_content.gd >"$LOGS/export.log" 2>&1 || fail "exporter" "$LOGS/export.log"
+"$GODOT" --headless --path . tools/export_server_content.tscn >"$LOGS/export.log" 2>&1 || fail "exporter" "$LOGS/export.log"
 
 step "generated files committed"
 if ! git diff --quiet -- levels/castle nakama/modules || [ -n "$(git ls-files --others --exclude-standard -- nakama/modules levels/castle)" ]; then

@@ -222,9 +222,10 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Race: two `join_world` calls in quick succession on a fresh server can create two world matches (the label index lags `match_create`); seen once in the two-client test right after a server start
 
 ### Milestone 19 — Placement data and stable object ids
-- [ ] `content/placements.json` read by the castle generator (tomes, enemies, plaques, fragments, checkpoints, sorting stone, switch/block)
-- [ ] `object_id` (`<area>/<name>`) on every interactable; generator refuses duplicate ids, unknown areas/kinds/spells
-- [ ] Exporter writes `generated/world_objects.lua` from `castle.tscn` (kind, areas, position, accepted effect types)
+- [x] `content/placements.json` read by the castle generator (tomes, enemies, plaques, fragments, checkpoints, sorting stone, switch/block); scene placement unchanged (verified node-for-node against the previous scene)
+- [x] `object_id` (`<area>/<name>`) + `WORLD_KIND` on every interactable script, `world_objects` group; secret walls carry `approach_area`; collectibles key pickups on the id; generator refuses duplicate ids, unknown areas/kinds/spells
+- [x] Exporter writes `generated/world_objects.lua` from `castle.tscn` (96 objects: kind, areas, position, accepted effect types); it now runs as a scene (`tools/export_server_content.tscn`) so autoload-using scripts compile
+- [x] Castle test: unique ids in known areas, every placement present
 
 ### Milestone 20 — Server-authoritative world objects
 - [ ] `OP_WORLD_EVENT` / `OP_OBJECT_STATE` / `OP_WORLD_SNAPSHOT`; server validation (object, area, known spell, accepted effect, rate limit)
@@ -312,7 +313,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Testing status
 
-Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (292 gameplay, localization and server-content checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
+Automated (all headless, see docs/development.md): `tests/check_scripts.tscn` (load everything), `tests/run_tests.tscn` (294 gameplay, localization and server-content checks), `tests/run_multiplayer_test.tscn` (two clients), `tests/run_reconnect_test.tscn`, `tests/run_offline_fallback_test.tscn`. Last full run: 2026-10-12, all green.
 
 | Area | Check | Status |
 |------|-------|--------|

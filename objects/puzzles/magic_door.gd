@@ -6,6 +6,13 @@ extends Node3D
 signal opened()
 signal closed()
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "magic_door"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+
 @export var open_height: float = 3.2
 @export var open_duration: float = 1.2
 @export var start_open: bool = false

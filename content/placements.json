@@ -1,0 +1,99 @@
+{
+  "great_hall": [
+    {"id": "sorting_stone", "kind": "sorting_stone", "wall": "n", "along": 0.5, "inset": 5},
+    {"id": "plaque_sorting_stone", "kind": "plaque", "text": "PLAQUE_SORTING_STONE", "wall": "n", "along": 0.3},
+    {"id": "plaque_great_hall", "kind": "plaque", "text": "PLAQUE_GREAT_HALL", "wall": "n", "along": 0.5}
+  ],
+  "entrance_hall": [
+    {"id": "plaque_castle_entrance", "kind": "plaque", "text": "PLAQUE_CASTLE_ENTRANCE", "wall": "w", "along": 0.75},
+    {"id": "checkpoint", "kind": "checkpoint", "at": [0, 4]}
+  ],
+  "library": [
+    {"id": "plaque_library", "kind": "plaque", "text": "PLAQUE_LIBRARY", "wall": "s", "along": 0.25},
+    {"id": "tome_glowmote", "kind": "spell_tome", "spell": "glowmote", "at": [0.0, 0]},
+    {"id": "checkpoint", "kind": "checkpoint", "at": [0, 4]}
+  ],
+  "class_sigilcraft": [
+    {"id": "plaque_sigilcraft", "kind": "plaque", "text": "PLAQUE_SIGILCRAFT", "wall": "n", "along": 0.5},
+    {"id": "tome_arcane_pulse", "kind": "spell_tome", "spell": "arcane_pulse", "beside_lectern": 0.0},
+    {"id": "tome_uplift", "kind": "spell_tome", "spell": "uplift", "beside_lectern": -2.0},
+    {"id": "practice_switch", "kind": "magic_switch", "corner": "nw", "inset": [1.5, 1.5]},
+    {"id": "practice_block", "kind": "pushable_block", "corner": "ne", "inset": [4, 4], "dy": 0.6}
+  ],
+  "stair_hall": [
+    {"id": "plaque_stair_hall", "kind": "plaque", "text": "PLAQUE_STAIR_HALL", "wall": "s", "along": 0.5},
+    {"id": "checkpoint", "kind": "checkpoint", "at": [0, 4]}
+  ],
+  "undercroft": [
+    {"id": "plaque_undercroft", "kind": "plaque", "text": "PLAQUE_UNDERCROFT", "wall": "n", "along": 0.5},
+    {"id": "fragment_a", "kind": "fragment", "at": [-6, -6]},
+    {"id": "fragment_b", "kind": "fragment", "at": [6, -6]},
+    {"id": "fragment_c", "kind": "fragment", "at": [0, 6]}
+  ],
+  "cellars": [
+    {"id": "plaque_cellars", "kind": "plaque", "text": "PLAQUE_CELLARS", "wall": "e", "along": 0.5},
+    {"id": "fragment_a", "kind": "fragment", "at": [-8, 4]},
+    {"id": "guardian_east", "kind": "crystal_guardian", "at": [4, -4], "yaw": 90},
+    {"id": "guardian_west", "kind": "crystal_guardian", "at": [-6, 4], "yaw": -45}
+  ],
+  "hidden_study": [
+    {"id": "plaque_hidden_study", "kind": "plaque", "text": "PLAQUE_HIDDEN_STUDY", "wall": "n", "along": 0.5},
+    {"id": "fragment_a", "kind": "fragment", "at": [0, -4]},
+    {"id": "fragment_b", "kind": "fragment", "at": [0, 4]}
+  ],
+  "loft": [
+    {"id": "plaque_loft", "kind": "plaque", "text": "PLAQUE_LOFT", "wall": "n", "along": 0.5},
+    {"id": "fragment_a", "kind": "fragment", "at": [-4, 0]},
+    {"id": "fragment_b", "kind": "fragment", "at": [4, 0]}
+  ],
+  "tower_sw_4": [
+    {"id": "plaque_stargazing", "kind": "plaque", "text": "PLAQUE_STARGAZING", "wall": "n", "along": 0.5},
+    {"id": "fragment_a", "kind": "fragment", "at": [-4, 4]}
+  ],
+  "grounds": [
+    {"id": "plaque_grounds", "kind": "plaque", "text": "PLAQUE_GROUNDS", "wall": "n", "along": 0.3}
+  ],
+  "class_skyriding": [
+    {"id": "tome_galewind", "kind": "spell_tome", "spell": "galewind", "beside_lectern": 0.0}
+  ],
+  "kitchens": [
+    {"id": "tome_emberkindle", "kind": "spell_tome", "spell": "emberkindle", "at": [0.0, 0]}
+  ],
+  "class_elixirs": [
+    {"id": "tome_wellspring", "kind": "spell_tome", "spell": "wellspring", "beside_lectern": 0.0}
+  ],
+  "class_warding": [
+    {"id": "tome_frostbind", "kind": "spell_tome", "spell": "frostbind", "beside_lectern": 0.0}
+  ],
+  "class_stargazing": [
+    {"id": "tome_duskveil", "kind": "spell_tome", "spell": "duskveil", "beside_lectern": 0.0}
+  ],
+  "class_glyphs": [
+    {"id": "tome_unbolt", "kind": "spell_tome", "spell": "unbolt", "beside_lectern": 0.0}
+  ],
+  "class_shapeshaping": [
+    {"id": "tome_mendweave", "kind": "spell_tome", "spell": "mendweave", "beside_lectern": 0.0}
+  ],
+  "class_herblore": [
+    {"id": "tome_quicksprout", "kind": "spell_tome", "spell": "quicksprout", "beside_lectern": 0.0}
+  ],
+  "tower_ne_3": [
+    {"id": "fragment_a", "kind": "fragment", "at": [-5, 5]}
+  ],
+  "tower_nw_3": [
+    {"id": "fragment_a", "kind": "fragment", "at": [-5, 5]}
+  ],
+  "roost": [
+    {"id": "fragment_a", "kind": "fragment", "at": [0, 0]}
+  ],
+  "north_hall": [
+    {"id": "checkpoint", "kind": "checkpoint", "at": [0, 4]}
+  ],
+  "dungeon_corridor": [
+    {"id": "checkpoint", "kind": "checkpoint", "at": [0, 4]},
+    {"id": "guardian_north", "kind": "crystal_guardian", "at": [0, -22], "yaw": 0}
+  ],
+  "gallery": [
+    {"id": "checkpoint", "kind": "checkpoint", "at": [0, 4]}
+  ]
+}

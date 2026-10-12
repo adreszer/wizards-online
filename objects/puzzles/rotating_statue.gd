@@ -4,6 +4,13 @@ extends StaticBody3D
 
 signal state_changed(state: int)
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "rotating_statue"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+
 @export var state_count: int = 4
 @export var initial_state: int = 0
 @export var rotate_duration: float = 0.5

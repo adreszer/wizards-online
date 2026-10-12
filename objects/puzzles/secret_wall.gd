@@ -5,6 +5,16 @@ extends Node3D
 
 signal revealed()
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "secret_wall"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+## Area on the ornament's side (the hidden room is the id's area); players
+## act on the wall from either.
+@export var approach_area: String = ""
+
 @export var slide_offset: Vector3 = Vector3(0, -3.4, 0)
 @export var slide_duration: float = 1.6
 

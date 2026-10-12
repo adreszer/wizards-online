@@ -5,8 +5,15 @@ extends Area3D
 
 signal collected(definition: CollectibleDefinition)
 
+## Kind name in the server's world-object map (generated/world_objects.lua).
+const WORLD_KIND := "collectible"
+
+## Stable id ("<area>/<name>") the server uses to refer to this object; set
+## by the castle generator. Empty for objects outside the castle.
+@export var object_id: String = ""
+
 @export var definition: CollectibleDefinition
-## Stable identifier; empty = derived from the scene path.
+## Stable identifier; empty = the object id, else derived from the scene path.
 @export var instance_key: String = ""
 @export var spin_speed: float = 1.6
 @export var bob_height: float = 0.15
@@ -26,7 +33,7 @@ func _ready() -> void:
 		push_warning("Collectible without definition at %s" % get_path())
 		return
 	if instance_key.is_empty():
-		instance_key = str(get_path())
+		instance_key = object_id if not object_id.is_empty() else str(get_path())
 	_base_y = _visual.position.y
 	_apply_definition()
 	GameSession.register_collectible(definition.id)
