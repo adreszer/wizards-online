@@ -12,6 +12,10 @@ extends CharacterBody3D
 const LAYER_PLAYER := 1 << 1
 const LAYER_REMOTE_PLAYER := 1 << 2
 const LAYER_WORLD := 1 << 0
+## Visual (render) layer for character bodies. Lights a character carries leave
+## it out of their shadow caster mask: a body 30 cm from its own torch would
+## otherwise throw a giant shadow across the room.
+const RENDER_LAYER_CHARACTER := 1 << 1
 
 ## Set BEFORE adding to the tree. Remote players get their transforms from the network.
 @export var is_local: bool = true
@@ -54,6 +58,7 @@ func _ready() -> void:
 	set_meta("health", health)
 	set_meta("player", self)
 	_apply_character()
+	_set_render_layer(visual)
 	cast_origin = visual.find_child("CastOrigin", true, false) as Node3D
 	off_hand = _find_off_hand()
 	held_item_mount.setup(off_hand)
@@ -81,6 +86,13 @@ func _apply_character() -> void:
 	old.queue_free()
 	visual = new_visual
 	animation_controller = new_visual.get_node("AnimationController") as AnimationController
+
+
+func _set_render_layer(node: Node) -> void:
+	if node is GeometryInstance3D:
+		(node as GeometryInstance3D).layers = RENDER_LAYER_CHARACTER
+	for child in node.get_children():
+		_set_render_layer(child)
 
 
 func _setup_local() -> void:

@@ -34,6 +34,8 @@ var _character: Node3D
 func _ready() -> void:
 	_light.omni_range = light_radius
 	_light.light_energy = base_energy
+	# Walls still block the light, but the carrier's body does not shade it.
+	_light.shadow_caster_mask = ~Player.RENDER_LAYER_CHARACTER & 0xFFFFF
 	# Run after the animation/skeleton update so the hand position is current.
 	process_priority = 100
 	_character = _find_character()
