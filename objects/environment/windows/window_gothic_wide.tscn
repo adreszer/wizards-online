@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://wingothicwide1"]
+
+[ext_resource type="Script" path="res://objects/environment/windows/window_frame.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/window_gothic_wide.glb" id="2"]
+
+[node name="WindowGothicWide" type="Node3D"]
+script = ExtResource("1")
+half_width = 0.713
+spring = 1.528
+apex = 2.648
+inset = 0.03
+glass = true
+
+[node name="Model" parent="." instance=ExtResource("2")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0.0007, 1.3324, 0.016)
