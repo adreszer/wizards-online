@@ -1,9 +1,9 @@
 shader_type spatial;
 render_mode cull_disabled;
 // wall_stone with a window opening cut out of it (used by wall_window.tscn).
-// The opening is a pointed arch in the wall module's own space (origin at the
-// bottom centre of the 4 m module, wall plane XY): straight jambs from `bottom`
-// to `spring`, then two circular arcs meeting at `apex`. WallWindow sets the
+// The opening is one or more pointed arches in the wall module's own space
+// (origin at the bottom centre of the 4 m module, wall plane XY): straight
+// jambs from `bottom` to `spring`, then two circular arcs meeting at `apex`. WallWindow sets the
 // instance uniforms from its window's outline and builds the matching stone
 // reveal, so the cut and the reveal can never disagree.
 
@@ -14,6 +14,8 @@ instance uniform vec3 mesh_scale = vec3(1.0);
 instance uniform vec3 mesh_offset = vec3(0.0);
 // half width, bottom, spring, apex (m, module space); half width 0 = no opening.
 instance uniform vec4 opening = vec4(0.0);
+// arch count, distance between arch centres (centred on x = 0).
+instance uniform vec2 arches = vec2(1.0, 0.0);
 
 varying vec2 module_xy;
 
@@ -24,9 +26,12 @@ void vertex() {
 	module_xy = (VERTEX * mesh_scale + mesh_offset).xy;
 }
 
+// Below the springing line the opening is one rectangle spanning every arch;
+// above it, each arch is two circular arcs meeting at the apex.
 bool inside_opening(vec2 p) {
 	float w = opening.x;
-	if (w <= 0.0 || p.y < opening.y || abs(p.x) > w) {
+	float half_total = w + arches.y * (arches.x - 1.0) * 0.5;
+	if (w <= 0.0 || p.y < opening.y || abs(p.x) > half_total) {
 		return false;
 	}
 	float dy = p.y - opening.z;
@@ -34,10 +39,16 @@ bool inside_opening(vec2 p) {
 		return true;
 	}
 	float h = opening.w - opening.z;
-	float c = (h * h - w * w) / (2.0 * w);   // arc centres sit at x = ±c on the springing line
+	float c = (h * h - w * w) / (2.0 * w);   // arc centres sit at ±c from the arch centre on the springing line
 	float r = w + c;
-	float dx = abs(p.x) + c;
-	return dx * dx + dy * dy <= r * r;
+	for (int i = 0; i < int(arches.x); i++) {
+		float cx = (float(i) - (arches.x - 1.0) * 0.5) * arches.y;
+		float dx = abs(p.x - cx) + c;
+		if (abs(p.x - cx) <= w && dx * dx + dy * dy <= r * r) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void fragment() {

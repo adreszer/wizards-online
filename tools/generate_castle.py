@@ -429,6 +429,12 @@ for a, b, axis, coord, off, storey, _name in secrets:
 # are the two end modules, flanking them.
 WINDOW_KINDS = {"hall", "classroom", "library", "common_room", "dormitory", "room", "tower", "corridor"}
 WINDOW_SCENE = "res://objects/environment/modular/wall_window.tscn"
+# Window type per room kind (WallWindow.window_scene); anything else gets the module's default single lancet.
+WINDOW_TYPES = {
+    "hall": "res://objects/environment/windows/window_gothic_double.tscn",
+    "library": "res://objects/environment/windows/window_gothic_double.tscn",
+    "common_room": "res://objects/environment/windows/window_gothic_double.tscn",
+}
 NO_WINDOW_WALLS = {("library", "n"), ("records_room", "e")}   # bookshelf walls (emit_shelves)
 
 def wall_line(r, side):
@@ -524,8 +530,10 @@ def emit_walls():
                 # The module's +Z side (the window's inner face) turns toward the room.
                 r = rooms[u["window"]]
                 inward = (r.z0 == coord) if axis == "x" else (r.x0 == coord)
+                kind_scene = WINDOW_TYPES.get(r.kind)
+                props = {"window_scene": f'ExtResource("{ext_id("PackedScene", kind_scene)}")'} if kind_scene else None
                 inst(uname(f"Window_{axis}{coord:+d}_s{storey}"), WINDOW_SCENE, pos, parent="Walls",
-                     rot_y=rot + (0.0 if inward else math.pi))
+                     rot_y=rot + (0.0 if inward else math.pi), props=props)
             if u["secret"]:
                 # SecretWall is 4 × 3.4 m; fill the strip above it up to the next row.
                 size = (4, MODULE_H - 3.4, T) if axis == "x" else (T, MODULE_H - 3.4, 4)

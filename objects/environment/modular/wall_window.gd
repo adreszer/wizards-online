@@ -9,9 +9,10 @@ extends StaticBody3D
 ## The window's +Z face looks toward the module's +Z side; the generator turns
 ## the module so that side faces the room.
 ##
-## Generated children are rebuilt on ready and never saved. The glass is
-## opaque, so the module keeps a full occluder and full collision like a plain
-## wall.
+## Windows whose model has open lights (`WindowFrame.glass`) get a glass pane
+## filling the opening on the wall's centre plane. Generated children are
+## rebuilt on ready and never saved. The glass is opaque, so the module keeps a
+## full occluder and full collision like a plain wall.
 
 @export var window_scene: PackedScene = preload("res://objects/environment/windows/window_gothic_iron.tscn"):
 	set(value):
@@ -33,6 +34,7 @@ const ARC_SEGMENTS := 12
 const BACKING_CLEARANCE := 0.03
 
 static var _reveal_material: StandardMaterial3D
+static var _glass_material: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -51,14 +53,18 @@ func _rebuild() -> void:
 	_add_generated(window)
 	var frame := window as WindowFrame
 	var o := frame.opening() if frame else Vector4.ZERO
+	var arches := frame.layout() if frame else Vector2(1.0, 0.0)
 	o.y += sill_height
 	o.z += sill_height
 	o.w += sill_height
-	_cut_wall(o)
+	_cut_wall(o, arches)
 	if o.x <= 0.0:
 		return
-	_add_generated(_build_reveal(o))
-	_add_backing(o)
+	var segs := outline(o, arches)
+	_add_generated(_build_reveal(segs))
+	if frame.glass:
+		_add_generated(_build_glass(segs))
+	_add_backing(o, arches)
 	if occluder and not Engine.is_editor_hint():
 		var occ := OccluderInstance3D.new()
 		var box := BoxOccluder3D.new()
@@ -74,7 +80,7 @@ func _add_generated(node: Node) -> void:
 
 
 ## Hands the opening to every stone mesh of the wall model, in module space.
-func _cut_wall(o: Vector4) -> void:
+func _cut_wall(o: Vector4, arches: Vector2) -> void:
 	var model := get_node_or_null("Model") as Node3D
 	if model == null:
 		return
@@ -83,6 +89,7 @@ func _cut_wall(o: Vector4) -> void:
 		mi.set_instance_shader_parameter("mesh_scale", xf.basis.get_scale())
 		mi.set_instance_shader_parameter("mesh_offset", xf.origin)
 		mi.set_instance_shader_parameter("opening", o)
+		mi.set_instance_shader_parameter("arches", arches)
 
 
 func _relative(node: Node3D) -> Transform3D:
@@ -94,42 +101,62 @@ func _relative(node: Node3D) -> Transform3D:
 	return xf
 
 
-## Outline of the opening (counter-clockwise from the bottom left) with the
-## inward normal at each point. Arc points carry the radial normal so the
-## curved reveal shades smoothly; corners are duplicated with each side's normal.
-static func outline(o: Vector4) -> Array:
+## Outline of the opening as segments [p0, n0, p1, n1] (counter-clockwise from
+## the bottom left) with the inward normal at each end. Arc points carry the
+## radial normal so curved reveals shade smoothly; corners are duplicated with
+## each side's normal. Neighbouring arches meet where their arcs cross, or on
+## the springing line (with a short flat soffit) when they don't reach.
+static func outline(o: Vector4, arches: Vector2) -> Array:
 	var w := o.x
 	var b := o.y
 	var s := o.z
 	var h := o.w - s
 	var c := (h * h - w * w) / (2.0 * w)
 	var r := w + c
-	var segs: Array = []   # each: [p0, n0, p1, n1]
-	segs.append([Vector2(-w, b), Vector2.UP, Vector2(w, b), Vector2.UP])
-	segs.append([Vector2(w, b), Vector2.LEFT, Vector2(w, s), Vector2.LEFT])
-	# Right arc: centre (-c, s), from angle 0 up to the apex.
+	var n := int(arches.x)
+	var pitch := arches.y
+	var half_total := w + pitch * (n - 1) / 2.0
 	var top := atan2(h, c)
-	var prev := Vector2(w, s)
-	for i in range(1, ARC_SEGMENTS + 1):
-		var a := top * i / ARC_SEGMENTS
-		var p := Vector2(-c + r * cos(a), s + r * sin(a))
-		segs.append([prev, (Vector2(-c, s) - prev).normalized(), p, (Vector2(-c, s) - p).normalized()])
-		prev = p
-	# Left arc mirrors it: centre (c, s), from the apex down to the springing line.
-	for i in range(ARC_SEGMENTS - 1, -1, -1):
-		var a := top * i / ARC_SEGMENTS
-		var p := Vector2(c - r * cos(a), s + r * sin(a))
-		segs.append([prev, (Vector2(c, s) - prev).normalized(), p, (Vector2(c, s) - p).normalized()])
-		prev = p
-	segs.append([Vector2(-w, s), Vector2.RIGHT, Vector2(-w, b), Vector2.RIGHT])
+	# Angle (from the springing line) where an arc meets its neighbour's.
+	var meet := 0.0
+	if n > 1 and pitch / 2.0 < w:
+		var dx := pitch / 2.0 + c
+		meet = asin(sqrt(maxf(r * r - dx * dx, 0.0)) / r)
+	var segs: Array = []
+	segs.append([Vector2(-half_total, b), Vector2.UP, Vector2(half_total, b), Vector2.UP])
+	segs.append([Vector2(half_total, b), Vector2.LEFT, Vector2(half_total, s), Vector2.LEFT])
+	var prev := Vector2(half_total, s)
+	for i in range(n - 1, -1, -1):
+		var cx := (i - (n - 1) / 2.0) * pitch
+		# Right half: centre (cx - c, s), rising from the springing line (or the meeting point) to the apex.
+		var right_centre := Vector2(cx - c, s)
+		var a0 := 0.0 if i == n - 1 else meet
+		var start := right_centre + Vector2(r * cos(a0), r * sin(a0))
+		if not start.is_equal_approx(prev):
+			segs.append([prev, Vector2.DOWN, start, Vector2.DOWN])
+		prev = start
+		for k in range(1, ARC_SEGMENTS + 1):
+			var a := lerpf(a0, top, float(k) / ARC_SEGMENTS)
+			var p := right_centre + Vector2(r * cos(a), r * sin(a))
+			segs.append([prev, (right_centre - prev).normalized(), p, (right_centre - p).normalized()])
+			prev = p
+		# Left half: centre (cx + c, s), falling from the apex.
+		var left_centre := Vector2(cx + c, s)
+		var a1 := 0.0 if i == 0 else meet
+		for k in range(ARC_SEGMENTS - 1, -1, -1):
+			var a := lerpf(a1, top, float(k) / ARC_SEGMENTS)
+			var p := left_centre + Vector2(-r * cos(a), r * sin(a))
+			segs.append([prev, (left_centre - prev).normalized(), p, (left_centre - p).normalized()])
+			prev = p
+	segs.append([prev, Vector2.RIGHT, Vector2(-half_total, b), Vector2.RIGHT])
 	return segs
 
 
-func _build_reveal(o: Vector4) -> MeshInstance3D:
+func _build_reveal(segs: Array) -> MeshInstance3D:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var z := reveal_depth / 2.0
-	for seg in outline(o):
+	for seg in segs:
 		var p0: Vector2 = seg[0]
 		var n0: Vector2 = seg[1]
 		var p1: Vector2 = seg[2]
@@ -139,8 +166,8 @@ func _build_reveal(o: Vector4) -> MeshInstance3D:
 			[Vector3(p0.x, p0.y, -z), n0], [Vector3(p1.x, p1.y, z), n1], [Vector3(p0.x, p0.y, z), n0],
 		]
 		for v in quad:
-			var n: Vector2 = v[1]
-			st.set_normal(Vector3(n.x, n.y, 0.0))
+			var nv: Vector2 = v[1]
+			st.set_normal(Vector3(nv.x, nv.y, 0.0))
 			st.add_vertex(v[0])
 	var mi := MeshInstance3D.new()
 	mi.name = "Reveal"
@@ -149,11 +176,31 @@ func _build_reveal(o: Vector4) -> MeshInstance3D:
 	return mi
 
 
+## One flat pane filling the whole opening on z = 0; the frame's bars pass
+## through it like leading holding the glass.
+func _build_glass(segs: Array) -> MeshInstance3D:
+	var poly := PackedVector2Array()
+	for seg in segs:
+		poly.append(seg[0])
+	var tris := Geometry2D.triangulate_polygon(poly)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_normal(Vector3.BACK)
+	for i in tris:
+		st.set_uv(poly[i])
+		st.add_vertex(Vector3(poly[i].x, poly[i].y, 0.0))
+	var mi := MeshInstance3D.new()
+	mi.name = "Glass"
+	mi.mesh = st.commit()
+	mi.material_override = _get_glass_material()
+	return mi
+
+
 ## Dark mortar behind the stone faces like ModularWallRun's slab, around the opening.
-func _add_backing(o: Vector4) -> void:
+func _add_backing(o: Vector4, arches: Vector2) -> void:
 	# Kept clear of the reveal so their faces never z-fight with it.
 	var half := module_width / 2.0
-	var w := o.x + BACKING_CLEARANCE
+	var w := o.x + arches.y * (arches.x - 1.0) / 2.0 + BACKING_CLEARANCE
 	var bottom := o.y - BACKING_CLEARANCE
 	var top := o.w + BACKING_CLEARANCE
 	var pieces := [
@@ -185,3 +232,35 @@ static func _get_reveal_material() -> StandardMaterial3D:
 		_reveal_material.uv1_scale = Vector3.ONE * 0.25
 		_reveal_material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	return _reveal_material
+
+
+## Leaded glass at night: dark grey-blue, glossy, with a faint cool glow so the
+## panes read against the iron even in a dim room. A soft noise mottles the
+## tint and the sheen like hand-blown panes (UVs are the pane's metres).
+static func _get_glass_material() -> StandardMaterial3D:
+	if _glass_material == null:
+		var noise := FastNoiseLite.new()
+		noise.frequency = 0.012
+		noise.fractal_octaves = 2
+		var ramp := Gradient.new()
+		ramp.set_color(0, Color(0.72, 0.74, 0.8))
+		ramp.set_color(1, Color(1.0, 1.0, 1.0))
+		var mottle := NoiseTexture2D.new()
+		mottle.width = 256
+		mottle.height = 256
+		mottle.seamless = true
+		mottle.noise = noise
+		mottle.color_ramp = ramp
+		_glass_material = StandardMaterial3D.new()
+		_glass_material.albedo_color = Color(0.07, 0.09, 0.12)
+		_glass_material.albedo_texture = mottle
+		_glass_material.metallic = 0.1
+		_glass_material.roughness = 0.15
+		_glass_material.emission_enabled = true
+		_glass_material.emission = Color(0.14, 0.19, 0.28)
+		_glass_material.emission_energy_multiplier = 0.6
+		_glass_material.emission_texture = mottle
+		_glass_material.emission_operator = BaseMaterial3D.EMISSION_OP_MULTIPLY
+		_glass_material.uv1_scale = Vector3(1.2, 1.2, 1.0)
+		_glass_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	return _glass_material
