@@ -6,7 +6,8 @@
 --
 -- States: secret_wall "revealed" | nil, magic_switch / lever true | false,
 -- wall_torch lit true | false, rotating_statue 0..state_count-1, castle_door
--- "locked" | false (closed) | true (open). A missing
+-- "locked" | false (closed) | true (open); the default is "locked" for a door
+-- that starts locked, open for one that starts open (start_open), else closed. A missing
 -- entry means the object's default, so snapshots only carry changed objects.
 
 local OBJECTS = require("generated.world_objects")
@@ -192,7 +193,10 @@ function M.state_of(world, oid)
   if obj.kind == "wall_torch" then return obj.lit ~= false end
   if obj.kind == "rotating_statue" then return math.floor(obj.initial_state or 0) end
   if obj.kind == "magic_switch" or obj.kind == "lever" then return false end
-  if obj.kind == "castle_door" then return obj.locked and "locked" or false end
+  if obj.kind == "castle_door" then
+    if obj.locked then return "locked" end
+    return obj.start_open == true
+  end
   return nil
 end
 

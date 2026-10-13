@@ -24,12 +24,18 @@ const WORLD_KIND := "castle_door"
 @export var approach_area: String = ""
 ## Starts locked (and returns to locked when the server resets the world).
 @export var locked: bool = false
+## Starts open (a main route); players can still close it. Ignored when locked.
+@export var start_open: bool = false
 @export var open_angle_degrees: float = 90.0
 @export var swing_duration: float = 0.9
 
 var is_open: bool = false
 var is_locked: bool = false
 var _tween: Tween
+
+## Leaf meshes imported without normals (some exports omit them), rebuilt once
+## with generated normals and tangents so lighting and the normal map work.
+static var _lit_meshes: Dictionary = {}
 
 ## Each hinge is the leaf's own AnimatableBody3D: a physics body only follows
 ## changes to its own transform, so rotating a parent would leave the
@@ -42,12 +48,33 @@ var _tween: Tween
 
 
 func _ready() -> void:
+	for mi in find_children("*", "MeshInstance3D", true, false):
+		_ensure_normals(mi as MeshInstance3D)
 	is_locked = locked
 	for i in _interactables:
 		i.interacted.connect(_on_interacted)
 	for r in _receivers:
 		r.spell_received.connect(_on_spell_received)
+	if start_open and not locked:
+		set_open(true, true)
 	_update_prompt()
+
+
+static func _ensure_normals(mi: MeshInstance3D) -> void:
+	var mesh := mi.mesh as ArrayMesh
+	if mesh == null or mesh.get_surface_count() == 0 or mesh.surface_get_format(0) & Mesh.ARRAY_FORMAT_NORMAL:
+		return
+	if not _lit_meshes.has(mesh):
+		var out := ArrayMesh.new()
+		for i in mesh.get_surface_count():
+			var st := SurfaceTool.new()
+			st.create_from(mesh, i)
+			st.generate_normals()
+			st.generate_tangents()
+			st.commit(out)
+			out.surface_set_material(i, mesh.surface_get_material(i))
+		_lit_meshes[mesh] = out
+	mi.mesh = _lit_meshes[mesh]
 
 
 func _on_interacted(interactor: Node) -> void:
@@ -104,8 +131,8 @@ func set_open(value: bool, instant: bool = false) -> void:
 		closed.emit()
 
 
-## Server state: "locked", false/null (closed) or true (open); null means the
-## default, which is locked for a door that starts locked.
+## Server state: "locked", false (closed) or true (open); null means the
+## default: locked for a door that starts locked, open for one that starts open.
 func apply_world_state(state: Variant, instant: bool) -> void:
 	# The state mixes types (String or bool), and comparing across them is an error.
 	var lock: bool = (state is String and state == "locked") or (state == null and locked)
@@ -114,7 +141,8 @@ func apply_world_state(state: Variant, instant: bool) -> void:
 		if not lock and not instant:
 			_audio.play()
 			unlocked.emit()
-	set_open(state is bool and state, instant)
+	var open_now: bool = (state is bool and state) if state != null else (start_open and not locked)
+	set_open(open_now, instant)
 	_update_prompt()
 
 

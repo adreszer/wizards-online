@@ -980,13 +980,18 @@ def emit_shelves():
     return n
 
 # Doors: a pair of oak leaves (CastleDoor) in the doorways of rooms people use as rooms
-# (classrooms, offices, dormitories, common rooms, the library). Wide double openings,
-# house gates (HouseDoor) and passages between halls and corridors stay open. Leaves
-# swing into the room; when a placed object stands where a leaf would swing, toward the
-# other side; when both are blocked the doorway stays open. Doors into LOCKED_DOOR_ROOMS
-# start locked: an unlock spell (Unbolt) opens them.
+# (classrooms, offices, dormitories, common rooms, the library, tower rooms). The castle's
+# main routes get the ceremonial leaves instead, standing open: both arches of every wide
+# double opening (the entrance, the courtyard, the library) and the doorways into
+# GRAND_DOOR_ROOMS. House gates (HouseDoor) and passages between halls and corridors stay
+# open. Leaves swing into the room (a main route: away from the open air); when a placed
+# object stands where a leaf would swing, toward the other side; when both are blocked
+# the doorway stays empty. Doors into LOCKED_DOOR_ROOMS start locked: an unlock spell
+# (Unbolt) opens them.
 DOOR_SCENE = "res://objects/environment/doors/castle_door.tscn"
-DOOR_KINDS = ("classroom", "room", "dormitory", "common_room", "library")
+GRAND_DOOR_SCENE = "res://objects/environment/doors/castle_door_ceremonial.tscn"
+DOOR_KINDS = ("classroom", "room", "dormitory", "common_room", "library", "tower")
+GRAND_DOOR_ROOMS = {"great_hall"}
 LOCKED_DOOR_ROOMS = {"staff_room", "cellars"}
 DOOR_SWING = 1.85   # a leaf sweeps this far into the room and along the wall from the doorway's centre ± 1.78
 
@@ -996,10 +1001,15 @@ def emit_castle_doors():
     n = 0
     for key, (a, b, count) in sorted(door_rooms.items()):
         axis, coord, off, storey = key
-        if count > 1 or key in gates:
+        if key in gates:
             continue
         A, B = rooms[a], rooms[b]
-        inside = [r for r in (A, B) if r.kind in DOOR_KINDS]
+        grand = count > 1 or A.id in GRAND_DOOR_ROOMS or B.id in GRAND_DOOR_ROOMS
+        if grand:
+            inside = sorted([r for r in (A, B) if r.kind != "outdoor"],
+                            key=lambda r: (r.id not in GRAND_DOOR_ROOMS, r.kind not in DOOR_KINDS))
+        else:
+            inside = [r for r in (A, B) if r.kind in DOOR_KINDS]
         if not inside:
             continue
         centre = off + 2
@@ -1027,7 +1037,9 @@ def emit_castle_doors():
         props = {"approach_area": f'"{(other if owner is side else side).id}"'}
         if owner.id in LOCKED_DOOR_ROOMS or other.id in LOCKED_DOOR_ROOMS:
             props["locked"] = "true"
-        inst(f"Door_{node_name(oid)}", DOOR_SCENE, pos, parent="Doors", rot_y=rot + (0.0 if toward else math.pi),
+        elif grand:
+            props["start_open"] = "true"
+        inst(f"Door_{node_name(oid)}", GRAND_DOOR_SCENE if grand else DOOR_SCENE, pos, parent="Doors", rot_y=rot + (0.0 if toward else math.pi),
              props=oid_props(oid, props), groups=["world_objects"])
         n += 1
     return n

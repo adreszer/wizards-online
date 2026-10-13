@@ -7,6 +7,7 @@ return {
     kind = "castle_door",
     locked = true,
     pos = { -20, -9, -6 },
+    start_open = false,
   },
   ["cellars/fragment_a"] = {
     accepts = {},
@@ -29,6 +30,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { 30, 0, -40 },
+    start_open = false,
   },
   ["class_beastlore/door_2"] = {
     accepts = { "unlock" },
@@ -37,6 +39,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { 20, 0, -30 },
+    start_open = false,
   },
   ["class_chronicles/door_1"] = {
     accepts = { "unlock" },
@@ -45,6 +48,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -20, 0, -14 },
+    start_open = false,
   },
   ["class_chronicles/statue_reader"] = {
     accepts = { "force" },
@@ -62,6 +66,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -20, -9, 2 },
+    start_open = false,
   },
   ["class_elixirs/tome_wellspring"] = {
     accepts = {},
@@ -77,6 +82,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -26, 0, -40 },
+    start_open = false,
   },
   ["class_glyphs/door_2"] = {
     accepts = { "unlock" },
@@ -85,6 +91,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -20, 0, -30 },
+    start_open = false,
   },
   ["class_glyphs/tome_unbolt"] = {
     accepts = {},
@@ -100,6 +107,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { 20, 0, 2 },
+    start_open = false,
   },
   ["class_herblore/tome_quicksprout"] = {
     accepts = {},
@@ -115,6 +123,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -26, 9, 24 },
+    start_open = false,
   },
   ["class_numeromancy/door_2"] = {
     accepts = { "unlock" },
@@ -123,6 +132,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -20, 9, 18 },
+    start_open = false,
   },
   ["class_shapeshaping/door_1"] = {
     accepts = { "unlock" },
@@ -131,6 +141,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -26, 0, 24 },
+    start_open = false,
   },
   ["class_shapeshaping/door_2"] = {
     accepts = { "unlock" },
@@ -139,6 +150,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -20, 0, 18 },
+    start_open = false,
   },
   ["class_shapeshaping/tome_mendweave"] = {
     accepts = {},
@@ -154,6 +166,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -20, 0, 2 },
+    start_open = false,
   },
   ["class_sigilcraft/plaque_sigilcraft"] = {
     accepts = {},
@@ -198,6 +211,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { 20, 0, -14 },
+    start_open = false,
   },
   ["class_skyriding/tome_galewind"] = {
     accepts = {},
@@ -213,6 +227,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { 20, 9, 2 },
+    start_open = false,
   },
   ["class_stargazing/tome_duskveil"] = {
     accepts = {},
@@ -228,6 +243,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -20, 9, 2 },
+    start_open = false,
   },
   ["class_warding/tome_frostbind"] = {
     accepts = {},
@@ -605,12 +621,75 @@ return {
     pos = { -12.18, -6.4, 20 },
     relight_after = 45,
   },
+  ["entrance_hall/door_1"] = {
+    accepts = { "unlock" },
+    area = "entrance_hall",
+    areas = { "entrance_hall", "courtyard" },
+    kind = "castle_door",
+    locked = false,
+    pos = { -2, 0, 24 },
+    start_open = true,
+  },
+  ["entrance_hall/door_2"] = {
+    accepts = { "unlock" },
+    area = "entrance_hall",
+    areas = { "entrance_hall", "courtyard" },
+    kind = "castle_door",
+    locked = false,
+    pos = { 2, 0, 24 },
+    start_open = true,
+  },
+  ["entrance_hall/door_3"] = {
+    accepts = { "unlock" },
+    area = "entrance_hall",
+    areas = { "entrance_hall", "grounds" },
+    kind = "castle_door",
+    locked = false,
+    pos = { -2, 0, 48 },
+    start_open = true,
+  },
+  ["entrance_hall/door_4"] = {
+    accepts = { "unlock" },
+    area = "entrance_hall",
+    areas = { "entrance_hall", "grounds" },
+    kind = "castle_door",
+    locked = false,
+    pos = { 2, 0, 48 },
+    start_open = true,
+  },
   ["entrance_hall/plaque_castle_entrance"] = {
     accepts = {},
     area = "entrance_hall",
     areas = { "entrance_hall" },
     kind = "plaque",
     pos = { -11.77, 1.6, 42 },
+  },
+  ["great_hall/door_1"] = {
+    accepts = { "unlock" },
+    area = "great_hall",
+    areas = { "great_hall", "corridor_e_0" },
+    kind = "castle_door",
+    locked = false,
+    pos = { 18, 0, 8 },
+    start_open = true,
+  },
+  ["great_hall/door_2"] = {
+    accepts = { "unlock" },
+    area = "great_hall",
+    areas = { "great_hall", "entrance_hall" },
+    kind = "castle_door",
+    locked = false,
+    pos = { 12, 0, 38 },
+    start_open = true,
+  },
+  ["great_hall/door_3"] = {
+    accepts = { "unlock" },
+    area = "great_hall",
+    areas = { "great_hall", "kitchens" },
+    kind = "castle_door",
+    locked = false,
+    pos = { 44, 0, 38 },
+    start_open = true,
   },
   ["great_hall/plaque_great_hall"] = {
     accepts = {},
@@ -685,6 +764,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { 40, 0, 62 },
+    start_open = false,
   },
   ["grounds/plaque_grounds"] = {
     accepts = {},
@@ -728,6 +808,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -20, 9, -30 },
+    start_open = false,
   },
   ["house3_common/door_1"] = {
     accepts = { "unlock" },
@@ -736,6 +817,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -44, -9, -26 },
+    start_open = false,
   },
   ["house3_common/house_door"] = {
     accepts = {},
@@ -751,6 +833,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { 60, 0, 18 },
+    start_open = false,
   },
   ["house4_common/house_door"] = {
     accepts = {},
@@ -758,14 +841,6 @@ return {
     areas = { "house4_common" },
     kind = "house_door",
     pos = { 54, 0, 24 },
-  },
-  ["kitchens/door_1"] = {
-    accepts = { "unlock" },
-    area = "kitchens",
-    areas = { "kitchens", "great_hall" },
-    kind = "castle_door",
-    locked = false,
-    pos = { 44, 0, 38 },
   },
   ["kitchens/tome_emberkindle"] = {
     accepts = {},
@@ -781,30 +856,52 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -14, 0, -40 },
+    start_open = false,
   },
   ["library/door_2"] = {
+    accepts = { "unlock" },
+    area = "library",
+    areas = { "library", "north_hall" },
+    kind = "castle_door",
+    locked = false,
+    pos = { -2, 0, -40 },
+    start_open = true,
+  },
+  ["library/door_3"] = {
+    accepts = { "unlock" },
+    area = "library",
+    areas = { "library", "north_hall" },
+    kind = "castle_door",
+    locked = false,
+    pos = { 2, 0, -40 },
+    start_open = true,
+  },
+  ["library/door_4"] = {
     accepts = { "unlock" },
     area = "library",
     areas = { "library", "corridor_e_0" },
     kind = "castle_door",
     locked = false,
     pos = { 18, 0, -40 },
+    start_open = false,
   },
-  ["library/door_3"] = {
+  ["library/door_5"] = {
     accepts = { "unlock" },
     area = "library",
     areas = { "library", "tower_nw_0" },
     kind = "castle_door",
     locked = false,
     pos = { -20, 0, -46 },
+    start_open = false,
   },
-  ["library/door_4"] = {
+  ["library/door_6"] = {
     accepts = { "unlock" },
     area = "library",
     areas = { "library", "tower_ne_0" },
     kind = "castle_door",
     locked = false,
     pos = { 20, 0, -46 },
+    start_open = false,
   },
   ["library/plaque_library"] = {
     accepts = {},
@@ -884,6 +981,24 @@ return {
     kind = "secret_wall",
     pos = { 12, 18, 38 },
   },
+  ["north_hall/door_1"] = {
+    accepts = { "unlock" },
+    area = "north_hall",
+    areas = { "north_hall", "courtyard" },
+    kind = "castle_door",
+    locked = false,
+    pos = { -2, 0, -16 },
+    start_open = true,
+  },
+  ["north_hall/door_2"] = {
+    accepts = { "unlock" },
+    area = "north_hall",
+    areas = { "north_hall", "courtyard" },
+    kind = "castle_door",
+    locked = false,
+    pos = { 2, 0, -16 },
+    start_open = true,
+  },
   ["records_room/door_1"] = {
     accepts = { "unlock" },
     area = "records_room",
@@ -891,6 +1006,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { 20, 9, -30 },
+    start_open = false,
   },
   ["roost/door_1"] = {
     accepts = { "unlock" },
@@ -899,6 +1015,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { -36, 18, 46 },
+    start_open = false,
   },
   ["roost/fragment_a"] = {
     accepts = {},
@@ -914,6 +1031,7 @@ return {
     kind = "castle_door",
     locked = false,
     pos = { 20, 9, -14 },
+    start_open = false,
   },
   ["staff_room/door_1"] = {
     accepts = { "unlock" },
@@ -922,6 +1040,7 @@ return {
     kind = "castle_door",
     locked = true,
     pos = { -20, 9, -14 },
+    start_open = false,
   },
   ["stair_hall/plaque_stair_hall"] = {
     accepts = {},
@@ -966,6 +1085,24 @@ return {
     areas = { "tower_nw_3" },
     kind = "collectible",
     pos = { -33, 27, -43 },
+  },
+  ["tower_sw_0/door_1"] = {
+    accepts = { "unlock" },
+    area = "tower_sw_0",
+    areas = { "tower_sw_0", "stair_hall" },
+    kind = "castle_door",
+    locked = false,
+    pos = { -36, 0, 30 },
+    start_open = false,
+  },
+  ["tower_sw_1/door_1"] = {
+    accepts = { "unlock" },
+    area = "tower_sw_1",
+    areas = { "tower_sw_1", "stair_hall" },
+    kind = "castle_door",
+    locked = false,
+    pos = { -36, 9, 30 },
+    start_open = false,
   },
   ["tower_sw_4/fragment_a"] = {
     accepts = {},

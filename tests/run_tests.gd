@@ -18,6 +18,7 @@ const INVENTORY_PANEL_SCENE := preload("res://ui/inventory/inventory_panel.tscn"
 const BLOCK_SCENE := preload("res://objects/puzzles/pushable_block.tscn")
 const WALL_TORCH_SCENE := preload("res://objects/environment/props/wall_torch.tscn")
 const CASTLE_DOOR_SCENE := preload("res://objects/environment/doors/castle_door.tscn")
+const GRAND_DOOR_SCENE := preload("res://objects/environment/doors/castle_door_ceremonial.tscn")
 const UNBOLT := preload("res://resources/spells/unbolt.tres")
 const HUD_SCENE := preload("res://ui/hud/hud.tscn")
 const PROFESSOR_PANEL_SCENE := preload("res://ui/school/professor_panel.tscn")
@@ -1506,7 +1507,19 @@ func _test_world_objects() -> void:
 	t.check(not locked_door.is_locked and not locked_door.is_open, "castle door: server state false = unlocked, closed")
 	locked_door.apply_world_state(true, true)
 	t.check(locked_door.is_open, "castle door: server state true opens it")
-	for n: Node in [wall, switch, torch, lever, statue, door, castle_door, locked_door]:
+	var grand: CastleDoor = GRAND_DOOR_SCENE.instantiate()
+	grand.start_open = true
+	grand.position = Vector3(-60, 0, 60)
+	add_child(grand)
+	await get_tree().process_frame
+	t.check(grand.is_open, "ceremonial door: a main-route door starts open")
+	grand.apply_world_state(false, true)
+	t.check(not grand.is_open, "ceremonial door: server state false closes it")
+	grand.apply_world_state(null, true)
+	t.check(grand.is_open, "ceremonial door: default state is open again")
+	var leaf_mesh := (grand.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D).mesh
+	t.check(leaf_mesh.surface_get_format(0) & Mesh.ARRAY_FORMAT_NORMAL, "ceremonial door: leaf mesh has normals (generated when the export lacks them)")
+	for n: Node in [wall, switch, torch, lever, statue, door, castle_door, locked_door, grand]:
 		n.queue_free()
 	await get_tree().process_frame
 
