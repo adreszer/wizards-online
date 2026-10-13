@@ -401,24 +401,83 @@ if unreachable:
 
 # --------------------------------------------------------------------------- walls
 units = {}   # (axis, coord, off, storey) -> {"rows": n, "door": bool, "secret": bool}
-def register_edge(axis, coord, lo, hi, storey, rows):
+def register_edge(axis, coord, lo, hi, storey, rows, room_id):
     for off in range(lo, hi, 4):
         key = (axis, coord, off, storey)
-        u = units.setdefault(key, {"rows": 0, "door": False, "secret": False})
+        u = units.setdefault(key, {"rows": 0, "door": False, "secret": False, "window": None, "rooms": set()})
         u["rows"] = max(u["rows"], rows)
+        u["rooms"].add(room_id)
 
 for r in rooms.values():
     for s in r.storeys():
-        register_edge("z", r.x0, r.z0, r.z1, s, r.rows)
-        register_edge("z", r.x1, r.z0, r.z1, s, r.rows)
-        register_edge("x", r.z0, r.x0, r.x1, s, r.rows)
-        register_edge("x", r.z1, r.x0, r.x1, s, r.rows)
+        register_edge("z", r.x0, r.z0, r.z1, s, r.rows, r.id)
+        register_edge("z", r.x1, r.z0, r.z1, s, r.rows, r.id)
+        register_edge("x", r.z0, r.x0, r.x1, s, r.rows, r.id)
+        register_edge("x", r.z1, r.x0, r.x1, s, r.rows, r.id)
 for axis, coord, off, storey in doors:
     assert (axis, coord, off, storey) in units, ("door on no wall", axis, coord, off, storey)
     units[(axis, coord, off, storey)]["door"] = True
     door_units.add((axis, coord, off, storey))
 for a, b, axis, coord, off, storey, _name in secrets:
     units[(axis, coord, off, storey)]["secret"] = True
+
+# Windows: the wall_window module (a window set into the stone) on walls that face the
+# outside or an open-air area, in the ground row of the room's own storey. Kept sparse:
+# every other module, never in a wall's end modules or beside a doorway, and not on walls
+# that carry furniture (bookshelf walls), stairs or a placed object. A classroom's front
+# wall is the exception the other way round: its middle holds the boards, so its windows
+# are the two end modules, flanking them.
+WINDOW_KINDS = {"hall", "classroom", "library", "common_room", "dormitory", "room", "tower", "corridor"}
+WINDOW_SCENE = "res://objects/environment/modular/wall_window.tscn"
+NO_WINDOW_WALLS = {("library", "n"), ("records_room", "e")}   # bookshelf walls (emit_shelves)
+
+def wall_line(r, side):
+    """(axis, coord, lo, hi) of one of room r's walls."""
+    if side in "we":
+        return "z", (r.x0 if side == "w" else r.x1), r.z0, r.z1
+    return "x", (r.z0 if side == "n" else r.z1), r.x0, r.x1
+
+def placed_wall_points(path):
+    """(x, z, storey) of every content/placements.json object, to keep windows clear of them."""
+    pts = []
+    with open(path) as f:
+        for area, entries in json.load(f).items():
+            r = rooms[area]
+            for e in entries:
+                (x, _y, z), _ = placement_point(r, e)
+                pts.append((x, z, r.storey))
+    return pts
+
+def choose_windows():
+    occupied = placed_wall_points(PLACEMENTS)
+    n = 0
+    for r in rooms.values():
+        if r.kind not in WINDOW_KINDS or r.storey < 0:
+            continue
+        for side in "wens":
+            if side in r.no_torch_sides or (r.id, side) in NO_WINDOW_WALLS:
+                continue
+            front = CLASSROOM_FRONT.get(r.id) == side
+            axis, coord, lo, hi = wall_line(r, side)
+            offs = list(range(lo, hi, 4))
+            for i, off in enumerate(offs):
+                end = i == 0 or i == len(offs) - 1
+                if (not end) if front else (i % 2 == 0 or end):
+                    continue
+                key = (axis, coord, off, r.storey)
+                u = units[key]
+                outside = all(o == r.id or rooms[o].kind == "outdoor" for o in u["rooms"])
+                if not outside or u["door"] or u["secret"] or u["window"]:
+                    continue
+                if any(units.get((axis, coord, o, r.storey), {}).get(f) for o in (off - 4, off + 4) for f in ("door", "secret")):
+                    continue
+                centre = off + 2
+                if any(st == r.storey and abs((px if axis == "z" else pz) - coord) < 1.0
+                       and abs((pz if axis == "z" else px) - centre) < 1.5 for px, pz, st in occupied):
+                    continue
+                u["window"] = r.id
+                n += 1
+    return n
 
 def run_start(axis, coord, lo, hi, y):
     if axis == "x":
@@ -447,7 +506,7 @@ def emit_walls():
                 gap = prev is not None and off != prev + 4
                 if gap:
                     flush(prev + 4)
-                solid = u["rows"] > row and not (row == 0 and (u["door"] or u["secret"]))
+                solid = u["rows"] > row and not (row == 0 and (u["door"] or u["secret"] or u["window"]))
                 if solid:
                     if run_lo is None:
                         run_lo = off
@@ -461,6 +520,12 @@ def emit_walls():
             rot = 0.0 if axis == "x" else math.radians(90)
             if u["door"]:
                 inst(uname(f"Doorway_{axis}{coord:+d}_s{storey}"), "res://objects/environment/modular/doorway.tscn", pos, parent="Walls", rot_y=rot)
+            if u["window"]:
+                # The module's +Z side (the window's inner face) turns toward the room.
+                r = rooms[u["window"]]
+                inward = (r.z0 == coord) if axis == "x" else (r.x0 == coord)
+                inst(uname(f"Window_{axis}{coord:+d}_s{storey}"), WINDOW_SCENE, pos, parent="Walls",
+                     rot_y=rot + (0.0 if inward else math.pi))
             if u["secret"]:
                 # SecretWall is 4 × 3.4 m; fill the strip above it up to the next row.
                 size = (4, MODULE_H - 3.4, T) if axis == "x" else (T, MODULE_H - 3.4, 4)
@@ -800,7 +865,7 @@ def wall_free_intervals(r, side, width, storey=None):
         along = lambda x, z: x; other = lambda x, z: z
     blocked = []
     for (a, c, off, st), u in units.items():
-        if a == axis and c == coord and st == storey and (u["door"] or u["secret"]):
+        if a == axis and c == coord and st == storey and lo <= off < hi and (u["door"] or u["secret"] or u["window"]):
             blocked.append((off - 0.3, off + 4.3))
     for x, z, st in pillar_points:
         if st == storey and abs(other(x, z) - coord) < 0.01 and lo - 1 <= along(x, z) <= hi + 1:
@@ -1004,6 +1069,7 @@ def emit_placements(path):
     return counts
 
 # --------------------------------------------------------------------------- build
+window_count = choose_windows()
 emit_walls()
 emit_secret_walls()
 emit_band_fillers()
@@ -1092,4 +1158,4 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 header = f'[gd_scene load_steps={len(ext) + 2} format=3 uid="uid://castle0000001"]\n\n'
 open(OUT, "w").write(header + exts + subs + root + "\n".join(nodes) + "\n")
 print("name keys:", " ".join(sorted({r.name_key for r in rooms.values()})))
-print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  chandeliers: {chandelier_count}  furniture: {furniture_count}  enemies: {enemy_count}  nodes: {len(nodes)}")
+print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  windows: {window_count}  chandeliers: {chandelier_count}  furniture: {furniture_count}  enemies: {enemy_count}  nodes: {len(nodes)}")

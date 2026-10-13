@@ -141,7 +141,7 @@ Server content: lists the Nakama runtime needs from the client (spell ids and nu
 
 Regenerating the castle after editing its plan (`python3 tools/generate_castle.py` from the project root) rewrites `levels/castle/castle.tscn` and `nakama/modules/world_areas.lua` (restart Nakama to pick the latter up); hand edits belong in the generator, in `objects/`, or in `levels/castle/castle.gd`. New rooms need an `AREA_<ID>` row in `localization/translations.csv` (the castle test fails on a missing name).
 
-Adding a new environment module: drop the GLB under `assets/models/…` (never edit it in-repo), run `inspect_model.gd`, create a wrapper `.tscn` under `objects/environment/…` with the fitting transform + simple collision, and place instances in the validation scene before using them in a level. Conventions are in `docs/plan.md` → "Production environment asset pipeline".
+Adding a new environment module: drop the GLB under `assets/models/…` (never edit it in-repo), run `inspect_model.gd`, create a wrapper `.tscn` under `objects/environment/…` with the fitting transform + simple collision, and place instances in the validation scene before using them in a level. Conventions are in `docs/plan.md` → "Production environment asset pipeline". A new window type: drop the GLB, make `objects/environment/windows/<id>.tscn` with a `WindowFrame` root (origin at the frame's bottom centre, mid-depth on z = 0, the room-side face on +Z) and fill in its outline (`half_width`, `spring`, `apex`, measured from the mesh); `WallWindow.window_scene` then cuts the matching opening into the wall by itself. Check it in section F of the validation scene.
 
 ## Localization
 

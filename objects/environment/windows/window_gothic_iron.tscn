@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://wingothiciron1"]
+
+[ext_resource type="Script" path="res://objects/environment/windows/window_frame.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/window_gothic_iron.glb" id="2"]
+
+[node name="WindowGothicIron" type="Node3D"]
+script = ExtResource("1")
+half_width = 0.423
+spring = 1.793
+apex = 2.675
+
+[node name="Model" parent="." instance=ExtResource("2")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0.0008, 1.3315, 0.0196)

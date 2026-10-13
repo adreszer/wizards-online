@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://assetvalid001"]
+[gd_scene load_steps=16 format=3 uid="uid://assetvalid001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/wall_plain.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/greybox/greybox_block.tscn" id="2"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://objects/environment/props/bookshelf_large.tscn" id="11"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/chandelier.tscn" id="12"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/feast_table.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://objects/environment/modular/wall_window.tscn" id="14"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -316,6 +317,25 @@ text = "E  student desk + bench, professor's desk, lectern, slate board (+Z towa
 font_size = 72
 outline_size = 12
 
+[node name="F_Window" type="Node3D" parent="."]
+
+[node name="WallL" parent="F_Window" instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -8)
+
+[node name="WallWindow" parent="F_Window" instance=ExtResource("14")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -8)
+
+[node name="WallR" parent="F_Window" instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -8)
+
+[node name="Label" type="Label3D" parent="F_Window"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.7, -8)
+billboard = 1
+pixel_size = 0.005
+text = "F  window set into a wall (wall_window.tscn)"
+font_size = 96
+outline_size = 12
+
 [node name="DevInfo" type="CanvasLayer" parent="."]
 
 [node name="Label" type="Label" parent="DevInfo"]
@@ -327,5 +347,5 @@ text = "Wall Plain
 ~3K triangles
 Production Asset Test
 
-A single  |  B 3x tiled  |  C corner  |  D player scale  |  E desk + bench
+A single  |  B 3x tiled  |  C corner  |  D player scale  |  E desk + bench  |  F window
 Esc: toggle mouse   F3: debug overlay"
