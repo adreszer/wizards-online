@@ -127,16 +127,16 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x-56_s0_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 0.000, -56.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 0.000, -56.000)
+length = 4.000
 
 [node name="Wall_x-56_s0_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 0.000, -56.000)
 length = 4.000
 
 [node name="Wall_x-56_s0_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 0.000, -56.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 0.000, -56.000)
+length = 4.000
 
 [node name="Wall_x-56_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 4.000, -56.000)
@@ -150,23 +150,29 @@ length = 16.000
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 0.000, -56.000)
 
 [node name="Window_x-56_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 0.000, -56.000)
+
+[node name="Window_x-56_s0_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 0.000, -56.000)
+
+[node name="Window_x-56_s0_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 30.000, 0.000, -56.000)
 
 [node name="Wall_x-56_s1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 9.000, -56.000)
 length = 4.000
 
 [node name="Wall_x-56_s1_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 9.000, -56.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 9.000, -56.000)
+length = 4.000
 
 [node name="Wall_x-56_s1_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 9.000, -56.000)
 length = 4.000
 
 [node name="Wall_x-56_s1_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 9.000, -56.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 9.000, -56.000)
+length = 4.000
 
 [node name="Wall_x-56_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 13.000, -56.000)
@@ -180,23 +186,29 @@ length = 16.000
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 9.000, -56.000)
 
 [node name="Window_x-56_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 9.000, -56.000)
+
+[node name="Window_x-56_s1_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 9.000, -56.000)
+
+[node name="Window_x-56_s1_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 30.000, 9.000, -56.000)
 
 [node name="Wall_x-56_s2_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 18.000, -56.000)
 length = 4.000
 
 [node name="Wall_x-56_s2_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 18.000, -56.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 18.000, -56.000)
+length = 4.000
 
 [node name="Wall_x-56_s2_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 18.000, -56.000)
 length = 4.000
 
 [node name="Wall_x-56_s2_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 18.000, -56.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 18.000, -56.000)
+length = 4.000
 
 [node name="Wall_x-56_s2_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 22.000, -56.000)
@@ -211,7 +223,15 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 window_scene = ExtResource("3")
 
 [node name="Window_x-56_s2_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 18.000, -56.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x-56_s2_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 18.000, -56.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x-56_s2_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 30.000, 18.000, -56.000)
 window_scene = ExtResource("3")
 
 [node name="Wall_x-56_s3_r0" parent="Walls" instance=ExtResource("1")]
@@ -219,16 +239,16 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x-56_s3_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 27.000, -56.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 27.000, -56.000)
+length = 4.000
 
 [node name="Wall_x-56_s3_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 27.000, -56.000)
 length = 4.000
 
 [node name="Wall_x-56_s3_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 27.000, -56.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 27.000, -56.000)
+length = 4.000
 
 [node name="Wall_x-56_s3_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 31.000, -56.000)
@@ -242,7 +262,13 @@ length = 16.000
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 27.000, -56.000)
 
 [node name="Window_x-56_s3_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 27.000, -56.000)
+
+[node name="Window_x-56_s3_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 27.000, -56.000)
+
+[node name="Window_x-56_s3_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 30.000, 27.000, -56.000)
 
 [node name="Wall_x-40_s-1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, -9.000, -40.000)
@@ -278,7 +304,11 @@ length = 8.000
 
 [node name="Wall_x-40_s0_r0_7" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 0.000, -40.000)
-length = 12.000
+length = 4.000
+
+[node name="Wall_x-40_s0_r0_8" parent="Walls" instance=ExtResource("1")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 40.000, 0.000, -40.000)
+length = 4.000
 
 [node name="Wall_x-40_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 4.000, -40.000)
@@ -306,6 +336,10 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 [node name="Doorway_x-40_s0_6" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 30.000, 0.000, -40.000)
 
+[node name="Window_x-40_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.000, 0.000, -40.000)
+window_scene = ExtResource("4")
+
 [node name="Wall_x-40_s1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 9.000, -40.000)
 length = 4.000
@@ -320,7 +354,11 @@ length = 52.000
 
 [node name="Wall_x-40_s1_r0_4" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 9.000, -40.000)
-length = 12.000
+length = 4.000
+
+[node name="Wall_x-40_s1_r0_5" parent="Walls" instance=ExtResource("1")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 40.000, 9.000, -40.000)
+length = 4.000
 
 [node name="Wall_x-40_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 13.000, -40.000)
@@ -335,21 +373,24 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 [node name="Doorway_x-40_s1_2" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 30.000, 9.000, -40.000)
 
+[node name="Window_x-40_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.000, 9.000, -40.000)
+
 [node name="Wall_x-40_s2_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 18.000, -40.000)
 length = 4.000
 
 [node name="Wall_x-40_s2_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 18.000, -40.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 18.000, -40.000)
+length = 4.000
 
 [node name="Wall_x-40_s2_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 18.000, -40.000)
 length = 4.000
 
 [node name="Wall_x-40_s2_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 18.000, -40.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 18.000, -40.000)
+length = 4.000
 
 [node name="Wall_x-40_s2_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 22.000, -40.000)
@@ -364,7 +405,15 @@ transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000
 window_scene = ExtResource("3")
 
 [node name="Window_x-40_s2_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -26.000, 18.000, -40.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x-40_s2_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 26.000, 18.000, -40.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x-40_s2_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 30.000, 18.000, -40.000)
 window_scene = ExtResource("3")
 
 [node name="Wall_x-40_s3_r0" parent="Walls" instance=ExtResource("1")]
@@ -372,16 +421,16 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x-40_s3_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 27.000, -40.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -24.000, 27.000, -40.000)
+length = 4.000
 
 [node name="Wall_x-40_s3_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 27.000, -40.000)
 length = 4.000
 
 [node name="Wall_x-40_s3_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 27.000, -40.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 32.000, 27.000, -40.000)
+length = 4.000
 
 [node name="Wall_x-40_s3_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 31.000, -40.000)
@@ -395,7 +444,13 @@ length = 16.000
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -30.000, 27.000, -40.000)
 
 [node name="Window_x-40_s3_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -26.000, 27.000, -40.000)
+
+[node name="Window_x-40_s3_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 26.000, 27.000, -40.000)
+
+[node name="Window_x-40_s3_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 30.000, 27.000, -40.000)
 
 [node name="Wall_x-24_s0_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 0.000, -24.000)
@@ -468,12 +523,8 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x-16_s1_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -4.000, 9.000, -16.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 8.000, 9.000, -16.000)
 length = 4.000
-
-[node name="Wall_x-16_s1_r0_3" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 9.000, -16.000)
-length = 8.000
 
 [node name="Wall_x-16_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 13.000, -16.000)
@@ -484,7 +535,15 @@ transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000
 window_scene = ExtResource("3")
 
 [node name="Window_x-16_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -2.000, 9.000, -16.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x-16_s1_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 2.000, 9.000, -16.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x-16_s1_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 6.000, 9.000, -16.000)
 window_scene = ExtResource("3")
 
 [node name="Wall_x-16_s2_r0" parent="Walls" instance=ExtResource("1")]
@@ -548,12 +607,12 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 28.000
 
 [node name="Wall_x+8_s0_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 0.000, 8.000)
-length = 12.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 56.000, 0.000, 8.000)
+length = 8.000
 
 [node name="Wall_x+8_s0_r0_5" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 68.000, 0.000, 8.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 72.000, 0.000, 8.000)
+length = 4.000
 
 [node name="Wall_x+8_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 4.000, 8.000)
@@ -571,7 +630,14 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 window_scene = ExtResource("3")
 
 [node name="Window_x+8_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 54.000, 0.000, 8.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+8_s0_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 66.000, 0.000, 8.000)
+
+[node name="Window_x+8_s0_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 70.000, 0.000, 8.000)
 
 [node name="Wall_x+8_s1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 9.000, 8.000)
@@ -626,8 +692,8 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 8.000
 
 [node name="Wall_x+24_s0_r0_8" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 68.000, 0.000, 24.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 72.000, 0.000, 24.000)
+length = 4.000
 
 [node name="Wall_x+24_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 4.000, 24.000)
@@ -658,6 +724,9 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 [node name="Window_x+24_s0_2" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 66.000, 0.000, 24.000)
 
+[node name="Window_x+24_s0_3" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 70.000, 0.000, 24.000)
+
 [node name="Wall_x+24_s1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 9.000, 24.000)
 length = 4.000
@@ -672,7 +741,11 @@ length = 8.000
 
 [node name="Wall_x+24_s1_r0_4" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 9.000, 24.000)
-length = 24.000
+length = 4.000
+
+[node name="Wall_x+24_s1_r0_5" parent="Walls" instance=ExtResource("1")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 8.000, 9.000, 24.000)
+length = 4.000
 
 [node name="Wall_x+24_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 13.000, 24.000)
@@ -687,21 +760,37 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 [node name="Doorway_x+24_s1_2" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -14.000, 9.000, 24.000)
 
+[node name="Window_x+24_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 9.000, 24.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+24_s1_3" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -2.000, 9.000, 24.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+24_s1_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 2.000, 9.000, 24.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+24_s1_5" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 6.000, 9.000, 24.000)
+window_scene = ExtResource("3")
+
 [node name="Wall_x+24_s2_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 18.000, 24.000)
 length = 4.000
 
 [node name="Wall_x+24_s2_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 18.000, 24.000)
-length = 36.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -40.000, 18.000, 24.000)
+length = 8.000
 
 [node name="Wall_x+24_s2_r0_3" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -4.000, 18.000, 24.000)
-length = 4.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -16.000, 18.000, 24.000)
+length = 8.000
 
 [node name="Wall_x+24_s2_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 18.000, 24.000)
-length = 24.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 8.000, 18.000, 24.000)
+length = 20.000
 
 [node name="Wall_x+24_s2_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 22.000, 24.000)
@@ -712,11 +801,39 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 window_scene = ExtResource("4")
 
 [node name="Window_x+24_s2_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -42.000, 18.000, 24.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+24_s2_3" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 18.000, 24.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+24_s2_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 18.000, 24.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+24_s2_5" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -22.000, 18.000, 24.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+24_s2_6" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 18.000, 24.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+24_s2_7" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 18.000, 24.000)
 window_scene = ExtResource("3")
 
-[node name="Window_x+24_s2_3" parent="Walls" instance=ExtResource("2")]
+[node name="Window_x+24_s2_8" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -2.000, 18.000, 24.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+24_s2_9" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 2.000, 18.000, 24.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+24_s2_10" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 6.000, 18.000, 24.000)
 window_scene = ExtResource("3")
 
 [node name="Wall_x+24_s3_r0" parent="Walls" instance=ExtResource("1")]
@@ -724,8 +841,8 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x+24_s3_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 27.000, 24.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -40.000, 27.000, 24.000)
+length = 4.000
 
 [node name="Wall_x+24_s3_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 31.000, 24.000)
@@ -733,6 +850,10 @@ length = 16.000
 
 [node name="Window_x+24_s3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -46.000, 27.000, 24.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+24_s3_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -42.000, 27.000, 24.000)
 window_scene = ExtResource("4")
 
 [node name="Wall_x+24_s4_r0" parent="Walls" instance=ExtResource("1")]
@@ -744,8 +865,8 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x+40_s0_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 0.000, 40.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -40.000, 0.000, 40.000)
+length = 4.000
 
 [node name="Wall_x+40_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 4.000, 40.000)
@@ -754,13 +875,16 @@ length = 16.000
 [node name="Window_x+40_s0" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -46.000, 0.000, 40.000)
 
+[node name="Window_x+40_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -42.000, 0.000, 40.000)
+
 [node name="Wall_x+40_s1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 9.000, 40.000)
 length = 4.000
 
 [node name="Wall_x+40_s1_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 9.000, 40.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -40.000, 9.000, 40.000)
+length = 4.000
 
 [node name="Wall_x+40_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 13.000, 40.000)
@@ -768,6 +892,9 @@ length = 16.000
 
 [node name="Window_x+40_s1" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -46.000, 9.000, 40.000)
+
+[node name="Window_x+40_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -42.000, 9.000, 40.000)
 
 [node name="Wall_x+40_s2_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 18.000, 40.000)
@@ -782,8 +909,8 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x+40_s3_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 27.000, 40.000)
-length = 8.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -40.000, 27.000, 40.000)
+length = 4.000
 
 [node name="Wall_x+40_s3_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 31.000, 40.000)
@@ -791,6 +918,10 @@ length = 16.000
 
 [node name="Window_x+40_s3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -46.000, 27.000, 40.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+40_s3_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -42.000, 27.000, 40.000)
 window_scene = ExtResource("4")
 
 [node name="Wall_x+40_s4_r0" parent="Walls" instance=ExtResource("1")]
@@ -806,28 +937,20 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x+48_s0_r0_3" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -20.000, 0.000, 48.000)
-length = 16.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -16.000, 0.000, 48.000)
+length = 12.000
 
 [node name="Wall_x+48_s0_r0_4" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 0.000, 48.000)
 length = 12.000
 
 [node name="Wall_x+48_s0_r0_5" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 0.000, 48.000)
-length = 4.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 40.000, 0.000, 48.000)
+length = 8.000
 
 [node name="Wall_x+48_s0_r0_6" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 0.000, 48.000)
-length = 4.000
-
-[node name="Wall_x+48_s0_r0_7" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 0.000, 48.000)
-length = 12.000
-
-[node name="Wall_x+48_s0_r0_8" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 0.000, 48.000)
-length = 12.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 56.000, 0.000, 48.000)
+length = 8.000
 
 [node name="Wall_x+48_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 4.000, 48.000)
@@ -841,50 +964,137 @@ window_scene = ExtResource("3")
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -22.000, 0.000, 48.000)
 window_scene = ExtResource("3")
 
+[node name="Window_x+48_s0_3" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -18.000, 0.000, 48.000)
+window_scene = ExtResource("3")
+
 [node name="Doorway_x+48_s0" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -2.000, 0.000, 48.000)
 
 [node name="Doorway_x+48_s0_2" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 2.000, 0.000, 48.000)
 
-[node name="Window_x+48_s0_3" parent="Walls" instance=ExtResource("2")]
+[node name="Window_x+48_s0_4" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 18.000, 0.000, 48.000)
 window_scene = ExtResource("4")
 
-[node name="Window_x+48_s0_4" parent="Walls" instance=ExtResource("2")]
-transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 26.000, 0.000, 48.000)
-window_scene = ExtResource("4")
-
 [node name="Window_x+48_s0_5" parent="Walls" instance=ExtResource("2")]
-transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 34.000, 0.000, 48.000)
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 22.000, 0.000, 48.000)
 window_scene = ExtResource("4")
 
 [node name="Window_x+48_s0_6" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 26.000, 0.000, 48.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+48_s0_7" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 30.000, 0.000, 48.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+48_s0_8" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 34.000, 0.000, 48.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+48_s0_9" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 38.000, 0.000, 48.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+48_s0_10" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 50.000, 0.000, 48.000)
+
+[node name="Window_x+48_s0_11" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 54.000, 0.000, 48.000)
 
 [node name="Wall_x+48_s1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 9.000, 48.000)
-length = 80.000
+length = 4.000
+
+[node name="Wall_x+48_s1_r0_2" parent="Walls" instance=ExtResource("1")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -16.000, 9.000, 48.000)
+length = 8.000
+
+[node name="Wall_x+48_s1_r0_3" parent="Walls" instance=ExtResource("1")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 8.000, 9.000, 48.000)
+length = 8.000
+
+[node name="Wall_x+48_s1_r0_4" parent="Walls" instance=ExtResource("1")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 40.000, 9.000, 48.000)
+length = 4.000
 
 [node name="Wall_x+48_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 13.000, 48.000)
 length = 80.000
+
+[node name="Window_x+48_s1" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -30.000, 9.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -26.000, 9.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s1_3" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -22.000, 9.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s1_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -18.000, 9.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s1_5" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -6.000, 9.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s1_6" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -2.000, 9.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s1_7" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 2.000, 9.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s1_8" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 6.000, 9.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s1_9" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 18.000, 9.000, 48.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+48_s1_10" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 22.000, 9.000, 48.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+48_s1_11" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 26.000, 9.000, 48.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+48_s1_12" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 30.000, 9.000, 48.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+48_s1_13" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 34.000, 9.000, 48.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+48_s1_14" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 38.000, 9.000, 48.000)
+window_scene = ExtResource("4")
 
 [node name="Wall_x+48_s2_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 18.000, 48.000)
 length = 4.000
 
 [node name="Wall_x+48_s2_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 18.000, 48.000)
-length = 36.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -40.000, 18.000, 48.000)
+length = 8.000
 
 [node name="Wall_x+48_s2_r0_3" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -4.000, 18.000, 48.000)
-length = 4.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -16.000, 18.000, 48.000)
+length = 8.000
 
 [node name="Wall_x+48_s2_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 18.000, 48.000)
-length = 24.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 8.000, 18.000, 48.000)
+length = 20.000
 
 [node name="Wall_x+48_s2_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 22.000, 48.000)
@@ -894,11 +1104,38 @@ length = 80.000
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -46.000, 18.000, 48.000)
 
 [node name="Window_x+48_s2_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -42.000, 18.000, 48.000)
+
+[node name="Window_x+48_s2_3" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -30.000, 18.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s2_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -26.000, 18.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s2_5" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -22.000, 18.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s2_6" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -18.000, 18.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s2_7" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -6.000, 18.000, 48.000)
 window_scene = ExtResource("3")
 
-[node name="Window_x+48_s2_3" parent="Walls" instance=ExtResource("2")]
+[node name="Window_x+48_s2_8" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -2.000, 18.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s2_9" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 2.000, 18.000, 48.000)
+window_scene = ExtResource("3")
+
+[node name="Window_x+48_s2_10" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 6.000, 18.000, 48.000)
 window_scene = ExtResource("3")
 
 [node name="Wall_x+52_s0_r0" parent="Walls" instance=ExtResource("1")]
@@ -910,19 +1147,23 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x+52_s0_r0_3" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 48.000, 0.000, 52.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 60.000, 0.000, 52.000)
 length = 4.000
-
-[node name="Wall_x+52_s0_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 56.000, 0.000, 52.000)
-length = 8.000
 
 [node name="Window_x+52_s0" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 46.000, 0.000, 52.000)
 window_scene = ExtResource("4")
 
 [node name="Window_x+52_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 50.000, 0.000, 52.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+52_s0_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 54.000, 0.000, 52.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+52_s0_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 58.000, 0.000, 52.000)
 window_scene = ExtResource("4")
 
 [node name="Wall_x+68_s0_r0" parent="Walls" instance=ExtResource("1")]
@@ -934,19 +1175,23 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 length = 4.000
 
 [node name="Wall_x+68_s0_r0_3" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 48.000, 0.000, 68.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 60.000, 0.000, 68.000)
 length = 4.000
-
-[node name="Wall_x+68_s0_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 56.000, 0.000, 68.000)
-length = 8.000
 
 [node name="Window_x+68_s0" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 46.000, 0.000, 68.000)
 window_scene = ExtResource("4")
 
 [node name="Window_x+68_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 50.000, 0.000, 68.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+68_s0_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 54.000, 0.000, 68.000)
+window_scene = ExtResource("4")
+
+[node name="Window_x+68_s0_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 58.000, 0.000, 68.000)
 window_scene = ExtResource("4")
 
 [node name="Wall_x+96_s0_r0" parent="Walls" instance=ExtResource("1")]
@@ -975,7 +1220,7 @@ length = 4.000
 
 [node name="Wall_z-52_s0_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 0.000, 40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z-52_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 4.000, -8.000)
@@ -988,13 +1233,16 @@ length = 16.000
 [node name="Window_z-52_s0" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 0.000, 30.000)
 
+[node name="Window_z-52_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 0.000, 34.000)
+
 [node name="Wall_z-52_s1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 9.000, 28.000)
 length = 4.000
 
 [node name="Wall_z-52_s1_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 9.000, 40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z-52_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 13.000, 40.000)
@@ -1002,6 +1250,9 @@ length = 16.000
 
 [node name="Window_z-52_s1" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 9.000, 30.000)
+
+[node name="Window_z-52_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 9.000, 34.000)
 
 [node name="Wall_z-52_s2_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -52.000, 18.000, 36.000)
@@ -1116,11 +1367,11 @@ length = 4.000
 
 [node name="Wall_z-44_s1_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, -20.000)
-length = 12.000
+length = 8.000
 
 [node name="Wall_z-44_s1_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, -8.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z-44_s1_r0_4" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, 4.000)
@@ -1138,21 +1389,27 @@ length = 64.000
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, -34.000)
 
 [node name="Window_z-44_s1_2" parent="Walls" instance=ExtResource("2")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, -18.000)
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, -30.000)
 
 [node name="Window_z-44_s1_3" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, -18.000)
+
+[node name="Window_z-44_s1_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, -14.000)
+
+[node name="Window_z-44_s1_5" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, -6.000)
 window_scene = ExtResource("4")
 
-[node name="Window_z-44_s1_4" parent="Walls" instance=ExtResource("2")]
+[node name="Window_z-44_s1_6" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, 6.000)
 window_scene = ExtResource("4")
 
-[node name="Window_z-44_s1_5" parent="Walls" instance=ExtResource("2")]
+[node name="Window_z-44_s1_7" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, 10.000)
 window_scene = ExtResource("4")
 
-[node name="Window_z-44_s1_6" parent="Walls" instance=ExtResource("2")]
+[node name="Window_z-44_s1_8" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -44.000, 9.000, 22.000)
 window_scene = ExtResource("4")
 
@@ -1173,7 +1430,7 @@ length = 4.000
 
 [node name="Wall_z-36_s0_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 0.000, -40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z-36_s0_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 0.000, 28.000)
@@ -1194,6 +1451,9 @@ length = 24.000
 [node name="Window_z-36_s0" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 0.000, -50.000)
 
+[node name="Window_z-36_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 0.000, -46.000)
+
 [node name="Doorway_z-36_s0" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 0.000, 30.000)
 
@@ -1203,7 +1463,7 @@ length = 4.000
 
 [node name="Wall_z-36_s1_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 9.000, -40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z-36_s1_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 9.000, 28.000)
@@ -1224,6 +1484,9 @@ length = 24.000
 [node name="Window_z-36_s1" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 9.000, -50.000)
 
+[node name="Window_z-36_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 9.000, -46.000)
+
 [node name="Doorway_z-36_s1" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 9.000, 30.000)
 
@@ -1233,7 +1496,7 @@ length = 4.000
 
 [node name="Wall_z-36_s2_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 18.000, -40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z-36_s2_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 18.000, 44.000)
@@ -1251,6 +1514,10 @@ length = 24.000
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 18.000, -50.000)
 window_scene = ExtResource("3")
 
+[node name="Window_z-36_s2_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 18.000, -46.000)
+window_scene = ExtResource("3")
+
 [node name="Doorway_z-36_s2" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 18.000, 46.000)
 
@@ -1260,7 +1527,7 @@ length = 4.000
 
 [node name="Wall_z-36_s3_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 27.000, -40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z-36_s3_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 27.000, 40.000)
@@ -1276,6 +1543,9 @@ length = 16.000
 
 [node name="Window_z-36_s3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 27.000, -50.000)
+
+[node name="Window_z-36_s3_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 27.000, -46.000)
 
 [node name="Wall_z-36_s4_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -36.000, 36.000, 40.000)
@@ -1362,28 +1632,36 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 0.000, 18.000)
 
 [node name="Wall_z-20_s1_r0" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 9.000, -32.000)
-length = 32.000
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 9.000, -60.000)
+length = 4.000
 
 [node name="Wall_z-20_s1_r0_2" parent="Walls" instance=ExtResource("1")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 9.000, -32.000)
+length = 24.000
+
+[node name="Wall_z-20_s1_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 9.000, -16.000)
 length = 12.000
 
-[node name="Wall_z-20_s1_r0_3" parent="Walls" instance=ExtResource("1")]
+[node name="Wall_z-20_s1_r0_4" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 9.000, 0.000)
 length = 12.000
 
-[node name="Wall_z-20_s1_r0_4" parent="Walls" instance=ExtResource("1")]
+[node name="Wall_z-20_s1_r0_5" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 9.000, 16.000)
 length = 12.000
 
-[node name="Wall_z-20_s1_r0_5" parent="Walls" instance=ExtResource("1")]
+[node name="Wall_z-20_s1_r0_6" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 9.000, 24.000)
 length = 4.000
 
 [node name="Wall_z-20_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 13.000, 24.000)
 length = 88.000
+
+[node name="Window_z-20_s1" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 9.000, -58.000)
+window_scene = ExtResource("3")
 
 [node name="Doorway_z-20_s1" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 9.000, -30.000)
@@ -1411,7 +1689,7 @@ length = 4.000
 
 [node name="Wall_z-20_s3_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 27.000, -40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z-20_s3_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, 31.000, -40.000)
@@ -1419,6 +1697,9 @@ length = 16.000
 
 [node name="Window_z-20_s3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -20.000, 27.000, -50.000)
+
+[node name="Window_z-20_s3_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -20.000, 27.000, -46.000)
 
 [node name="Wall_z-12_s-1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, -9.000, -28.000)
@@ -1470,24 +1751,12 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 length = 12.000
 
 [node name="Wall_z-12_s1_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, 9.000, -12.000)
-length = 12.000
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, 9.000, -16.000)
+length = 8.000
 
 [node name="Wall_z-12_s1_r0_3" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, 9.000, -4.000)
-length = 4.000
-
-[node name="Wall_z-12_s1_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, 9.000, 4.000)
-length = 4.000
-
-[node name="Wall_z-12_s1_r0_5" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, 9.000, 12.000)
-length = 4.000
-
-[node name="Wall_z-12_s1_r0_6" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, 9.000, 48.000)
-length = 32.000
+length = 28.000
 
 [node name="Wall_z-12_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, 13.000, 48.000)
@@ -1497,16 +1766,31 @@ length = 88.000
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, 9.000, -26.000)
 
 [node name="Window_z-12_s1" parent="Walls" instance=ExtResource("2")]
-transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, -10.000)
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, -14.000)
 
 [node name="Window_z-12_s1_2" parent="Walls" instance=ExtResource("2")]
-transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, -2.000)
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, -10.000)
 
 [node name="Window_z-12_s1_3" parent="Walls" instance=ExtResource("2")]
-transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, 6.000)
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, -6.000)
 
 [node name="Window_z-12_s1_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, -2.000)
+
+[node name="Window_z-12_s1_5" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, 2.000)
+
+[node name="Window_z-12_s1_6" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, 6.000)
+
+[node name="Window_z-12_s1_7" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, 10.000)
+
+[node name="Window_z-12_s1_8" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, 14.000)
+
+[node name="Window_z-12_s1_9" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -12.000, 9.000, 18.000)
 
 [node name="Wall_z-12_s2_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -12.000, 18.000, 44.000)
@@ -1540,14 +1824,10 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 length = 4.000
 
 [node name="Wall_z+12_s0_r0_4" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 0.000, 20.000)
-length = 4.000
-
-[node name="Wall_z+12_s0_r0_5" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 0.000, 36.000)
 length = 12.000
 
-[node name="Wall_z+12_s0_r0_6" parent="Walls" instance=ExtResource("1")]
+[node name="Wall_z+12_s0_r0_5" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 0.000, 48.000)
 length = 8.000
 
@@ -1566,6 +1846,10 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 window_scene = ExtResource("4")
 
 [node name="Window_z+12_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 0.000, 18.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+12_s0_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 0.000, 22.000)
 window_scene = ExtResource("4")
 
@@ -1577,16 +1861,16 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 length = 12.000
 
 [node name="Wall_z+12_s1_r0_2" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, -12.000)
-length = 12.000
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, -16.000)
+length = 8.000
 
 [node name="Wall_z+12_s1_r0_3" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, -4.000)
-length = 4.000
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, 12.000)
+length = 8.000
 
 [node name="Wall_z+12_s1_r0_4" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, 48.000)
-length = 48.000
+length = 24.000
 
 [node name="Wall_z+12_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 13.000, 48.000)
@@ -1596,10 +1880,31 @@ length = 88.000
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, -26.000)
 
 [node name="Window_z+12_s1" parent="Walls" instance=ExtResource("2")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, -10.000)
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, -14.000)
 
 [node name="Window_z+12_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, -10.000)
+
+[node name="Window_z+12_s1_3" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, -6.000)
+
+[node name="Window_z+12_s1_4" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, -2.000)
+
+[node name="Window_z+12_s1_5" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, 2.000)
+
+[node name="Window_z+12_s1_6" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, 14.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+12_s1_7" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, 18.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+12_s1_8" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 9.000, 22.000)
+window_scene = ExtResource("4")
 
 [node name="Wall_z+12_s2_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.000, 18.000, 36.000)
@@ -1662,24 +1967,32 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 0.000, 2.000)
 
 [node name="Wall_z+20_s1_r0" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 9.000, -32.000)
-length = 32.000
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 9.000, -60.000)
+length = 4.000
 
 [node name="Wall_z+20_s1_r0_2" parent="Walls" instance=ExtResource("1")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 9.000, -32.000)
+length = 24.000
+
+[node name="Wall_z+20_s1_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 9.000, -16.000)
 length = 12.000
 
-[node name="Wall_z+20_s1_r0_3" parent="Walls" instance=ExtResource("1")]
+[node name="Wall_z+20_s1_r0_4" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 9.000, 0.000)
 length = 12.000
 
-[node name="Wall_z+20_s1_r0_4" parent="Walls" instance=ExtResource("1")]
+[node name="Wall_z+20_s1_r0_5" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 9.000, 8.000)
 length = 4.000
 
 [node name="Wall_z+20_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 13.000, 8.000)
 length = 72.000
+
+[node name="Window_z+20_s1" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 20.000, 9.000, -58.000)
+window_scene = ExtResource("3")
 
 [node name="Doorway_z+20_s1" parent="Walls" instance=ExtResource("5")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 9.000, -30.000)
@@ -1696,7 +2009,7 @@ length = 4.000
 
 [node name="Wall_z+20_s2_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 18.000, -40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z+20_s2_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 22.000, -40.000)
@@ -1706,13 +2019,17 @@ length = 16.000
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 18.000, -50.000)
 window_scene = ExtResource("3")
 
+[node name="Window_z+20_s2_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 18.000, -46.000)
+window_scene = ExtResource("3")
+
 [node name="Wall_z+20_s3_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 27.000, -52.000)
 length = 4.000
 
 [node name="Wall_z+20_s3_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 27.000, -40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z+20_s3_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 31.000, -40.000)
@@ -1720,6 +2037,9 @@ length = 16.000
 
 [node name="Window_z+20_s3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 27.000, -50.000)
+
+[node name="Window_z+20_s3_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 20.000, 27.000, -46.000)
 
 [node name="Wall_z+28_s2_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 28.000, 18.000, 48.000)
@@ -1735,7 +2055,7 @@ length = 4.000
 
 [node name="Wall_z+36_s0_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 36.000, 0.000, -40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z+36_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 36.000, 4.000, -40.000)
@@ -1743,6 +2063,9 @@ length = 16.000
 
 [node name="Window_z+36_s0" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 36.000, 0.000, -50.000)
+
+[node name="Window_z+36_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 36.000, 0.000, -46.000)
 
 [node name="Wall_z+36_s1_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 36.000, 9.000, -40.000)
@@ -1766,7 +2089,7 @@ length = 4.000
 
 [node name="Wall_z+36_s3_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 36.000, 27.000, -40.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z+36_s3_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 36.000, 31.000, -40.000)
@@ -1774,6 +2097,9 @@ length = 16.000
 
 [node name="Window_z+36_s3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 36.000, 27.000, -50.000)
+
+[node name="Window_z+36_s3_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 36.000, 27.000, -46.000)
 
 [node name="Wall_z+40_s0_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 40.000, 0.000, 60.000)
@@ -1843,15 +2169,19 @@ length = 20.000
 
 [node name="Wall_z+44_s1_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 44.000, 9.000, -8.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z+44_s1_r0_3" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 44.000, 9.000, 4.000)
 length = 8.000
 
 [node name="Wall_z+44_s1_r0_4" parent="Walls" instance=ExtResource("1")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 44.000, 9.000, 12.000)
+length = 4.000
+
+[node name="Wall_z+44_s1_r0_5" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 44.000, 9.000, 48.000)
-length = 40.000
+length = 4.000
 
 [node name="Wall_z+44_s1_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 44.000, 13.000, 48.000)
@@ -1861,11 +2191,46 @@ length = 88.000
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, -18.000)
 
 [node name="Window_z+44_s1_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, -14.000)
+
+[node name="Window_z+44_s1_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, -6.000)
 window_scene = ExtResource("4")
 
-[node name="Window_z+44_s1_3" parent="Walls" instance=ExtResource("2")]
+[node name="Window_z+44_s1_4" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, 6.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+44_s1_5" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, 14.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+44_s1_6" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, 18.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+44_s1_7" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, 22.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+44_s1_8" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, 26.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+44_s1_9" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, 30.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+44_s1_10" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, 34.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+44_s1_11" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, 38.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+44_s1_12" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 44.000, 9.000, 42.000)
 window_scene = ExtResource("4")
 
 [node name="Wall_z+60_s0_r0" parent="Walls" instance=ExtResource("1")]
@@ -1877,12 +2242,8 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 length = 8.000
 
 [node name="Wall_z+60_s0_r0_3" parent="Walls" instance=ExtResource("1")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 60.000, 0.000, 36.000)
-length = 4.000
-
-[node name="Wall_z+60_s0_r0_4" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 60.000, 0.000, 48.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z+60_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 60.000, 4.000, 48.000)
@@ -1895,7 +2256,13 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 60.000, 0.000, 30.000)
 
 [node name="Window_z+60_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 60.000, 0.000, 34.000)
+
+[node name="Window_z+60_s0_3" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 60.000, 0.000, 38.000)
+
+[node name="Window_z+60_s0_4" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 60.000, 0.000, 42.000)
 
 [node name="Wall_z+64_s0_r0" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 64.000, 0.000, 56.000)
@@ -1903,10 +2270,14 @@ length = 8.000
 
 [node name="Wall_z+64_s0_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 64.000, 0.000, 96.000)
-length = 36.000
+length = 32.000
 
 [node name="Window_z+64_s0" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 64.000, 0.000, 58.000)
+window_scene = ExtResource("4")
+
+[node name="Window_z+64_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 64.000, 0.000, 62.000)
 window_scene = ExtResource("4")
 
 [node name="Wall_z+76_s0_r0" parent="Walls" instance=ExtResource("1")]
@@ -1915,7 +2286,7 @@ length = 4.000
 
 [node name="Wall_z+76_s0_r0_2" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 76.000, 0.000, 24.000)
-length = 8.000
+length = 4.000
 
 [node name="Wall_z+76_s0_r1" parent="Walls" instance=ExtResource("1")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 76.000, 4.000, 24.000)
@@ -1923,6 +2294,9 @@ length = 16.000
 
 [node name="Window_z+76_s0" parent="Walls" instance=ExtResource("2")]
 transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 76.000, 0.000, 14.000)
+
+[node name="Window_z+76_s0_2" parent="Walls" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, 76.000, 0.000, 18.000)
 
 [node name="Secret_undercroft_secret_wall" parent="." groups=["secret_walls", "world_objects"] instance=ExtResource("7")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -12.000, -9.000, -26.000)

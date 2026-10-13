@@ -422,11 +422,12 @@ for a, b, axis, coord, off, storey, _name in secrets:
     units[(axis, coord, off, storey)]["secret"] = True
 
 # Windows: the wall_window module (a window set into the stone) on walls that face the
-# outside or an open-air area, in the ground row of the room's own storey. Kept sparse:
-# every other module, never in a wall's end modules or beside a doorway, and not on walls
-# that carry furniture (bookshelf walls), stairs or a placed object. A classroom's front
-# wall is the exception the other way round: its middle holds the boards, so its windows
-# are the two end modules, flanking them.
+# outside or an open-air area, in the lower row of every storey a room spans (tall halls
+# get a second, high tier). Every module of such a wall can hold one, except its end
+# modules, modules beside a doorway or secret wall, and walls that carry furniture
+# (bookshelf walls), stairs or a placed object. A classroom's front wall is the exception
+# the other way round: its middle holds the boards, so its windows are the two end
+# modules, flanking them. The *_EVERY_OTHER switches thin the rows to every second module.
 WINDOW_KINDS = {"hall", "classroom", "library", "common_room", "dormitory", "room", "tower", "corridor"}
 WINDOW_SCENE = "res://objects/environment/modular/wall_window.tscn"
 # Window type per room kind (WallWindow.window_scene), then per room; anything else gets the
@@ -454,6 +455,10 @@ def placed_wall_points(path):
                 pts.append((x, z, r.storey))
     return pts
 
+WINDOW_EVERY_OTHER = False
+WINDOW_UPPER_EVERY_OTHER = False
+WINDOW_AVOID_DOORS = True
+
 def choose_windows():
     occupied = placed_wall_points(PLACEMENTS)
     n = 0
@@ -466,23 +471,28 @@ def choose_windows():
             front = CLASSROOM_FRONT.get(r.id) == side
             axis, coord, lo, hi = wall_line(r, side)
             offs = list(range(lo, hi, 4))
-            for i, off in enumerate(offs):
-                end = i == 0 or i == len(offs) - 1
-                if (not end) if front else (i % 2 == 0 or end):
-                    continue
-                key = (axis, coord, off, r.storey)
-                u = units[key]
-                outside = all(o == r.id or rooms[o].kind == "outdoor" for o in u["rooms"])
-                if not outside or u["door"] or u["secret"] or u["window"]:
-                    continue
-                if any(units.get((axis, coord, o, r.storey), {}).get(f) for o in (off - 4, off + 4) for f in ("door", "secret")):
-                    continue
-                centre = off + 2
-                if any(st == r.storey and abs((px if axis == "z" else pz) - coord) < 1.0
-                       and abs((pz if axis == "z" else px) - centre) < 1.5 for px, pz, st in occupied):
-                    continue
-                u["window"] = r.id
-                n += 1
+            for storey in r.storeys():
+                upper = storey != r.storey
+                for i, off in enumerate(offs):
+                    end = i == 0 or i == len(offs) - 1
+                    if front and not upper:
+                        if not end:
+                            continue
+                    elif end or (upper and WINDOW_UPPER_EVERY_OTHER and i % 2 == 0) or (not upper and WINDOW_EVERY_OTHER and i % 2 == 0):
+                        continue
+                    key = (axis, coord, off, storey)
+                    u = units[key]
+                    outside = all(o == r.id or rooms[o].kind == "outdoor" for o in u["rooms"])
+                    if not outside or u["door"] or u["secret"] or u["window"]:
+                        continue
+                    if WINDOW_AVOID_DOORS and any(units.get((axis, coord, o, storey), {}).get(f) for o in (off - 4, off + 4) for f in ("door", "secret")):
+                        continue
+                    centre = off + 2
+                    if any(st == storey and abs((px if axis == "z" else pz) - coord) < 1.0
+                           and abs((pz if axis == "z" else px) - centre) < 1.5 for px, pz, st in occupied):
+                        continue
+                    u["window"] = r.id
+                    n += 1
     return n
 
 def run_start(axis, coord, lo, hi, y):
