@@ -123,6 +123,7 @@ secrets = []    # (a, b, axis, coord, off, storey, name)
 stairs = []     # dicts
 edges = []      # (a, b) connectivity for the reachability check
 door_units = set()
+door_rooms = {}  # (axis, coord, off, storey) -> (room a, room b, openings in that doorway)
 
 def shared_edge(A, B):
     """Wall line shared by two rooms: (axis, coord, lo, hi). axis 'z' = wall along Z at x=coord."""
@@ -158,6 +159,7 @@ def door(a, b, at=None, storey=None, count=1):
     assert storey in A.storeys() and storey in B.storeys(), f"door {a}/{b}: storey {storey}"
     for off in _door_offs(lo, hi, at, count):
         doors.append((axis, coord, off, storey))
+        door_rooms[(axis, coord, off, storey)] = (a, b, count)
         # A doorway into a house area (common room, dormitory, house landing) gets a gate.
         if A.house != B.house:
             house_gates.append((axis, coord, off, storey, A.house or B.house, a if A.house else b))
@@ -173,6 +175,7 @@ def door_on(a, side, at, storey=None, count=1, to=None):
         axis, coord, lo, hi = "x", (A.z1 if side == "s" else A.z0), A.x0, A.x1
     for off in _door_offs(lo, hi, at, count):
         doors.append((axis, coord, off, storey))
+        door_rooms[(axis, coord, off, storey)] = (a, to or A.inside, count)
     edges.append((a, to or A.inside))
 
 def secret(a, b, at=None, storey=None, name="secret_wall"):
@@ -976,6 +979,59 @@ def emit_shelves():
         shelf_at(study, "w", z); n += 1
     return n
 
+# Doors: a pair of oak leaves (CastleDoor) in the doorways of rooms people use as rooms
+# (classrooms, offices, dormitories, common rooms, the library). Wide double openings,
+# house gates (HouseDoor) and passages between halls and corridors stay open. Leaves
+# swing into the room; when a placed object stands where a leaf would swing, toward the
+# other side; when both are blocked the doorway stays open. Doors into LOCKED_DOOR_ROOMS
+# start locked: an unlock spell (Unbolt) opens them.
+DOOR_SCENE = "res://objects/environment/doors/castle_door.tscn"
+DOOR_KINDS = ("classroom", "room", "dormitory", "common_room", "library")
+LOCKED_DOOR_ROOMS = {"staff_room", "cellars"}
+DOOR_SWING = 1.85   # a leaf sweeps this far into the room and along the wall from the doorway's centre ± 1.78
+
+def emit_castle_doors():
+    occupied = placed_wall_points(PLACEMENTS)
+    gates = {(ax, c, off, st) for ax, c, off, st, _h, _a in house_gates}
+    n = 0
+    for key, (a, b, count) in sorted(door_rooms.items()):
+        axis, coord, off, storey = key
+        if count > 1 or key in gates:
+            continue
+        A, B = rooms[a], rooms[b]
+        inside = [r for r in (A, B) if r.kind in DOOR_KINDS]
+        if not inside:
+            continue
+        centre = off + 2
+        def swing_clear(r):
+            # Is the strip the leaves sweep on r's side free of placed objects?
+            sign = 1 if (r.z0 == coord if axis == "x" else r.x0 == coord) else -1
+            for px, pz, st in occupied:
+                along, across = (px, pz - coord) if axis == "x" else (pz, px - coord)
+                if st == storey and 0 < across * sign < DOOR_SWING + 0.5 and abs(along - centre) < 2 * DOOR_SWING:
+                    return False
+            return True
+        order = inside + [r for r in (A, B) if r not in inside]
+        side = next((r for r in order if swing_clear(r)), None)
+        if side is None:
+            continue
+        other = B if side is A else A
+        owner = inside[0]
+        y = storey * STOREY
+        pos = (centre, y, coord) if axis == "x" else (coord, y, centre)
+        rot = 0.0 if axis == "x" else math.radians(90)
+        # The leaves open toward the door's +Z side, which must face `side`.
+        toward = (side.z0 == coord) if axis == "x" else (side.x0 == coord)
+        oid = f"{owner.id}/door_{_names['door:' + owner.id] + 1}"
+        _names['door:' + owner.id] += 1
+        props = {"approach_area": f'"{(other if owner is side else side).id}"'}
+        if owner.id in LOCKED_DOOR_ROOMS or other.id in LOCKED_DOOR_ROOMS:
+            props["locked"] = "true"
+        inst(f"Door_{node_name(oid)}", DOOR_SCENE, pos, parent="Doors", rot_y=rot + (0.0 if toward else math.pi),
+             props=oid_props(oid, props), groups=["world_objects"])
+        n += 1
+    return n
+
 def emit_house_gates():
     for axis, coord, off, storey, house, area in house_gates:
         y = storey * STOREY
@@ -1101,6 +1157,7 @@ chandelier_count = emit_chandeliers()
 emit_zones()
 emit_house_gates()
 placed = emit_placements(PLACEMENTS)
+door_count = emit_castle_doors()
 furniture_count = emit_furniture() + emit_shelves() + emit_great_hall()
 enemy_count = placed["crystal_guardian"]
 emit_area_map("nakama/modules/world_areas.lua")
@@ -1176,4 +1233,4 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 header = f'[gd_scene load_steps={len(ext) + 2} format=3 uid="uid://castle0000001"]\n\n'
 open(OUT, "w").write(header + exts + subs + root + "\n".join(nodes) + "\n")
 print("name keys:", " ".join(sorted({r.name_key for r in rooms.values()})))
-print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  windows: {window_count}  chandeliers: {chandelier_count}  furniture: {furniture_count}  enemies: {enemy_count}  nodes: {len(nodes)}")
+print(f"rooms: {len(rooms)}  wall units: {len(units)}  doors: {len(doors)}  secrets: {len(secrets)}  stairs: {len(stairs)}  torches: {torch_count}  windows: {window_count}  castle doors: {door_count}  chandeliers: {chandelier_count}  furniture: {furniture_count}  enemies: {enemy_count}  nodes: {len(nodes)}")

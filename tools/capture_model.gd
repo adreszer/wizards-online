@@ -4,7 +4,8 @@ extends Node
 ## check a new prop's orientation and scale before it is placed in a level.
 ##   godot --path . tools/capture_model.tscn -- --scene=res://path/to/model.glb --out=/absolute/dir [--dist=3.5]
 ## With --eye=x,y,z --target=x,y,z a full scene (.tscn, no extra floor/lights) is
-## rendered once from that viewpoint instead, e.g. to look into a castle room.
+## rendered once from that viewpoint instead, e.g. to look into a castle room;
+## --open-doors swings every CastleDoor in it open first.
 
 const FLOOR := preload("res://objects/environment/modular/floor_tile.tscn")
 
@@ -20,6 +21,7 @@ const VIEWS := [
 var _out: String = "user://captures"
 var _scene: String = ""
 var _dist: float = 3.5
+var _open_doors := false
 var _eye := Vector3.INF
 var _double_sided := false
 var _target := Vector3.INF
@@ -33,6 +35,8 @@ func _ready() -> void:
 			_scene = arg.trim_prefix("--scene=")
 		elif arg.begins_with("--dist="):
 			_dist = float(arg.trim_prefix("--dist="))
+		elif arg == "--open-doors":
+			_open_doors = true
 		elif arg == "--double-sided":
 			_double_sided = true
 		elif arg.begins_with("--eye="):
@@ -60,8 +64,13 @@ func _run() -> void:
 		get_tree().quit(1)
 		return
 	if custom:
-		add_child(packed.instantiate())
+		var scene_root := packed.instantiate()
+		add_child(scene_root)
 		await _frames(30)
+		if _open_doors:
+			for node in scene_root.find_children("*", "Node3D", true, false):
+				if node is CastleDoor:
+					(node as CastleDoor).set_open(true, true)
 		var cam := Camera3D.new()
 		cam.fov = 60.0
 		cam.near = 0.05

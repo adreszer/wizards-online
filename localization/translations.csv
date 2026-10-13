@@ -52,6 +52,10 @@ INTERACT_DEFAULT,Interact,Użyj
 INTERACT_READ,Read,Czytaj
 INTERACT_PULL_LEVER,Pull lever,Pociągnij dźwignię
 INTERACT_PULL_LEVER_BACK,Pull lever back,Cofnij dźwignię
+INTERACT_OPEN_DOOR,Open the door,Otwórz drzwi
+INTERACT_CLOSE_DOOR,Close the door,Zamknij drzwi
+INTERACT_DOOR_LOCKED,Locked door,Zamknięte drzwi
+NOTIFY_DOOR_LOCKED,The door is locked. A spell might open it.,Drzwi są zamknięte na klucz. Może otworzy je zaklęcie.
 INTERACT_STUDY_TOME,Study the tome,Przestudiuj księgę
 NOTIFY_SPELL_LEARNED,Learned %s — it sits on your hotbar (keys 1–0). Aim with the centre of the screen and press Cast (LMB).,Poznajesz czar %s — trafił na pasek czarów (klawisze 1–0). Celuj środkiem ekranu i naciśnij Czar (LPM).
 NOTIFY_SECRET_PASSAGE,A hidden passage opens!,Otwiera się ukryte przejście!

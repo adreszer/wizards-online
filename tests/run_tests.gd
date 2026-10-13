@@ -17,6 +17,8 @@ const TORCH := preload("res://resources/items/torch.tres")
 const INVENTORY_PANEL_SCENE := preload("res://ui/inventory/inventory_panel.tscn")
 const BLOCK_SCENE := preload("res://objects/puzzles/pushable_block.tscn")
 const WALL_TORCH_SCENE := preload("res://objects/environment/props/wall_torch.tscn")
+const CASTLE_DOOR_SCENE := preload("res://objects/environment/doors/castle_door.tscn")
+const UNBOLT := preload("res://resources/spells/unbolt.tres")
 const HUD_SCENE := preload("res://ui/hud/hud.tscn")
 const PROFESSOR_PANEL_SCENE := preload("res://ui/school/professor_panel.tscn")
 const SORTING_PANEL_SCENE := preload("res://ui/school/sorting_panel.tscn")
@@ -1466,7 +1468,38 @@ func _test_world_objects() -> void:
 	t.check(door.is_open, "door: server state opens it instantly")
 	door.apply_world_state(null, true)
 	t.check(not door.is_open, "door: default state closes it")
-	for n: Node in [wall, switch, torch, lever, statue, door]:
+	var castle_door: CastleDoor = CASTLE_DOOR_SCENE.instantiate()
+	add_child(castle_door)
+	await get_tree().process_frame
+	var leaf: Interactable = castle_door.get_node("HingeL/Leaf/Interactable")
+	leaf.interact(self)
+	t.check(castle_door.is_open, "castle door: interacting offline opens it")
+	leaf.interact(self)
+	t.check(not castle_door.is_open, "castle door: interacting again closes it")
+	castle_door.set_open(true, true)
+	t.check(is_equal_approx(castle_door.get_node("HingeL").rotation.y, -deg_to_rad(castle_door.open_angle_degrees))
+			and is_equal_approx(castle_door.get_node("HingeR").rotation.y, deg_to_rad(castle_door.open_angle_degrees)),
+			"castle door: both leaves swing toward +Z")
+	castle_door.set_open(false, true)
+	var locked_door: CastleDoor = CASTLE_DOOR_SCENE.instantiate()
+	locked_door.locked = true
+	add_child(locked_door)
+	await get_tree().process_frame
+	locked_door.get_node("HingeR/Leaf/Interactable").interact(self)
+	t.check(locked_door.is_locked and not locked_door.is_open, "castle door: a locked door refuses the handle")
+	var receiver: SpellReceiver = locked_door.get_node("HingeR/Leaf/SpellReceiver")
+	t.check(not receiver.receive(SpellEffect.create(ARCANE_PULSE, self, "", Vector3.ZERO, Vector3.FORWARD)), "castle door: ignores spells other than unlock")
+	receiver.receive(SpellEffect.create(UNBOLT, self, "", Vector3.ZERO, Vector3.FORWARD))
+	t.check(not locked_door.is_locked and not locked_door.is_open, "castle door: Unbolt unlocks it, still closed")
+	locked_door.get_node("HingeR/Leaf/Interactable").interact(self)
+	t.check(locked_door.is_open, "castle door: unlocked, it opens")
+	locked_door.apply_world_state(null, true)
+	t.check(locked_door.is_locked and not locked_door.is_open, "castle door: default state of a locked door is locked and shut")
+	locked_door.apply_world_state(false, true)
+	t.check(not locked_door.is_locked and not locked_door.is_open, "castle door: server state false = unlocked, closed")
+	locked_door.apply_world_state(true, true)
+	t.check(locked_door.is_open, "castle door: server state true opens it")
+	for n: Node in [wall, switch, torch, lever, statue, door, castle_door, locked_door]:
 		n.queue_free()
 	await get_tree().process_frame
 

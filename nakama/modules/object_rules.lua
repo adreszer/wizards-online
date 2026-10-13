@@ -5,7 +5,8 @@
 -- objects (pushable blocks, pressure plates) stay local to each client.
 --
 -- States: secret_wall "revealed" | nil, magic_switch / lever true | false,
--- wall_torch lit true | false, rotating_statue 0..state_count-1. A missing
+-- wall_torch lit true | false, rotating_statue 0..state_count-1, castle_door
+-- "locked" | false (closed) | true (open). A missing
 -- entry means the object's default, so snapshots only carry changed objects.
 
 local OBJECTS = require("generated.world_objects")
@@ -67,6 +68,18 @@ M.KINDS = {
       local on = current(world, oid, false)
       if on and obj.one_shot then return nil end
       return not on
+    end,
+  },
+  castle_door = {
+    -- Locked doors ignore the handle; an unlock spell (Unbolt) frees them, still closed.
+    interact = function(world, oid, obj)
+      local s = M.state_of(world, oid)
+      if s == "locked" then return nil end
+      return not s
+    end,
+    spell = function(world, oid, obj, effect_type)
+      if effect_type == "unlock" and M.state_of(world, oid) == "locked" then return false end
+      return nil
     end,
   },
   rotating_statue = {
@@ -179,6 +192,7 @@ function M.state_of(world, oid)
   if obj.kind == "wall_torch" then return obj.lit ~= false end
   if obj.kind == "rotating_statue" then return math.floor(obj.initial_state or 0) end
   if obj.kind == "magic_switch" or obj.kind == "lever" then return false end
+  if obj.kind == "castle_door" then return obj.locked and "locked" or false end
   return nil
 end
 
