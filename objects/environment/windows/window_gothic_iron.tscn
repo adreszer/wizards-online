@@ -5,9 +5,11 @@
 
 [node name="WindowGothicIron" type="Node3D"]
 script = ExtResource("1")
-half_width = 0.423
-spring = 1.793
-apex = 2.675
+half_width = 0.484
+spring = 1.745
+apex = 2.578
+inset = 0.03
+glass = true
 
 [node name="Model" parent="." instance=ExtResource("2")]
-transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0.0008, 1.3315, 0.0196)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0.0001, 1.3324, 0.0144)
