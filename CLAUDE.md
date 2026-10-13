@@ -50,6 +50,7 @@ A multiplayer **open-world magical school**: one large castle (plus grounds) tha
 ## Where things are
 
 - `docs/plan.md` — implementation tracker (keep it current).
+- `docs/roadmap.md` — feature roadmap and idea bank (what to build next and why).
 - `docs/architecture.md` — code structure; `docs/development.md` — how to run and test.
 - `README.md` — quick start.
 

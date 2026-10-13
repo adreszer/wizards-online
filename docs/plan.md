@@ -1,6 +1,6 @@
 # Implementation Plan — Arcanum Halls MVP
 
-Authoritative implementation tracker. Updated continuously as work progresses.
+Authoritative implementation tracker. Updated continuously as work progresses. Longer-term direction and the idea bank live in `docs/roadmap.md`.
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` complete
 
