@@ -42,6 +42,8 @@ const RENDER_LAYER_CHARACTER := 1 << 1
 
 ## Mesh catch-up speed after a step is set per step (distance / stall time); this is the floor.
 @export var min_step_catchup_speed: float = 2.0
+## A body jump longer than this in one tick is a teleport (respawn, spawn): drawn without interpolation.
+@export var teleport_distance: float = 2.0
 
 var cast_origin: Node3D
 ## Server-decided role (CharacterProfile.ROLE_*); students by default.
@@ -50,6 +52,13 @@ var house: int = 0
 ## World-space offset applied to the mesh so a one-tick step-up reads as a smooth climb.
 var _visual_offset: Vector3 = Vector3.ZERO
 var _visual_catchup_speed: float = 0.0
+## Body transform at the start of the current physics tick. Physics runs at a fixed
+## 60 Hz while frames render at the display rate, so between ticks the mesh and the
+## camera are drawn at the position interpolated from here to the body's current
+## one; without it the body visibly judders whenever it moves across the screen.
+var _tick_start: Transform3D
+## The mesh's own transform under the body (the interpolation offset is added to it).
+var _visual_base: Transform3D
 ## Off-hand socket the held item (torch…) is parented to.
 var off_hand: Node3D
 
@@ -102,6 +111,8 @@ func _setup_local() -> void:
 	nameplate.visible = false
 	camera_rig.target = self
 	movement.setup(self, player_input)
+	_tick_start = global_transform
+	_visual_base = visual.transform
 	movement.frame_yaw_provider = camera_rig.get_yaw
 	movement.state_changed.connect(animation_controller.set_movement_state)
 	movement.stepped.connect(_on_stepped)
@@ -159,6 +170,8 @@ func _setup_remote() -> void:
 
 func _on_stepped(displacement: Vector3, duration: float) -> void:
 	_visual_offset -= displacement
+	# The step offset already eases the mesh across the jump; don't interpolate it as well.
+	_tick_start.origin += displacement
 	# Constant speed so the mesh walks a straight diagonal onto the tread at walking pace.
 	_visual_catchup_speed = maxf(_visual_offset.length() / maxf(duration, 0.01), min_step_catchup_speed)
 
@@ -166,18 +179,27 @@ func _on_stepped(displacement: Vector3, duration: float) -> void:
 func _process(delta: float) -> void:
 	if not is_local:
 		return
-	if _visual_offset == Vector3.ZERO:
-		return
-	_visual_offset = _visual_offset.move_toward(Vector3.ZERO, _visual_catchup_speed * delta)
+	if _visual_offset != Vector3.ZERO:
+		_visual_offset = _visual_offset.move_toward(Vector3.ZERO, _visual_catchup_speed * delta)
+	var fraction := Engine.get_physics_interpolation_fraction()
+	var lag := Vector3.ZERO
+	var yaw_lag := 0.0
+	if _tick_start.origin.distance_to(global_position) < teleport_distance:
+		lag = _tick_start.origin.lerp(global_position, fraction) - global_position
+		var start_yaw := _tick_start.basis.get_euler().y
+		yaw_lag = angle_difference(rotation.y, lerp_angle(start_yaw, rotation.y, fraction))
+	var offset := _visual_offset + lag
 	# The body yaws with facing, so convert the world offset into its local frame.
-	visual.position = global_basis.inverse() * _visual_offset
-	camera_rig.follow_offset = _visual_offset
+	visual.transform = Transform3D(Basis(Vector3.UP, yaw_lag), global_basis.inverse() * offset) * _visual_base
+	camera_rig.follow_offset = offset
 	nameplate.position = Vector3(0.0, 2.25, 0.0) + visual.position
 
 
 func _physics_process(_delta: float) -> void:
 	if not is_local:
 		return
+	# Runs before the Movement child, so this is where the body starts the tick.
+	_tick_start = global_transform
 	var slot := player_input.consume_spell_slot()
 	if slot >= 0:
 		spell_caster.select_slot(slot)

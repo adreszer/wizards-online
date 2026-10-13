@@ -60,6 +60,7 @@ Player (CharacterBody3D, player.gd — wiring only)
 
 - `is_local` is set by the spawner **before** the node enters the tree. `_setup_local` / `_setup_remote` do the wiring.
 - Movement is camera-relative through a `frame_yaw_provider` callable, so tests and future gamepad/cinematic cameras plug in without touching movement.
+- Render smoothing: physics runs at a fixed 60 Hz but frames render at the display rate, so `Player._process` draws the mesh (and points the camera) at the transform interpolated between the start and end of the current physics tick (`Engine.get_physics_interpolation_fraction()`), on top of the stair-step offset. Without it the body juddered whenever it moved across the screen. Engine-wide physics interpolation stays off because many props move in `_process`.
 - Animation: an `AnimationNodeBlendTree` with a 6-way `AnimationNodeTransition` (idle/walk/run/jump/fall/land, cross-faded) feeding an `AnimationNodeOneShot` for casting filtered to the arm. Gameplay only calls `set_movement_state_name()` and `play_cast()`, so the placeholder animations can be replaced by editing `character_visual.tscn` alone.
 - Remote players share the same scene: their `LocalPlayer` subtree is freed, physics is disabled, and `NetworkSynchronizer` drives the transform and animation state.
 
