@@ -31,9 +31,12 @@ var is_open: bool = false
 var is_locked: bool = false
 var _tween: Tween
 
+## Each hinge is the leaf's own AnimatableBody3D: a physics body only follows
+## changes to its own transform, so rotating a parent would leave the
+## collision shut while the leaf swings.
 @onready var _hinges: Array[Node3D] = [$HingeL, $HingeR]
-@onready var _interactables: Array[Interactable] = [$HingeL/Leaf/Interactable, $HingeR/Leaf/Interactable]
-@onready var _receivers: Array[SpellReceiver] = [$HingeL/Leaf/SpellReceiver, $HingeR/Leaf/SpellReceiver]
+@onready var _interactables: Array[Interactable] = [$HingeL/Interactable, $HingeR/Interactable]
+@onready var _receivers: Array[SpellReceiver] = [$HingeL/SpellReceiver, $HingeR/SpellReceiver]
 @onready var _occluder: OccluderInstance3D = $Occluder
 @onready var _audio: AudioStreamPlayer3D = $Audio
 

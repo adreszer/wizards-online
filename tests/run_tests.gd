@@ -1469,9 +1469,10 @@ func _test_world_objects() -> void:
 	door.apply_world_state(null, true)
 	t.check(not door.is_open, "door: default state closes it")
 	var castle_door: CastleDoor = CASTLE_DOOR_SCENE.instantiate()
+	castle_door.position = Vector3(60, 0, 60)   # clear of the objects above, for the collision checks
 	add_child(castle_door)
 	await get_tree().process_frame
-	var leaf: Interactable = castle_door.get_node("HingeL/Leaf/Interactable")
+	var leaf: Interactable = castle_door.get_node("HingeL/Interactable")
 	leaf.interact(self)
 	t.check(castle_door.is_open, "castle door: interacting offline opens it")
 	leaf.interact(self)
@@ -1480,18 +1481,24 @@ func _test_world_objects() -> void:
 	t.check(is_equal_approx(castle_door.get_node("HingeL").rotation.y, -deg_to_rad(castle_door.open_angle_degrees))
 			and is_equal_approx(castle_door.get_node("HingeR").rotation.y, deg_to_rad(castle_door.open_angle_degrees)),
 			"castle door: both leaves swing toward +Z")
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	t.check(not _capsule_blocked(castle_door.global_position + Vector3(0, 1.0, 0)), "castle door: an open doorway lets a player-sized capsule through")
 	castle_door.set_open(false, true)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	t.check(_capsule_blocked(castle_door.global_position + Vector3(0, 1.0, 0)), "castle door: a closed door blocks the doorway")
 	var locked_door: CastleDoor = CASTLE_DOOR_SCENE.instantiate()
 	locked_door.locked = true
 	add_child(locked_door)
 	await get_tree().process_frame
-	locked_door.get_node("HingeR/Leaf/Interactable").interact(self)
+	locked_door.get_node("HingeR/Interactable").interact(self)
 	t.check(locked_door.is_locked and not locked_door.is_open, "castle door: a locked door refuses the handle")
-	var receiver: SpellReceiver = locked_door.get_node("HingeR/Leaf/SpellReceiver")
+	var receiver: SpellReceiver = locked_door.get_node("HingeR/SpellReceiver")
 	t.check(not receiver.receive(SpellEffect.create(ARCANE_PULSE, self, "", Vector3.ZERO, Vector3.FORWARD)), "castle door: ignores spells other than unlock")
 	receiver.receive(SpellEffect.create(UNBOLT, self, "", Vector3.ZERO, Vector3.FORWARD))
 	t.check(not locked_door.is_locked and not locked_door.is_open, "castle door: Unbolt unlocks it, still closed")
-	locked_door.get_node("HingeR/Leaf/Interactable").interact(self)
+	locked_door.get_node("HingeR/Interactable").interact(self)
 	t.check(locked_door.is_open, "castle door: unlocked, it opens")
 	locked_door.apply_world_state(null, true)
 	t.check(locked_door.is_locked and not locked_door.is_open, "castle door: default state of a locked door is locked and shut")
@@ -1502,6 +1509,18 @@ func _test_world_objects() -> void:
 	for n: Node in [wall, switch, torch, lever, statue, door, castle_door, locked_door]:
 		n.queue_free()
 	await get_tree().process_frame
+
+
+## True when a player-sized capsule at `centre` overlaps world geometry.
+func _capsule_blocked(centre: Vector3) -> bool:
+	var q := PhysicsShapeQueryParameters3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.35
+	capsule.height = 1.8
+	q.shape = capsule
+	q.collision_mask = 1
+	q.transform = Transform3D(Basis(), centre)
+	return not get_viewport().world_3d.direct_space_state.intersect_shape(q).is_empty()
 
 
 ## Server-only mystery content (nakama/content/) refers only to things that
