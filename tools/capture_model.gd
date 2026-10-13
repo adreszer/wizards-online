@@ -5,7 +5,7 @@ extends Node
 ##   godot --path . tools/capture_model.tscn -- --scene=res://path/to/model.glb --out=/absolute/dir [--dist=3.5]
 ## With --eye=x,y,z --target=x,y,z a full scene (.tscn, no extra floor/lights) is
 ## rendered once from that viewpoint instead, e.g. to look into a castle room;
-## --open-doors swings every CastleDoor in it open first.
+## --open-doors swings every CastleDoor and HouseDoor in it open first.
 
 const FLOOR := preload("res://objects/environment/modular/floor_tile.tscn")
 
@@ -71,6 +71,10 @@ func _run() -> void:
 			for node in scene_root.find_children("*", "Node3D", true, false):
 				if node is CastleDoor:
 					(node as CastleDoor).set_open(true, true)
+				elif node is HouseDoor:
+					(node as HouseDoor).open_seconds = 60.0
+					(node as HouseDoor).open()
+			await _frames(90)
 		var cam := Camera3D.new()
 		cam.fov = 60.0
 		cam.near = 0.05

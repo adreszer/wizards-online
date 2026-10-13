@@ -835,7 +835,7 @@ func _test_houses() -> void:
 	await get_tree().process_frame
 	var refusals: Array = []
 	door.refused.connect(func(who: Node) -> void: refusals.append(who))
-	var interactable: Interactable = door.get_node("Panel/Interactable")
+	var interactable: Interactable = door.get_node("HingeL/Interactable")
 	interactable.interact(player)
 	t.check(not door.is_open and refusals.size() == 1 and refusals[0] == player, "an unsorted player is refused at a house door")
 	player.set_profile("student", 3)
@@ -845,8 +845,11 @@ func _test_houses() -> void:
 	t.check(houses_seen == [3, 2] and player.nameplate.text.ends_with(tr("HOUSE_2_NAME")), "house changes fire house_changed and show on the nameplate")
 	interactable.interact(player)
 	t.check(door.is_open and refusals.size() == 2, "a member opens the door")
+	await _wait(door.open_duration + 0.1)
+	t.check(not _capsule_blocked(door.global_position + Vector3(0, 1.0, 0)), "an open house door lets the member walk through")
 	await _wait(door.open_seconds + door.open_duration + 0.3)
 	t.check(not door.is_open, "the door closes again after open_seconds")
+	t.check(_capsule_blocked(door.global_position + Vector3(0, 1.0, 0)), "a closed house door blocks the doorway")
 	door.queue_free()
 
 	# The Choosing Stone opens the ceremony once; the panel sorts offline.

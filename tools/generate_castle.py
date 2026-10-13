@@ -1050,6 +1050,10 @@ def emit_house_gates():
         centre = off + 2
         pos = (centre, y, coord) if axis == "x" else (coord, y, centre)
         rot = 0.0 if axis == "x" else math.radians(90)
+        # The leaves swing toward the door's +Z side: into the house area.
+        H = rooms[area]
+        if not ((H.z0 == coord) if axis == "x" else (H.x0 == coord)):
+            rot += math.pi
         oid = f"{area}/house_door"
         inst(f"HouseDoor_{node_name(oid)}", "res://objects/school/house_door.tscn", pos, parent="Doors", rot_y=rot,
              props=oid_props(oid, {"house": str(house)}), groups=["world_objects"])

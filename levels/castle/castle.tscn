@@ -6429,22 +6429,22 @@ house = 0
 size = Vector3(16.0, 9.0, 24.0)
 
 [node name="HouseDoor_house4_common_house_door" parent="Doors" groups=["world_objects"] instance=ExtResource("16")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 54.000, 0.000, 24.000)
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 54.000, 0.000, 24.000)
 object_id = "house4_common/house_door"
 house = 4
 
 [node name="HouseDoor_tower_ne_1_house_door" parent="Doors" groups=["world_objects"] instance=ExtResource("16")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 30.000, 9.000, -40.000)
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 30.000, 9.000, -40.000)
 object_id = "tower_ne_1/house_door"
 house = 1
 
 [node name="HouseDoor_tower_nw_1_house_door" parent="Doors" groups=["world_objects"] instance=ExtResource("16")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 9.000, -40.000)
+transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -26.000, 9.000, -40.000)
 object_id = "tower_nw_1/house_door"
 house = 2
 
 [node name="HouseDoor_house3_common_house_door" parent="Doors" groups=["world_objects"] instance=ExtResource("16")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -20.000, -9.000, -26.000)
+transform = Transform3D(-0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, -0.000000, -20.000, -9.000, -26.000)
 object_id = "house3_common/house_door"
 house = 3
 
