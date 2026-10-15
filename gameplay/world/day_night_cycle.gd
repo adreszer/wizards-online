@@ -64,7 +64,8 @@ var daylight := 0.0
 
 var _timer := 0.0
 var _phase_known := false
-var _exteriors: Array[CastleExterior] = []
+## CastleExterior and Village nodes: their window glows follow the daylight (set_daylight).
+var _exteriors: Array[Node] = []
 
 
 func _ready() -> void:
@@ -81,8 +82,8 @@ func _ready() -> void:
 	fill_light = level.get_node_or_null("Sun") as DirectionalLight3D
 	if fill_light != null:
 		fill_light.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY   # no second disc in the sky
-	for node in level.find_children("*", "CastleExterior", true, false):
-		_exteriors.append(node as CastleExterior)
+	for type in ["CastleExterior", "Village"]:
+		_exteriors.append_array(level.find_children("*", type, true, false))
 	NetworkManager.school_clock_changed.connect(func(_by: String) -> void: refresh())
 	refresh()
 
@@ -165,7 +166,7 @@ func apply_hours(h: float) -> void:
 	WallWindow.set_daylight(daylight)
 	for exterior in _exteriors:
 		if is_instance_valid(exterior):
-			exterior.set_daylight(daylight)
+			exterior.call("set_daylight", daylight)
 
 
 ## The sun while it is above the horizon, the moon (opposite it) otherwise; each

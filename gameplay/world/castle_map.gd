@@ -20,6 +20,9 @@ const STOREY_HEIGHT := 9.0
 const DISCOVERY_PREFIX := "map:"
 ## Grounds zones wider than this are the whole estate, not a named place.
 const MAX_GROUNDS_LABEL_SIZE := 1000.0
+## Rooms outside the castle (the village's shops, inns, post office, station hall): they
+## stand on the terrain, so they are drawn with the ground floor whatever their height.
+const OUTSIDE_KINDS := ["shop", "inn", "post_office", "station"]
 
 ## {id, key, kind, house, rect: Rect2 (x, z), lo, hi (storeys, inclusive), secret}
 ## sorted largest first, so nested rooms draw over the ones they sit in.
@@ -69,12 +72,15 @@ func build(level: Node) -> void:
 			if z.size.x < MAX_GROUNDS_LABEL_SIZE:
 				grounds.append({"id": str(z.area_id), "key": z.display_key, "rect": rect})
 			continue
-		var lo := roundi((p.y - z.size.y * 0.5) / STOREY_HEIGHT)
-		var hi := lo + maxi(1, roundi(z.size.y / STOREY_HEIGHT)) - 1
+		var outside := OUTSIDE_KINDS.has(z.kind)
+		var lo := 0 if outside else roundi((p.y - z.size.y * 0.5) / STOREY_HEIGHT)
+		var hi := 0 if outside else lo + maxi(1, roundi(z.size.y / STOREY_HEIGHT)) - 1
 		rooms.append({"id": str(z.area_id), "key": z.display_key, "kind": z.kind, "house": z.house,
-			"rect": rect, "lo": lo, "hi": hi, "secret": z.kind == "secret"})
+			"rect": rect, "lo": lo, "hi": hi, "secret": z.kind == "secret", "outside": outside})
 		min_storey = mini(min_storey, lo)
 		max_storey = maxi(max_storey, hi)
+		if outside:
+			continue
 		castle_bounds = rect if not bounds_set else castle_bounds.merge(rect)
 		bounds_set = true
 	rooms.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["rect"].get_area() > b["rect"].get_area())
@@ -138,7 +144,9 @@ func room_at(pos: Vector3) -> Dictionary:
 func room_at_point(point: Vector2, storey: int) -> Dictionary:
 	var best: Dictionary = {}
 	for r in rooms:
-		if storey < r["lo"] or storey > r["hi"] or not is_known(r) or not (r["rect"] as Rect2).has_point(point):
+		# Outside rooms stand on the terrain: whatever storey its height falls in, a step either way counts.
+		var slack := 1 if r.get("outside", false) else 0
+		if storey < r["lo"] - slack or storey > r["hi"] + slack or not is_known(r) or not (r["rect"] as Rect2).has_point(point):
 			continue
 		if best.is_empty() or r["rect"].get_area() < best["rect"].get_area():
 			best = r
@@ -149,8 +157,9 @@ func room_at_point(point: Vector2, storey: int) -> Dictionary:
 ## storey inside the castle, the ground floor outdoors.
 func view_storey_at(pos: Vector3) -> int:
 	var storey := storey_of(pos.y)
-	if not room_at(pos).is_empty():
-		return storey
+	var room := room_at(pos)
+	if not room.is_empty():
+		return 0 if room.get("outside", false) else storey
 	# On the terrain (which rises and falls far from storey heights) show the ground floor.
 	for r in rooms:
 		if (r["rect"] as Rect2).has_point(Vector2(pos.x, pos.z)) and storey >= r["lo"] - 1 and storey <= r["hi"] + 1:

@@ -27769,6 +27769,118 @@ kind = "grounds"
 house = 0
 size = Vector3(260.0, 66.3, 80.0)
 
+[node name="Zone_village_square" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 3.000, 750.000)
+area_id = &"village_square"
+display_key = "AREA_VILLAGE_SQUARE"
+kind = "grounds"
+house = 0
+size = Vector3(48.0, 28.0, 52.0)
+
+[node name="Zone_sweet_shop" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -192.000, -4.300, 732.000)
+area_id = &"sweet_shop"
+display_key = "AREA_VILLAGE_SWEET_SHOP"
+kind = "shop"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_stationer" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -156.000, -4.300, 732.000)
+area_id = &"stationer"
+display_key = "AREA_VILLAGE_STATIONER"
+kind = "shop"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_apothecary" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -112.000, -4.300, 732.000)
+area_id = &"apothecary"
+display_key = "AREA_VILLAGE_APOTHECARY"
+kind = "shop"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_bookshop" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, -4.300, 732.000)
+area_id = &"bookshop"
+display_key = "AREA_VILLAGE_BOOKSHOP"
+kind = "shop"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_instrument_maker" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 80.000, -4.300, 732.000)
+area_id = &"instrument_maker"
+display_key = "AREA_VILLAGE_INSTRUMENT_MAKER"
+kind = "shop"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_joke_shop" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -184.000, -4.300, 768.000)
+area_id = &"joke_shop"
+display_key = "AREA_VILLAGE_JOKE_SHOP"
+kind = "shop"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_tailor" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -148.000, -4.300, 768.000)
+area_id = &"tailor"
+display_key = "AREA_VILLAGE_TAILOR"
+kind = "shop"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_general_store" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 48.000, -4.300, 768.000)
+area_id = &"general_store"
+display_key = "AREA_VILLAGE_GENERAL_STORE"
+kind = "shop"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_broom_workshop" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, -4.300, 768.000)
+area_id = &"broom_workshop"
+display_key = "AREA_VILLAGE_BROOM_WORKSHOP"
+kind = "shop"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_inn" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -14.000, -4.300, 712.000)
+area_id = &"inn"
+display_key = "AREA_VILLAGE_INN"
+kind = "inn"
+house = 0
+size = Vector3(20.0, 4.4, 24.0)
+
+[node name="Zone_post_office" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 16.000, -4.300, 714.000)
+area_id = &"post_office"
+display_key = "AREA_VILLAGE_POST_OFFICE"
+kind = "post_office"
+house = 0
+size = Vector3(16.0, 4.4, 20.0)
+
+[node name="Zone_tea_house" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -16.000, -4.300, 784.000)
+area_id = &"tea_house"
+display_key = "AREA_VILLAGE_TEA_HOUSE"
+kind = "inn"
+house = 0
+size = Vector3(16.0, 4.4, 16.0)
+
+[node name="Zone_station_hall" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -248.000, -4.300, 774.000)
+area_id = &"station_hall"
+display_key = "AREA_STATION_HALL"
+kind = "station"
+house = 0
+size = Vector3(40.0, 4.4, 20.0)
+
 [node name="Zone_landing_stage" parent="Zones" instance=ExtResource("22")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -220.000, -15.550, -62.000)
 area_id = &"landing_stage"
@@ -27826,12 +27938,28 @@ house = 0
 size = Vector3(32.0, 49.2, 124.0)
 
 [node name="Zone_gatehouse" parent="Zones" instance=ExtResource("22")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -2.350, 660.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, -1.350, 660.000)
 area_id = &"gatehouse"
 display_key = "AREA_GATEHOUSE"
 kind = "grounds"
 house = 0
-size = Vector3(56.0, 31.5, 48.0)
+size = Vector3(56.0, 33.5, 48.0)
+
+[node name="Zone_village" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 2.550, 748.000)
+area_id = &"village"
+display_key = "AREA_VILLAGE"
+kind = "grounds"
+house = 0
+size = Vector3(472.0, 28.9, 104.0)
+
+[node name="Zone_station" parent="Zones" instance=ExtResource("22")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -246.000, 15.000, 820.000)
+area_id = &"station"
+display_key = "AREA_STATION"
+kind = "grounds"
+house = 0
+size = Vector3(52.0, 53.2, 152.0)
 
 [node name="HouseDoor_house4_common_house_door" parent="Doors" groups=["world_objects"] instance=ExtResource("23")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 54.000, 0.000, 24.000)

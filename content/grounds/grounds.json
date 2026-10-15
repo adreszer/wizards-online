@@ -47,6 +47,32 @@
   {"id": "viaduct", "kind": "viaduct", "path": "causeway", "zone": [-16, 16, 276, 400]},
   {"id": "gatehouse", "kind": "gatehouse", "at": [0, 660], "size": [30, 12], "zone": [-28, 28, 636, 684]}
  ],
+ "village": {
+  "_doc": "The village beyond the outer gatehouse and its railway station (tools/grounds/village.py). Placeholder names until the owner picks them. Rows of lots along the high street are laid out from the seed on the 4 m grid (listed lots in order, then houses to fill the row); 'pinned' buildings stay where they are. Every shop, the inns, the post office and the station hall can be walked into and is its own area (kinds shop, inn, post_office, station). Shop ids are stable: later shop logic keys off them.",
+  "id": "village",
+  "seed": 7,
+  "height": -7.0,
+  "site": [-280, 192, 698, 800],
+  "zone": [-280, 192, 696, 800],
+  "road": {"x": 0, "from": 644, "to": 744, "width": 8},
+  "street": {"z": 750, "width": 20, "west": -238, "east": 178},
+  "square": {"rect": [-24, 24, 724, 776], "paving": 40, "fountain": [0, 750], "fountain_radius": 3.6},
+  "forecourt": {"rect": [-262, -230, 744, 764], "width": 20, "points": [[-252, 754], [-240, 754]]},
+  "rows": [
+   {"id": "north_west", "side": "n", "front": 740, "from": -216, "to": -28, "lots": ["house", {"id": "sweet_shop", "kind": "shop", "goods": "sweets"}, "house", {"id": "stationer", "kind": "shop", "goods": "paper"}, "house", "house", {"id": "apothecary", "kind": "shop", "goods": "bottles"}]},
+   {"id": "north_east", "side": "n", "front": 740, "from": 28, "to": 176, "lots": [{"id": "bookshop", "kind": "shop", "goods": "books"}, "house", "house", {"id": "instrument_maker", "kind": "shop", "goods": "brass"}]},
+   {"id": "south_west", "side": "s", "front": 760, "from": -224, "to": -28, "lots": ["house", "house", {"id": "joke_shop", "kind": "shop", "goods": "toys"}, "house", {"id": "tailor", "kind": "shop", "goods": "cloth"}]},
+   {"id": "south_east", "side": "s", "front": 760, "from": 28, "to": 176, "lots": ["house", {"id": "general_store", "kind": "shop", "goods": "general"}, "house", {"id": "broom_workshop", "kind": "shop", "goods": "brooms"}]}
+  ],
+  "pinned": [
+   {"id": "inn", "kind": "inn", "rect": [-24, -4, 700, 724], "front": "s", "storeys": 3, "goods": "tavern"},
+   {"id": "post_office", "kind": "post_office", "rect": [8, 24, 704, 724], "front": "s", "goods": "parcels"},
+   {"id": "tea_house", "kind": "inn", "rect": [-24, -8, 776, 792], "front": "n", "goods": "tea"},
+   {"id": "square_house", "kind": "house", "rect": [8, 24, 776, 788], "front": "n"},
+   {"id": "station_hall", "kind": "station", "rect": [-268, -228, 764, 784], "front": "n", "door": -248, "back_door": -245, "name_key": "AREA_STATION_HALL", "goods": "station"}
+  ],
+  "station": {"id": "station", "zone": [-272, -220, 744, 896], "track_x": -236, "bed": -7.6, "buffer_z": 788, "portal_z": 890, "platform": [-252, -238, 784, 870], "yard": [-256, -228, 784, 872], "carriages": 3, "canopy_length": 48, "arrival": [-245, 830, 0]}
+ },
  "paths": [
   {"id": "causeway", "kind": "road", "width": 12, "points": [[0, 98], [0, 276], [0, 400], [0, 640]], "straight": true, "bridges": [[1, 2]]},
   {"id": "lake_road", "kind": "path", "width": 5, "points": [[0, 180], [-120, 190], [-200, 110], [-206, 60]]},

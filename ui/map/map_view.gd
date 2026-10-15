@@ -23,9 +23,14 @@ const KIND_COLORS := {
 	"stair_turret": Color(0.7, 0.66, 0.58),
 	"shaft": Color(0.6, 0.57, 0.52),
 	"secret": Color(0.72, 0.62, 0.78),
+	"shop": Color(0.88, 0.72, 0.42),
+	"inn": Color(0.82, 0.56, 0.42),
+	"post_office": Color(0.6, 0.7, 0.86),
+	"station": Color(0.66, 0.74, 0.6),
 }
 ## Kinds whose names are worth printing first; ordinary rooms get one when they fit.
-const LABEL_PRIORITY := ["hall", "classroom", "library", "common_room", "dormitory", "outdoor", "secret", "tower", "shaft", "bridge"]
+const LABEL_PRIORITY := ["hall", "classroom", "library", "common_room", "dormitory", "outdoor", "secret", "tower", "shaft", "bridge",
+	"station", "inn", "post_office", "shop"]
 
 @export var pixels_per_metre: float = 2.0
 @export var show_room_labels: bool = true

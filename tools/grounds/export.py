@@ -114,8 +114,9 @@ class Scene:
             body += f"{k} = {v}\n"
         self.nodes.append(body)
 
-    def node(self, name, type_, parent=".", pos=None, yaw=0.0, props=None, pitch=0.0):
-        body = f'[node name="{self.uname(name)}" type="{type_}" parent="{parent}"]\n'
+    def node(self, name, type_, parent=".", pos=None, yaw=0.0, props=None, pitch=0.0, groups=None):
+        g = f' groups=[{", ".join(json.dumps(x) for x in groups)}]' if groups else ""
+        body = f'[node name="{self.uname(name)}" type="{type_}" parent="{parent}"{g}]\n'
         if pos is not None:
             body += f"transform = {self.xf(pos, yaw, pitch)}\n"
         for k, v in (props or {}).items():
@@ -155,6 +156,8 @@ def write_scene(g, kit, out_dir=OUT_DIR):
         emit_landmark(sc, g, lm)
     for br in g.bridges:
         emit_bridge(sc, g, br)
+    from . import village
+    village.emit(sc, g, KIT)
     with open(os.path.join(out_dir, "grounds.tscn"), "w") as f:
         f.write(sc.text(root))
 
@@ -165,8 +168,8 @@ def ground(g, x, z):
 
 def emit_landmark(sc, g, lm):
     kind = lm["kind"]
-    if kind in ("covered_bridge", "viaduct"):
-        return   # built from the path's bridge span (emit_bridge)
+    if kind in ("covered_bridge", "viaduct", "village", "station"):
+        return   # built from the path's bridge span (emit_bridge) or by village.py
     x, z = lm["at"]
     yaw = math.radians(lm.get("yaw", 0.0))
     y = ground(g, x, z)
@@ -223,7 +226,11 @@ def emit_landmark(sc, g, lm):
             sc.block(name + "Tower", (x + side * (w / 2 - 4), y + 7, z), (8, 14, d), color=STONE)
             sc.block(name + "Cap", (x + side * (w / 2 - 4), y + 15, z), (9, 2, d + 1), color=ROOF)
         sc.block(name + "Arch", (x, y + 11, z), (w - 16, 6, d), color=STONE)
-        sc.block(name + "Gate", (x, y + 4, z + d / 2 - 1), (w - 16, 8, 0.6), color=(0.3, 0.22, 0.15))
+        # The gate stands open: the road runs on through it to the village.
+        leaf = (w - 16) / 2
+        for side in (-1, 1):
+            sc.block(name + "Gate", (x + side * (leaf - 0.4), y + 4, z + d / 2 + leaf / 2 - 0.2), (0.6, 8, leaf),
+                     color=(0.3, 0.22, 0.15))
 
 
 def emit_bridge(sc, g, br):

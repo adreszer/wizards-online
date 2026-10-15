@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 
 from castle import main
-from grounds import generate, rules, zones
+from grounds import generate, rules, village, zones
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -49,6 +49,39 @@ class GroundsTest(unittest.TestCase):
         cfg["paths"].append({"id": "goat_track", "kind": "path", "width": 3, "points": [[-160, -100], [-140, -100]], "straight": True})
         g = generate.generate(cfg, self.plan)
         self.assertIn("G2", {v.rule for v in rules.validate(g, self.plan)})
+
+    def test_village_lots_are_stable(self):
+        lay = self.cfg["village"]["_layout"]
+        ids = [b["id"] for b in lay["buildings"]]
+        self.assertEqual(len(ids), len(set(ids)))
+        for shop in ("sweet_shop", "stationer", "apothecary", "bookshop", "instrument_maker", "joke_shop", "tailor",
+                     "general_store", "broom_workshop", "inn", "tea_house", "post_office", "station_hall"):
+            self.assertIn(shop, ids)
+        again = main.load_grounds()["village"]["_layout"]["buildings"]
+        self.assertEqual([b["rect"] for b in again], [b["rect"] for b in lay["buildings"]])
+
+    def test_village_rooms_are_areas(self):
+        rooms = {r.id: r for r in self.plan.rooms.values() if r.get("terrain")}
+        for b in self.cfg["village"]["_layout"]["buildings"]:
+            if b["enterable"]:
+                self.assertIn(b["id"], rooms)
+                self.assertEqual(rooms[b["id"]].kind, b["kind"])
+                lo, hi = rooms[b["id"]].get("zone_y")
+                self.assertEqual(lo, b["floor"])   # like the castle: an area starts at its floor
+                self.assertGreater(hi, b["floor"] + 3.0)
+        for need in ("village", "village_square", "station"):
+            self.assertIn(need, rooms)
+
+    def test_a_house_on_the_street_or_facing_nowhere_is_refused(self):
+        cfg = json.loads(json.dumps(self.cfg, default=list))
+        lay = cfg["village"]["_layout"]
+        first = lay["buildings"][0]
+        lay["buildings"].append(dict(first, id="squatter", rect=[-60, -48, 744, 756]))
+        first["front"] = "n" if first["front"] == "s" else "s"
+        g = generate.generate(cfg, self.plan)
+        found = {(r, w) for r, w, _m in village.validate(g)}
+        self.assertIn(("V1", "squatter"), found)
+        self.assertIn(("V2", first["id"]), found)
 
 
 if __name__ == "__main__":

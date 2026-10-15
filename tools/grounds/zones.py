@@ -1,7 +1,7 @@
 """Outdoor areas as terrain rooms of the castle plan.
 
 Every zone in grounds.json and every landmark's zone becomes a Room with kind "grounds"
-and terrain=True: no geometry is built for it, but it gets an AreaZone, an entry in the
+(or the zone's own kind: the village's shops, inns, post office and station hall) and terrain=True: no geometry is built for it, but it gets an AreaZone, an entry in the
 server's area map and a place in the reachability graph (linked to the estate, which
 the forecourt's gates and the lake gate open onto).
 """
@@ -15,9 +15,10 @@ def add_terrain_rooms(plan, cfg):
     plan.terrain_links = []
     for z in specs:
         x0, x1, z0, z1 = z["rect"]
-        plan.room(z["id"], x0, x1, z0, z1, storey=z.get("storey", 0), kind="grounds", ceiling=False, rows=1,
+        extra = {"zone_y": tuple(z["zone_y"])} if z.get("zone_y") else {}
+        plan.room(z["id"], x0, x1, z0, z1, storey=z.get("storey", 0), kind=z.get("kind", "grounds"), ceiling=False, rows=1,
                   pillars=False, torches=False, name_key=z.get("name_key"), terrain=True,
-                  inside=None if z["id"] == "estate" else "estate")
+                  inside=None if z["id"] == "estate" else "estate", **extra)
         if z["id"] != "estate":
             plan.terrain_links.append((z["id"], "estate"))
     return plan
@@ -28,7 +29,7 @@ def set_zone_heights(plan, g):
     point to 24 m above its highest (the estate: everything)."""
     T = g.terrain
     for r in plan.rooms.values():
-        if not r.get("terrain"):
+        if not r.get("terrain") or r.get("zone_y"):
             continue
         x0, x1, z0, z1 = r.rect
         m = (T.X >= x0) & (T.X <= x1) & (T.Z >= z0) & (T.Z <= z1)

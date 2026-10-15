@@ -73,6 +73,7 @@ func _run() -> void:
 	await _test_level_wiring()
 	await _test_castle()
 	await _test_grounds()
+	await _test_village()
 	await _test_map()
 	await _test_setpieces()
 	await _test_day_night()
@@ -1601,6 +1602,107 @@ func _test_grounds() -> void:
 	t.check(player.global_position.distance_to(shore) < 6.0, "deep water carries the player back to the shore (at %s)" % str(player.global_position))
 	castle.queue_free()
 	await get_tree().process_frame
+
+
+func _test_village() -> void:
+	t.section("Village")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var village := castle.get_node_or_null("Grounds/Village") as Village
+	t.check(village != null and village.buildings.size() >= 40, "the village stands beyond the outer gate (%d buildings)" % (village.buildings.size() if village != null else 0))
+	if village == null:
+		castle.queue_free()
+		return
+	var zones := {}
+	for z: AreaZone in castle.get_zones():
+		zones[str(z.area_id)] = z
+	var enterable := village.buildings.filter(func(b: Dictionary) -> bool: return b["enterable"])
+	var missing: Array[String] = []
+	for b: Dictionary in enterable:
+		var z := zones.get(b["id"]) as AreaZone
+		if z == null or z.kind != str(b["kind"]):
+			missing.append(str(b["id"]))
+	t.check(enterable.size() >= 12 and missing.is_empty(), "every shop, inn, the post office and the station hall is its own area (%d, missing %s)" % [enterable.size(), str(missing)])
+	var inside_meshes := village.find_children("Inside_*", "MeshInstance3D", false, false)
+	var outside_meshes := village.find_children("Outside_*", "MeshInstance3D", false, false)
+	var shapes := village.get_node("Collision").get_child_count()
+	t.check(shapes > 300 and outside_meshes.size() > 5 and inside_meshes.size() > 3, "buildings, interiors and the railway are built (%d shapes, %d outside / %d inside meshes)" % [shapes, outside_meshes.size(), inside_meshes.size()])
+	t.check(inside_meshes.all(func(m: MeshInstance3D) -> bool: return m.layers == 1) and outside_meshes.all(func(m: MeshInstance3D) -> bool: return m.layers & (1 << 10) != 0),
+		"interiors stay off the outdoor light's layer, the outside is on it")
+	var glow := village.get("_glow") as StandardMaterial3D
+	village.set_daylight(0.0)
+	var night := glow.albedo_color
+	village.set_daylight(1.0)
+	t.check(night.r > 0.9 and glow.albedo_color.r < 0.5, "window glows follow the daylight")
+	# Walk in from the high street: up the step, through the door, into the shop's area.
+	var terrain: Terrain = castle.get_node("Grounds/Terrain")
+	var shop := village.building("sweet_shop")
+	var street := Village.door_point(shop, 5.0)
+	street.y = terrain.height_at(street.x, street.z)
+	terrain.focus_on(street, true)
+	await _spawn_player(street + Vector3(0, 0.4, 0))
+	var entered: Array = []
+	var on_enter := func(id: StringName, _z: Node) -> void: entered.append(id)
+	GameEvents.area_entered.connect(on_enter)
+	var stuck := await _walk_route([Village.door_point(shop, 1.0), Village.door_point(shop, -4.0)], terrain)
+	GameEvents.area_entered.disconnect(on_enter)
+	t.check(stuck.is_empty() and entered.has(&"sweet_shop"), "a player walks in off the high street into the sweet shop (%s, entered %s)" % [stuck, str(entered)])
+	t.check(absf(player.global_position.y - float(shop["floor"])) < 0.3, "and stands on the shop floor (y %.2f)" % player.global_position.y)
+	var castle_map := CastleMap.new()
+	add_child(castle_map)
+	castle_map.build(castle)
+	t.check(castle_map.room_at(player.global_position).get("id", "") == "sweet_shop" and castle_map.view_storey_at(player.global_position) == 0,
+		"the map finds the shop under the player and shows the ground floor")
+	castle_map.queue_free()
+	# Arrival: from the platform through the station hall onto the forecourt.
+	var marker := castle.get_tree().get_first_node_in_group("station_arrival") as Node3D
+	t.check(marker != null and village.is_ancestor_of(marker), "the station has an arrival marker on its platform")
+	var hall := village.building("station_hall")
+	var back := Vector3(float(hall["back_door"]), float(hall["floor"]), float(hall["rect"][3]))
+	terrain.focus_on(marker.global_position, true)
+	await _spawn_player(marker.global_position + Vector3(0, 0.3, 0))
+	await _wait(0.3)
+	t.check(absf(player.global_position.y - float(hall["floor"])) < 0.3, "a player put on the arrival marker stands on the platform (y %.2f)" % player.global_position.y)
+	entered.clear()
+	GameEvents.area_entered.connect(on_enter)
+	stuck = await _walk_route([back + Vector3(0, 0, 2.0), back + Vector3(0, 0, -2.0), Village.door_point(hall, -2.0), Village.door_point(hall, 4.0)], terrain)
+	GameEvents.area_entered.disconnect(on_enter)
+	t.check(stuck.is_empty() and entered.has(&"station_hall"), "from the platform through the station hall to the forecourt (%s, entered %s)" % [stuck, str(entered)])
+	# /goto takes a playtester there.
+	await _spawn_player(Vector3(0, 0.2, 84))
+	var line := ChatCommands.run("/goto station", player)
+	await _wait(0.3)
+	t.check(player.global_position.distance_to(marker.global_position) < 1.0, "/goto station puts the player on the platform (%s)" % line)
+	ChatCommands.run("/idz wioska", player)
+	await _wait(0.3)
+	var square := zones["village_square"] as AreaZone
+	t.check(absf(player.global_position.x - square.global_position.x) < square.size.x / 2.0 and absf(player.global_position.z - square.global_position.z) < square.size.z / 2.0,
+		"/idz wioska puts the player in the village square")
+	t.check(ChatCommands.run("/goto nowhere_at_all", player).contains("nowhere_at_all"), "/goto names an unknown place back")
+	castle.queue_free()
+	await get_tree().process_frame
+
+
+## Walks the player through the points in order (each within 8 s); "" or where it got stuck.
+func _walk_route(points: Array, terrain: Terrain = null) -> String:
+	for target: Vector3 in points:
+		var ok := false
+		for i in range(int(8.0 * Engine.physics_ticks_per_second)):
+			var to := target - player.global_position
+			to.y = 0
+			if to.length() < 0.8:
+				ok = true
+				break
+			player.movement.set_external_move(to.normalized(), true)
+			if terrain != null and i % 30 == 0:
+				terrain.focus_on(player.global_position, true)
+			await get_tree().physics_frame
+		if not ok:
+			player.movement.set_external_move(Vector3.ZERO)
+			return "stuck at (%.1f, %.1f, %.1f) heading for (%.1f, %.1f)" % [player.global_position.x, player.global_position.y, player.global_position.z, target.x, target.z]
+	player.movement.set_external_move(Vector3.ZERO)
+	return ""
 
 
 func _test_map() -> void:

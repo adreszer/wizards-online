@@ -24,8 +24,9 @@ def load_kit(path=KIT):
 
 
 def load_grounds(path=GROUNDS):
+    from grounds import village
     with open(path) as f:
-        return json.load(f)
+        return village.expand(json.load(f))
 
 
 def plan_from_data(data, grounds_cfg=None, seed=None):
@@ -116,6 +117,8 @@ def main(argv=None):
     kit = load_kit()
     gexport.write_data(g)
     gexport.write_scene(g, kit)
+    from grounds import village
+    village.write(g)
     from . import props
     props.write_all()
     lookup = names_lookup(plan)

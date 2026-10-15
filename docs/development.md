@@ -133,6 +133,8 @@ godot --path . tools/capture_held_item.tscn -- --out=/absolute/output/dir --char
 godot --path . tools/capture_model.tscn -- --scene=res://assets/models/environment/modular/student_desk.glb --out=/absolute/output/dir
 # one view of a whole scene (e.g. look into a castle room)
 godot --path . tools/capture_model.tscn -- --scene=res://levels/castle/castle.tscn --eye=-22,4.5,-3 --target=-36,0.8,0 --out=/absolute/output/dir
+# the village and the station (street, square, shop and inn interiors, platform, portal, aerial) by day and night
+godot --path . tools/capture_village.tscn -- --out=/absolute/output/dir [--hours=12,0]
 ```
 
 Placed gameplay objects (practice tomes, plaques, fragments, checkpoints, guardians, the sorting stone, puzzle pieces) live in `content/placements.json`, keyed by area id; the header of the placement section in `tools/castle/build.py` documents the position modes (`slot: centre`, `at`, `wall`/`along`, `corner`/`inset`, `door`/`along`/`inset`, `beside_lectern`; every position must land inside its room) and `KINDS` lists the scenes. Each entry becomes a node with the stable object id `"<area>/<id>"` (`object_id` on the instance, `world_objects` group); secret walls are `"<hidden room>/secret_wall"`, house gates `"<area>/house_door"`, torches `"<room>/torch_<n>"` (counted per room, so don't build mysteries on them). The generator refuses duplicate ids, unknown areas, kinds or spells. After regenerating, re-run the exporter: `generated/world_objects.lua` (id → kind, areas, position, accepted effect types) is read from the built castle.
@@ -170,6 +172,7 @@ Open the chat (Enter or T; works offline too) and type a command:
 - `/broom` or `/miotla`: a flying broom (B to fly)
 - `/give <item id>` (`/daj`): any item from `ItemRegistry.ITEM_IDS`
 - `/plan` (`/lekcje`, `/timetable`): opens the timetable (online only; offline there is none)
+- `/goto <place>` (`/idz`, `/tp`): jumps to `station` (`stacja`), `village` (`wioska`), `castle` (`zamek`) or any area id (`sweet_shop`, `great_hall`…); offline always, online professors and admins only
 - `/time` (`/czas`): the school time; `/time 14:30`, `/time dawn|day|dusk|night` (`swit|dzien|zmierzch|noc`) moves the clock (online: for everyone, and it stays moved across restarts)
 - `/help` (`/pomoc`): the list
 

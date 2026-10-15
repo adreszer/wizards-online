@@ -142,3 +142,10 @@ def outdoor_zones(g, plan):
     for need in ["estate"] + [lm["id"] for lm in g.cfg["landmarks"]]:
         if need not in ids:
             yield need, "no outdoor area"
+
+
+@rule("V", "the village: lots clear of streets and each other (V1), doors onto a street (V2), floors on the site (V3), railway into a hillside (V4)")
+def village_rules(g, plan):
+    from . import village
+    for rule_id, where, msg in village.validate(g):
+        yield where, f"{rule_id}: {msg}"

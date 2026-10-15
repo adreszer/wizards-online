@@ -6,6 +6,8 @@ extends RefCounted
 ##   /give <item id> (/daj)      give any registered item
 ##   /time [hh[:mm]] (/czas)     show the school time, or move the clock (everyone's, online)
 ##   /plan (/timetable)          open the timetable
+##   /goto <place> (/idz)        jump to the station, the village, the castle gate or any area id
+##                               (offline always; online only professors and admins)
 ##   /help (/pomoc)              list the commands
 ## Offline they act on the local inventory directly. Online the server owns the
 ## inventory: the request goes up as OP_CHEAT and is accepted from admins, or
@@ -16,6 +18,11 @@ const BROOM_ALIASES: Array[String] = ["broom", "miotla", "miotła"]
 const HELP_ALIASES: Array[String] = ["help", "pomoc", "?"]
 const TIME_ALIASES: Array[String] = ["time", "czas", "godzina"]
 const PLAN_ALIASES: Array[String] = ["plan", "timetable", "lekcje"]
+const GOTO_ALIASES: Array[String] = ["goto", "tp", "idz", "idź"]
+## Named places for /goto; anything else is looked up as an area id.
+const PLACE_ALIASES := {"station": "@station", "stacja": "@station", "dworzec": "@station", "pociag": "@station", "pociąg": "@station",
+	"village": "@village", "wioska": "@village", "rynek": "@village",
+	"castle": "@start", "zamek": "@start", "start": "@start", "szkola": "@start", "szkoła": "@start"}
 
 
 static func is_command(text: String) -> bool:
@@ -41,7 +48,56 @@ static func run(text: String, player: Node) -> String:
 		return _t("CHEAT_PLAN_OPENED")
 	if TIME_ALIASES.has(name):
 		return time(parts[1] if parts.size() > 1 else "")
+	if GOTO_ALIASES.has(name):
+		return goto(parts[1] if parts.size() > 1 else "", player)
 	return _t("CHEAT_UNKNOWN") % text
+
+
+## Moves the local player to a named place or the floor of an area (a playtest shortcut:
+## the village and the station are a long walk from the castle).
+static func goto(place: String, player: Node) -> String:
+	if place.is_empty():
+		return _t("CHEAT_GOTO_USAGE")
+	var body := player as Node3D
+	if body == null or not body.is_inside_tree():
+		return _t("CHEAT_NO_PLAYER")
+	if NetworkManager.is_in_world() and not [CharacterProfile.ROLE_PROFESSOR, CharacterProfile.ROLE_ADMIN].has(NetworkManager.get_local_role()):
+		return _t("CHEAT_GOTO_NOT_ALLOWED")
+	var target: Variant = place_position(body, str(PLACE_ALIASES.get(place.to_lower(), place.to_lower())))
+	if target == null:
+		return _t("CHEAT_GOTO_UNKNOWN") % place
+	body.global_position = target
+	if body is CharacterBody3D:
+		(body as CharacterBody3D).velocity = Vector3.ZERO
+	return _t("CHEAT_GOTO_DONE") % place
+
+
+## Where /goto puts you: "@station" / "@village" (markers on the platform and in the
+## square), "@start" (the level's StartPoint) or the floor under an area's centre. null if
+## there is no such place. The terrain's collision around the target is built first.
+static func place_position(body: Node3D, place: String) -> Variant:
+	var tree := body.get_tree()
+	var terrain := tree.root.find_child("Terrain", true, false) as Terrain
+	var markers := {"@station": "station_arrival", "@village": "village_arrival"}
+	if markers.has(place):
+		var marker := tree.get_first_node_in_group(markers[place]) as Node3D
+		if marker != null and terrain != null:
+			terrain.focus_on(marker.global_position, true)
+		return marker.global_position if marker != null else null
+	if place == "@start":
+		var start := tree.root.find_child("StartPoint", true, false) as Node3D
+		return start.global_position + Vector3(0, 0.2, 0) if start != null else null
+	for node in tree.get_nodes_in_group(AreaZone.GROUP):
+		var zone := node as AreaZone
+		if zone == null or str(zone.area_id) != place:
+			continue
+		if terrain != null:
+			terrain.focus_on(zone.global_position, true)
+		var top := zone.global_position + Vector3(0, zone.size.y * 0.5, 0)
+		var bottom := zone.global_position - Vector3(0, zone.size.y * 0.5, 0)
+		var hit := body.get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(top, bottom, 1))
+		return (hit["position"] as Vector3) + Vector3(0, 0.2, 0) if not hit.is_empty() else bottom + Vector3(0, 0.5, 0)
+	return null
 
 
 ## No argument: says the time. Otherwise sets it ("14", "14:30", "day", "night").

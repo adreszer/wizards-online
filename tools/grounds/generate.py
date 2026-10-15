@@ -34,7 +34,8 @@ def generate(cfg, plan):
     g.paths, g.path_dist, g.bridges = build_paths(T, cfg, blocked)
     # Re-flatten pinned areas the carving may have nicked, then the castle plateau stays exact.
     for t in cfg.get("terraces", []):
-        T.flat(t["rect"], t["height"], 2)
+        if not t.get("keep_carving"):
+            T.flat(t["rect"], t["height"], 2)
     for r in rects:
         x0, x1, z0, z1 = r
         inside = (T.X >= x0 - 4) & (T.X <= x1 + 4) & (T.Z >= z0 - 4) & (T.Z <= z1 + 4)

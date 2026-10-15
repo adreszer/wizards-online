@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://grounds000001"]
+[gd_scene load_steps=7 format=3 uid="uid://grounds000001"]
 
 [ext_resource type="Script" path="res://gameplay/world/terrain.gd" id="1"]
 [ext_resource type="PackedScene" path="res://objects/greybox/greybox_block.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://objects/environment/grounds/lantern_post.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://objects/environment/grounds/goal_ring.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://objects/environment/modular/railing.tscn" id="5"]
+[ext_resource type="Script" path="res://gameplay/world/village.gd" id="6"]
 
 [node name="Grounds" type="Node3D"]
 
@@ -380,33 +381,38 @@ size = Vector3(88.000, 4.000, 0.300)
 color = Color(0.230, 0.480, 0.720, 1)
 
 [node name="GatehouseTower" parent="Landmarks" instance=ExtResource("2")]
-transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -11.000, -5.747, 660.000)
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -11.000, -5.669, 660.000)
 size = Vector3(8.000, 14.000, 12.000)
 color = Color(0.620, 0.600, 0.560, 1)
 
 [node name="GatehouseCap" parent="Landmarks" instance=ExtResource("2")]
-transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -11.000, 2.253, 660.000)
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -11.000, 2.331, 660.000)
 size = Vector3(9.000, 2.000, 13.000)
 color = Color(0.320, 0.220, 0.200, 1)
 
 [node name="GatehouseTower_2" parent="Landmarks" instance=ExtResource("2")]
-transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 11.000, -5.747, 660.000)
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 11.000, -5.669, 660.000)
 size = Vector3(8.000, 14.000, 12.000)
 color = Color(0.620, 0.600, 0.560, 1)
 
 [node name="GatehouseCap_2" parent="Landmarks" instance=ExtResource("2")]
-transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 11.000, 2.253, 660.000)
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 11.000, 2.331, 660.000)
 size = Vector3(9.000, 2.000, 13.000)
 color = Color(0.320, 0.220, 0.200, 1)
 
 [node name="GatehouseArch" parent="Landmarks" instance=ExtResource("2")]
-transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 0.000, -1.747, 660.000)
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 0.000, -1.669, 660.000)
 size = Vector3(14.000, 6.000, 12.000)
 color = Color(0.620, 0.600, 0.560, 1)
 
 [node name="GatehouseGate" parent="Landmarks" instance=ExtResource("2")]
-transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 0.000, -8.747, 665.000)
-size = Vector3(14.000, 8.000, 0.600)
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -6.600, -8.669, 669.300)
+size = Vector3(0.600, 8.000, 7.000)
+color = Color(0.300, 0.220, 0.150, 1)
+
+[node name="GatehouseGate_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 6.600, -8.669, 669.300)
+size = Vector3(0.600, 8.000, 7.000)
 color = Color(0.300, 0.220, 0.150, 1)
 
 [node name="ViaductDeck" parent="Landmarks" instance=ExtResource("5")]
@@ -603,4 +609,103 @@ length = 94.000
 rise = -4.580
 height = 0.5
 thickness = 10.600
+
+[node name="Village" type="Node3D" parent="."]
+script = ExtResource("6")
+data_path = "res://levels/grounds/village.json"
+
+[node name="Lanterns" type="Node3D" parent="Village"]
+
+[node name="Lantern" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -230.000, -7.000, 742.500)
+
+[node name="Lantern_2" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -208.000, -7.000, 757.500)
+
+[node name="Lantern_3" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -186.000, -7.000, 742.500)
+
+[node name="Lantern_4" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -164.000, -7.000, 757.500)
+
+[node name="Lantern_5" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -142.000, -7.000, 742.500)
+
+[node name="Lantern_6" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -120.000, -7.000, 757.500)
+
+[node name="Lantern_7" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -98.000, -7.000, 742.500)
+
+[node name="Lantern_8" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -76.000, -7.000, 757.500)
+
+[node name="Lantern_9" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -54.000, -7.000, 742.500)
+
+[node name="Lantern_10" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -32.000, -7.000, 757.500)
+
+[node name="Lantern_11" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 34.000, -7.000, 742.500)
+
+[node name="Lantern_12" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 56.000, -7.000, 757.500)
+
+[node name="Lantern_13" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 78.000, -7.000, 742.500)
+
+[node name="Lantern_14" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 100.000, -7.000, 757.500)
+
+[node name="Lantern_15" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 122.000, -7.000, 742.500)
+
+[node name="Lantern_16" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 144.000, -7.000, 757.500)
+
+[node name="Lantern_17" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 166.000, -7.000, 742.500)
+
+[node name="Lantern_18" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -22.000, -7.000, 726.000)
+
+[node name="Lantern_19" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -22.000, -7.000, 774.000)
+
+[node name="Lantern_20" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 22.000, -7.000, 726.000)
+
+[node name="Lantern_21" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 22.000, -7.000, 774.000)
+
+[node name="Lantern_22" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 5.200, -12.686, 660.000)
+
+[node name="Lantern_23" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 5.200, -9.010, 688.000)
+
+[node name="Lantern_24" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -260.500, -7.000, 762.500)
+
+[node name="Lantern_25" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -231.500, -7.000, 762.500)
+
+[node name="Lantern_26" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -251.000, -6.500, 794.000)
+
+[node name="Lantern_27" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -251.000, -6.500, 812.000)
+
+[node name="Lantern_28" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -251.000, -6.500, 830.000)
+
+[node name="Lantern_29" parent="Village/Lanterns" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -251.000, -6.500, 848.000)
+
+[node name="StationArrival" type="Marker3D" parent="Village" groups=["station_arrival"]]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -245.000, -6.400, 830.000)
+
+[node name="VillageArrival" type="Marker3D" parent="Village" groups=["village_arrival"]]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 0.000, -6.900, 762.000)
 
