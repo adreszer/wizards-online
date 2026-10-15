@@ -1971,6 +1971,27 @@ func _test_day_night() -> void:
 		cycle.time_override = 6.75
 		cycle.refresh()
 		t.check(cycle.sky_light.light_energy > e1 and cycle.sky_light.light_color.r > cycle.sky_light.light_color.b, "the low morning sun is warm and rising")
+
+	# Music follows the time of day.
+	t.check(MusicDirector.track_for(SchoolClock.Phase.DAWN) == &"day" and MusicDirector.track_for(SchoolClock.Phase.DAY) == &"day"
+		and MusicDirector.track_for(SchoolClock.Phase.DUSK) == &"night" and MusicDirector.track_for(SchoolClock.Phase.NIGHT) == &"night",
+		"day music from dawn, night music from dusk")
+	t.check(AudioServer.get_bus_index(&"Music") > 0, "there is a Music bus")
+	var music := castle.get_node_or_null("MusicDirector") as MusicDirector
+	t.check(music != null and music.cycle == cycle, "the castle plays music from its day/night cycle")
+	if music != null and cycle != null:
+		for track: StringName in MusicDirector.TRACKS:
+			var stream := MusicDirector.TRACKS[track] as AudioStream
+			t.check(stream != null and stream.get_length() > MusicDirector.LOOP_FADE * 4.0, "%s music is long enough to loop (%.0f s)" % [track, stream.get_length()])
+		cycle.time_override = 12.0
+		cycle.refresh()
+		music.update()
+		t.check(music.current == &"day", "noon plays the day music")
+		cycle.time_override = 23.0
+		cycle.refresh()
+		music.update()
+		var playing := music.find_children("*", "AudioStreamPlayer", false, false).filter(func(p: Node) -> bool: return (p as AudioStreamPlayer).playing)
+		t.check(music.current == &"night" and playing.size() == 2, "night switches to the night music, crossfading from the day track")
 	castle.queue_free()
 	await get_tree().process_frame
 

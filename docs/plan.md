@@ -349,6 +349,15 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [ ] Spending: shops in the village (`Economy.spend`, stock, prices, purchases into the inventory), cosmetics and decoration only
 - [ ] More ways to earn: homework graded by professors, events, house-cup bonuses; a professor tool to reward a student in a lesson
 
+### Milestone 38 — Audio (list: docs/audio-list.md)
+- [x] The full sound and music list with generation prompts, sources (generate vs library), takes and a credit budget: `docs/audio-list.md`; music style set by the owner (magical symphony orchestra, celesta lead)
+- [x] `Music` audio bus (`default_bus_layout.tres`)
+- [x] `MusicDirector` (added by `castle.gd`, reads the `DayNightCycle` phase): day track from dawn, night track from dusk, 8 s crossfade on a phase change, each track loops by crossfading its last 6 s into its start, 3 s fade-in at level start
+- [x] First two tracks: `music_castle_day`, `music_castle_night` (ElevenLabs Music, loudness-matched to −18 LUFS; originals in `assets/audio/music/source/`, ignored by Godot); provenance in `assets/audio/SOURCES.csv`
+- [x] Tests: track per phase, Music bus, castle wiring, tracks long enough to loop, day → night switch crossfades
+- [ ] Music volume slider in settings; area-specific music (grounds, lessons, feast, duel) and stingers
+- [ ] Sound effects, ambiences per area, footsteps per surface, reverb per area (the rest of the list)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
