@@ -201,7 +201,7 @@ debug_overlay={
 [internationalization]
 
 locale/fallback="pl"
-locale/translations=PackedStringArray("res://localization/translations.en.translation", "res://localization/translations.pl.translation")
+locale/translations=PackedStringArray("res://localization/translations.en.translation", "res://localization/translations.pl.translation", "res://localization/castle_generated.en.translation", "res://localization/castle_generated.pl.translation")
 
 [layer_names]
 

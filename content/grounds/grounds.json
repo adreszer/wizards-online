@@ -53,7 +53,7 @@
   {"id": "first_year_path", "kind": "path", "width": 4, "points": [[-212, -62], [-192, -200], [-108, -60]], "straight": true},
   {"id": "pitch_road", "kind": "road", "width": 7, "points": [[0, 230], [180, 150], [286, 46], [380, 46], [440, 80]], "bridges": [[2, 3]]},
   {"id": "circle_path", "kind": "path", "width": 4, "points": [[390, 46], [420, -150], [430, -400]]},
-  {"id": "cottage_path", "kind": "path", "width": 4, "points": [[68, 72], [150, 60], [185, -120], [173, -312]]}
+  {"id": "cottage_path", "kind": "path", "width": 4, "points": [[68, 72], [104, 104], [236, 100], [252, -120], [173, -312]]}
  ],
  "zones": [
   {"id": "estate", "rect": [-1024, 1024, -1024, 1024], "name_key": "AREA_ESTATE"},

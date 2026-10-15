@@ -578,6 +578,11 @@ def structure(plan):
     for r in plan.rooms.values():
         if r.storey <= 0 or r.inside is not None:
             continue
+        if r.get("support") == "bridge":
+            ends = [n for n in plan.rooms.values() if n.id != r.id and not n.get("terrain") and n.storey <= r.storey <= n.top_storey and _touches(n, r)]
+            if len(ends) < 2 or min(r.width, r.depth) > 12:
+                yield r.id, "a bridge spans at most 12 m wide between two rooms on its storey"
+            continue
         if r.get("support") == "corbel":
             if min(r.width, r.depth) > 8:
                 yield r.id, "a corbelled room reaches out at most 8 m"
@@ -614,3 +619,17 @@ def waiver_shape(plan):
     for w in plan.waivers:
         if not all(w.get(k) for k in ("rule", "where", "until", "why")):
             yield str(w), "incomplete waiver"
+
+
+@rule("C12", "doorways never open onto a stair hole")
+def doors_clear_of_holes(plan):
+    holes = [(h, r.storey) for r in plan.rooms.values() for h in r.holes]
+    for (axis, coord, off, s), (a, b, _n) in plan.door_rooms.items():
+        for sign in (-1, 1):
+            if axis == "x":
+                thr = (off, off + 4, min(coord, coord + sign * 1.6), max(coord, coord + sign * 1.6))
+            else:
+                thr = (min(coord, coord + sign * 1.6), max(coord, coord + sign * 1.6), off, off + 4)
+            for h, hs in holes:
+                if hs == s and _rect_overlap(thr, h):
+                    yield f"{a}/{b}", f"doorway on storey {s} opens onto the stair hole {_fmt(h)}"

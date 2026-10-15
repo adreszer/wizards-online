@@ -1076,7 +1076,7 @@ func _test_castle() -> void:
 			ranged += 1
 	t.check(ranged > 100, "interior detail fades out at the far-view range (%d meshes)" % ranged)
 	var batch: StaticBatch = castle.get_node("StaticBatch")
-	t.check(batch.instance_count > 3000 and castle.get_node("Walls").find_children("*", "StaticBody3D", true, false).size() < 400,
+	t.check(batch.instance_count > 3000 and castle.get_node("Walls").find_children("*", "StaticBody3D", true, false).size() < batch.instance_count / 8,
 		"static modules are batched (%d modules in %d nodes)" % [batch.instance_count, batch.get_child_count()])
 	t.check(get_tree().get_nodes_in_group("secret_walls").size() >= 3, "castle has secret passages")
 	# Stable object ids: unique "<area>/<name>", the area exists, and every placement is in the scene.

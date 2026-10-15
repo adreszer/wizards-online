@@ -101,7 +101,9 @@ def scatter_clearance(g, plan):
             yield kind, f"{bad} instances closer than {c_path} m to a path"
         for r in g.castle_rects:
             x0, x1, z0, z1 = r
-            m = (arr[:, 0] > x0 - c_castle + 1) & (arr[:, 0] < x1 + c_castle - 1) & (arr[:, 2] > z0 - c_castle + 1) & (arr[:, 2] < z1 + c_castle - 1)
+            dx = np.maximum(np.maximum(x0 - arr[:, 0], arr[:, 0] - x1), 0)
+            dz = np.maximum(np.maximum(z0 - arr[:, 2], arr[:, 2] - z1), 0)
+            m = np.hypot(dx, dz) < c_castle - 1.0
             if m.any():
                 yield kind, f"{int(m.sum())} instances within {c_castle} m of the castle"
                 break

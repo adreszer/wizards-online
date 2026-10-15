@@ -28,17 +28,41 @@ def load_grounds(path=GROUNDS):
         return json.load(f)
 
 
-def plan_from_data(data, grounds_cfg=None):
+def plan_from_data(data, grounds_cfg=None, seed=None):
     from grounds import zones
+    from . import layout
     plan = program.from_data(data)
+    plan.generated_names = []
+    if data.get("layout"):
+        spec = data["layout"]
+        lay = layout.generate(plan, spec, spec.get("seed", 0) if seed is None else seed)
+        plan.generated_names = lay.generated
     zones.add_terrain_rooms(plan, grounds_cfg or load_grounds())
     return circulation.derive(plan)
 
 
-def make_plan(path=PROGRAM, grounds_path=GROUNDS):
+def make_plan(path=PROGRAM, grounds_path=GROUNDS, seed=None):
     with open(path) as f:
         data = json.load(f)
-    return plan_from_data(data, load_grounds(grounds_path))
+    return plan_from_data(data, load_grounds(grounds_path), seed)
+
+
+def search(path, grounds_path, first, count):
+    """Try layout seeds first..first+count-1; print which pass every castle rule."""
+    from .layout import LayoutError
+    ok = []
+    for seed in range(first, first + count):
+        try:
+            plan = make_plan(path, grounds_path, seed)
+        except (LayoutError, PlanError) as e:
+            print(f"seed {seed}: layout failed ({e})")
+            continue
+        v = rules.validate(plan)
+        rooms = sum(1 for r in plan.rooms.values() if not r.get("terrain"))
+        print(f"seed {seed}: {len(v)} violation(s), {rooms} rooms" + (f"  first: {v[0]}" if v else ""))
+        if not v:
+            ok.append(seed)
+    print("passing seeds:", ok)
 
 
 def main(argv=None):
@@ -48,10 +72,16 @@ def main(argv=None):
     ap.add_argument("--grounds", default=GROUNDS)
     ap.add_argument("--check", action="store_true", help="validate only")
     ap.add_argument("--preview", action="store_true", help="write SVG previews")
+    ap.add_argument("--seed", type=int, help="layout seed (default: the program's)")
+    ap.add_argument("--search", type=int, metavar="N", help="try N layout seeds from --seed and list the ones that pass")
     args = ap.parse_args(argv)
+    if args.search:
+        search(args.program, args.grounds, args.seed or 0, args.search)
+        return
+    from .layout import LayoutError
     try:
-        plan = make_plan(args.program, args.grounds)
-    except PlanError as e:
+        plan = make_plan(args.program, args.grounds, args.seed)
+    except (PlanError, LayoutError) as e:
         sys.exit(f"program error: {e}")
     cfg = load_grounds(args.grounds)
     violations = rules.validate(plan)
@@ -83,6 +113,8 @@ def main(argv=None):
     from . import exterior
     shell = exterior.write(exterior.generate(plan, build.units, g.terrain))
     export.area_map(plan, AREA_MAP)
+    from . import layout
+    layout.write_names(plan.generated_names)
     print("name keys:", " ".join(sorted({r.name_key for r in plan.rooms.values()})))
     print("  ".join(f"{k.replace('_', ' ')}: {v}" for k, v in stats.items()))
     print("exterior:", "  ".join(f"{k}: {v}" for k, v in shell.items()))

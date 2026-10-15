@@ -14,7 +14,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 HASHES = os.path.join(HERE, "denylist.sha256")
-SCANNED = ["content", "localization/translations.csv", "levels/castle", "nakama/content", "resources"]
+SCANNED = ["content", "localization", "levels/castle", "nakama/content", "resources"]
 TEXT_EXT = (".json", ".csv", ".tscn", ".tres", ".lua", ".md", ".txt")
 
 

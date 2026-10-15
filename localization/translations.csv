@@ -130,6 +130,11 @@ AREA_SONG_ROOM,Song Room,Sala Pieśni
 AREA_RECORDS_ROOM,Records Room,Archiwum
 AREA_GALLERY,Long Gallery,Długa Galeria
 AREA_ROOST,Messenger Roost,Gołębnik Posłańców
+AREA_CORRIDOR_W_2,"West Corridor, second floor","Korytarz Zachodni, drugie piętro"
+AREA_STUDY_HALL,Study Hall,Sala Nauki
+AREA_TROPHY_ROOM,Trophy Room,Sala Trofeów
+AREA_HEAD_STUDY,Head's Study,Gabinet Dyrektora
+AREA_MAP_ROOM,Map Room,Sala Map
 AREA_TOWER_NE_0,Northeast Tower,Wieża Północno-Wschodnia
 AREA_TOWER_NE_1,Drakoryn Landing,Podest Drakorynu
 AREA_TOWER_NE_2,Drakoryn Common Room,Pokój wspólny Drakorynu

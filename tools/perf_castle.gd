@@ -22,6 +22,7 @@ var out_path := ""
 
 
 func _ready() -> void:
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)   # measure frames, not the display
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--copies="):
 			copies = int(arg.trim_prefix("--copies="))

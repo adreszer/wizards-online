@@ -63,9 +63,10 @@ func _update(force: bool) -> void:
 			n += 1
 		if force or want != _active[key]:
 			_active[key] = want
-			for node: Node in _cells[key]:
+			for node in _cells[key]:
+				# Picked-up collectibles and spent objects are freed: skip them.
 				if is_instance_valid(node):
-					node.process_mode = Node.PROCESS_MODE_INHERIT if want else Node.PROCESS_MODE_DISABLED
+					(node as Node).process_mode = Node.PROCESS_MODE_INHERIT if want else Node.PROCESS_MODE_DISABLED
 	cells_active = n
 
 

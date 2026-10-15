@@ -1,0 +1,172 @@
+keys,en,pl
+AREA_ARCHIVE_WING_C0,"Archive Wing, ground floor corridor","Skrzydło Archiwum, korytarz (parter)"
+AREA_ARCHIVE_WING_C1,"Archive Wing, first floor corridor","Skrzydło Archiwum, korytarz (pierwsze piętro)"
+AREA_ARCHIVE_WING_C2,"Archive Wing, second floor corridor","Skrzydło Archiwum, korytarz (drugie piętro)"
+AREA_ARCHIVE_WING_R1,Archive Room,Sala Archiwalna
+AREA_ARCHIVE_WING_R10,Map Store II,Magazyn Map II
+AREA_ARCHIVE_WING_R11,Archive Room III,Sala Archiwalna III
+AREA_ARCHIVE_WING_R12,Reading Alcove III,Wnęka Czytelnicza III
+AREA_ARCHIVE_WING_R13,Catalogue Room III,Pokój Katalogowy III
+AREA_ARCHIVE_WING_R14,Scroll Room III,Sala Zwojów III
+AREA_ARCHIVE_WING_R15,Map Store III,Magazyn Map III
+AREA_ARCHIVE_WING_R16,Archive Room IV,Sala Archiwalna IV
+AREA_ARCHIVE_WING_R17,Reading Alcove IV,Wnęka Czytelnicza IV
+AREA_ARCHIVE_WING_R18,Catalogue Room IV,Pokój Katalogowy IV
+AREA_ARCHIVE_WING_R19,Scroll Room IV,Sala Zwojów IV
+AREA_ARCHIVE_WING_R2,Reading Alcove,Wnęka Czytelnicza
+AREA_ARCHIVE_WING_R3,Catalogue Room,Pokój Katalogowy
+AREA_ARCHIVE_WING_R4,Scroll Room,Sala Zwojów
+AREA_ARCHIVE_WING_R5,Map Store,Magazyn Map
+AREA_ARCHIVE_WING_R6,Archive Room II,Sala Archiwalna II
+AREA_ARCHIVE_WING_R7,Reading Alcove II,Wnęka Czytelnicza II
+AREA_ARCHIVE_WING_R8,Catalogue Room II,Pokój Katalogowy II
+AREA_ARCHIVE_WING_R9,Scroll Room II,Sala Zwojów II
+AREA_ARCHIVE_WING_STAIR_A,"Archive Wing, stair turret","Skrzydło Archiwum, wieżyczka schodowa"
+AREA_BATHING_HALL,Bathing Hall,Łaźnia
+AREA_BINDERY,Bindery,Introligatornia
+AREA_CLOCK_TOWER_0,Clock Tower Hall,Sień Wieży Zegarowej
+AREA_CLOCK_TOWER_1,"Clock Tower, first floor","Wieża Zegarowa, pierwsze piętro"
+AREA_CLOCK_TOWER_2,"Clock Tower, second floor","Wieża Zegarowa, drugie piętro"
+AREA_CLOCK_TOWER_3,"Clock Tower, third floor","Wieża Zegarowa, trzecie piętro"
+AREA_CLOCK_TOWER_4,"Clock Tower, fourth floor","Wieża Zegarowa, czwarte piętro"
+AREA_CLOCK_TOWER_5,Clockwork Loft,Strych Zegarowy
+AREA_CLOCK_TOWER_STAIR,"Clock Tower, stair turret","Wieża Zegarowa, wieżyczka schodowa"
+AREA_CLOISTER_GARTH,Cloister Garth,Wirydarz
+AREA_COLD_STORE,Cold Store,Chłodnia
+AREA_DAWN_TOWER_0,"Dawn Tower, ground floor","Wieża Świtu, parter"
+AREA_DAWN_TOWER_1,"Dawn Tower, first floor","Wieża Świtu, pierwsze piętro"
+AREA_DAWN_TOWER_2,"Dawn Tower, second floor","Wieża Świtu, drugie piętro"
+AREA_DAWN_TOWER_3,"Dawn Tower, third floor","Wieża Świtu, trzecie piętro"
+AREA_DAWN_TOWER_4,Dawn Tower Lookout,Punkt Widokowy Wieży Świtu
+AREA_DAWN_TOWER_STAIR,"Dawn Tower, stair turret","Wieża Świtu, wieżyczka schodowa"
+AREA_DUELLING_HALL,Duelling Hall,Sala Pojedynków
+AREA_DUSK_TOWER_0,"Dusk Tower, ground floor","Wieża Zmierzchu, parter"
+AREA_DUSK_TOWER_1,"Dusk Tower, first floor","Wieża Zmierzchu, pierwsze piętro"
+AREA_DUSK_TOWER_2,"Dusk Tower, second floor","Wieża Zmierzchu, drugie piętro"
+AREA_DUSK_TOWER_3,"Dusk Tower, third floor","Wieża Zmierzchu, trzecie piętro"
+AREA_DUSK_TOWER_4,Dusk Tower Lookout,Punkt Widokowy Wieży Zmierzchu
+AREA_DUSK_TOWER_STAIR,"Dusk Tower, stair turret","Wieża Zmierzchu, wieżyczka schodowa"
+AREA_EAST_WING_C0,"East Wing, ground floor corridor","Skrzydło Wschodnie, korytarz (parter)"
+AREA_EAST_WING_C1,"East Wing, first floor corridor","Skrzydło Wschodnie, korytarz (pierwsze piętro)"
+AREA_EAST_WING_C2,"East Wing, second floor corridor","Skrzydło Wschodnie, korytarz (drugie piętro)"
+AREA_EAST_WING_C3,"East Wing, third floor corridor","Skrzydło Wschodnie, korytarz (trzecie piętro)"
+AREA_EAST_WING_C4,"East Wing, fourth floor corridor","Skrzydło Wschodnie, korytarz (czwarte piętro)"
+AREA_EAST_WING_CM1,"East Wing, cellar level corridor","Skrzydło Wschodnie, korytarz (poziom piwnic)"
+AREA_EAST_WING_R1,Tutoring Room,Sala Korepetycji
+AREA_EAST_WING_R10,Office II,Gabinet II
+AREA_EAST_WING_R11,Supply Room II,Magazyn Przyborów II
+AREA_EAST_WING_R12,Robing Room II,Szatnia Profesorska II
+AREA_EAST_WING_R13,Spare Classroom II,Wolna Klasa II
+AREA_EAST_WING_R14,Mail Room II,Pokój Pocztowy II
+AREA_EAST_WING_R15,Records Office II,Kancelaria II
+AREA_EAST_WING_R16,Waiting Room II,Poczekalnia II
+AREA_EAST_WING_R17,Tutoring Room III,Sala Korepetycji III
+AREA_EAST_WING_R18,Office III,Gabinet III
+AREA_EAST_WING_R19,Supply Room III,Magazyn Przyborów III
+AREA_EAST_WING_R2,Office,Gabinet
+AREA_EAST_WING_R20,Robing Room III,Szatnia Profesorska III
+AREA_EAST_WING_R21,Spare Classroom III,Wolna Klasa III
+AREA_EAST_WING_R22,Mail Room III,Pokój Pocztowy III
+AREA_EAST_WING_R23,Records Office III,Kancelaria III
+AREA_EAST_WING_R24,Waiting Room III,Poczekalnia III
+AREA_EAST_WING_R25,Tutoring Room IV,Sala Korepetycji IV
+AREA_EAST_WING_R26,Office IV,Gabinet IV
+AREA_EAST_WING_R27,Supply Room IV,Magazyn Przyborów IV
+AREA_EAST_WING_R28,Robing Room IV,Szatnia Profesorska IV
+AREA_EAST_WING_R3,Supply Room,Magazyn Przyborów
+AREA_EAST_WING_R4,Robing Room,Szatnia Profesorska
+AREA_EAST_WING_R5,Spare Classroom,Wolna Klasa
+AREA_EAST_WING_R6,Mail Room,Pokój Pocztowy
+AREA_EAST_WING_R7,Records Office,Kancelaria
+AREA_EAST_WING_R8,Waiting Room,Poczekalnia
+AREA_EAST_WING_R9,Tutoring Room II,Sala Korepetycji II
+AREA_EAST_WING_STAIR_A,"East Wing, stair turret","Skrzydło Wschodnie, wieżyczka schodowa"
+AREA_FACULTY_LOUNGE,Faculty Lounge,Pokój Profesorski
+AREA_GLOBE_ROOM,Globe Room,Sala Globusów
+AREA_GREAT_ARCHIVE,Great Archive,Wielkie Archiwum
+AREA_NORTH_WING_C0,"North Wing, ground floor corridor","Skrzydło Północne, korytarz (parter)"
+AREA_NORTH_WING_C1,"North Wing, first floor corridor","Skrzydło Północne, korytarz (pierwsze piętro)"
+AREA_NORTH_WING_C2,"North Wing, second floor corridor","Skrzydło Północne, korytarz (drugie piętro)"
+AREA_NORTH_WING_C3,"North Wing, third floor corridor","Skrzydło Północne, korytarz (trzecie piętro)"
+AREA_NORTH_WING_CM1,"North Wing, cellar level corridor","Skrzydło Północne, korytarz (poziom piwnic)"
+AREA_NORTH_WING_R1,Guest Chamber,Komnata Gościnna
+AREA_NORTH_WING_R10,Ink Store,Magazyn Atramentu
+AREA_NORTH_WING_R11,Box Room,Graciarnia
+AREA_NORTH_WING_R12,Practice Room,Sala Ćwiczeń
+AREA_NORTH_WING_R13,Guest Chamber II,Komnata Gościnna II
+AREA_NORTH_WING_R14,Seminar Room II,Sala Seminaryjna II
+AREA_NORTH_WING_R15,Old Classroom II,Stara Klasa II
+AREA_NORTH_WING_R16,Copying Room II,Pracownia Kopistów II
+AREA_NORTH_WING_R17,Study Room II,Pokój Nauki II
+AREA_NORTH_WING_R18,Storeroom II,Składzik II
+AREA_NORTH_WING_R19,Quiet Room II,Pokój Ciszy II
+AREA_NORTH_WING_R2,Seminar Room,Sala Seminaryjna
+AREA_NORTH_WING_R20,Lost Property II,Biuro Rzeczy Znalezionych II
+AREA_NORTH_WING_R21,Linen Store II,Bieliźniarnia II
+AREA_NORTH_WING_R22,Ink Store II,Magazyn Atramentu II
+AREA_NORTH_WING_R23,Box Room II,Graciarnia II
+AREA_NORTH_WING_R24,Practice Room II,Sala Ćwiczeń II
+AREA_NORTH_WING_R25,Guest Chamber III,Komnata Gościnna III
+AREA_NORTH_WING_R26,Seminar Room III,Sala Seminaryjna III
+AREA_NORTH_WING_R27,Old Classroom III,Stara Klasa III
+AREA_NORTH_WING_R28,Copying Room III,Pracownia Kopistów III
+AREA_NORTH_WING_R29,Study Room III,Pokój Nauki III
+AREA_NORTH_WING_R3,Old Classroom,Stara Klasa
+AREA_NORTH_WING_R30,Storeroom III,Składzik III
+AREA_NORTH_WING_R31,Quiet Room III,Pokój Ciszy III
+AREA_NORTH_WING_R32,Lost Property III,Biuro Rzeczy Znalezionych III
+AREA_NORTH_WING_R33,Linen Store III,Bieliźniarnia III
+AREA_NORTH_WING_R34,Ink Store III,Magazyn Atramentu III
+AREA_NORTH_WING_R35,Box Room III,Graciarnia III
+AREA_NORTH_WING_R36,Practice Room III,Sala Ćwiczeń III
+AREA_NORTH_WING_R37,Guest Chamber IV,Komnata Gościnna IV
+AREA_NORTH_WING_R38,Seminar Room IV,Sala Seminaryjna IV
+AREA_NORTH_WING_R39,Old Classroom IV,Stara Klasa IV
+AREA_NORTH_WING_R4,Copying Room,Pracownia Kopistów
+AREA_NORTH_WING_R5,Study Room,Pokój Nauki
+AREA_NORTH_WING_R6,Storeroom,Składzik
+AREA_NORTH_WING_R7,Quiet Room,Pokój Ciszy
+AREA_NORTH_WING_R8,Lost Property,Biuro Rzeczy Znalezionych
+AREA_NORTH_WING_R9,Linen Store,Bieliźniarnia
+AREA_NORTH_WING_STAIR_B,"North Wing, stair turret","Skrzydło Północne, wieżyczka schodowa"
+AREA_OFFICE_CHRONICLES,Chronicles Office,Gabinet Kronik
+AREA_OFFICE_ELIXIRS,Elixirs Office,Gabinet Eliksirów
+AREA_OFFICE_HERBLORE,Herblore Office,Gabinet Zielarstwa
+AREA_OFFICE_SHAPESHAPING,Shapeshaping Office,Gabinet Przemian
+AREA_OFFICE_SIGILCRAFT,Sigilcraft Office,Gabinet Znakarstwa
+AREA_OFFICE_STARGAZING,Stargazing Office,Gabinet Gwiazdoznawstwa
+AREA_OFFICE_WARDING,Warding Office,Gabinet Osłon
+AREA_OLD_CELLS,Old Cells,Stare Cele
+AREA_PORTRAIT_GALLERY,Portrait Gallery,Galeria Portretów
+AREA_READING_ROOM,Reading Room,Czytelnia
+AREA_RESTRICTED_STACKS,Restricted Stacks,Zakazane Regały
+AREA_SCRIPTORIUM,Scriptorium,Skryptorium
+AREA_SKY_BRIDGE,Sky Bridge,Podniebny Most
+AREA_STAFF_LIBRARY,Staff Library,Biblioteka Nauczycielska
+AREA_TURNING_STAIRS,Hall of Turning Stairs,Sala Obracających się Schodów
+AREA_UNFINISHED_WING_C0,"Unfinished Wing, ground floor corridor","Niedokończone Skrzydło, korytarz (parter)"
+AREA_UNFINISHED_WING_C1,"Unfinished Wing, first floor corridor","Niedokończone Skrzydło, korytarz (pierwsze piętro)"
+AREA_UNFINISHED_WING_C2,"Unfinished Wing, second floor corridor","Niedokończone Skrzydło, korytarz (drugie piętro)"
+AREA_UNFINISHED_WING_R1,Dust-sheeted Room,Komnata pod Pokrowcami
+AREA_UNFINISHED_WING_R10,Dust-sheeted Room IV,Komnata pod Pokrowcami IV
+AREA_UNFINISHED_WING_R11,Unfinished Hall IV,Niedokończona Sala IV
+AREA_UNFINISHED_WING_R12,Bare Room IV,Pusta Komnata IV
+AREA_UNFINISHED_WING_R13,Dust-sheeted Room V,Komnata pod Pokrowcami V
+AREA_UNFINISHED_WING_R14,Unfinished Hall V,Niedokończona Sala V
+AREA_UNFINISHED_WING_R15,Bare Room V,Pusta Komnata V
+AREA_UNFINISHED_WING_R16,Dust-sheeted Room VI,Komnata pod Pokrowcami VI
+AREA_UNFINISHED_WING_R17,Unfinished Hall VI,Niedokończona Sala VI
+AREA_UNFINISHED_WING_R18,Bare Room VI,Pusta Komnata VI
+AREA_UNFINISHED_WING_R19,Dust-sheeted Room VI,Komnata pod Pokrowcami VI
+AREA_UNFINISHED_WING_R2,Unfinished Hall,Niedokończona Sala
+AREA_UNFINISHED_WING_R20,Unfinished Hall VI,Niedokończona Sala VI
+AREA_UNFINISHED_WING_R21,Bare Room VI,Pusta Komnata VI
+AREA_UNFINISHED_WING_R3,Bare Room,Pusta Komnata
+AREA_UNFINISHED_WING_R4,Dust-sheeted Room II,Komnata pod Pokrowcami II
+AREA_UNFINISHED_WING_R5,Unfinished Hall II,Niedokończona Sala II
+AREA_UNFINISHED_WING_R6,Bare Room II,Pusta Komnata II
+AREA_UNFINISHED_WING_R7,Dust-sheeted Room III,Komnata pod Pokrowcami III
+AREA_UNFINISHED_WING_R8,Unfinished Hall III,Niedokończona Sala III
+AREA_UNFINISHED_WING_R9,Bare Room III,Pusta Komnata III
+AREA_UNFINISHED_WING_STAIR_A,"Unfinished Wing, stair turret","Niedokończone Skrzydło, wieżyczka schodowa"
+AREA_WINE_CELLAR,Wine Cellar,Piwniczka
