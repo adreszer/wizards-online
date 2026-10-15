@@ -267,6 +267,18 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Offline practice mysteries (`content/offline_mysteries.json`, `OfflineMysteryEngine`): the secret walls get their own public offline solutions; the online ones stay server-only
 - [ ] Run `tools/check_build.sh` in CI once there is CI
 
+### Milestones 24–32 — Generated castle and grounds at scale (design: docs/castle-generation.md)
+Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B) are validators that refuse to write the scene; ids and details in the design doc.
+- [ ] M24 Generator foundation: `tools/castle/` split, `content/castle/program.json` with every room pinned (byte-identical output), rules engine, `kit.json` role → scene, SVG preview per storey, slot-based placements, hashed name denylist
+- [ ] M25 Stairs and circulation: rules S1–S9 / C1–C10 / A1 / A3 enforced; fix the current castle (4 m approach and arrival landings, grand staircase re-cut, `SpiralStaircase` in towers, balustrades and railings, no doors/windows behind flights); walk-every-flight test
+- [ ] M26 Grounds v1: headless terrain generator (plateau, lake, ravine, cliffs, paths between pinned landmarks, scatter, soft boundary, outdoor zones), fixed arrival causeway and lake crossing
+- [ ] M27 Exterior shell: roofs, spires, battlements, buttresses, turrets, bridges, plinth meeting the terrain, far-view HLOD with lit windows
+- [ ] M28 Scale infrastructure: sector scenes + `SectorStreamer` (room graph as portal graph), MultiMesh batching, merged collision, per-sector budgets, 5× stress fixture
+- [ ] M29 Layout generator: program → graph → grid embedding with pins; the full-curriculum castle at target scale (~320 × 260 m, 250–350 areas); existing area ids kept
+- [ ] M30 Living castle: `ServerClock`, `ScheduledMover`, the shifting staircase shaft (shifting flights, rail gates, trick steps), a clockwork jump route, a rotating corridor; rules M1–M6; two-client sync test
+- [ ] M31 Secrets generator: hidden rooms in layout voids, passages as shortcuts, generated lock-and-key chains as mystery content
+- [ ] M32 Dressing pass: per-kind furnishing, house colours per territory, portrait/tapestry slots, subject clutter kits through the kit table
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

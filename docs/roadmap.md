@@ -148,7 +148,7 @@ Goal: attending a lesson is fun, and progress over weeks is visible.
 
 ### Term G: "Beyond the walls" (grounds and the wider world)
 
-1. **The grounds properly** (L ★★★). A lake with a water shader, a forest edge (forbidden at night, original name), the greenhouse in glass, the beast paddock with creatures, a stone circle, a boathouse, a clock tower. The castle silhouette visible from outside with lit windows.
+1. **The grounds properly** (L ★★★). A lake with a water shader, a forest edge (forbidden at night, original name), the greenhouse in glass, the beast paddock with creatures, a stone circle, a boathouse, a clock tower. The castle silhouette visible from outside with lit windows. Planned as generated grounds in `docs/castle-generation.md` (Milestones 26–27).
 2. **Herb Lore gardening** (M ★★). Plant, water, grow and harvest magical plants in the greenhouse (Quicksprout helps). Plants are ingredients for Elixirs.
 3. **Elixir brewing** (M ★★★). A cauldron minigame (order, stirring, heat, timing). Brewed elixirs are consumables (glow-in-dark, featherfall, voice-change, colour-change robes for an hour). Professors can grade the results.
 4. **Beastlore creatures and familiars** (L ★★★). Original creatures to care for in lessons; later a personal familiar that follows you, sits on your shoulder, sleeps on your dorm bed. Huge for attachment.
