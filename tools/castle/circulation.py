@@ -165,6 +165,8 @@ def add_edge_railing(plan, side, coord, a, b, y, why):
 def walkable(plan, x, z, y, eps=0.05):
     """Is there a floor, landing or pad with its top at height y under (x, z)?"""
     for r in plan.rooms.values():
+        if r.get("terrain"):
+            continue
         if abs(r.y - y) < eps and inside(r.rect, x, z) and not any(inside(h, x, z, 0.01) for h in r.holes):
             if r.inside is None and any(c.inside == r.id and inside(c.rect, x, z) for c in plan.rooms.values()):
                 continue

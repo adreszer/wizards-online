@@ -15,6 +15,8 @@
   "staircase": "res://objects/environment/modular/staircase.tscn",
   "spiral_staircase": "res://objects/environment/modular/spiral_staircase.tscn",
   "railing": "res://objects/environment/modular/railing.tscn",
+  "lantern_post": "res://objects/environment/grounds/lantern_post.tscn",
+  "goal_ring": "res://objects/environment/grounds/goal_ring.tscn",
   "wall_torch": "res://objects/environment/props/wall_torch.tscn",
   "chandelier": "res://objects/environment/props/chandelier.tscn",
   "area_zone": "res://gameplay/world/area_zone.tscn",
@@ -32,5 +34,6 @@
   "feast_table": "res://objects/environment/props/feast_table.tscn"
  },
  "window_by_kind": {"hall": "window_double", "library": "window_double", "common_room": "window_double", "classroom": "window_wide"},
+ "flora": {},
  "floor_tiles": {"plain": ["floor_tile_plain", 0.46], "ornate": ["floor_tile_ornate", 0.22]}
 }

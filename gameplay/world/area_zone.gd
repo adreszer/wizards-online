@@ -11,7 +11,7 @@ extends Area3D
 @export var area_id: StringName = &""
 ## Translation key of the player-facing name.
 @export var display_key: String = "AREA_UNKNOWN"
-## Free-form category: hall, corridor, classroom, common_room, dormitory, tower, outdoor, secret…
+## Free-form category: hall, corridor, classroom, common_room, dormitory, tower, outdoor (walled open air), grounds (open terrain), secret…
 @export var kind: String = "room"
 ## House placeholder (1–4) for common rooms and dormitories, 0 for shared areas.
 @export var house: int = 0

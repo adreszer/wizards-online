@@ -91,8 +91,14 @@ def register_edge(axis, coord, lo, hi, storey, rows, room_id):
         u["rows"] = max(u["rows"], rows)
         u["rooms"].add(room_id)
 
+def built(r):
+    """Rooms that get geometry (terrain rooms are only areas)."""
+    return not r.get("terrain")
+
 def register_units():
     for r in rooms.values():
+        if not built(r):
+            continue
         for s in r.storeys():
             register_edge("z", r.x0, r.z0, r.z1, s, r.rows, r.id)
             register_edge("z", r.x1, r.z0, r.z1, s, r.rows, r.id)
@@ -307,7 +313,9 @@ def emit_railings():
 
 def emit_floors_and_ceilings():
     for r in rooms.values():
-        holes = list(r.holes) + [rooms[i].rect for i in rooms if rooms[i].inside == r.id]
+        if not built(r):
+            continue
+        holes = list(r.holes) + [rooms[i].rect for i in rooms if rooms[i].inside == r.id and built(rooms[i])]
         for k, piece in enumerate(rect_minus_all(r.rect, holes)):
             floor_piece(uname(f"Floor_{r.id}"), piece, r.y, thick=1.0 if r.storey <= 0 else 0.5, tile=r.tile)
         for rect, y in r.extra_floors:
@@ -430,7 +438,11 @@ def emit_zones():
     for r in rooms.values():
         cx, cz = r.centre()
         h = r.bands * STOREY
-        inst(f"Zone_{r.id}", K("area_zone"), (cx, r.y + h / 2, cz), parent="Zones",
+        y = r.y + h / 2
+        if r.get("zone_y"):
+            lo, hi = r.get("zone_y")
+            h, y = hi - lo, (lo + hi) / 2
+        inst(f"Zone_{r.id}", K("area_zone"), (cx, y, cz), parent="Zones",
              props={"area_id": f'&"{r.id}"', "display_key": f'"{r.name_key}"', "kind": f'"{r.kind}"',
                     "house": str(r.house), "size": f"Vector3({r.x1 - r.x0:.1f}, {h:.1f}, {r.z1 - r.z0:.1f})"})
 
@@ -645,7 +657,7 @@ def emit_castle_doors():
         A, B = rooms[a], rooms[b]
         grand = count > 1 or A.get("door_style") == "grand" or B.get("door_style") == "grand"
         if grand:
-            inside = sorted([r for r in (A, B) if r.kind != "outdoor"],
+            inside = sorted([r for r in (A, B) if r.kind not in ("outdoor", "grounds")],
                             key=lambda r: (r.get("door_style") != "grand", r.kind not in DOOR_KINDS))
         else:
             inside = [r for r in (A, B) if r.kind in DOOR_KINDS]
@@ -827,17 +839,35 @@ def emit_placements(path):
 
 # --------------------------------------------------------------------------- build
 SCENE_ENV = '''
+[sub_resource type="ProceduralSkyMaterial" id="NightSkyMat"]
+sky_top_color = Color(0.015, 0.02, 0.045, 1)
+sky_horizon_color = Color(0.07, 0.08, 0.12, 1)
+sky_curve = 0.12
+ground_bottom_color = Color(0.02, 0.02, 0.025, 1)
+ground_horizon_color = Color(0.07, 0.08, 0.11, 1)
+sun_angle_max = 4.0
+sun_curve = 0.08
+energy_multiplier = 1.0
+
+[sub_resource type="Sky" id="NightSky"]
+sky_material = SubResource("NightSkyMat")
+
 [sub_resource type="Environment" id="Env"]
-background_mode = 1
-background_color = Color(0.05, 0.045, 0.045, 1)
+background_mode = 2
+sky = SubResource("NightSky")
 ambient_light_source = 2
 ambient_light_color = Color(0.5, 0.5, 0.56, 1)
 ambient_light_energy = 0.22
 tonemap_mode = 2
 fog_enabled = true
-fog_light_color = Color(0.12, 0.11, 0.11, 1)
-fog_density = 0.005
+fog_light_color = Color(0.09, 0.1, 0.13, 1)
+fog_density = 0.0016
+fog_sky_affect = 0.35
 '''
+# Render layer 11 ("outdoor"): terrain, water, flora and exteriors. Only the moon lights it,
+# so moonlight never reaches the castle's interiors.
+OUTDOOR_LAYER = 11
+OUTDOOR_LAYER_MASK = 1 << (OUTDOOR_LAYER - 1)
 CONTAINERS = ["Geometry", "Floors", "Walls", "Pillars", "Ceilings", "Stairs", "Torches", "Lights", "Zones",
               "Collectibles", "Checkpoints", "Tomes", "Doors", "Furniture", "Enemies", "Props", "Puzzles"]
 
@@ -885,6 +915,7 @@ def build(plan, kit, placements=PLACEMENTS):
 
 def scene_text(plan):
     level_script = ext_id("Script", "res://levels/castle/castle.gd")
+    grounds = ext_id("PackedScene", "res://levels/grounds/grounds.tscn")
     exts = ""
     for (kind, path), i in sorted(ext.items(), key=lambda kv: kv[1]):
         exts += f'[ext_resource type="{kind}" path="{path}" id="{i}"]\n'
@@ -907,6 +938,15 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 '''
     for c in CONTAINERS:
         root += f'\n[node name="{c}" type="Node3D" parent="."]\n'
+    root += f'\n[node name="Grounds" parent="." instance=ExtResource("{grounds}")]\n'
+    root += f'''
+[node name="Moon" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 60, 0)
+light_color = Color(0.55, 0.64, 0.95, 1)
+light_energy = 0.38
+light_cull_mask = {OUTDOOR_LAYER_MASK}
+shadow_enabled = false
+'''
     root += "\n"
-    header = f'[gd_scene load_steps={len(ext) + 2} format=3 uid="uid://castle0000001"]\n\n'
+    header = f'[gd_scene load_steps={len(ext) + 4} format=3 uid="uid://castle0000001"]\n\n'
     return header + exts + SCENE_ENV + root + "\n".join(nodes) + "\n"

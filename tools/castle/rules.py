@@ -77,6 +77,8 @@ def level_edges(plan):
         out.append(((a, s), (b, s), "door"))
     for a, b, _ax, _c, _off, s, _n in plan.secrets:
         out.append(((a, s), (b, s), "secret"))
+    for a, b in getattr(plan, "terrain_links", []):
+        out.append(((a, plan.rooms[a].storey), (b, plan.rooms[b].storey), "door"))
     for st in plan.stairs:
         if st.get("kind") == "spiral":
             R = plan.rooms[st["lo"]]
@@ -121,7 +123,7 @@ def no_overlap(plan):
     for i, a in enumerate(ids):
         for b in ids[i + 1:]:
             A, B = plan.rooms[a], plan.rooms[b]
-            if A.inside == b or B.inside == a:
+            if A.inside == b or B.inside == a or A.get("terrain") or B.get("terrain"):
                 continue
             if set(A.storeys()) & set(B.storeys()) and overlaps(A, B):
                 yield a, f"overlaps {b}"
@@ -303,7 +305,7 @@ def _overhead(plan, st, x, z, h):
         if v > h + 0.01 and (best is None or v < best):
             best = v
     for r in plan.rooms.values():
-        if not _c.inside(r.rect, x, z, 0.01):
+        if r.get("terrain") or not _c.inside(r.rect, x, z, 0.01):
             continue
         if r.ceiling and not any(_c.inside(c, x, z, -0.01) for c in r.ceiling_holes) and r.ceiling_y > h:
             take(r.ceiling_y)
@@ -407,7 +409,7 @@ def stair_rooms(plan):
 
 def _main_rooms(plan):
     return [r for r in plan.rooms.values()
-            if r.house == 0 and r.kind not in ("secret", "tower", "stair_turret", "outdoor") and r.get("door_style") != "locked"
+            if r.house == 0 and r.kind not in ("secret", "tower", "stair_turret", "outdoor", "grounds") and r.get("door_style") != "locked"
             and not r.get("tower")]
 
 
@@ -509,7 +511,7 @@ def corridors(plan):
 @rule("C4", "room proportions and minimum sizes")
 def proportions(plan):
     for r in plan.rooms.values():
-        if r.kind not in ("corridor", "passage", "outdoor", "hall", "gallery", "shaft") and max(r.width, r.depth) > 3 * min(r.width, r.depth):
+        if r.kind not in ("corridor", "passage", "outdoor", "grounds", "hall", "gallery", "shaft") and max(r.width, r.depth) > 3 * min(r.width, r.depth):
             yield r.id, f"{r.width} x {r.depth} is longer than 3:1"
         need = MIN_SIZE.get(r.kind)
         if r.id == "great_hall":
@@ -552,7 +554,7 @@ def house_gates(plan):
 @rule("C7", "doorways keep a module from corners and 4 m from each other")
 def door_spacing(plan):
     for r in plan.rooms.values():
-        if r.kind in ("outdoor", "stair_turret"):
+        if r.kind in ("outdoor", "grounds", "stair_turret"):
             continue
         for side in "wens":
             axis, coord, lo, hi = r.wall_line(side)

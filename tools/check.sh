@@ -34,8 +34,8 @@ step "export server content"
 "$GODOT" --headless --path . tools/export_server_content.tscn >"$LOGS/export.log" 2>&1 || fail "exporter" "$LOGS/export.log"
 
 step "generated files committed"
-if ! git diff --quiet -- levels/castle nakama/modules || [ -n "$(git ls-files --others --exclude-standard -- nakama/modules levels/castle)" ]; then
-  git status --short -- levels/castle nakama/modules
+if ! git diff --quiet -- levels/castle levels/grounds nakama/modules || [ -n "$(git ls-files --others --exclude-standard -- nakama/modules levels/castle levels/grounds)" ]; then
+  git status --short -- levels/castle levels/grounds nakama/modules
   echo "Generated files differ from the commit; review and commit them." >&2
   exit 1
 fi

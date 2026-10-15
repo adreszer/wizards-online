@@ -59,6 +59,8 @@
   {"id": "house3_common", "rect": [-44, -20, -40, -16], "storey": -1, "kind": "common_room", "tile": "ornate", "house": 3},
   {"id": "house3_dorm", "rect": [-60, -44, -40, -16], "storey": -1, "kind": "dormitory", "house": 3},
   {"id": "undercroft", "rect": [-12, 12, -40, -16], "storey": -1, "kind": "secret", "tile": "ornate"},
+  {"id": "lake_passage", "rect": [-20, -12, -64, -40], "storey": -1, "kind": "corridor"},
+  {"id": "lake_tunnel", "rect": [-76, -20, -64, -56], "storey": -1, "kind": "corridor"},
   {"id": "hidden_study", "rect": [-52, -44, -24, -8], "kind": "secret", "tile": "ornate", "dressing": "study"},
   {"id": "loft", "rect": [12, 28, 24, 48], "storey": 2, "kind": "secret", "tile": "ornate"}
  ],
@@ -124,7 +126,12 @@
   {"a": "tower_sw_1", "b": "tower_sw_stair", "storey": 1},
   {"a": "tower_sw_2", "b": "tower_sw_stair", "storey": 2},
   {"a": "tower_sw_3", "b": "tower_sw_stair", "storey": 3},
-  {"a": "tower_sw_4", "b": "tower_sw_stair", "storey": 4}
+  {"a": "tower_sw_4", "b": "tower_sw_stair", "storey": 4},
+  {"on": true, "room": "grounds", "side": "s", "at": 0, "count": 2, "to": "approach"},
+  {"on": true, "room": "grounds", "side": "e", "at": 72, "to": "estate"},
+  {"a": "dungeon_corridor", "b": "lake_passage", "storey": -1},
+  {"a": "lake_passage", "b": "lake_tunnel", "storey": -1},
+  {"on": true, "room": "lake_tunnel", "side": "w", "at": -60, "storey": -1, "to": "lake_terrace"}
  ],
  "secrets": [
   {"a": "dungeon_corridor", "b": "undercroft", "at": -28},
@@ -148,8 +155,6 @@
  ],
  "parapets": [],
  "waivers": [
-  {"rule": "S9", "where": "dungeon_corridor", "until": "M26", "why": "the lake gate (first-year crossing) becomes the second way into the dungeons"},
-  {"rule": "S9", "where": "class_elixirs", "until": "M26", "why": "as dungeon_corridor"},
   {"rule": "S9", "where": "gallery", "until": "M29", "why": "the upper wings add a second stair to storey 2"},
   {"rule": "S9", "where": "roost", "until": "M29", "why": "as gallery"}
  ]

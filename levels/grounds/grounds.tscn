@@ -1,0 +1,606 @@
+[gd_scene load_steps=6 format=3 uid="uid://grounds000001"]
+
+[ext_resource type="Script" path="res://gameplay/world/terrain.gd" id="1"]
+[ext_resource type="PackedScene" path="res://objects/greybox/greybox_block.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://objects/environment/grounds/lantern_post.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://objects/environment/grounds/goal_ring.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://objects/environment/modular/railing.tscn" id="5"]
+
+[node name="Grounds" type="Node3D"]
+
+[node name="Terrain" type="Node3D" parent="."]
+script = ExtResource("1")
+data_path = "res://levels/grounds/terrain.json"
+
+[node name="Landmarks" type="Node3D" parent="."]
+
+[node name="LandingStageDeck" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -230.000, -27.300, -62.000)
+size = Vector3(36.000, 0.400, 6.000)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -234.000, -30.300, -64.600)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -234.000, -30.300, -59.400)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_3" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -230.000, -30.300, -64.600)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_4" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -230.000, -30.300, -59.400)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_5" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -226.000, -30.300, -64.600)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_6" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -226.000, -30.300, -59.400)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_7" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -222.000, -30.300, -64.600)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_8" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -222.000, -30.300, -59.400)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_9" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -218.000, -30.300, -64.600)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_10" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -218.000, -30.300, -59.400)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_11" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -214.000, -30.300, -64.600)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_12" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -214.000, -30.300, -59.400)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_13" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -210.000, -30.300, -64.600)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStagePile_14" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -210.000, -30.300, -59.400)
+size = Vector3(0.500, 6.000, 0.500)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="LandingStageBoat" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -232.000, -27.750, -56.800)
+size = Vector3(4.200, 0.600, 1.600)
+color = Color(0.350, 0.250, 0.180, 1)
+
+[node name="LandingStageBoat_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -226.500, -27.750, -56.800)
+size = Vector3(4.200, 0.600, 1.600)
+color = Color(0.350, 0.250, 0.180, 1)
+
+[node name="LandingStageBoat_3" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -221.000, -27.750, -56.800)
+size = Vector3(4.200, 0.600, 1.600)
+color = Color(0.350, 0.250, 0.180, 1)
+
+[node name="LandingStageBoat_4" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -215.500, -27.750, -56.800)
+size = Vector3(4.200, 0.600, 1.600)
+color = Color(0.350, 0.250, 0.180, 1)
+
+[node name="LandingStageLantern" parent="Landmarks" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -238.000, -27.100, -64.500)
+
+[node name="LandingStageLantern_2" parent="Landmarks" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -208.000, -27.100, -64.500)
+
+[node name="BoathouseWalls" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -218.000, -18.602, 58.000)
+size = Vector3(20.000, 8.000, 14.000)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="BoathouseRoof" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -218.000, -13.802, 58.000)
+size = Vector3(21.600, 1.600, 15.600)
+color = Color(0.320, 0.220, 0.200, 1)
+
+[node name="BoathouseRidge" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -218.000, -12.502, 58.000)
+size = Vector3(21.200, 1.200, 7.000)
+color = Color(0.320, 0.220, 0.200, 1)
+
+[node name="BoathouseLantern" parent="Landmarks" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -229.500, -21.602, 66.500)
+
+[node name="CottageWalls" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 173.000, 1.229, -330.000)
+size = Vector3(14.000, 6.000, 10.000)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="CottageRoof" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 173.000, 5.029, -330.000)
+size = Vector3(15.600, 1.600, 11.600)
+color = Color(0.320, 0.220, 0.200, 1)
+
+[node name="CottageRidge" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 173.000, 6.329, -330.000)
+size = Vector3(15.200, 1.200, 5.000)
+color = Color(0.320, 0.220, 0.200, 1)
+
+[node name="CottageChimney" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 178.000, 6.729, -330.000)
+size = Vector3(1.400, 4.000, 1.400)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="CottageGarden" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 173.000, -0.371, -320.000)
+size = Vector3(14.000, 0.800, 6.000)
+color = Color(0.350, 0.280, 0.180, 1)
+
+[node name="CottageLantern" parent="Landmarks" instance=ExtResource("3")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 164.500, -0.771, -323.500)
+
+[node name="StoneCircleStone" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, -0.000000, 0.000000, 1.000000, 0.000000, 0.000000, -0.000000, 1.000000, 444.000, 4.140, -430.000)
+size = Vector3(1.300, 4.400, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.866025, -0.000000, -0.500000, 0.000000, 1.000000, 0.000000, 0.500000, -0.000000, 0.866025, 442.124, 4.140, -423.000)
+size = Vector3(1.300, 5.000, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_3" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.500000, -0.000000, -0.866025, 0.000000, 1.000000, 0.000000, 0.866025, -0.000000, 0.500000, 437.000, 4.140, -417.876)
+size = Vector3(1.300, 5.600, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_4" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, 430.000, 4.140, -416.000)
+size = Vector3(1.300, 4.400, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_5" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(-0.500000, 0.000000, -0.866025, 0.000000, 1.000000, 0.000000, 0.866025, -0.000000, -0.500000, 423.000, 4.140, -417.876)
+size = Vector3(1.300, 5.000, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_6" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(-0.866025, 0.000000, -0.500000, 0.000000, 1.000000, 0.000000, 0.500000, -0.000000, -0.866025, 417.876, 4.140, -423.000)
+size = Vector3(1.300, 5.600, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_7" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(-1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 0.000000, 0.000000, -0.000000, -1.000000, 416.000, 4.140, -430.000)
+size = Vector3(1.300, 4.400, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_8" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(-0.866025, 0.000000, 0.500000, 0.000000, 1.000000, 0.000000, -0.500000, 0.000000, -0.866025, 417.876, 4.140, -437.000)
+size = Vector3(1.300, 5.000, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_9" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(-0.500000, 0.000000, 0.866025, 0.000000, 1.000000, 0.000000, -0.866025, 0.000000, -0.500000, 423.000, 4.140, -442.124)
+size = Vector3(1.300, 5.600, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_10" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(-0.000000, 0.000000, 1.000000, 0.000000, 1.000000, 0.000000, -1.000000, 0.000000, -0.000000, 430.000, 4.140, -444.000)
+size = Vector3(1.300, 4.400, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_11" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.500000, -0.000000, 0.866025, 0.000000, 1.000000, 0.000000, -0.866025, 0.000000, 0.500000, 437.000, 4.140, -442.124)
+size = Vector3(1.300, 5.000, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleStone_12" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.866025, -0.000000, 0.500000, 0.000000, 1.000000, 0.000000, -0.500000, 0.000000, 0.866025, 442.124, 4.140, -437.000)
+size = Vector3(1.300, 5.600, 0.800)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="StoneCircleAltar" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 430.000, 3.040, -430.000)
+size = Vector3(3.000, 1.000, 1.600)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="PitchField" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 560.000, -21.545, 80.000)
+size = Vector3(200.000, 1.000, 90.000)
+color = Color(0.300, 0.450, 0.220, 1)
+
+[node name="PitchGoalPole" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 472.000, -14.095, 71.000)
+size = Vector3(0.500, 14.000, 0.500)
+color = Color(0.800, 0.700, 0.350, 1)
+
+[node name="PitchGoalRing" parent="Landmarks" instance=ExtResource("4")]
+transform = Transform3D(0.000000, -0.000000, 1.000000, 0.000000, 1.000000, 0.000000, -1.000000, 0.000000, 0.000000, 472.000, -4.895, 71.000)
+
+[node name="PitchGoalPole_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 472.000, -12.095, 80.000)
+size = Vector3(0.500, 18.000, 0.500)
+color = Color(0.800, 0.700, 0.350, 1)
+
+[node name="PitchGoalRing_2" parent="Landmarks" instance=ExtResource("4")]
+transform = Transform3D(0.000000, -0.000000, 1.000000, 0.000000, 1.000000, 0.000000, -1.000000, 0.000000, 0.000000, 472.000, -0.895, 80.000)
+
+[node name="PitchGoalPole_3" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 472.000, -14.095, 89.000)
+size = Vector3(0.500, 14.000, 0.500)
+color = Color(0.800, 0.700, 0.350, 1)
+
+[node name="PitchGoalRing_3" parent="Landmarks" instance=ExtResource("4")]
+transform = Transform3D(0.000000, -0.000000, 1.000000, 0.000000, 1.000000, 0.000000, -1.000000, 0.000000, 0.000000, 472.000, -4.895, 89.000)
+
+[node name="PitchGoalPole_4" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 648.000, -14.095, 71.000)
+size = Vector3(0.500, 14.000, 0.500)
+color = Color(0.800, 0.700, 0.350, 1)
+
+[node name="PitchGoalRing_4" parent="Landmarks" instance=ExtResource("4")]
+transform = Transform3D(0.000000, -0.000000, 1.000000, 0.000000, 1.000000, 0.000000, -1.000000, 0.000000, 0.000000, 648.000, -4.895, 71.000)
+
+[node name="PitchGoalPole_5" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 648.000, -12.095, 80.000)
+size = Vector3(0.500, 18.000, 0.500)
+color = Color(0.800, 0.700, 0.350, 1)
+
+[node name="PitchGoalRing_5" parent="Landmarks" instance=ExtResource("4")]
+transform = Transform3D(0.000000, -0.000000, 1.000000, 0.000000, 1.000000, 0.000000, -1.000000, 0.000000, 0.000000, 648.000, -0.895, 80.000)
+
+[node name="PitchGoalPole_6" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 648.000, -14.095, 89.000)
+size = Vector3(0.500, 14.000, 0.500)
+color = Color(0.800, 0.700, 0.350, 1)
+
+[node name="PitchGoalRing_6" parent="Landmarks" instance=ExtResource("4")]
+transform = Transform3D(0.000000, -0.000000, 1.000000, 0.000000, 1.000000, 0.000000, -1.000000, 0.000000, 0.000000, 648.000, -4.895, 89.000)
+
+[node name="PitchStand" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -20.095, 27.000)
+size = Vector3(92.000, 2.000, 2.400)
+color = Color(0.720, 0.290, 0.230, 1)
+
+[node name="PitchStand_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -18.095, 24.800)
+size = Vector3(92.000, 6.000, 2.400)
+color = Color(0.720, 0.290, 0.230, 1)
+
+[node name="PitchStand_3" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -16.095, 22.600)
+size = Vector3(92.000, 10.000, 2.400)
+color = Color(0.720, 0.290, 0.230, 1)
+
+[node name="PitchStand_4" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -14.095, 20.400)
+size = Vector3(92.000, 14.000, 2.400)
+color = Color(0.720, 0.290, 0.230, 1)
+
+[node name="PitchBanner" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -8.095, 17.000)
+size = Vector3(88.000, 4.000, 0.300)
+color = Color(0.720, 0.290, 0.230, 1)
+
+[node name="PitchStand_5" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -20.095, 27.000)
+size = Vector3(92.000, 2.000, 2.400)
+color = Color(0.790, 0.650, 0.250, 1)
+
+[node name="PitchStand_6" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -18.095, 24.800)
+size = Vector3(92.000, 6.000, 2.400)
+color = Color(0.790, 0.650, 0.250, 1)
+
+[node name="PitchStand_7" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -16.095, 22.600)
+size = Vector3(92.000, 10.000, 2.400)
+color = Color(0.790, 0.650, 0.250, 1)
+
+[node name="PitchStand_8" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -14.095, 20.400)
+size = Vector3(92.000, 14.000, 2.400)
+color = Color(0.790, 0.650, 0.250, 1)
+
+[node name="PitchBanner_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -8.095, 17.000)
+size = Vector3(88.000, 4.000, 0.300)
+color = Color(0.790, 0.650, 0.250, 1)
+
+[node name="PitchStand_9" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -20.095, 133.000)
+size = Vector3(92.000, 2.000, 2.400)
+color = Color(0.850, 0.450, 0.230, 1)
+
+[node name="PitchStand_10" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -18.095, 135.200)
+size = Vector3(92.000, 6.000, 2.400)
+color = Color(0.850, 0.450, 0.230, 1)
+
+[node name="PitchStand_11" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -16.095, 137.400)
+size = Vector3(92.000, 10.000, 2.400)
+color = Color(0.850, 0.450, 0.230, 1)
+
+[node name="PitchStand_12" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -14.095, 139.600)
+size = Vector3(92.000, 14.000, 2.400)
+color = Color(0.850, 0.450, 0.230, 1)
+
+[node name="PitchBanner_3" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 510.000, -8.095, 143.000)
+size = Vector3(88.000, 4.000, 0.300)
+color = Color(0.850, 0.450, 0.230, 1)
+
+[node name="PitchStand_13" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -20.095, 133.000)
+size = Vector3(92.000, 2.000, 2.400)
+color = Color(0.230, 0.480, 0.720, 1)
+
+[node name="PitchStand_14" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -18.095, 135.200)
+size = Vector3(92.000, 6.000, 2.400)
+color = Color(0.230, 0.480, 0.720, 1)
+
+[node name="PitchStand_15" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -16.095, 137.400)
+size = Vector3(92.000, 10.000, 2.400)
+color = Color(0.230, 0.480, 0.720, 1)
+
+[node name="PitchStand_16" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -14.095, 139.600)
+size = Vector3(92.000, 14.000, 2.400)
+color = Color(0.230, 0.480, 0.720, 1)
+
+[node name="PitchBanner_4" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 610.000, -8.095, 143.000)
+size = Vector3(88.000, 4.000, 0.300)
+color = Color(0.230, 0.480, 0.720, 1)
+
+[node name="GatehouseTower" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -11.000, -5.747, 660.000)
+size = Vector3(8.000, 14.000, 12.000)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="GatehouseCap" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, -11.000, 2.253, 660.000)
+size = Vector3(9.000, 2.000, 13.000)
+color = Color(0.320, 0.220, 0.200, 1)
+
+[node name="GatehouseTower_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 11.000, -5.747, 660.000)
+size = Vector3(8.000, 14.000, 12.000)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="GatehouseCap_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 11.000, 2.253, 660.000)
+size = Vector3(9.000, 2.000, 13.000)
+color = Color(0.320, 0.220, 0.200, 1)
+
+[node name="GatehouseArch" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 0.000, -1.747, 660.000)
+size = Vector3(14.000, 6.000, 12.000)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="GatehouseGate" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 0.000, -8.747, 665.000)
+size = Vector3(14.000, 8.000, 0.600)
+color = Color(0.300, 0.220, 0.150, 1)
+
+[node name="ViaductDeck" parent="Landmarks" instance=ExtResource("5")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, 0.000, -7.454, 276.000)
+length = 124.000
+rise = -3.869
+height = 1.200
+thickness = 14.000
+
+[node name="ViaductParapet" parent="Landmarks" instance=ExtResource("5")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, 6.800, -6.254, 276.000)
+length = 124.000
+rise = -3.869
+height = 1.2
+
+[node name="ViaductParapet_2" parent="Landmarks" instance=ExtResource("5")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, -6.800, -6.254, 276.000)
+length = 124.000
+rise = -3.869
+height = 1.2
+
+[node name="ViaductPier" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, 0.000, -8.823, 293.714)
+size = Vector3(5.000, 1.631, 11.200)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="ViaductPier_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, 0.000, -13.047, 311.429)
+size = Vector3(5.000, 8.974, 11.200)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="ViaductPier_3" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, 0.000, -17.379, 329.143)
+size = Vector3(5.000, 16.533, 11.200)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="ViaductPier_4" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, 0.000, -18.736, 346.857)
+size = Vector3(5.000, 18.141, 11.200)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="ViaductPier_5" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, 0.000, -18.560, 364.571)
+size = Vector3(5.000, 16.685, 11.200)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="ViaductPier_6" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(0.000000, -0.000000, -1.000000, 0.000000, 1.000000, 0.000000, 1.000000, -0.000000, 0.000000, 0.000, -14.701, 382.286)
+size = Vector3(5.000, 7.862, 11.200)
+color = Color(0.620, 0.600, 0.560, 1)
+
+[node name="CoveredBridgeDeck" parent="Landmarks" instance=ExtResource("5")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 286.000, -3.848, 46.000)
+length = 94.000
+rise = -4.556
+height = 1.200
+thickness = 9.000
+
+[node name="CoveredBridgeParapet" parent="Landmarks" instance=ExtResource("5")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 286.000, -2.648, 41.700)
+length = 94.000
+rise = -4.556
+height = 1.4
+
+[node name="CoveredBridgeParapet_2" parent="Landmarks" instance=ExtResource("5")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 286.000, -2.648, 50.300)
+length = 94.000
+rise = -4.556
+height = 1.4
+
+[node name="CoveredBridgePost" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 286.000, -0.048, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_2" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 286.000, -0.048, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_3" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 294.545, -0.462, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_4" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 294.545, -0.462, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_5" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 303.091, -0.877, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_6" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 303.091, -0.877, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_7" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 311.636, -1.291, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_8" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 311.636, -1.291, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_9" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 320.182, -1.705, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_10" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 320.182, -1.705, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_11" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 328.727, -2.119, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_12" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 328.727, -2.119, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_13" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 337.273, -2.533, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_14" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 337.273, -2.533, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_15" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 345.818, -2.947, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_16" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 345.818, -2.947, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_17" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 354.364, -3.361, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_18" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 354.364, -3.361, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_19" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 362.909, -3.776, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_20" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 362.909, -3.776, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_21" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 371.455, -4.190, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_22" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 371.455, -4.190, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_23" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 380.000, -4.604, 41.700)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgePost_24" parent="Landmarks" instance=ExtResource("2")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 380.000, -4.604, 50.300)
+size = Vector3(0.400, 5.200, 0.400)
+color = Color(0.450, 0.320, 0.200, 1)
+
+[node name="CoveredBridgeRoofSlab" parent="Landmarks" instance=ExtResource("5")]
+transform = Transform3D(1.000000, -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, -0.000000, 0.000000, 1.000000, 286.000, 2.552, 46.000)
+length = 94.000
+rise = -4.556
+height = 0.5
+thickness = 10.600
+

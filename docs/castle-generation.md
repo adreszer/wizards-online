@@ -46,6 +46,10 @@ content/placements.json        gameplay objects, positioned by slot (not raw off
 
 ---
 
+### Grounds pipeline (as built in Milestone 26)
+
+`tools/grounds/` runs inside the castle generator (one command builds both): `terrain.py` layers the heightmap (hills that grow with distance from the castle's summit, the lake basin, the island, the plateau under every castle room, cliffs, hills, valleys with rivers, mountains at the border, flats under landmarks, terraces), `paths.py` routes roads with A* between pinned waypoints and carves them at 9 degrees at most (rule G2 allows 10), bridges keep their span, `scatter.py` places trees, bushes and rocks from forest masks with the G4 clearances, `zones.py` turns grounds zones and landmark zones into terrain rooms of kind `grounds` (no geometry, but an `AreaZone`, a line in the server's area map and a place in the reachability graph, linked to the estate), `rules.py` checks G1-G6 and `export.py` writes `levels/grounds/` (`terrain.json`, `height.bin`, `holes.bin`, `splat.png`, `scatter.bin`, `grounds.tscn` with greybox landmarks and bridges). The terrain has holes wherever a castle room has its own floor at or below the ground floor, and wherever it would dip into an underground room. Outdoor objects sit on render layer 11, the only layer the moon lights; a node on the terrain carries players out of deep water back to the last dry ground and lowers their kill height below the lake floor.
+
 ## 3. Rules
 
 Each rule has an id. The validator reports violations by id and room, and each rule has a test. A rule can be **waived** for one place only by a `waivers` entry in the program naming the rule, the place, the milestone that lifts it and why; the generator tests list them, so they cannot pile up silently.
@@ -157,7 +161,7 @@ What that needs:
 - **Sectors.** The castle is split into sector scenes (a wing, a tower, the hub, the dungeons), each a separate generated `.tscn`. A `SectorStreamer` keeps the player's sector plus everything within N doorways (the room graph *is* the portal graph) and the exterior shell loaded, and loads and unloads others in the background. Today's single 6,000-instance scene would become ~40,000 instances in one file, which is not workable.
 - **Batching.** Repeated modules (wall faces, floor tiles, pillars, roof tiles) are drawn as one `MultiMeshInstance3D` per module type per sector instead of one node each. Collision is merged into per-sector static bodies. The occluders on wall runs and floors stay.
 - **Far view (HLOD).** A merged low-detail mesh of the whole exterior with lit-window emissive cards, shown beyond about 150 m. The detailed exterior of a sector is shown near it.
-- **Terrain.** The Terrain3D GDExtension (clipmap LOD, holes for the castle plinth and caves, built-in instancer for scatter) is recommended. The fallback is our own chunked mesh with `HeightMapShape3D` collision. Scatter uses visibility ranges and impostor billboards for distant trees.
+- **Terrain (decided in Milestone 26: our own, no GDExtension).** `gameplay/world/terrain.gd` builds 64 m chunks from the generated heightmap: a coarse mesh for every chunk, full resolution within 240 m of the player, skirts against cracks, collision (`HeightMapShape3D`, triangle collision where the castle cuts holes) and tree trunks only within 120 m of a local player. Flora is one MultiMesh per kind per 128 m cell with visibility ranges. The Python generator samples the same heights, which Terrain3D would not have given us.
 - **Lights.** About 350 omni lights today, roughly 2,000 at target scale. They're loaded per sector and capped per room (B2). Baked or SDFGI lighting is decided in the lighting overhaul (roadmap 5.1).
 
 ---
@@ -232,7 +236,6 @@ Order: 24 → 25 is the immediate fix. 26 and 27 can run in parallel with 28. 29
 
 - **Scale.** Confirm the target (~320 × 260 m castle, 250–350 areas, 2 × 2 km grounds) or set another.
 - **Canonical vs. regenerated.** One frozen castle that grows (recommended), or a new layout per school year.
-- **Terrain3D.** Accept a GDExtension dependency (recommended) or build our own terrain.
 - **Arrival.** Keep both arrivals (causeway plus the first-year lake crossing)?
 - **Shifting stairs.** Schedule period, and whether some flights only move at night.
 - **Final names** for every *placeholder* in this document.

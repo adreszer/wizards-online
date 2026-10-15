@@ -5,7 +5,8 @@ extends Node
 ##   godot --path . tools/capture_model.tscn -- --scene=res://path/to/model.glb --out=/absolute/dir [--dist=3.5]
 ## With --eye=x,y,z --target=x,y,z a full scene (.tscn, no extra floor/lights) is
 ## rendered once from that viewpoint instead, e.g. to look into a castle room;
-## --open-doors swings every CastleDoor and HouseDoor in it open first.
+## --open-doors swings every CastleDoor and HouseDoor in it open first; --frames=N waits N
+## frames after placing the camera (streamed terrain detail needs a few dozen).
 
 const FLOOR := preload("res://objects/environment/modular/floor_tile.tscn")
 
@@ -25,6 +26,7 @@ var _open_doors := false
 var _eye := Vector3.INF
 var _double_sided := false
 var _target := Vector3.INF
+var _settle_frames := 20
 
 
 func _ready() -> void:
@@ -41,6 +43,8 @@ func _ready() -> void:
 			_double_sided = true
 		elif arg.begins_with("--eye="):
 			_eye = _vec(arg.trim_prefix("--eye="))
+		elif arg.begins_with("--frames="):
+			_settle_frames = int(arg.trim_prefix("--frames="))
 		elif arg.begins_with("--target="):
 			_target = _vec(arg.trim_prefix("--target="))
 	if _scene.is_empty():
@@ -82,7 +86,7 @@ func _run() -> void:
 		cam.current = true
 		cam.global_position = _eye
 		cam.look_at(_target, Vector3.UP)
-		await _frames(20)
+		await _frames(_settle_frames)
 		_save("custom")
 		print("Saved 1 capture of %s to %s" % [_scene, _out])
 		get_tree().quit(0)

@@ -64,6 +64,7 @@ func _run() -> void:
 	await _test_moving_platform()
 	await _test_level_wiring()
 	await _test_castle()
+	await _test_grounds()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -1147,8 +1148,24 @@ func _test_castle() -> void:
 	t.check(landing_houses.get(&"tower_ne_1", 0) == 1 and landing_houses.get(&"tower_nw_1", 0) == 2, "tower landings belong to their houses")
 	# Every area has a floor under its centre (rooms with stair holes keep their centre solid).
 	var fell: Array[String] = []
+	var terrain: Terrain = castle.get_node_or_null("Grounds/Terrain")
+	t.check(terrain != null and terrain.size_x > 0, "the castle stands in generated grounds")
 	for z in zones:
 		var base_y := z.global_position.y - z.size.y / 2.0
+		if z.kind == "grounds" and terrain != null:
+			# Outdoor areas over terrain: stand on open ground in the area (its centre, or an
+			# inset corner when a landmark stands in the middle).
+			var spot: Vector3 = await _open_ground(terrain, z)
+			if spot == Vector3.INF:
+				continue
+			var cx := spot.x
+			var cz := spot.z
+			base_y = spot.y
+			await _spawn_player(Vector3(cx, base_y + 0.4, cz))
+			await _wait(0.4)
+			if not player.movement.is_grounded or absf(player.global_position.y - base_y) > 0.6:
+				fell.append("%s (y %.2f vs ground %.2f)" % [z.area_id, player.global_position.y, base_y])
+			continue
 		await _spawn_player(Vector3(z.global_position.x, base_y + 0.2, z.global_position.z))
 		await _wait(0.4)
 		if not player.movement.is_grounded or absf(player.global_position.y - base_y) > 0.3:
@@ -1214,6 +1231,102 @@ func _test_castle() -> void:
 	t.check(flights_ok.is_empty(), "every straight flight is walkable from its approach to its arrival landing (stuck: %s)" % ", ".join(flights_ok))
 	castle.queue_free()
 	await get_tree().process_frame
+
+
+func _test_grounds() -> void:
+	t.section("Grounds")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var terrain: Terrain = castle.get_node("Grounds/Terrain")
+	var worst := 0.0
+	for p: Array in terrain.meta.get("probes", []):
+		worst = maxf(worst, absf(terrain.height_at(p[0], p[2]) - float(p[1])))
+	t.check(terrain.meta.get("probes", []).size() > 3 and worst < 0.02, "terrain heights match the generator (worst %.3f m)" % worst)
+	t.check(not terrain.has_ground(0.0, 36.0) and terrain.has_ground(0.0, 120.0), "the terrain has a hole where the castle's floors are")
+	# The first-year path: from the landing stage up the cliff to the lake terrace, through the
+	# lake gate into the boat tunnel.
+	var route: Array = terrain.meta["paths"]["first_year_path"]
+	var start := Vector3(route[0][0], route[0][1], route[0][2])
+	terrain.focus_on(start, true)
+	await _spawn_player(start + Vector3(0, 0.5, 0))
+	var entered: Array = []
+	var on_enter := func(id: StringName, _z: Node) -> void: entered.append(id)
+	GameEvents.area_entered.connect(on_enter)
+	var stuck := ""
+	var targets: Array[Vector3] = []
+	for p: Array in route:
+		targets.append(Vector3(p[0], p[1], p[2]))
+	targets.append(Vector3(-84.0, -9.0, -58.0))
+	targets.append(Vector3(-66.0, -9.0, -58.0))
+	for target in targets:
+		var ok := false
+		for i in range(int(6.0 * Engine.physics_ticks_per_second)):
+			var to := target - player.global_position
+			to.y = 0
+			if to.length() < 1.6:
+				ok = true
+				break
+			player.movement.set_external_move(to.normalized(), true)
+			if i % 30 == 0:
+				terrain.focus_on(player.global_position, true)
+			await get_tree().physics_frame
+		if not ok:
+			stuck = "stuck at (%.1f, %.1f, %.1f) heading for (%.1f, %.1f)" % [player.global_position.x, player.global_position.y, player.global_position.z, target.x, target.z]
+			break
+	player.movement.set_external_move(Vector3.ZERO)
+	GameEvents.area_entered.disconnect(on_enter)
+	t.check(stuck.is_empty(), "the first-year path climbs from the landing stage to the lake gate (%s)" % stuck)
+	t.check(entered.has(&"lake_terrace") and entered.has(&"lake_tunnel"), "walking it reaches the lake terrace and the boat tunnel (%s)" % str(entered))
+	# The causeway crosses the viaduct without dropping into the valley.
+	var causeway: Array = terrain.meta["paths"]["causeway"]
+	var low := INF
+	var from := Vector3(0, 0, 270)
+	for p: Array in causeway:
+		if absf(float(p[2]) - 270.0) < 3.0:
+			from.y = p[1]
+	terrain.focus_on(from, true)
+	await _spawn_player(from + Vector3(0, 0.6, 0))
+	player.movement.set_external_move(Vector3(0, 0, 1), true)
+	for i in range(int(22.0 * Engine.physics_ticks_per_second)):
+		if i % 30 == 0:
+			terrain.focus_on(player.global_position, true)
+		await get_tree().physics_frame
+		low = minf(low, player.global_position.y - terrain.height_at(player.global_position.x, player.global_position.z))
+		if player.global_position.z > 410.0:
+			break
+	player.movement.set_external_move(Vector3.ZERO)
+	t.check(player.global_position.z > 405.0, "the causeway can be walked across the viaduct (z %.1f)" % player.global_position.z)
+	# Deep water carries a player back to the last dry ground.
+	var shore := Vector3(-215.0, 0, 20.0)
+	shore.y = terrain.height_at(shore.x, shore.z)
+	terrain.focus_on(shore, true)
+	await _spawn_player(shore + Vector3(0, 0.4, 0))
+	await _wait(0.5)
+	player.global_position = Vector3(-420.0, terrain.water_level - 4.0, 20.0)
+	await _wait(0.3)
+	t.check(player.global_position.distance_to(shore) < 6.0, "deep water carries the player back to the shore (at %s)" % str(player.global_position))
+	castle.queue_free()
+	await get_tree().process_frame
+
+
+## A dry point of an outdoor area with nothing built on it, or INF.
+func _open_ground(terrain: Terrain, z: AreaZone) -> Vector3:
+	var half := Vector2(minf(z.size.x / 2.0 - 5.0, 60.0), minf(z.size.z / 2.0 - 5.0, 60.0))
+	var c := z.global_position
+	for offset in [Vector2.ZERO, Vector2(-1, 1), Vector2(1, 1), Vector2(-1, -1), Vector2(1, -1)]:
+		var x := clampf(c.x + offset.x * half.x, -900.0, 900.0)
+		var zz := clampf(c.z + offset.y * half.y, -900.0, 900.0)
+		var ground := terrain.height_at(x, zz)
+		if ground < terrain.water_level + 0.5 or not terrain.has_ground(x, zz):
+			continue
+		terrain.focus_on(Vector3(x, ground, zz), true)
+		await get_tree().physics_frame
+		var hit: Dictionary = terrain.get_world_3d().direct_space_state.intersect_ray(
+			PhysicsRayQueryParameters3D.create(Vector3(x, ground + 40.0, zz), Vector3(x, ground - 5.0, zz)))
+		if not hit.is_empty() and absf((hit["position"] as Vector3).y - ground) < 0.3:
+			return Vector3(x, ground, zz)
+	return Vector3.INF
 
 
 # --- Level wiring ------------------------------------------------------------------------

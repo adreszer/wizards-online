@@ -21,8 +21,9 @@ HOUSE_FILL = {1: "#b84a3a", 2: "#c9a640", 3: "#d9733a", 4: "#3a7ab8"}
 
 
 def bounds(plan):
-    xs = [v for r in plan.rooms.values() for v in (r.x0, r.x1)]
-    zs = [v for r in plan.rooms.values() for v in (r.z0, r.z1)]
+    built = [r for r in plan.rooms.values() if not r.get("terrain")]
+    xs = [v for r in built for v in (r.x0, r.x1)]
+    zs = [v for r in built for v in (r.z0, r.z1)]
     return min(xs) - 8, max(xs) + 8, min(zs) - 8, max(zs) + 8
 
 
@@ -43,7 +44,7 @@ def svg_storey(plan, s, extra=None):
         out.append(f'<line x1="{X(gx):.1f}" y1="0" x2="{X(gx):.1f}" y2="{H:.1f}" stroke="#2a2a30"/>')
     for gz in range(int(z0 // 16) * 16, int(z1) + 1, 16):
         out.append(f'<line x1="0" y1="{Z(gz):.1f}" x2="{W:.1f}" y2="{Z(gz):.1f}" stroke="#2a2a30"/>')
-    present = [r for r in plan.rooms.values() if s in r.storeys()]
+    present = [r for r in plan.rooms.values() if s in r.storeys() and not r.get("terrain")]
     present.sort(key=lambda r: (r.inside is not None, r.storey))
     for r in present:
         fill = HOUSE_FILL.get(r.house) if r.house else KIND_FILL.get(r.kind, "#999")
@@ -93,7 +94,7 @@ def svg_storey(plan, s, extra=None):
     return "\n".join(out)
 
 
-def write_all(plan, out_dir=OUT_DIR):
+def write_all(plan, grounds=None, out_dir=OUT_DIR):
     os.makedirs(out_dir, exist_ok=True)
     names = []
     for s in storeys(plan):

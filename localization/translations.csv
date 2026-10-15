@@ -59,6 +59,7 @@ NOTIFY_DOOR_LOCKED,The door is locked. A spell might open it.,Drzwi są zamknię
 INTERACT_STUDY_TOME,Study the tome,Przestudiuj księgę
 NOTIFY_SPELL_LEARNED,Learned %s — it sits on your hotbar (keys 1–0). Aim with the centre of the screen and press Cast (LMB).,Poznajesz czar %s — trafił na pasek czarów (klawisze 1–0). Celuj środkiem ekranu i naciśnij Czar (LPM).
 NOTIFY_SECRET_PASSAGE,A hidden passage opens!,Otwiera się ukryte przejście!
+NOTIFY_DEEP_WATER,"The water is too deep, so you scramble back to the shore.","Woda jest za głęboka, więc wracasz na brzeg."
 NOTIFY_CHECKPOINT,Checkpoint reached,Punkt kontrolny
 NOTIFY_STATUES_ALIGNED,The statues' gaze aligns. Something unlocked.,Spojrzenia posągów się zbiegają. Coś się odblokowało.
 NOTIFY_LEVER_STUCK,The lever will not budge while the statues look away.,"Dźwignia ani drgnie, dopóki posągi patrzą w inną stronę."
@@ -146,6 +147,21 @@ AREA_TOWER_SW_2,"Southwest Tower, second floor","Wieża Południowo-Zachodnia, d
 AREA_STARGAZING_PLATFORM,Stargazing Platform,Taras Gwiazdoznawstwa
 AREA_DUNGEON_CORRIDOR,Dungeon Corridor,Korytarz Lochów
 AREA_CELLARS,Cellars,Piwnice
+AREA_LAKE_PASSAGE,Lake Passage,Korytarz Jeziorny
+AREA_LAKE_TUNNEL,Boat Tunnel,Tunel do Przystani
+AREA_ESTATE,Castle Grounds,Tereny Zamkowe
+AREA_APPROACH,The Long Approach,Długa Droga
+AREA_LAKE_SHORE,Lakeshore,Brzeg Jeziora
+AREA_LAKE_TERRACE,Lake Terrace,Taras nad Jeziorem
+AREA_FOREST_EDGE,Edge of the Thornwood,Skraj Cierniowego Lasu
+AREA_LANDING_STAGE,Landing Stage,Przystań
+AREA_BOATHOUSE,Boathouse,Szopa na Łodzie
+AREA_COTTAGE,Groundskeeper's Cottage,Chata Gajowego
+AREA_STONE_CIRCLE,Circle of Standing Stones,Krąg Menhirów
+AREA_PITCH,Lantern Chase Pitch,Boisko Pogoni za Latarnią
+AREA_COVERED_BRIDGE,Covered Bridge,Kryty Most
+AREA_VIADUCT,Stone Viaduct,Kamienny Wiadukt
+AREA_GATEHOUSE,Outer Gatehouse,Zewnętrzna Brama
 AREA_UNDERCROFT,Undercroft,Krypta
 AREA_HIDDEN_STUDY,Hidden Study,Ukryty Gabinet
 AREA_LOFT,Forgotten Loft,Zapomniany Strych
