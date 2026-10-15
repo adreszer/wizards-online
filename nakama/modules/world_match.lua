@@ -30,6 +30,7 @@ local AREAS = require("world_areas")
 local Objects = require("object_rules")
 local Mysteries = require("mysteries")
 local School = require("school")
+local Timetable = require("timetable")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -43,6 +44,7 @@ local OP_LESSON, OP_LESSON_STATE, OP_LESSON_RESULT = P.OP_LESSON, P.OP_LESSON_ST
 local OP_HOUSE_POINTS, OP_HOUSE_TOTALS, OP_HOUSE_POINTS_RESULT = P.OP_HOUSE_POINTS, P.OP_HOUSE_TOTALS, P.OP_HOUSE_POINTS_RESULT
 local OP_LECTURE, OP_LECTURE_TEXT = P.OP_LECTURE, P.OP_LECTURE_TEXT
 local OP_CHEAT, OP_CHEAT_RESULT, OP_CLOCK = P.OP_CHEAT, P.OP_CHEAT_RESULT, P.OP_CLOCK
+local OP_TIMETABLE = P.OP_TIMETABLE
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
 local MAX_AREA_ID_BYTES = 48
@@ -287,7 +289,7 @@ end
 local function lessons_payload(state)
   local out = {}
   for area, lesson in pairs(state.lessons) do
-    out[area] = { subject = lesson.subject, by = lesson.by_name, sid = lesson.by_sid }
+    out[area] = { subject = lesson.subject, by = lesson.by_name, sid = lesson.by_sid, slot = lesson.slot or "" }
   end
   return nk.json_encode({ lessons = out })
 end
@@ -302,7 +304,7 @@ local function close_lesson(dispatcher, state, area, why)
   state.lessons[area] = nil
   local count = 0
   for _ in pairs(lesson.attendance) do count = count + 1 end
-  nk.logger_info(string.format("lesson %s in %s by %s closed (%s), %d attended, %d points", lesson.subject, area, lesson.by_name, why, count, lesson.points))
+  nk.logger_info(string.format("lesson %s in %s by %s closed (%s), %d attended, %d points, slot %s", lesson.subject, area, lesson.by_name, why, count, lesson.points, lesson.slot or "-"))
   send_lessons(dispatcher, state, nil)
 end
 
@@ -321,6 +323,13 @@ local function send_clock(dispatcher, state, presences, by_name)
   local payload = { day = School.day_seconds(state.rules), offset = state.clock_offset }
   if by_name then payload.by = by_name end
   dispatcher.broadcast_message(OP_CLOCK, nk.json_encode(payload), presences, nil, true)
+end
+
+-- The timetable's coming occurrences; `presences` nil = everyone.
+local function send_timetable(dispatcher, state, presences)
+  local now = nk.time() / 1000
+  state.timetable_day = Timetable.school_day(state.timetable, now)
+  dispatcher.broadcast_message(OP_TIMETABLE, Timetable.payload(state.timetable, now), presences, nil, true)
 end
 
 local function broadcast_object(dispatcher, oid, value)
@@ -371,7 +380,7 @@ function M.match_init(context, params)
   local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {}, locales = {},
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
-                  clock_offset = School.load_clock_offset() }
+                  clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0 }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -410,6 +419,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     send_lessons(dispatcher, state, { p })
     send_house_totals(dispatcher, state, { p })
     send_clock(dispatcher, state, { p })
+    send_timetable(dispatcher, state, { p })
     local rest = others(state, p.session_id)
     if #rest > 0 then
       dispatcher.broadcast_message(OP_PLAYER_JOINED, nk.json_encode(entry_for(state, p.session_id)), rest, nil, true)
@@ -459,6 +469,10 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       if now - lesson.opened_at > state.rules.session_max_minutes * 60 then
         close_lesson(dispatcher, state, area, "time")
       end
+    end
+    -- A new school day rolls the timetable window on.
+    if Timetable.school_day(state.timetable, now) ~= state.timetable_day then
+      send_timetable(dispatcher, state, nil)
     end
     local occupied = function(area) return #players_in(state, area) > 0 end
     run_actions(dispatcher, state, Mysteries.tick(state.engine, state.mysteries, nk.time() / 1000, occupied))
@@ -645,7 +659,10 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         elseif state.lessons[area] then
           reason = "already_open"
         else
-          state.lessons[area] = { subject = subject, by_sid = sid, by_name = state.names[sid] or "", opened_at = now, attendance = {}, points = 0 }
+          -- A lesson opened in its timetable slot (or just before) belongs to that slot.
+          local slot = Timetable.current(state.timetable, now, area, subject)
+          state.lessons[area] = { subject = subject, by_sid = sid, by_name = state.names[sid] or "", opened_at = now, attendance = {}, points = 0,
+                                  slot = slot and slot.id or nil }
           for _, pl in ipairs(players_in(state, area)) do
             if pl.sid ~= sid then state.lessons[area].attendance[pl.uid] = state.names[pl.sid] or "" end
           end
@@ -719,6 +736,11 @@ end
 -- Answers { ok, sid, user_id, role, house } or { ok = false, reason }.
 function M.match_signal(context, dispatcher, tick, state, data)
   local ok, request = pcall(nk.json_decode, data or "")
+  if ok and type(request) == "table" and request.op == "reload_timetable" then
+    state.timetable = Timetable.load()
+    send_timetable(dispatcher, state, nil)
+    return state, nk.json_encode({ ok = true, slots = #state.timetable.slots })
+  end
   if ok and type(request) == "table" and request.op == "reset_world" then
     local driven = state.world.driven
     state.world = Objects.new_world()

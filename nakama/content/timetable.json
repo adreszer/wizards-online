@@ -1,0 +1,21 @@
+{
+  "_comment": "The school week in real time. Times are the school's local time (utc_offset_minutes, plus an hour of EU summer time when dst is \"eu\"). kind \"lesson\" needs a subject (its first classroom unless room is set) and may name a professor; kind \"study\" is self-study in a room. Edit and restart Nakama (or call the admin_reload_timetable RPC).",
+  "utc_offset_minutes": 60,
+  "dst": "eu",
+  "days_ahead": 7,
+  "slots": [
+    { "id": "mon_charms", "day": "mon", "start": "18:00", "minutes": 45, "subject": "sigilcraft" },
+    { "id": "mon_transfiguration", "day": "mon", "start": "19:00", "minutes": 45, "subject": "shapeshaping" },
+    { "id": "tue_potions", "day": "tue", "start": "18:00", "minutes": 45, "subject": "elixirs" },
+    { "id": "tue_defence", "day": "tue", "start": "19:00", "minutes": 45, "subject": "warding" },
+    { "id": "wed_herbology", "day": "wed", "start": "18:00", "minutes": 45, "subject": "herblore", "room": "greenhouse" },
+    { "id": "wed_history", "day": "wed", "start": "19:00", "minutes": 45, "subject": "chronicles" },
+    { "id": "thu_creatures", "day": "thu", "start": "18:00", "minutes": 45, "subject": "beastlore" },
+    { "id": "thu_arithmancy", "day": "thu", "start": "19:00", "minutes": 45, "subject": "numeromancy" },
+    { "id": "fri_runes", "day": "fri", "start": "18:00", "minutes": 45, "subject": "glyphs" },
+    { "id": "fri_divination", "day": "fri", "start": "19:00", "minutes": 45, "subject": "farsight" },
+    { "id": "sat_flying", "day": "sat", "start": "12:00", "minutes": 60, "subject": "skyriding" },
+    { "id": "sat_astronomy", "day": "sat", "start": "21:00", "minutes": 60, "subject": "stargazing" },
+    { "id": "sun_study", "day": "sun", "start": "17:00", "minutes": 90, "kind": "study", "room": "library" }
+  ]
+}

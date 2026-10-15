@@ -52,6 +52,8 @@ signal cheat_result_received(ok: bool, item_id: String, reason: String)
 ## The school clock changed (server OP_CLOCK, or /time offline); `by_name` is who
 ## moved it ("" for the join snapshot).
 signal school_clock_changed(by_name: String)
+## The server sent the timetable (on join, each new school day, after a reload).
+signal timetable_changed()
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal system_message(text: String)
 
@@ -70,6 +72,8 @@ var local_display_name: String = ""
 var clock := ServerClock.new()
 ## Time of day (see school_hours()); the server's settings online, defaults offline.
 var school_clock := SchoolClock.new()
+## The school week in real time (empty offline; see Timetable).
+var timetable := Timetable.new()
 var _reconnect_attempts: int = 0
 var _reconnecting: bool = false
 
@@ -100,6 +104,9 @@ func _ready() -> void:
 	state_synchronizer.clock_received.connect(func(payload: Dictionary) -> void:
 		school_clock.apply(payload)
 		school_clock_changed.emit(str(payload.get("by", ""))))
+	state_synchronizer.timetable_received.connect(func(payload: Dictionary) -> void:
+		timetable.apply(payload)
+		timetable_changed.emit())
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 	world_session.server_clock_received.connect(func(server_ms: float, sent_ms: int) -> void:
@@ -345,6 +352,11 @@ func admin_set_profile(request: Dictionary, http_key: String = "") -> Dictionary
 ## (dev tooling and tests). Same access rules as admin_set_profile.
 func admin_reset_world(http_key: String = "") -> Dictionary:
 	return await _admin_rpc(NetworkProtocol.RPC_ADMIN_RESET_WORLD, {}, http_key)
+
+
+## Re-reads nakama/content/timetable.json on the server and resends it to everyone.
+func admin_reload_timetable(http_key: String = "") -> Dictionary:
+	return await _admin_rpc(NetworkProtocol.RPC_ADMIN_RELOAD_TIMETABLE, {}, http_key)
 
 
 func _session_rpc(rpc_id: String, request: Dictionary) -> Dictionary:

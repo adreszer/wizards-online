@@ -169,10 +169,28 @@ Open the chat (Enter or T; works offline too) and type a command:
 
 - `/broom` or `/miotla`: a flying broom (B to fly)
 - `/give <item id>` (`/daj`): any item from `ItemRegistry.ITEM_IDS`
+- `/plan` (`/lekcje`, `/timetable`): opens the timetable (online only; offline there is none)
 - `/time` (`/czas`): the school time; `/time 14:30`, `/time dawn|day|dusk|night` (`swit|dzien|zmierzch|noc`) moves the clock (online: for everyone, and it stays moved across restarts)
 - `/help` (`/pomoc`): the list
 
 Offline they change the local inventory. Online the server decides: admins always, everyone while `"cheats_enabled": true` in `nakama/content/school_rules.json` (the dev default; set it to false for a public server, then restart Nakama). Without a cheat, take a broom from the stand beside the spawn on the grounds or in the flying classroom.
+
+## Editing the timetable
+
+The school week lives in `nakama/content/timetable.json` (server only; it never ships in the client). Each slot is weekly, in school time (Warsaw: `utc_offset_minutes` 60 plus `"dst": "eu"`):
+
+```json
+{ "id": "mon_charms", "day": "mon", "start": "18:00", "minutes": 45, "subject": "sigilcraft", "professor": "Vexley" }
+{ "id": "sun_study", "day": "sun", "start": "17:00", "minutes": 90, "kind": "study", "room": "library" }
+```
+
+`subject` is a subject id (`resources/school/subjects/`); the room defaults to the subject's first classroom (`room` overrides it with any area id); `professor` is optional text for the boards. After editing, either restart Nakama or reload it live:
+
+```bash
+curl -s "http://127.0.0.1:7350/v2/rpc/admin_reload_timetable?http_key=defaulthttpkey&unwrap" -d '{}'
+```
+
+Slots that name an unknown subject, room, day or time are left out and logged (`docker logs wizards-nakama | grep timetable`). `run_tests.tscn` also checks the shipped file.
 
 ## Adding an item
 

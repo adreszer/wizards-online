@@ -343,7 +343,7 @@ NOTIFY_FLIGHT_CONTROLS,Flying: the broom follows the mouse · W forward · Space
 INVENTORY_RIDING_MARK,(riding),(w locie)
 INVENTORY_CLICK_TO_RIDE,Click to mount it or land (shortcut: B).,"Kliknij, aby wsiąść albo wylądować (skrót: B)."
 CHAT_OFFLINE_COMMANDS_ONLY,Offline there is nobody to talk to; only commands work here (/help).,Offline nie ma z kim rozmawiać; działają tylko komendy (/pomoc).
-CHEAT_HELP,Commands: /broom (/miotla) gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /help this list.,Komendy: /miotla (/broom) daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /pomoc ta lista.
+CHEAT_HELP,Commands: /broom (/miotla) gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /plan opens the timetable · /help this list.,Komendy: /miotla (/broom) daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /plan otwiera plan lekcji · /pomoc ta lista.
 CHEAT_GIVE_USAGE,Usage: /give <item>. Items: %s,Użycie: /daj <przedmiot>. Przedmioty: %s
 CHEAT_UNKNOWN,Unknown command: %s (try /help).,Nieznana komenda: %s (spróbuj /pomoc).
 CHEAT_UNKNOWN_ITEM,"No item called ""%s"". Items: %s",Nie ma przedmiotu „%s”. Przedmioty: %s
@@ -375,3 +375,33 @@ NOTIFY_DAWN,Dawn breaks over the castle.,Nad zamkiem wstaje świt.
 NOTIFY_NIGHTFALL,Night falls over the castle.,Nad zamkiem zapada noc.
 TALLY_TITLE,House Columns,Kolumny Domów
 TALLY_POINTS,%d pts,%d pkt
+TIMETABLE_TITLE,Timetable,Plan lekcji
+TIMETABLE_OFFLINE,"Lessons take place in the online school, where the timetable hangs.","Lekcje odbywają się w szkole online, tam też wisi plan lekcji."
+TIMETABLE_EMPTY,No lessons this week.,W tym tygodniu nie ma lekcji.
+TIMETABLE_NOW,Now,Teraz
+TIMETABLE_NEXT,Next,Następna
+TIMETABLE_STUDY,Self-study,Nauka własna
+TIMETABLE_PROFESSOR,Prof. %s,prof. %s
+TIMETABLE_FOOTER,Times are school time (now %s). Esc closes.,Godziny według czasu szkolnego (teraz %s). Esc zamyka.
+TIMETABLE_CLOSE,Close,Zamknij
+TIMETABLE_STARTS_SOON,The bell: %s begins in 5 minutes · %s,Dzwon: za 5 minut %s · %s
+TIMETABLE_STARTS_NOW,The bell: %s begins now · %s,Dzwon: zaczyna się %s · %s
+TIMETABLE_ENDED,The bell: %s is over.,Dzwon: koniec zajęć (%s).
+INTERACT_READ_TIMETABLE,Read the timetable,Przeczytaj plan lekcji
+CHEAT_PLAN_OPENED,Opening the timetable.,Otwieram plan lekcji.
+HUD_LESSON_NOW,Now: %s (until %s),Teraz: %s (do %s)
+HUD_LESSON_NEXT,Next: %s · %s,Następna: %s · %s
+DAY_MON,Mon,pon.
+DAY_TUE,Tue,wt.
+DAY_WED,Wed,śr.
+DAY_THU,Thu,czw.
+DAY_FRI,Fri,pt.
+DAY_SAT,Sat,sob.
+DAY_SUN,Sun,niedz.
+DAY_MON_LONG,Monday,Poniedziałek
+DAY_TUE_LONG,Tuesday,Wtorek
+DAY_WED_LONG,Wednesday,Środa
+DAY_THU_LONG,Thursday,Czwartek
+DAY_FRI_LONG,Friday,Piątek
+DAY_SAT_LONG,Saturday,Sobota
+DAY_SUN_LONG,Sunday,Niedziela

@@ -2,11 +2,13 @@ extends Node3D
 ## The castle world. Geometry comes from tools/generate_castle.py; this script
 ## only wires generic reactions (secrets, checkpoints) and adds the
 ## WorldObjectSync that keeps objects in step with the server and the
-## DayNightCycle that lights the world from the school clock. Rooms are
+## DayNightCycle that lights the world from the school clock, and the
+## SchoolBells that ring the timetable. Rooms are
 ## AreaZones (see gameplay/world/area_zone.gd) that other systems key off.
 
 var world_object_sync: WorldObjectSync
 var day_night: DayNightCycle
+var bells: SchoolBells
 
 
 func _ready() -> void:
@@ -19,6 +21,9 @@ func _ready() -> void:
 	day_night = DayNightCycle.new()
 	day_night.name = "DayNightCycle"
 	add_child(day_night)
+	bells = SchoolBells.new()
+	bells.name = "SchoolBells"
+	add_child(bells)
 	for wall in get_tree().get_nodes_in_group("secret_walls"):
 		if wall is SecretWall:
 			(wall as SecretWall).revealed.connect(func() -> void: GameEvents.notification_requested.emit(tr("NOTIFY_SECRET_PASSAGE"), 4.0))

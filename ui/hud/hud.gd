@@ -15,6 +15,7 @@ extends CanvasLayer
 @onready var _notification_label: Label = %NotificationLabel
 @onready var _status_label: Label = %StatusLabel
 @onready var _clock_label: Label = %ClockLabel
+@onready var _schedule_label: Label = %ScheduleLabel
 @onready var _crosshair: Control = %Crosshair
 @onready var _hotbar_root: Control = %HotbarRoot
 @onready var _hotbar: HBoxContainer = %Hotbar
@@ -81,6 +82,10 @@ func _process(delta: float) -> void:
 func _refresh_clock() -> void:
 	var hours := NetworkManager.school_hours()
 	_clock_label.text = tr("HUD_CLOCK") % [SchoolClock.format(hours), tr(SchoolClock.phase_key(SchoolClock.phase_of(hours)))]
+	var line := NetworkManager.timetable.status_line(NetworkManager.server_time())
+	_schedule_label.text = line
+	_schedule_label.visible = line != ""
+
 
 
 func _bind_player(player: Node) -> void:

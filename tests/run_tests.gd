@@ -76,6 +76,7 @@ func _run() -> void:
 	await _test_map()
 	await _test_setpieces()
 	await _test_day_night()
+	await _test_timetable()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -1344,7 +1345,7 @@ func _test_castle() -> void:
 	if placements is Dictionary:
 		for area: String in placements:
 			for entry: Dictionary in placements[area]:
-				if entry["kind"] in ["checkpoint", "crystal_guardian", "house_tally"]:
+				if entry["kind"] in ["checkpoint", "crystal_guardian", "house_tally", "notice_board"]:
 					continue
 				if not object_ids.has(area + "/" + str(entry["id"])):
 					missing_placed.append(area + "/" + str(entry["id"]))
@@ -1827,6 +1828,84 @@ func _test_day_night() -> void:
 		cycle.time_override = 6.75
 		cycle.refresh()
 		t.check(cycle.sky_light.light_energy > e1 and cycle.sky_light.light_color.r > cycle.sky_light.light_color.b, "the low morning sun is warm and rising")
+	castle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_timetable() -> void:
+	t.section("Timetable")
+	# 2026-10-12 was a Monday; school time is UTC+2 (summer time) in this payload.
+	var monday := 1791763200.0   # 2026-10-12 (a Monday) 00:00 UTC
+	var tt := Timetable.new()
+	t.check(not tt.received and NoticeBoard.board_text(tt, monday, 5).contains(tr("TIMETABLE_OFFLINE")), "offline the board says lessons are online")
+	var charms := monday + 16 * 3600.0   # 18:00 school time
+	tt.apply({"tz": 120, "slots": [
+		{"id": "mon_transfiguration", "k": "lesson", "s": "shapeshaping", "a": "class_shapeshaping", "p": "", "t0": charms + 3600.0, "t1": charms + 3600.0 + 2700.0},
+		{"id": "mon_charms", "k": "lesson", "s": "sigilcraft", "a": "class_sigilcraft", "p": "Vexley", "t0": charms, "t1": charms + 2700.0},
+		{"id": "sun_study", "k": "study", "s": "", "a": "library", "p": "", "t0": charms + 6 * 86400.0, "t1": charms + 6 * 86400.0 + 5400.0},
+		{"id": "broken", "t0": 10.0, "t1": 5.0}]})
+	t.check(tt.received and tt.entries.size() == 3 and tt.entries[0].id == "mon_charms", "the server's slots are kept in start order, broken ones dropped")
+	var st := tt.school_time(charms)
+	t.check(st.weekday == 0 and st.hour == 18 and st.minute == 0 and tt.clock_text(charms) == "18:00" and tt.day_key(charms) == "DAY_MON",
+		"times read in school time (Monday 18:00)")
+	t.check(tt.next_after(charms - 60.0).id == "mon_charms" and tt.current(charms + 60.0, "class_sigilcraft").id == "mon_charms"
+		and tt.current(charms + 60.0, "library").is_empty(), "next and running lessons")
+	var events := tt.events_between(charms - 400.0, charms + 10.0)
+	t.check(events.size() == 2 and events[0].event == "warn" and events[1].event == "start", "the bell warns 5 minutes before and rings at the start")
+	t.check(tt.events_between(charms + 2690.0, charms + 2710.0)[0].event == "end", "and at the end")
+	t.check(Timetable.title_of(tt.entries[2]) == tr("TIMETABLE_STUDY") and Timetable.title_of(tt.entries[0]) == tr("SUBJECT_SIGILCRAFT_NAME"), "entry titles")
+	var board := NoticeBoard.board_text(tt, charms + 60.0, 5)
+	t.check(board.contains(tr("TIMETABLE_NOW") + "   " + tr("SUBJECT_SIGILCRAFT_NAME")) and board.contains("19:00"), "the board marks the running lesson and lists the next (%s)" % board.replace("\n", " | "))
+	t.check(tt.status_line(charms - 600.0) == tr("HUD_LESSON_NEXT") % [tr("SUBJECT_SIGILCRAFT_NAME"), "18:00"]
+		and tt.status_line(charms + 60.0) == tr("HUD_LESSON_NOW") % [tr("SUBJECT_SIGILCRAFT_NAME"), "18:45"], "the HUD shows the running or next lesson")
+	t.check(TimetablePanel.week_bbcode(tt, charms - 600.0, get_tree()).contains(tr("DAY_SUN_LONG")), "the week panel groups by day")
+
+	# The shipped timetable names real subjects and rooms.
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/timetable.json"))
+	var ok := data is Dictionary and (data.get("slots", []) as Array).size() > 0
+	var problems: Array[String] = []
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var zones := {}
+	for z in (castle as Node).get_tree().get_nodes_in_group(AreaZone.GROUP):
+		zones[str((z as AreaZone).area_id)] = z
+	if ok:
+		for slot: Dictionary in data.slots:
+			var kind := str(slot.get("kind", "lesson"))
+			var subject := SubjectRegistry.load_definition(str(slot.get("subject", "")))
+			var room := str(slot.get("room", subject.classrooms[0] if subject != null else ""))
+			if kind == "lesson" and subject == null:
+				problems.append("%s: subject" % slot.id)
+			if not zones.has(room):
+				problems.append("%s: room %s" % [slot.id, room])
+			if not ["mon", "tue", "wed", "thu", "fri", "sat", "sun"].has(str(slot.get("day", ""))) or SchoolClock.parse(str(slot.get("start", ""))) < 0.0:
+				problems.append("%s: day/start" % slot.id)
+	t.check(ok and problems.is_empty(), "timetable.json slots name real subjects, rooms and times %s" % str(problems))
+
+	# Notice boards hang in the entrance hall and every common room.
+	var boards := castle.find_children("*", "NoticeBoard", true, false)
+	var board_areas := {}
+	for b: Node in boards:
+		for id: String in zones:
+			var z := zones[id] as AreaZone
+			var local := z.to_local((b as Node3D).global_position)
+			if absf(local.x) <= z.size.x / 2 and absf(local.y) <= z.size.y / 2 and absf(local.z) <= z.size.z / 2 and z.kind != "grounds":
+				board_areas[z.kind if z.kind == "common_room" else id] = int(board_areas.get(z.kind if z.kind == "common_room" else id, 0)) + 1
+	t.check(boards.size() == 5 and board_areas.get("entrance_hall", 0) == 1 and board_areas.get("common_room", 0) == 4, "a notice board in the entrance hall and each common room (%s)" % str(board_areas))
+
+	# Bells ring from the shared timetable.
+	var saved := NetworkManager.timetable
+	NetworkManager.timetable = tt
+	var bells := castle.get_node_or_null("SchoolBells") as SchoolBells
+	t.check(bells != null and SchoolBells.bell_stream().data.size() > 10000, "the castle has a bell")
+	if bells != null:
+		bells.set_process(false)
+		bells.check(charms - 301.0)
+		bells.check(charms - 299.0)
+		bells.check(charms + 1.0)
+		t.check(bells.rung.size() == 2 and bells.rung[0].event == "warn" and bells.rung[1].event == "start", "bells ring the warning and the start once each")
+	NetworkManager.timetable = saved
 	castle.queue_free()
 	await get_tree().process_frame
 

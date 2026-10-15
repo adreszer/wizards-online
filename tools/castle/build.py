@@ -594,6 +594,9 @@ def wall_free_intervals(r, side, width, storey=None):
     for x, z, st in torch_points:
         if st == storey and abs(other(x, z) - coord) < 0.5 and lo <= along(x, z) <= hi:
             blocked.append((along(x, z) - 0.4, along(x, z) + 0.4))
+    for x, z, st, half in wall_spans:
+        if st == storey and abs(other(x, z) - coord) < 0.6 and lo - half <= along(x, z) <= hi + half:
+            blocked.append((along(x, z) - half, along(x, z) + half))
     blocked.sort()
     free, cursor = [], lo + T / 2
     for b0, b1 in blocked:
@@ -789,8 +792,14 @@ KINDS = {
     "sorting_stone": ("res://objects/school/sorting_stone.tscn", ".", True),
     "house_tally": ("res://objects/school/house_tally.tscn", "Props", False),
     "item_rack": ("res://objects/interactables/broom_rack.tscn", "Props", True),
+    "notice_board": ("res://objects/school/notice_board.tscn", "Props", False),
 }
 PLAQUE_HEIGHT = 1.6
+NOTICE_BOARD_HEIGHT = 1.9   # centre of the 1.55 m board (its origin) above the floor
+# Placed kinds that take wall space from the dressing (half their width along the wall, m).
+WALL_SPAN_KINDS = {"notice_board": 1.5}
+wall_spans = []   # (x, z, storey, half width) of placed wall items, filled by emit_placements
+WALL_HEIGHTS = {"plaque": PLAQUE_HEIGHT, "notice_board": NOTICE_BOARD_HEIGHT}
 WALL_FLUSH = T / 2 + 0.05
 
 def placement_point(r, e):
@@ -804,7 +813,7 @@ def placement_point(r, e):
     if "wall" in e:
         side, along = e["wall"], e.get("along", 0.5)
         d = e.get("inset", WALL_FLUSH)
-        y = r.y + e.get("height", PLAQUE_HEIGHT if e["kind"] == "plaque" else 0.0)
+        y = r.y + e.get("height", WALL_HEIGHTS.get(e["kind"], 0.0))
         if side == "n": return (r.x0 + (r.x1 - r.x0) * along, y, r.z0 + d), 0.0
         if side == "s": return (r.x0 + (r.x1 - r.x0) * along, y, r.z1 - d), math.radians(180)
         if side == "w": return (r.x0 + d, y, r.z0 + (r.z1 - r.z0) * along), math.radians(90)
@@ -892,6 +901,8 @@ def emit_placements(path):
             oid = f"{area}/{e['id']}"
             pos, yaw = placement_point(r, e)
             check_inside(r, e, pos)
+            if e["kind"] in WALL_SPAN_KINDS:
+                wall_spans.append((pos[0], pos[2], r.storey, WALL_SPAN_KINDS[e["kind"]]))
             props = {}
             if e["kind"] == "spell_tome":
                 spell_ext = ext_id("Resource", "res://resources/spells/" + e["spell"] + ".tres")
@@ -959,6 +970,7 @@ def reset(plan, kit):
     del nodes[:]
     del torch_points[:]
     del placed_nodes[:]
+    del wall_spans[:]
 
 
 def build(plan, kit, placements=PLACEMENTS):

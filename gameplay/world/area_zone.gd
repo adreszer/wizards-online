@@ -7,6 +7,9 @@ extends Area3D
 ## hardcoding coordinates. The box is built from [member size] so the level
 ## generator can emit one node per room.
 
+## Every zone joins this group (lookups by area id: timetable rooms, …).
+const GROUP := &"area_zones"
+
 ## Stable identifier used by gameplay/server logic (never shown to players).
 @export var area_id: StringName = &""
 ## Translation key of the player-facing name.
@@ -20,6 +23,7 @@ extends Area3D
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
 	collision_layer = 0
 	collision_mask = 2  # player
 	monitorable = false

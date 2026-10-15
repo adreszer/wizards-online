@@ -27,6 +27,7 @@ signal house_points_result_received(ok: bool, house: int, delta: int, reason: St
 signal lecture_received(by_name: String, text: String)
 signal cheat_result_received(ok: bool, item_id: String, reason: String)
 signal clock_received(payload: Dictionary)
+signal timetable_received(payload: Dictionary)
 
 @export var ping_interval: float = 2.0
 
@@ -72,6 +73,7 @@ func bind(p_session: WorldSession) -> void:
 	session.lecture_received.connect(lecture_received.emit)
 	session.cheat_result_received.connect(cheat_result_received.emit)
 	session.clock_received.connect(clock_received.emit)
+	session.timetable_received.connect(timetable_received.emit)
 
 
 func reset() -> void:

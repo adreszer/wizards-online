@@ -7,6 +7,7 @@
   ],
   "entrance_hall": [
     {"id": "plaque_castle_entrance", "kind": "plaque", "text": "PLAQUE_CASTLE_ENTRANCE", "wall": "w", "along": 0.75},
+    {"id": "notice_board", "kind": "notice_board", "wall": "w", "along": 0.3},
     {"id": "checkpoint", "kind": "checkpoint", "at": [0, 4]}
   ],
   "library": [
@@ -101,5 +102,17 @@
   ],
   "gallery": [
     {"id": "checkpoint", "kind": "checkpoint", "at": [0, 4]}
+  ],
+  "tower_ne_2": [
+    {"id": "notice_board", "kind": "notice_board", "wall": "auto"}
+  ],
+  "tower_nw_2": [
+    {"id": "notice_board", "kind": "notice_board", "wall": "auto"}
+  ],
+  "house3_common": [
+    {"id": "notice_board", "kind": "notice_board", "wall": "auto"}
+  ],
+  "house4_common": [
+    {"id": "notice_board", "kind": "notice_board", "wall": "auto"}
   ]
 }

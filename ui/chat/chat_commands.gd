@@ -5,6 +5,7 @@ extends RefCounted
 ##   /broom (/miotla, /miotła)   give the local player a broom
 ##   /give <item id> (/daj)      give any registered item
 ##   /time [hh[:mm]] (/czas)     show the school time, or move the clock (everyone's, online)
+##   /plan (/timetable)          open the timetable
 ##   /help (/pomoc)              list the commands
 ## Offline they act on the local inventory directly. Online the server owns the
 ## inventory: the request goes up as OP_CHEAT and is accepted from admins, or
@@ -14,6 +15,7 @@ const GIVE_ALIASES: Array[String] = ["give", "daj"]
 const BROOM_ALIASES: Array[String] = ["broom", "miotla", "miotła"]
 const HELP_ALIASES: Array[String] = ["help", "pomoc", "?"]
 const TIME_ALIASES: Array[String] = ["time", "czas", "godzina"]
+const PLAN_ALIASES: Array[String] = ["plan", "timetable", "lekcje"]
 
 
 static func is_command(text: String) -> bool:
@@ -33,6 +35,10 @@ static func run(text: String, player: Node) -> String:
 		if parts.size() < 2:
 			return _t("CHEAT_GIVE_USAGE") % ", ".join(ItemRegistry.ITEM_IDS)
 		return give(parts[1].to_lower(), player)
+	if PLAN_ALIASES.has(name):
+		# Deferred: the chat box releases the keyboard first, then the panel takes it.
+		GameEvents.timetable_requested.emit.call_deferred()
+		return _t("CHEAT_PLAN_OPENED")
 	if TIME_ALIASES.has(name):
 		return time(parts[1] if parts.size() > 1 else "")
 	return _t("CHEAT_UNKNOWN") % text

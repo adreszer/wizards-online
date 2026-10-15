@@ -45,3 +45,9 @@ signal area_exited(area_id: StringName, zone: Node)
 ## The school's time of day entered a new phase (SchoolClock.Phase: night, dawn, day,
 ## dusk). Emitted by the level's DayNightCycle, also once when it starts.
 signal time_phase_changed(phase: int)
+
+## Someone asked to see the timetable (a notice board, /plan): the panel opens.
+signal timetable_requested()
+## The school bell rang for a timetable entry: event "warn" (5 minutes before),
+## "start" or "end"; entry as in Timetable.entries.
+signal school_bell_rang(event: String, entry: Dictionary)

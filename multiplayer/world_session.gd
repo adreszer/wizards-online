@@ -41,6 +41,8 @@ signal house_points_result_received(ok: bool, house: int, delta: int, reason: St
 signal cheat_result_received(ok: bool, item_id: String, reason: String)
 ## The school clock {day, offset, by?} (see SchoolClock).
 signal clock_received(payload: Dictionary)
+## The timetable's coming occurrences (see Timetable).
+signal timetable_received(payload: Dictionary)
 ## A professor's lecture line in the local player's classroom.
 signal lecture_received(by_name: String, text: String)
 
@@ -153,6 +155,8 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 			cheat_result_received.emit(bool(payload.get("ok", false)), str(payload.get("id", "")), str(payload.get("reason", "")))
 		NetworkProtocol.OP_CLOCK:
 			clock_received.emit(payload)
+		NetworkProtocol.OP_TIMETABLE:
+			timetable_received.emit(payload)
 		NetworkProtocol.OP_LECTURE_TEXT:
 			lecture_received.emit(str(payload.get("by", "")), str(payload.get("text", "")))
 		NetworkProtocol.OP_WORLD_SNAPSHOT:

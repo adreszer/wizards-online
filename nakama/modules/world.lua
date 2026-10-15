@@ -119,6 +119,19 @@ local function rpc_admin_reset_world(context, payload)
 end
 nk.register_rpc(rpc_admin_reset_world, P.RPC_ADMIN_RESET_WORLD)
 
+-- RPC "admin_reload_timetable": {} → {ok, slots}: re-reads nakama/content/timetable.json
+-- and sends the new week to everyone. Admins or the HTTP key.
+local function rpc_admin_reload_timetable(context, payload)
+  require_admin(context)
+  local result = nk.match_signal(find_or_create_world(), nk.json_encode({ op = "reload_timetable" }))
+  local decoded = result and select(2, pcall(nk.json_decode, result)) or nil
+  if type(decoded) ~= "table" or not decoded.ok then
+    error({ "match did not answer", 13 })
+  end
+  return nk.json_encode(decoded)
+end
+nk.register_rpc(rpc_admin_reload_timetable, P.RPC_ADMIN_RELOAD_TIMETABLE)
+
 -- RPC "house_points_ledger": {limit?} → {records, totals}: the stored record of
 -- every house points change, newest first (admins or the HTTP key).
 local function rpc_house_points_ledger(context, payload)

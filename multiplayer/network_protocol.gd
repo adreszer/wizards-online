@@ -77,6 +77,11 @@ const OP_CHEAT_RESULT := 32
 ## server → joining player, and all when it changes: {day: seconds per school day,
 ## offset: seconds added to the world time, by?: who moved it} (see SchoolClock)
 const OP_CLOCK := 33
+## server → joining player, and all when the school day rolls over or the timetable
+## is reloaded: {tz: school UTC offset in minutes, slots: [{id, k: "lesson" | "study",
+## s: subject id, a: area id, p: professor name, t0, t1: start/end in epoch seconds}]}
+## (see Timetable; the source is nakama/content/timetable.json)
+const OP_TIMETABLE := 34
 
 const CHAT_ROOM := "world"
 ## Server RPC that finds (or creates) the shared world match.
@@ -85,6 +90,8 @@ const RPC_JOIN_WORLD := "join_world"
 const RPC_ADMIN_SET_PROFILE := "admin_set_profile"
 ## Server RPC that resets world objects and shared mysteries (admin or HTTP key; dev and tests).
 const RPC_ADMIN_RESET_WORLD := "admin_reset_world"
+## Admin RPC: {} → {ok, slots} re-reads nakama/content/timetable.json and resends it
+const RPC_ADMIN_RELOAD_TIMETABLE := "admin_reload_timetable"
 ## Admin RPC: {limit?} → {records: [{house, delta, reason, by_name, source, subject, at}], totals}
 const RPC_HOUSE_POINTS_LEDGER := "house_points_ledger"
 ## Staff RPC: {id?, title, lines: [text]} → {id} stores a lesson plan for the caller

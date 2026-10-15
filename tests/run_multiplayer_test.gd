@@ -28,6 +28,7 @@ var lectures: Array[String] = []
 var cheat_results: Array = []
 ## Who moved the school clock, per OP_CLOCK ("" = the join snapshot)
 var clock_changes: Array[String] = []
+var timetables_received: int = 0
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
@@ -57,6 +58,7 @@ func _ready() -> void:
 	NetworkManager.lesson_result_received.connect(func(ok: bool, action: String, reason: String) -> void: lesson_results.append({"ok": ok, "action": action, "reason": reason}))
 	NetworkManager.house_points_result_received.connect(func(ok: bool, house: int, delta: int, reason: String) -> void: points_results.append({"ok": ok, "house": house, "delta": delta, "reason": reason}))
 	NetworkManager.lecture_received.connect(func(by: String, text: String) -> void: lectures.append("%s: %s" % [by, text]))
+	NetworkManager.timetable_changed.connect(func() -> void: timetables_received += 1)
 	NetworkManager.school_clock_changed.connect(func(by: String) -> void: clock_changes.append(by))
 	NetworkManager.cheat_result_received.connect(func(ok: bool, id: String, reason: String) -> void: cheat_results.append({"ok": ok, "id": id, "reason": reason}))
 	await _run()
@@ -324,12 +326,36 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 			saw_broom[0] = true
 		return r == null, 60.0)
 	t.check(saw_broom[0], "B's broom shows on the remote player while B flies")
+	var before := timetables_received
+	var reloaded: Dictionary = await NetworkManager.admin_reload_timetable(HTTP_KEY)
+	var got := await _wait_until(func() -> bool: return timetables_received > before, 10.0)
+	t.check(reloaded.get("ok", false) == true and got, "admin_reload_timetable resends the week to everyone (%s)" % str(reloaded))
 	t.check(clock_changes.has("") and clock_changes.has("ClientB"), "the school clock comes with the join, and B's /time reaches A (%s)" % str(clock_changes))
 	t.check(ok, "remote player removed when B disconnects")
 	t.check(leaves.has("ClientB"), "leave event received for ClientB")
 	ok = await _wait_until(func() -> bool: return _remote(spawner) != null, 30.0)
 	t.check(ok, "remote player re-appears when B reconnects")
 	await _wait(1.0)
+
+
+## The join brings the coming week: every occurrence falls on its slot's weekday
+## and start time in school time (nakama/content/timetable.json).
+func _check_timetable() -> void:
+	var tt := NetworkManager.timetable
+	t.check(tt.received and timetables_received >= 1 and tt.entries.size() >= 10, "the join brings the timetable (%d entries)" % tt.entries.size())
+	t.check(tt.tz_minutes == 60 or tt.tz_minutes == 120, "school time is Warsaw time (UTC+%d min)" % tt.tz_minutes)
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/timetable.json"))
+	var slots := {}
+	for slot: Dictionary in data.slots:
+		slots[slot.id] = slot
+	var days := ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+	var wrong: Array[String] = []
+	for e in tt.entries:
+		var slot: Dictionary = slots.get(e.id, {})
+		var st := tt.school_time(e.t0)
+		if slot.is_empty() or days[st.weekday] != slot.day or tt.clock_text(e.t0) != str(slot.start).pad_zeros(5) or e.t1 - e.t0 != float(slot.minutes) * 60.0:
+			wrong.append("%s@%s %s" % [e.id, tt.day_key(e.t0), tt.clock_text(e.t0)])
+	t.check(wrong.is_empty() and tt.entries[0].t1 > NetworkManager.server_time(), "every occurrence lands on its slot's day and hour %s" % str(wrong))
 
 
 # --- Actor (client B) ------------------------------------------------------------------
@@ -469,6 +495,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(ok and cheat_results[0]["reason"] == "already_owned" and cheat_results[1]["reason"] == "unknown_item", "cheats: an owned broom and an unknown item are refused (%s)" % str(cheat_results))
 	t.check(player.inventory.count_of(&"broom") == 1, "still exactly one broom")
 	t.check(clock_changes.has(""), "the join brings the school clock")
+	_check_timetable()
 	var hours_before := NetworkManager.school_hours()
 	NetworkManager.set_school_hours(15.5)
 	ok = await _wait_until(func() -> bool: return clock_changes.has("ClientB"), 10.0)

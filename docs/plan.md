@@ -310,6 +310,18 @@ Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B
 - [ ] Night-only content keys off `time_phase_changed` / `SchoolClock.is_night`: night flight of the turning stairs, night creatures, stargazing, curfew; the same check on the server for anything it decides
 - [ ] Sun shadows outdoors (off for now; measure the cost on the grounds first)
 
+### Milestone 35 — Timetable and bells
+- [x] The school week as server data: `nakama/content/timetable.json`, weekly slots (day, start, minutes, subject or self-study, optional room and professor) in real time, in the school's time zone (`utc_offset_minutes` + EU summer time, checked against Europe/Warsaw for 2024–2030); `timetable.lua` validates slots (subject, room, times; bad ones logged and skipped)
+- [x] `OP_TIMETABLE`: the server sends concrete occurrences (epoch seconds) for the coming week on join, at each new school day and after `admin_reload_timetable` (RPC, admins or the HTTP key), so clients need no time zone rules; shown in school time
+- [x] A lesson opened in its timetabled classroom during its slot (or up to 10 minutes before) records the slot (`lessons.slot`, logged at close)
+- [x] `SchoolBells` (added by `castle.gd`): one stroke 5 minutes before, three at the start, two at the end, castle-wide, with a HUD notification; the bell is synthesised (no asset)
+- [x] `NoticeBoard` (placement kind `notice_board`, on the wall board model) in the entrance hall and every common room: the coming lessons, the running one marked; interact (or `/plan`) opens `TimetablePanel`, the week grouped by day; HUD line "Now: … (until …)" / "Next: … · …"
+- [x] Generator: placed wall items (`WALL_SPAN_KINDS`) keep the dressing (hearths, banners) off their wall span
+- [x] Tests: timetable model, board/HUD/panel text, bells, `timetable.json` validity, board placement; two clients: occurrences land on their slot's weekday and hour in school time, reload resends; `tools/capture_timetable.tscn` for screenshots
+- [ ] Attendance per slot stored for grades (today it is only logged); "absent" when a timetabled lesson has no professor (self-study fallback)
+- [ ] In-game timetable editing for admins (today: edit the JSON, then reload)
+- [ ] Terms and holidays (`calendar.json`): weeks without lessons, exam weeks
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
