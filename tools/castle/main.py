@@ -74,8 +74,11 @@ def main(argv=None):
     stats, text = build.build(plan, kit)
     with open(OUT, "w") as f:
         f.write(text)
+    from . import exterior
+    shell = exterior.write(exterior.generate(plan, build.units, g.terrain))
     export.area_map(plan, AREA_MAP)
     print("name keys:", " ".join(sorted({r.name_key for r in plan.rooms.values()})))
     print("  ".join(f"{k.replace('_', ' ')}: {v}" for k, v in stats.items()))
+    print("exterior:", "  ".join(f"{k}: {v}" for k, v in shell.items()))
     print("grounds:", "  ".join(f"{k}: {len(v)}" for k, v in sorted(g.scatter.items())),
           " paths:", len(g.paths), " bridges:", len(g.bridges))

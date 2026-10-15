@@ -1,4 +1,4 @@
-[gd_scene load_steps=54 format=3 uid="uid://castle0000001"]
+[gd_scene load_steps=55 format=3 uid="uid://castle0000001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/modular_wall_run.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/environment/modular/wall_window.tscn" id="2"]
@@ -50,6 +50,7 @@
 [ext_resource type="PackedScene" path="res://objects/environment/props/feast_table.tscn" id="48"]
 [ext_resource type="Script" path="res://levels/castle/castle.gd" id="49"]
 [ext_resource type="PackedScene" path="res://levels/grounds/grounds.tscn" id="50"]
+[ext_resource type="Script" path="res://gameplay/world/castle_exterior.gd" id="51"]
 
 [sub_resource type="ProceduralSkyMaterial" id="NightSkyMat"]
 sky_top_color = Color(0.015, 0.02, 0.045, 1)
@@ -126,6 +127,9 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.0, 0.05, 84.0)
 [node name="Puzzles" type="Node3D" parent="."]
 
 [node name="Grounds" parent="." instance=ExtResource("50")]
+
+[node name="Exterior" type="Node3D" parent="."]
+script = ExtResource("51")
 
 [node name="Moon" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 60, 0)
@@ -3426,7 +3430,7 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 size = Vector3(24.000, 0.540, 16.000)
 
 [node name="Ceiling_greenhouse" parent="Ceilings" instance=ExtResource("11")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 40.000, 8.000, 52.000)
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 40.000, 4.000, 52.000)
 size_x = 24.000
 size_z = 16.000
 occluder_y = 0.245
@@ -6050,12 +6054,12 @@ transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000
 object_id = "lake_tunnel/torch_12"
 
 [node name="Chandelier_greenhouse" parent="Lights" instance=ExtResource("16")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 46.000, 8.000, 60.000)
-drop = 2.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 46.000, 4.000, 60.000)
+drop = -2.000
 
 [node name="Chandelier_greenhouse_2" parent="Lights" instance=ExtResource("16")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 58.000, 8.000, 60.000)
-drop = 2.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 58.000, 4.000, 60.000)
+drop = -2.000
 
 [node name="Chandelier_entrance_hall" parent="Lights" instance=ExtResource("16")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 17.000, 30.000)

@@ -916,6 +916,7 @@ def build(plan, kit, placements=PLACEMENTS):
 def scene_text(plan):
     level_script = ext_id("Script", "res://levels/castle/castle.gd")
     grounds = ext_id("PackedScene", "res://levels/grounds/grounds.tscn")
+    exterior = ext_id("Script", "res://gameplay/world/castle_exterior.gd")
     exts = ""
     for (kind, path), i in sorted(ext.items(), key=lambda kv: kv[1]):
         exts += f'[ext_resource type="{kind}" path="{path}" id="{i}"]\n'
@@ -939,6 +940,7 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
     for c in CONTAINERS:
         root += f'\n[node name="{c}" type="Node3D" parent="."]\n'
     root += f'\n[node name="Grounds" parent="." instance=ExtResource("{grounds}")]\n'
+    root += f'\n[node name="Exterior" type="Node3D" parent="."]\nscript = ExtResource("{exterior}")\n'
     root += f'''
 [node name="Moon" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 60, 0)

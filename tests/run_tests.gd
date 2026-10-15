@@ -1063,6 +1063,18 @@ func _test_castle() -> void:
 			untranslated.append(z.display_key)
 	t.check(untranslated.is_empty(), "every area has a translated name (missing: %s)" % ", ".join(untranslated))
 	t.check(castle.get_node_or_null("StartPoint") != null, "castle has a StartPoint")
+	var shell: CastleExterior = castle.get_node_or_null("Exterior")
+	var shell_ok := shell != null
+	for part in ["Roofs", "Stone", "Hlod", "HlodWindows"]:
+		var mi: MeshInstance3D = shell.get_node_or_null(part) if shell != null else null
+		shell_ok = shell_ok and mi != null and mi.mesh != null and mi.mesh.get_surface_count() > 0
+	t.check(shell_ok, "the castle has its exterior shell (roofs, stone, far view)")
+	await get_tree().process_frame
+	var ranged := 0
+	for w in castle.get_node("Walls").find_children("*", "MeshInstance3D", true, false):
+		if (w as MeshInstance3D).visibility_range_end > 0.0:
+			ranged += 1
+	t.check(ranged > 100, "interior detail fades out at the far-view range (%d wall meshes)" % ranged)
 	t.check(get_tree().get_nodes_in_group("secret_walls").size() >= 3, "castle has secret passages")
 	# Stable object ids: unique "<area>/<name>", the area exists, and every placement is in the scene.
 	var area_ids: Dictionary = {}

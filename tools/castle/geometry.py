@@ -63,7 +63,9 @@ class Room:
     @property
     def top_storey(self): return self.storey + self.bands - 1
     @property
-    def ceiling_y(self): return self.top_storey * STOREY + BAND_H
+    def ceiling_y(self):
+        # Single-row rooms (4 m walls: the greenhouse) are roofed at their wall top.
+        return self.top_storey * STOREY + (BAND_H if self.rows >= 2 else self.rows * MODULE_H)
     @property
     def rect(self): return (self.x0, self.x1, self.z0, self.z1)
     @property

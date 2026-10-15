@@ -4,7 +4,7 @@
  "gate": {"x": 0, "z": 48, "facing": "s"},
  "start": [0.0, 0.0, 84.0],
  "rooms": [
-  {"id": "grounds", "rect": [-64, 64, 48, 96], "kind": "outdoor", "ceiling": false, "rows": 1, "pillars": false, "torches": false},
+  {"id": "grounds", "rect": [-64, 64, 48, 96], "kind": "outdoor", "ceiling": false, "rows": 1, "pillars": false, "torches": false, "battlements": true},
   {"id": "greenhouse", "rect": [40, 64, 52, 68], "kind": "classroom", "rows": 1, "inside": "grounds"},
   {"id": "paddock", "rect": [-64, -40, 52, 68], "kind": "outdoor", "ceiling": false, "rows": 1, "pillars": false, "torches": false, "inside": "grounds"},
   {"id": "entrance_hall", "rect": [-12, 12, 24, 48], "bands": 2, "kind": "hall"},
@@ -51,7 +51,7 @@
   {"id": "tower_sw_1", "rect": [-52, -36, 24, 40], "storey": 1, "kind": "tower", "tower": "sw"},
   {"id": "tower_sw_2", "rect": [-52, -36, 24, 40], "storey": 2, "kind": "classroom", "tile": "ornate", "front": "e", "tower": "sw"},
   {"id": "tower_sw_3", "rect": [-52, -36, 24, 40], "storey": 3, "kind": "classroom", "tile": "ornate", "name_key": "AREA_CLASS_FARSIGHT", "front": "e", "tower": "sw"},
-  {"id": "tower_sw_4", "rect": [-52, -36, 24, 40], "storey": 4, "kind": "outdoor", "ceiling": false, "rows": 1, "pillars": false, "torches": false, "name_key": "AREA_STARGAZING_PLATFORM", "tower": "sw"},
+  {"id": "tower_sw_4", "rect": [-52, -36, 24, 40], "storey": 4, "kind": "outdoor", "ceiling": false, "rows": 1, "pillars": false, "torches": false, "name_key": "AREA_STARGAZING_PLATFORM", "tower": "sw", "battlements": true},
   {"id": "tower_sw_stair", "rect": [-60, -52, 28, 36], "bands": 5, "kind": "stair_turret", "tower": "sw", "pillars": false, "torches": false},
   {"id": "dungeon_corridor", "rect": [-20, -12, -40, 24], "storey": -1, "kind": "corridor"},
   {"id": "class_elixirs", "rect": [-44, -20, 0, 24], "storey": -1, "kind": "classroom", "tile": "ornate", "front": "w"},
