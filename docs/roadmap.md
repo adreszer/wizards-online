@@ -211,6 +211,7 @@ Ordered by "biggest change on screen per day of work".
 ### 5.8 Audio (paired with visuals)
 
 - Ambience per area, footsteps per surface, reverb zones, spell sounds per spell, a bell system, a small music set (day, night, feast, lesson, duel, mystery found). (M ★★★)
+- The full sound and music list, with generation prompts, sources and a credit budget, is in `docs/audio-list.md`.
 
 ---
 
