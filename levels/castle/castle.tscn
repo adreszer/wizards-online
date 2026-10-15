@@ -24315,14 +24315,6 @@ object_id = "unfinished_wing_c2/torch_6"
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 44.000, 20.600, -164.175)
 object_id = "unfinished_wing_c2/torch_7"
 
-[node name="Chandelier_greenhouse" parent="Lights" instance=ExtResource("21")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 46.000, 4.000, 60.000)
-drop = -2.000
-
-[node name="Chandelier_greenhouse_2" parent="Lights" instance=ExtResource("21")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 58.000, 4.000, 60.000)
-drop = -2.000
-
 [node name="Chandelier_entrance_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 17.000, 30.000)
 drop = 11.000
@@ -24377,19 +24369,35 @@ drop = 11.000
 
 [node name="Chandelier_stair_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 26.000, 30.000)
-drop = 20.000
+drop = 11.000
 
 [node name="Chandelier_stair_hall_2" parent="Lights" instance=ExtResource("21")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 26.000, 42.000)
-drop = 20.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 8.000, 30.000)
+drop = 2.000
 
 [node name="Chandelier_stair_hall_3" parent="Lights" instance=ExtResource("21")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 26.000, 30.000)
-drop = 20.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 26.000, 42.000)
+drop = 2.000
 
 [node name="Chandelier_stair_hall_4" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 17.000, 42.000)
+drop = 11.000
+
+[node name="Chandelier_stair_hall_5" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 26.000, 30.000)
+drop = 11.000
+
+[node name="Chandelier_stair_hall_6" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 8.000, 30.000)
+drop = 2.000
+
+[node name="Chandelier_stair_hall_7" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 26.000, 42.000)
-drop = 20.000
+drop = 2.000
+
+[node name="Chandelier_stair_hall_8" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 17.000, 42.000)
+drop = 11.000
 
 [node name="Chandelier_north_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 8.000, -34.000)
@@ -25233,51 +25241,91 @@ drop = 2.000
 
 [node name="Chandelier_turning_stairs" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 130.000, 44.000, -5.333)
-drop = 47.000
+drop = 2.000
 
 [node name="Chandelier_turning_stairs_2" parent="Lights" instance=ExtResource("21")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 130.000, 44.000, 8.000)
-drop = 47.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 130.000, -1.000, -5.333)
+drop = 2.000
 
 [node name="Chandelier_turning_stairs_3" parent="Lights" instance=ExtResource("21")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 130.000, 44.000, 21.333)
-drop = 47.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 130.000, 44.000, 8.000)
+drop = 2.000
 
 [node name="Chandelier_turning_stairs_4" parent="Lights" instance=ExtResource("21")]
-transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 142.000, 44.000, -5.333)
-drop = 47.000
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 130.000, -1.000, 8.000)
+drop = 2.000
 
 [node name="Chandelier_turning_stairs_5" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 130.000, 44.000, 21.333)
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_6" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 130.000, -1.000, 21.333)
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_7" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 142.000, 44.000, -5.333)
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_8" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 142.000, -1.000, -5.333)
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_9" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 142.000, 44.000, 8.000)
 drop = 47.000
 
-[node name="Chandelier_turning_stairs_6" parent="Lights" instance=ExtResource("21")]
+[node name="Chandelier_turning_stairs_10" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 142.000, 44.000, 21.333)
-drop = 47.000
+drop = 2.000
 
-[node name="Chandelier_turning_stairs_7" parent="Lights" instance=ExtResource("21")]
+[node name="Chandelier_turning_stairs_11" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 142.000, -1.000, 21.333)
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_12" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 154.000, 44.000, -5.333)
-drop = 47.000
+drop = 2.000
 
-[node name="Chandelier_turning_stairs_8" parent="Lights" instance=ExtResource("21")]
+[node name="Chandelier_turning_stairs_13" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 154.000, -1.000, -5.333)
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_14" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 154.000, 44.000, 8.000)
 drop = 47.000
 
-[node name="Chandelier_turning_stairs_9" parent="Lights" instance=ExtResource("21")]
+[node name="Chandelier_turning_stairs_15" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 154.000, 44.000, 21.333)
-drop = 47.000
+drop = 2.000
 
-[node name="Chandelier_turning_stairs_10" parent="Lights" instance=ExtResource("21")]
+[node name="Chandelier_turning_stairs_16" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 154.000, -1.000, 21.333)
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_17" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 166.000, 44.000, -5.333)
-drop = 47.000
+drop = 2.000
 
-[node name="Chandelier_turning_stairs_11" parent="Lights" instance=ExtResource("21")]
+[node name="Chandelier_turning_stairs_18" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 166.000, -1.000, -5.333)
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_19" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 166.000, 44.000, 8.000)
-drop = 47.000
+drop = 2.000
 
-[node name="Chandelier_turning_stairs_12" parent="Lights" instance=ExtResource("21")]
+[node name="Chandelier_turning_stairs_20" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 166.000, -1.000, 8.000)
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_21" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 166.000, 44.000, 21.333)
-drop = 47.000
+drop = 2.000
+
+[node name="Chandelier_turning_stairs_22" parent="Lights" instance=ExtResource("21")]
+transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 166.000, -1.000, 21.333)
+drop = 2.000
 
 [node name="Chandelier_duelling_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 129.333, 17.000, 44.000)

@@ -397,10 +397,27 @@ def emit_pillars():
 CHANDELIER_PITCH = 12.0   # one chandelier per ~12 m of room along each axis
 
 CHANDELIER_CANDLE_HEIGHT = 4.3   # candles this high above the floor, whatever the ceiling
+CHANDELIER_RADIUS = 1.3          # the hanging model's reach; a landing this close overhead is in the way
+LANDING_THICK = 1.0              # landing slab depth (floor_piece thick for extra floors)
 
 def has_chandeliers(r):
     """Roofed rooms are lit from above; corridors and outdoor areas keep wall torches."""
     return r.ceiling and r.kind not in ("corridor", "outdoor", "stair_turret")
+
+def chandelier_bands(r, x, z):
+    """(top, floor) of the open bands over (x, z) that get a chandelier, highest first.
+    Landings inside a tall room split it: a chandelier hangs from the underside of the first surface above it
+    and never runs its rod through a landing floor."""
+    over = sorted({y for (x0, x1, z0, z1), y in r.extra_floors
+                   if r.y < y < r.ceiling_y
+                   and x0 - CHANDELIER_RADIUS <= x <= x1 + CHANDELIER_RADIUS
+                   and z0 - CHANDELIER_RADIUS <= z <= z1 + CHANDELIER_RADIUS}, reverse=True)
+    tops = [r.ceiling_y] + [y - LANDING_THICK for y in over]
+    floors = over + [r.y]
+    bands = list(zip(tops, floors))
+    # The top band and the ground band; the walkways between are lit from these and by
+    # wall torches (a multi-storey shaft would otherwise blow the room's light budget).
+    return bands if len(bands) <= 2 else [bands[0], bands[-1]]
 
 def emit_chandeliers():
     n = 0
@@ -413,10 +430,13 @@ def emit_chandeliers():
             for j in range(nz):
                 x = r.x0 + w * (i + 0.5) / nx
                 z = r.z0 + d * (j + 0.5) / nz
-                drop = r.ceiling_y - r.y - CHANDELIER_CANDLE_HEIGHT - 1.7
-                inst(uname(f"Chandelier_{r.id}"), K("chandelier"),
-                     (x, r.ceiling_y, z), parent="Lights", props={"drop": f"{drop:.3f}"})
-                n += 1
+                for top, floor in chandelier_bands(r, x, z):
+                    drop = top - floor - CHANDELIER_CANDLE_HEIGHT - 1.7
+                    if drop < 0.3:
+                        continue    # too low a band to hang candles in
+                    inst(uname(f"Chandelier_{r.id}"), K("chandelier"),
+                         (x, top, z), parent="Lights", props={"drop": f"{drop:.3f}"})
+                    n += 1
     return n
 
 def emit_torches():
