@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=3 uid="uid://phstatue"]
+
+[sub_resource type="StandardMaterial3D" id="M1"]
+albedo_color = Color(0.55, 0.53, 0.5, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="P1"]
+size = Vector3(1.0, 0.6, 1.0)
+
+[sub_resource type="CylinderMesh" id="P2"]
+top_radius = 0.3
+bottom_radius = 0.35
+height = 1.8
+radial_segments = 12
+
+[sub_resource type="SphereMesh" id="P3"]
+radius = 0.28
+height = 0.56
+radial_segments = 12
+rings = 6
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(1.000, 2.880, 1.000)
+
+[node name="Statue" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.6)
+mesh = SubResource("P1")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0.6)
+mesh = SubResource("P2")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0.6)
+mesh = SubResource("P3")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 1.440, 0.600)
+shape = SubResource("Shape")

@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3 uid="uid://phglobe"]
+
+[sub_resource type="StandardMaterial3D" id="M1"]
+albedo_color = Color(0.42, 0.29, 0.18, 1)
+roughness = 0.85
+
+[sub_resource type="CylinderMesh" id="P1"]
+top_radius = 0.3
+bottom_radius = 0.25
+height = 0.8
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="M2"]
+albedo_color = Color(0.3, 0.45, 0.6, 1)
+roughness = 0.85
+
+[sub_resource type="SphereMesh" id="P2"]
+radius = 0.4
+height = 0.8
+radial_segments = 12
+rings = 6
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.800, 1.550, 0.800)
+
+[node name="Globe" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0.4)
+mesh = SubResource("P1")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0.4)
+mesh = SubResource("P2")
+surface_material_override/0 = SubResource("M2")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 0.775, 0.400)
+shape = SubResource("Shape")

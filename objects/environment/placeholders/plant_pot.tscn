@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3 uid="uid://phplantpot"]
+
+[sub_resource type="StandardMaterial3D" id="M1"]
+albedo_color = Color(0.5, 0.3, 0.2, 1)
+roughness = 0.85
+
+[sub_resource type="CylinderMesh" id="P1"]
+top_radius = 0.22
+bottom_radius = 0.3
+height = 0.4
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="M2"]
+albedo_color = Color(0.2, 0.45, 0.18, 1)
+roughness = 0.85
+
+[sub_resource type="SphereMesh" id="P2"]
+radius = 0.35
+height = 0.7
+radial_segments = 12
+rings = 6
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.700, 1.000, 0.700)
+
+[node name="PlantPot" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0.35)
+mesh = SubResource("P1")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0.35)
+mesh = SubResource("P2")
+surface_material_override/0 = SubResource("M2")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 0.500, 0.350)
+shape = SubResource("Shape")

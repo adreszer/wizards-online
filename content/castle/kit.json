@@ -1,5 +1,5 @@
 {
- "_doc": "Role -> wrapper scene used by the castle generator (tools/castle). Swap an asset by changing its path here; the generator never names scenes itself. 'variants' pick a scene per room kind / room id / house before falling back to the role's default.",
+ "_doc": "Role -> wrapper scene used by the castle generator (tools/castle). 'props' overrides the dressing pass's placeholder props per kind (bed, hearth, banner_h1, portrait... see tools/castle/props.py), 'flora' the grounds' trees and rocks per kind (a Mesh resource). Swap an asset by changing its path here; the generator never names scenes itself. 'variants' pick a scene per room kind / room id / house before falling back to the role's default.",
  "roles": {
   "block": "res://objects/greybox/greybox_block.tscn",
   "wall_run": "res://objects/environment/modular/modular_wall_run.tscn",
@@ -39,5 +39,6 @@
  },
  "window_by_kind": {"hall": "window_double", "library": "window_double", "common_room": "window_double", "classroom": "window_wide"},
  "flora": {},
+ "props": {},
  "floor_tiles": {"plain": ["floor_tile_plain", 0.46], "ornate": ["floor_tile_ornate", 0.22]}
 }

@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://phcandelabra"]
+
+[sub_resource type="StandardMaterial3D" id="M1"]
+albedo_color = Color(0.72, 0.56, 0.25, 1)
+roughness = 0.85
+
+[sub_resource type="CylinderMesh" id="P1"]
+top_radius = 0.05
+bottom_radius = 0.05
+height = 1.4
+radial_segments = 12
+
+[sub_resource type="BoxMesh" id="P2"]
+size = Vector3(0.6, 0.05, 0.05)
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.600, 1.425, 0.100)
+
+[node name="Candelabra" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0.3)
+mesh = SubResource("P1")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0.3)
+mesh = SubResource("P2")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 0.712, 0.300)
+shape = SubResource("Shape")

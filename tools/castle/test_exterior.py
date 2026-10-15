@@ -51,6 +51,19 @@ class ExteriorTest(unittest.TestCase):
         from castle import budgets
         self.assertEqual([str(v) for v in budgets.check(self.plan, build.units, build.placed_nodes)], [])
 
+    def test_no_room_is_left_empty(self):
+        from castle import budgets
+        self.assertEqual(budgets.empty_rooms(self.plan, build.placed_nodes), [])
+
+    def test_props_come_from_the_kit(self):
+        from castle import dressing
+        kit = main.load_kit()
+        kit["props"] = {"bed": "res://somewhere/real_bed.tscn"}
+        build.build(main.make_plan(), kit)
+        beds = [p for _parent, _pos, p in build.placed_nodes if p.endswith("bed.tscn")]
+        self.assertTrue(beds and all(p == "res://somewhere/real_bed.tscn" for p in beds))
+        build.build(self.plan, main.load_kit())
+
     def test_far_view_has_every_roofed_room(self):
         n = sum(1 for r in self.plan.rooms.values() if exterior.built(r) and not exterior.open_air(r))
         self.assertEqual(len(self.data["hlod"]), n)

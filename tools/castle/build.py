@@ -961,6 +961,8 @@ def build(plan, kit, placements=PLACEMENTS):
     placed = emit_placements(placements)
     door_count = emit_castle_doors()
     furniture_count = emit_furniture() + emit_shelves() + emit_great_hall()
+    from . import dressing
+    furniture_count += dressing.dress(plan, getattr(plan, "names_by_key", {}))
     stats = dict(rooms=len(rooms), wall_units=len(units), doors=len(doors), secrets=len(secrets), stairs=len(stairs), railings=railing_count, movers=mover_count,
                  torches=torch_count, windows=window_count, castle_doors=door_count, chandeliers=chandelier_count,
                  furniture=furniture_count, enemies=placed["crystal_guardian"], nodes=len(nodes))

@@ -1,0 +1,50 @@
+[gd_scene load_steps=7 format=3 uid="uid://phdummy"]
+
+[sub_resource type="StandardMaterial3D" id="M1"]
+albedo_color = Color(0.42, 0.29, 0.18, 1)
+roughness = 0.85
+
+[sub_resource type="CylinderMesh" id="P1"]
+top_radius = 0.08
+bottom_radius = 0.08
+height = 1.2
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="M2"]
+albedo_color = Color(0.82, 0.74, 0.55, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="P2"]
+size = Vector3(0.6, 0.8, 0.3)
+
+[sub_resource type="SphereMesh" id="P3"]
+radius = 0.2
+height = 0.4
+radial_segments = 12
+rings = 6
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.600, 2.200, 0.400)
+
+[node name="Dummy" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0.4)
+mesh = SubResource("P1")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0.4)
+mesh = SubResource("P2")
+surface_material_override/0 = SubResource("M2")
+
+[node name="Part3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0.4)
+mesh = SubResource("P3")
+surface_material_override/0 = SubResource("M2")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 1.100, 0.400)
+shape = SubResource("Shape")

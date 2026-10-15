@@ -59,11 +59,26 @@ def check(plan, units, placed):
     for c, n in lights.items():
         if n > CELL_LIGHTS:
             out.append(Violation("B1", f"cell {c}", f"{n} lights (cap {CELL_LIGHTS})"))
+    for rid in empty_rooms(plan, placed):
+        out.append(Violation("D1", rid, "nothing placed in it"))
     for rid, n in room_lights.items():
         r = plan.rooms[rid]
         cap = max(ROOM_LIGHTS_MIN, int(r.width * r.depth / M2_PER_LIGHT))
         if n > cap:
             out.append(Violation("B2", rid, f"{n} lights (cap {cap})"))
+    return out
+
+
+def empty_rooms(plan, placed):
+    """D1: rooms (not open air, turrets or the terrain) with nothing placed in them."""
+    out = []
+    for r in plan.rooms.values():
+        if r.get("terrain") or r.kind in ("outdoor", "grounds", "stair_turret"):
+            continue
+        has = any(parent in ("Furniture", "Collectibles", "Tomes", "Props", "Puzzles") and r.x0 <= pos[0] <= r.x1 and r.z0 <= pos[2] <= r.z1
+                  and r.y - 0.5 <= pos[1] <= r.ceiling_y for parent, pos, _p in placed)
+        if not has:
+            out.append(r.id)
     return out
 
 

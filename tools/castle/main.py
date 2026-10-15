@@ -116,6 +116,10 @@ def main(argv=None):
     kit = load_kit()
     gexport.write_data(g)
     gexport.write_scene(g, kit)
+    from . import props
+    props.write_all()
+    lookup = names_lookup(plan)
+    plan.names_by_key = {r.name_key: lookup(r.id)[0] for r in plan.rooms.values()}
     stats, text = build.build(plan, kit)
     from . import budgets
     over = budgets.check(plan, build.units, build.placed_nodes)

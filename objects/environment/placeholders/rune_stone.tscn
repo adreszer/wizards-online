@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://phrunestone"]
+
+[sub_resource type="StandardMaterial3D" id="M1"]
+albedo_color = Color(0.55, 0.53, 0.5, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="P1"]
+size = Vector3(0.7, 1.6, 0.3)
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.700, 1.600, 0.300)
+
+[node name="RuneStone" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0.3)
+mesh = SubResource("P1")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 0.800, 0.300)
+shape = SubResource("Shape")

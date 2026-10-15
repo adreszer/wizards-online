@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://phtapestry"]
+
+[sub_resource type="StandardMaterial3D" id="M1"]
+albedo_color = Color(0.42, 0.18, 0.2, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="P1"]
+size = Vector3(2.4, 3.2, 0.04)
+
+[node name="Tapestry" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0.03)
+mesh = SubResource("P1")
+surface_material_override/0 = SubResource("M1")

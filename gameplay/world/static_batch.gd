@@ -60,8 +60,15 @@ static func for_node(node: Node) -> StaticBatch:
 	return null
 
 
+const PLACEHOLDERS := "res://objects/environment/placeholders/"
+
+
 static func can_batch(scene: PackedScene) -> bool:
-	return scene != null and BATCHABLE.has(scene.resource_path)
+	return scene != null and can_batch_path(scene.resource_path)
+
+
+static func can_batch_path(path: String) -> bool:
+	return BATCHABLE.has(path) or path.begins_with(PLACEHOLDERS)
 
 
 static func prototype(scene: PackedScene) -> Dictionary:
@@ -132,7 +139,7 @@ func flush() -> void:
 		if container == null:
 			continue
 		for child in container.get_children():
-			if child is Node3D and BATCHABLE.has((child as Node).scene_file_path) and child.get_script() == null:
+			if child is Node3D and can_batch_path((child as Node).scene_file_path) and child.get_script() == null:
 				if add(load(child.scene_file_path), (child as Node3D).global_transform):
 					container.remove_child(child)
 					child.free()

@@ -1,0 +1,56 @@
+[gd_scene load_steps=8 format=3 uid="uid://phtable"]
+
+[sub_resource type="StandardMaterial3D" id="M1"]
+albedo_color = Color(0.42, 0.29, 0.18, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="P1"]
+size = Vector3(2.0, 0.08, 1.0)
+
+[sub_resource type="BoxMesh" id="P2"]
+size = Vector3(0.1, 0.75, 0.1)
+
+[sub_resource type="BoxMesh" id="P3"]
+size = Vector3(0.1, 0.75, 0.1)
+
+[sub_resource type="BoxMesh" id="P4"]
+size = Vector3(0.1, 0.75, 0.1)
+
+[sub_resource type="BoxMesh" id="P5"]
+size = Vector3(0.1, 0.75, 0.1)
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(2.000, 0.825, 1.000)
+
+[node name="Table" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.78, 0.5)
+mesh = SubResource("P1")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.37, 0.1)
+mesh = SubResource("P2")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.37, 0.1)
+mesh = SubResource("P3")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.37, 0.9)
+mesh = SubResource("P4")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Part5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.37, 0.9)
+mesh = SubResource("P5")
+surface_material_override/0 = SubResource("M1")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 0.408, 0.500)
+shape = SubResource("Shape")
