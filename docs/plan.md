@@ -299,6 +299,16 @@ Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B
 - [ ] Doorways on the map (the generator knows them; export them with the zones or read the door nodes)
 - [ ] The map as an in-world item (roadmap: self-filling chart, house-mates' locations)
 
+### Milestone 34 — School clock, day and night
+- [x] `SchoolClock` (`gameplay/world/school_clock.gd`): hours = ((world time + offset) / day length) mod 1 × 24, a pure function of `NetworkManager.server_time()`, so every client agrees without streaming; phases night (21–5), dawn (5–7), day (7–19), dusk (19–21)
+- [x] Server owns it: `day_length_minutes` in `school_rules.json` (60 by default), the offset persisted in storage (`school/clock`), both sent as `OP_CLOCK` on join and whenever it moves; `school.lua` mirrors the maths
+- [x] `/time [hh:mm | dawn | day | dusk | night]` (`/czas`): shows or moves the clock (offline locally; online `OP_CHEAT {time}`, admins or `cheats_enabled`, broadcast to everyone with who moved it)
+- [x] `DayNightCycle` (added by `castle.gd`): sky colours and a generated star field, the outdoor light is the sun by day (warm and low at dawn and dusk, white at noon, east → south → west) and the moon by night, swapping at the horizon while it is dark; ambient, fog and the interior fill rise a little by day; window glass glows with daylight and the far-view window glows fade by day; `GameEvents.time_phase_changed` plus dawn/nightfall notifications
+- [x] HUD clock (top right: "14:05 · day"); headless tests for the clock maths, `/time`, and the castle's noon/midnight/dawn lighting
+- [ ] Torches and chandeliers lit at dusk and snuffed at dawn (a curfew pass with the timetable)
+- [ ] Night-only content keys off `time_phase_changed` / `SchoolClock.is_night`: night flight of the turning stairs, night creatures, stargazing, curfew; the same check on the server for anything it decides
+- [ ] Sun shadows outdoors (off for now; measure the cost on the grounds first)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

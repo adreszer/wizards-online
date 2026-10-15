@@ -343,7 +343,7 @@ NOTIFY_FLIGHT_CONTROLS,Flying: the broom follows the mouse · W forward · Space
 INVENTORY_RIDING_MARK,(riding),(w locie)
 INVENTORY_CLICK_TO_RIDE,Click to mount it or land (shortcut: B).,"Kliknij, aby wsiąść albo wylądować (skrót: B)."
 CHAT_OFFLINE_COMMANDS_ONLY,Offline there is nobody to talk to; only commands work here (/help).,Offline nie ma z kim rozmawiać; działają tylko komendy (/pomoc).
-CHEAT_HELP,Commands: /broom (/miotla) gives a flying broom · /give <item> gives any item · /help this list.,Komendy: /miotla (/broom) daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /pomoc ta lista.
+CHEAT_HELP,Commands: /broom (/miotla) gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /help this list.,Komendy: /miotla (/broom) daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /pomoc ta lista.
 CHEAT_GIVE_USAGE,Usage: /give <item>. Items: %s,Użycie: /daj <przedmiot>. Przedmioty: %s
 CHEAT_UNKNOWN,Unknown command: %s (try /help).,Nieznana komenda: %s (spróbuj /pomoc).
 CHEAT_UNKNOWN_ITEM,"No item called ""%s"". Items: %s",Nie ma przedmiotu „%s”. Przedmioty: %s
@@ -361,3 +361,15 @@ MAP_FLOOR_DUNGEONS,Dungeons (level %d),Lochy (poziom %d)
 MAP_OUTDOORS,Outdoors,Na zewnątrz
 MAP_FIND_ME,Find me,Gdzie jestem
 MAP_HINT,Drag to move · wheel to zoom · PgUp/PgDn change floor · M or Esc closes,Przeciągnij aby przesunąć · kółko przybliża · PgUp/PgDn zmienia piętro · M lub Esc zamyka
+CHEAT_TIME_NOW,School time: %s (%s).,Czas w szkole: %s (%s).
+CHEAT_TIME_USAGE,Usage: /time [hh:mm | dawn | day | dusk | night].,Użycie: /czas [gg:mm | swit | dzien | zmierzch | noc].
+CHEAT_TIME_REQUESTED,Asking the server to set the clock to %s…,Prośba do serwera o ustawienie zegara na %s…
+CHEAT_TIME_SET,The school clock now reads %s.,Szkolny zegar wskazuje teraz %s.
+CHEAT_TIME_SET_BY,The school clock now reads %s (moved by %s).,Szkolny zegar wskazuje teraz %s (przestawił(a): %s).
+TIME_NIGHT,night,noc
+TIME_DAWN,dawn,świt
+TIME_DAY,day,dzień
+TIME_DUSK,dusk,zmierzch
+HUD_CLOCK,%s · %s,%s · %s
+NOTIFY_DAWN,Dawn breaks over the castle.,Nad zamkiem wstaje świt.
+NOTIFY_NIGHTFALL,Night falls over the castle.,Nad zamkiem zapada noc.

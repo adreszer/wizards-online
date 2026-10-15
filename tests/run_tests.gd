@@ -74,6 +74,7 @@ func _run() -> void:
 	await _test_grounds()
 	await _test_map()
 	await _test_setpieces()
+	await _test_day_night()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -1719,6 +1720,70 @@ func _test_setpieces() -> void:
 		player.movement.request_jump()
 		await _wait(0.1)
 		t.check(not player.movement.is_held(), "a jump frees it")
+	castle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_day_night() -> void:
+	t.section("Day and night")
+	var clock := SchoolClock.new()
+	clock.day_seconds = 3600.0
+	t.check(is_equal_approx(clock.hours_at(0.0), 0.0) and is_equal_approx(clock.hours_at(1800.0), 12.0), "a school day is one day length of world time")
+	clock.offset = clock.offset_for(123456.7, 14.5)
+	t.check(absf(clock.hours_at(123456.7) - 14.5) < 0.001, "offset_for moves the clock to the asked hour")
+	t.check(absf(clock.hours_at(123456.7 + 150.0) - 15.5) < 0.001, "and it keeps running from there")
+	t.check(SchoolClock.phase_of(0.0) == SchoolClock.Phase.NIGHT and SchoolClock.phase_of(6.0) == SchoolClock.Phase.DAWN
+		and SchoolClock.phase_of(12.0) == SchoolClock.Phase.DAY and SchoolClock.phase_of(20.0) == SchoolClock.Phase.DUSK,
+		"phases: night, dawn, day, dusk")
+	t.check(SchoolClock.format(7.09) == "07:05" and SchoolClock.format(23.99) == "23:59", "the clock reads hh:mm")
+	t.check(is_equal_approx(SchoolClock.parse("14:30"), 14.5) and is_equal_approx(SchoolClock.parse("7"), 7.0)
+		and SchoolClock.parse("25") < 0.0 and SchoolClock.parse("noon") < 0.0, "/time parses hh, hh:mm and refuses the rest")
+	t.check(clock.apply({"day": 1200.0, "offset": 30.0}) and clock.day_seconds == 1200.0 and not clock.apply({"day": 1200.0, "offset": 30.0}),
+		"the server's clock settings apply once")
+	t.check(DayNightCycle.sun_direction(12.0).y > 0.8 and DayNightCycle.sun_direction(0.0).y < -0.8
+		and absf(DayNightCycle.sun_direction(6.0).y) < 0.01 and DayNightCycle.sun_direction(6.0).x > 0.99, "the sun rises in the east and stands high at noon")
+
+	# Offline /time moves the shared school clock.
+	var saved_offset := NetworkManager.school_clock.offset
+	var line := ChatCommands.run("/czas 13:15", null)
+	t.check(absf(NetworkManager.school_hours() - 13.25) < 0.01, "/time 13:15 sets the clock offline (%s)" % line)
+	ChatCommands.run("/time night", null)
+	t.check(SchoolClock.is_night(NetworkManager.school_hours()), "/time night")
+	t.check(ChatCommands.run("/time 99", null) == tr("CHEAT_TIME_USAGE"), "/time refuses a bad hour")
+	NetworkManager.school_clock.offset = saved_offset
+
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var cycle := castle.get_node_or_null("DayNightCycle") as DayNightCycle
+	t.check(cycle != null and cycle.sky_light != null and cycle.fill_light != null and cycle.sky_material != null,
+		"the castle lights itself from the school clock")
+	if cycle != null and cycle.sky_light != null:
+		cycle.time_override = 3.0   # start from a known phase (the real clock could be anywhere)
+		cycle.refresh()
+		var phases: Array[int] = []
+		var on_phase := func(p: int) -> void: phases.append(p)
+		GameEvents.time_phase_changed.connect(on_phase)
+		cycle.time_override = 12.0
+		cycle.refresh()
+		var noon_ambient := cycle.environment.ambient_light_energy
+		var sun := cycle.sky_light
+		t.check(sun.visible and sun.light_energy > 1.0 and sun.light_color.b > 0.8, "noon: a bright white sun over the grounds (%.2f)" % sun.light_energy)
+		t.check((-sun.global_basis.z).y < -0.8, "noon: the sun shines down from high up")
+		t.check(cycle.daylight > 0.99 and cycle.sky_material.sky_cover_modulate.a < 0.01, "noon: full daylight, no stars")
+		cycle.time_override = 0.0
+		cycle.refresh()
+		t.check(sun.visible and sun.light_energy < 0.5 and sun.light_color.b > sun.light_color.r, "midnight: the dim blue moon (%.2f)" % sun.light_energy)
+		t.check(cycle.environment.ambient_light_energy < noon_ambient and cycle.sky_material.sky_cover_modulate.a > 0.99, "midnight: darker, with stars")
+		t.check(phases.has(SchoolClock.Phase.DAY) and phases.has(SchoolClock.Phase.NIGHT), "phase changes reach GameEvents")
+		GameEvents.time_phase_changed.disconnect(on_phase)
+		cycle.time_override = 6.0
+		cycle.refresh()
+		t.check(sun.light_energy < 0.05, "the light fades out where sun and moon swap at the horizon")
+		var e1 := cycle.sky_light.light_energy
+		cycle.time_override = 6.75
+		cycle.refresh()
+		t.check(cycle.sky_light.light_energy > e1 and cycle.sky_light.light_color.r > cycle.sky_light.light_color.b, "the low morning sun is warm and rising")
 	castle.queue_free()
 	await get_tree().process_frame
 

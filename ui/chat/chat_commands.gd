@@ -4,6 +4,7 @@ extends RefCounted
 ## Today they are dev cheats for playtesting the big castle:
 ##   /broom (/miotla, /miotła)   give the local player a broom
 ##   /give <item id> (/daj)      give any registered item
+##   /time [hh[:mm]] (/czas)     show the school time, or move the clock (everyone's, online)
 ##   /help (/pomoc)              list the commands
 ## Offline they act on the local inventory directly. Online the server owns the
 ## inventory: the request goes up as OP_CHEAT and is accepted from admins, or
@@ -12,6 +13,7 @@ extends RefCounted
 const GIVE_ALIASES: Array[String] = ["give", "daj"]
 const BROOM_ALIASES: Array[String] = ["broom", "miotla", "miotła"]
 const HELP_ALIASES: Array[String] = ["help", "pomoc", "?"]
+const TIME_ALIASES: Array[String] = ["time", "czas", "godzina"]
 
 
 static func is_command(text: String) -> bool:
@@ -31,7 +33,24 @@ static func run(text: String, player: Node) -> String:
 		if parts.size() < 2:
 			return _t("CHEAT_GIVE_USAGE") % ", ".join(ItemRegistry.ITEM_IDS)
 		return give(parts[1].to_lower(), player)
+	if TIME_ALIASES.has(name):
+		return time(parts[1] if parts.size() > 1 else "")
 	return _t("CHEAT_UNKNOWN") % text
+
+
+## No argument: says the time. Otherwise sets it ("14", "14:30", "day", "night").
+static func time(arg: String) -> String:
+	if arg == "":
+		var now := NetworkManager.school_hours()
+		return _t("CHEAT_TIME_NOW") % [SchoolClock.format(now), _t(SchoolClock.phase_key(SchoolClock.phase_of(now)))]
+	var hours: float = {"day": 12.0, "dzien": 12.0, "dzień": 12.0, "night": 0.0, "noc": 0.0,
+		"dawn": 5.5, "swit": 5.5, "świt": 5.5, "dusk": 19.5, "zmierzch": 19.5}.get(arg.to_lower(), SchoolClock.parse(arg))
+	if hours < 0.0:
+		return _t("CHEAT_TIME_USAGE")
+	NetworkManager.set_school_hours(hours)
+	if NetworkManager.is_in_world():
+		return _t("CHEAT_TIME_REQUESTED") % SchoolClock.format(hours)
+	return _t("CHEAT_TIME_SET") % SchoolClock.format(hours)
 
 
 static func give(item_id: String, player: Node) -> String:

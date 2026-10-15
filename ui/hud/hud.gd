@@ -14,6 +14,7 @@ extends CanvasLayer
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _notification_label: Label = %NotificationLabel
 @onready var _status_label: Label = %StatusLabel
+@onready var _clock_label: Label = %ClockLabel
 @onready var _crosshair: Control = %Crosshair
 @onready var _hotbar_root: Control = %HotbarRoot
 @onready var _hotbar: HBoxContainer = %Hotbar
@@ -32,6 +33,7 @@ var _player: Node
 var _caster: SpellCaster
 var _inventory: Inventory
 var _notification_timer: float = 0.0
+var _clock_timer: float = 0.0
 var _focused: Interactable
 var _status: int = NetworkManager.Status.OFFLINE
 var _status_message: String = ""
@@ -65,10 +67,20 @@ func _process(delta: float) -> void:
 		var cd := _caster.equipped_spell.cooldown
 		_cooldown_bar.value = 1.0 - (_caster.cooldown_remaining / cd if cd > 0.0 else 0.0)
 	_update_hotbar_cooldowns()
+	_clock_timer -= delta
+	if _clock_timer <= 0.0:
+		_clock_timer = 0.5
+		_refresh_clock()
 	if _notification_timer > 0.0:
 		_notification_timer -= delta
 		if _notification_timer <= 0.0:
 			_notification_label.visible = false
+
+
+## School time and phase, e.g. "14:05 · day".
+func _refresh_clock() -> void:
+	var hours := NetworkManager.school_hours()
+	_clock_label.text = tr("HUD_CLOCK") % [SchoolClock.format(hours), tr(SchoolClock.phase_key(SchoolClock.phase_of(hours)))]
 
 
 func _bind_player(player: Node) -> void:

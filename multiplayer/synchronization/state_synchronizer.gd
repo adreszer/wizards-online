@@ -26,6 +26,7 @@ signal house_totals_changed(totals: PackedInt32Array)
 signal house_points_result_received(ok: bool, house: int, delta: int, reason: String)
 signal lecture_received(by_name: String, text: String)
 signal cheat_result_received(ok: bool, item_id: String, reason: String)
+signal clock_received(payload: Dictionary)
 
 @export var ping_interval: float = 2.0
 
@@ -70,6 +71,7 @@ func bind(p_session: WorldSession) -> void:
 	session.house_points_result_received.connect(house_points_result_received.emit)
 	session.lecture_received.connect(lecture_received.emit)
 	session.cheat_result_received.connect(cheat_result_received.emit)
+	session.clock_received.connect(clock_received.emit)
 
 
 func reset() -> void:
@@ -143,6 +145,11 @@ func send_house_points(house: int, delta: int, reason: String) -> void:
 func send_cheat_give(item_id: String) -> void:
 	if session != null:
 		session.send(NetworkProtocol.OP_CHEAT, {"give": item_id})
+
+
+func send_cheat_time(hours: float) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_CHEAT, {"time": hours})
 
 
 func send_lecture(text: String) -> void:

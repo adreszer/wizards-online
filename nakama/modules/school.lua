@@ -7,6 +7,7 @@
 --   house_points/totals       { totals = {h1, h2, h3, h4} }
 --   house_points/<uuid>       { house, delta, reason, by, by_name, source, subject, at }
 --   lesson_plans/<id>         per professor (owner-readable): { title, lines = {text} }
+--   school/clock              { offset } seconds added to the world time (see SchoolClock)
 
 local nk = require("nakama")
 local SUBJECTS = require("generated.subjects")
@@ -24,12 +25,15 @@ M.DEFAULT_RULES = {
   cheats_enabled = false,
   max_reason_bytes = 120,
   max_lecture_bytes = 400,
+  -- Real minutes per school day (the day/night cycle); clients get it as OP_CLOCK.
+  day_length_minutes = 60,
 }
 M.HOUSES = 4
 M.POINTS_COLLECTION, M.TOTALS_KEY = "house_points", "totals"
 M.PLAN_COLLECTION = "lesson_plans"
 M.MAX_PLAN_LINES = 100
 M.MAX_TITLE_BYTES = 80
+M.CLOCK_COLLECTION, M.CLOCK_KEY = "school", "clock"
 
 function M.load_rules()
   local rules = {}
@@ -149,6 +153,34 @@ function M.list_plans(uid)
   end
   table.sort(plans, function(a, b) return a.title < b.title end)
   return plans
+end
+
+-- School time of day (mirrors gameplay/world/school_clock.gd): hours are
+-- ((world seconds + offset) / day seconds) mod 1 x 24.
+function M.day_seconds(rules)
+  return math.max(1, rules.day_length_minutes) * 60
+end
+
+function M.offset_for(now, hours, day)
+  return ((hours % 24) / 24 * day - now) % day
+end
+
+function M.load_clock_offset()
+  local ok, objects = pcall(nk.storage_read, { { collection = M.CLOCK_COLLECTION, key = M.CLOCK_KEY, user_id = nil } })
+  if ok and objects and objects[1] and type(objects[1].value) == "table" then
+    return tonumber(objects[1].value.offset) or 0
+  end
+  return 0
+end
+
+function M.save_clock_offset(offset)
+  local ok, err = pcall(nk.storage_write, {
+    { collection = M.CLOCK_COLLECTION, key = M.CLOCK_KEY, user_id = nil, value = { offset = offset }, permission_read = 2, permission_write = 0 },
+  })
+  if not ok then
+    nk.logger_error("school clock write failed: " .. tostring(err))
+  end
+  return ok
 end
 
 return M

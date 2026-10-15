@@ -96,6 +96,12 @@ theme_override_styles/panel = SubResource("PanelStyle")
 [node name="VBox" type="VBoxContainer" parent="TopRight"]
 layout_mode = 2
 
+[node name="ClockLabel" type="Label" parent="TopRight/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "12:00"
+horizontal_alignment = 2
+
 [node name="StatusLabel" type="Label" parent="TopRight/VBox"]
 unique_name_in_owner = true
 layout_mode = 2

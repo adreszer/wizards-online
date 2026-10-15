@@ -21,6 +21,7 @@ func _ready() -> void:
 	NetworkManager.chat_message_received.connect(_on_message)
 	NetworkManager.system_message.connect(add_system_line)
 	NetworkManager.cheat_result_received.connect(_on_cheat_result)
+	NetworkManager.school_clock_changed.connect(_on_school_clock_changed)
 	_panel.visible = GameSession.is_online()
 	_input_field.visible = false
 	if GameSession.is_online():
@@ -87,6 +88,12 @@ func _on_message(sender_name: String, text: String, is_self: bool) -> void:
 
 func _on_cheat_result(ok: bool, item_id: String, reason: String) -> void:
 	add_system_line(ChatCommands.result_line(ok, ItemRegistry.load_definition(item_id), reason))
+
+
+## Someone moved the school clock with /time (the join snapshot has no name).
+func _on_school_clock_changed(by_name: String) -> void:
+	if by_name != "":
+		add_system_line(tr("CHEAT_TIME_SET_BY") % [SchoolClock.format(NetworkManager.school_hours()), by_name])
 
 
 func add_system_line(text: String) -> void:

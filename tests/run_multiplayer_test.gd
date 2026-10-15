@@ -26,6 +26,8 @@ var lesson_results: Array = []
 var points_results: Array = []
 var lectures: Array[String] = []
 var cheat_results: Array = []
+## Who moved the school clock, per OP_CLOCK ("" = the join snapshot)
+var clock_changes: Array[String] = []
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
@@ -55,6 +57,7 @@ func _ready() -> void:
 	NetworkManager.lesson_result_received.connect(func(ok: bool, action: String, reason: String) -> void: lesson_results.append({"ok": ok, "action": action, "reason": reason}))
 	NetworkManager.house_points_result_received.connect(func(ok: bool, house: int, delta: int, reason: String) -> void: points_results.append({"ok": ok, "house": house, "delta": delta, "reason": reason}))
 	NetworkManager.lecture_received.connect(func(by: String, text: String) -> void: lectures.append("%s: %s" % [by, text]))
+	NetworkManager.school_clock_changed.connect(func(by: String) -> void: clock_changes.append(by))
 	NetworkManager.cheat_result_received.connect(func(ok: bool, id: String, reason: String) -> void: cheat_results.append({"ok": ok, "id": id, "reason": reason}))
 	await _run()
 
@@ -321,6 +324,7 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 			saw_broom[0] = true
 		return r == null, 60.0)
 	t.check(saw_broom[0], "B's broom shows on the remote player while B flies")
+	t.check(clock_changes.has("") and clock_changes.has("ClientB"), "the school clock comes with the join, and B's /time reaches A (%s)" % str(clock_changes))
 	t.check(ok, "remote player removed when B disconnects")
 	t.check(leaves.has("ClientB"), "leave event received for ClientB")
 	ok = await _wait_until(func() -> bool: return _remote(spawner) != null, 30.0)
@@ -464,6 +468,13 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return cheat_results.size() >= 2, 10.0)
 	t.check(ok and cheat_results[0]["reason"] == "already_owned" and cheat_results[1]["reason"] == "unknown_item", "cheats: an owned broom and an unknown item are refused (%s)" % str(cheat_results))
 	t.check(player.inventory.count_of(&"broom") == 1, "still exactly one broom")
+	t.check(clock_changes.has(""), "the join brings the school clock")
+	var hours_before := NetworkManager.school_hours()
+	NetworkManager.set_school_hours(15.5)
+	ok = await _wait_until(func() -> bool: return clock_changes.has("ClientB"), 10.0)
+	t.check(ok and absf(NetworkManager.school_hours() - 15.5) < 0.05, "/time moves the server's clock (%.2f h)" % NetworkManager.school_hours())
+	NetworkManager.set_school_hours(hours_before)   # leave the dev server's clock where it was
+	await _wait_until(func() -> bool: return clock_changes.count("ClientB") >= 2, 10.0)
 	t.check(player.broom_rider.toggle() and player.movement.is_flying, "the student mounts the broom")
 	player.movement.set_external_vertical(1.0)
 	await _wait(1.5)

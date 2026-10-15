@@ -49,6 +49,9 @@ signal house_points_result_received(ok: bool, house: int, delta: int, reason: St
 signal lecture_received(by_name: String, text: String)
 ## Outcome of a cheat the local player sent (see ChatCommands).
 signal cheat_result_received(ok: bool, item_id: String, reason: String)
+## The school clock changed (server OP_CLOCK, or /time offline); `by_name` is who
+## moved it ("" for the join snapshot).
+signal school_clock_changed(by_name: String)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal system_message(text: String)
 
@@ -65,6 +68,8 @@ var local_display_name: String = ""
 @onready var chat_manager: ChatManager = $ChatManager
 
 var clock := ServerClock.new()
+## Time of day (see school_hours()); the server's settings online, defaults offline.
+var school_clock := SchoolClock.new()
 var _reconnect_attempts: int = 0
 var _reconnecting: bool = false
 
@@ -92,6 +97,9 @@ func _ready() -> void:
 	state_synchronizer.house_points_result_received.connect(house_points_result_received.emit)
 	state_synchronizer.lecture_received.connect(_on_lecture)
 	state_synchronizer.cheat_result_received.connect(cheat_result_received.emit)
+	state_synchronizer.clock_received.connect(func(payload: Dictionary) -> void:
+		school_clock.apply(payload)
+		school_clock_changed.emit(str(payload.get("by", ""))))
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 	world_session.server_clock_received.connect(func(server_ms: float, sent_ms: int) -> void:
@@ -119,6 +127,21 @@ func get_world_object_states() -> Dictionary:
 ## so every client sees the same castle at the same moment.
 func server_time() -> float:
 	return clock.now() if is_online() else ServerClock.local_seconds()
+
+
+## The school's time of day in hours (0 ≤ h < 24), the same on every client.
+func school_hours() -> float:
+	return school_clock.hours_at(server_time())
+
+
+## Move the school clock to `hours`: online a cheat request (the server answers with
+## OP_CLOCK for everyone), offline the local clock moves at once.
+func set_school_hours(hours: float) -> void:
+	if is_in_world():
+		state_synchronizer.send_cheat_time(hours)
+	else:
+		school_clock.offset = school_clock.offset_for(server_time(), hours)
+		school_clock_changed.emit("")
 
 
 func get_ping_ms() -> int:

@@ -9,10 +9,14 @@ extends Node3D
 ## layers 1 and 11, so the moon lights it. Beyond [member detail_range] from the camera
 ## the castle's interior detail (walls, floors, furniture, lights…) is hidden and the
 ## HLOD boxes and window glows take over; the shell itself is always drawn.
+## DayNightCycle dims the window glows by day (set_daylight).
 
 const OUTDOOR_LAYER := 1 << 10
 const DETAIL_CONTAINERS := ["Geometry", "Floors", "Walls", "Pillars", "Ceilings", "Stairs", "Torches", "Lights",
 	"Furniture", "Doors", "Props", "Tomes", "Puzzles", "Collectibles", "Checkpoints"]
+
+const NIGHT_GLOW := Color(1.0, 0.72, 0.38)
+const DAY_GLOW := Color(0.2, 0.22, 0.26)
 
 @export var data_path: String = "res://levels/castle/exterior.json"
 ## Interior detail is drawn up to this distance (m); the HLOD from a little before it.
@@ -84,8 +88,14 @@ func _make_materials() -> void:
 	_slate.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_glow = StandardMaterial3D.new()
 	_glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_glow.albedo_color = Color(1.0, 0.72, 0.38)
+	_glow.albedo_color = NIGHT_GLOW
 	_glow.cull_mode = BaseMaterial3D.CULL_DISABLED
+
+
+## 0 = night (windows glow with candlelight), 1 = full day (dark panes against the sun).
+func set_daylight(amount: float) -> void:
+	if _glow != null:
+		_glow.albedo_color = NIGHT_GLOW.lerp(DAY_GLOW, clampf(amount, 0.0, 1.0))
 
 
 ## A flat-shaded surface (every face keeps its own normal: crisp roof planes and stone edges).

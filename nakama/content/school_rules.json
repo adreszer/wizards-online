@@ -6,5 +6,6 @@
   "practice_tomes_enabled": true,
   "cheats_enabled": true,
   "max_reason_bytes": 120,
-  "max_lecture_bytes": 400
+  "max_lecture_bytes": 400,
+  "day_length_minutes": 60
 }

@@ -42,7 +42,7 @@ local OP_SERVER_TEXT = P.OP_SERVER_TEXT
 local OP_LESSON, OP_LESSON_STATE, OP_LESSON_RESULT = P.OP_LESSON, P.OP_LESSON_STATE, P.OP_LESSON_RESULT
 local OP_HOUSE_POINTS, OP_HOUSE_TOTALS, OP_HOUSE_POINTS_RESULT = P.OP_HOUSE_POINTS, P.OP_HOUSE_TOTALS, P.OP_HOUSE_POINTS_RESULT
 local OP_LECTURE, OP_LECTURE_TEXT = P.OP_LECTURE, P.OP_LECTURE_TEXT
-local OP_CHEAT, OP_CHEAT_RESULT = P.OP_CHEAT, P.OP_CHEAT_RESULT
+local OP_CHEAT, OP_CHEAT_RESULT, OP_CLOCK = P.OP_CHEAT, P.OP_CHEAT_RESULT, P.OP_CLOCK
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
 local MAX_AREA_ID_BYTES = 48
@@ -316,6 +316,13 @@ local function own_lesson(state, sid)
   return nil
 end
 
+-- The school clock (day length + offset); `presences` nil = everyone.
+local function send_clock(dispatcher, state, presences, by_name)
+  local payload = { day = School.day_seconds(state.rules), offset = state.clock_offset }
+  if by_name then payload.by = by_name end
+  dispatcher.broadcast_message(OP_CLOCK, nk.json_encode(payload), presences, nil, true)
+end
+
 local function broadcast_object(dispatcher, oid, value)
   dispatcher.broadcast_message(OP_OBJECT_STATE, nk.json_encode({ o = oid, s = value }), nil, nil, true)
 end
@@ -363,7 +370,8 @@ end
 function M.match_init(context, params)
   local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {}, locales = {},
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
-                  lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {} }
+                  lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
+                  clock_offset = School.load_clock_offset() }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -401,6 +409,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     dispatcher.broadcast_message(OP_WORLD_SNAPSHOT, nk.json_encode({ objects = state.world.objects, s = nk.time() }), { p }, nil, true)
     send_lessons(dispatcher, state, { p })
     send_house_totals(dispatcher, state, { p })
+    send_clock(dispatcher, state, { p })
     local rest = others(state, p.session_id)
     if #rest > 0 then
       dispatcher.broadcast_message(OP_PLAYER_JOINED, nk.json_encode(entry_for(state, p.session_id)), rest, nil, true)
@@ -600,14 +609,27 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       local ok, payload = pcall(nk.json_decode, message.data)
       local profile = state.profiles[sid]
       local id = ok and type(payload) == "table" and type(payload.give) == "string" and payload.give or ""
+      local hours = ok and type(payload) == "table" and type(payload.time) == "number" and payload.time or nil
       local reason
       if not profile or not (state.rules.cheats_enabled or profile.role == "admin") then
         reason = "not_allowed"
+      elseif hours ~= nil then
+        -- /time: move the school clock for everyone (answered by OP_CLOCK, not a result).
+        if hours ~= hours or hours < 0 or hours >= 24 then
+          reason = "bad_time"
+        else
+          state.clock_offset = School.offset_for(nk.time() / 1000, hours, School.day_seconds(state.rules))
+          School.save_clock_offset(state.clock_offset)
+          nk.logger_info(string.format("cheat: %s set the school clock to %.2f h", state.names[sid] or sid, hours))
+          send_clock(dispatcher, state, nil, state.names[sid] or "")
+        end
       else
         reason = give_item(dispatcher, state, sid, id)
         nk.logger_info(string.format("cheat: %s gave themselves %s (%s)", state.names[sid] or sid, id, tostring(reason or "ok")))
       end
-      dispatcher.broadcast_message(OP_CHEAT_RESULT, nk.json_encode({ ok = reason == nil, id = ITEMS[id] and id or "", reason = reason or "" }), { message.sender }, nil, true)
+      if hours == nil or reason ~= nil then
+        dispatcher.broadcast_message(OP_CHEAT_RESULT, nk.json_encode({ ok = reason == nil, id = ITEMS[id] and id or "", reason = reason or "" }), { message.sender }, nil, true)
+      end
     elseif message.op_code == OP_LESSON then
       local ok, payload = pcall(nk.json_decode, message.data)
       local action = ok and type(payload) == "table" and payload.action or ""

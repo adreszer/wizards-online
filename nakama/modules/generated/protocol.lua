@@ -5,6 +5,7 @@ return {
   OP_AREA = 4,
   OP_CHEAT = 31,
   OP_CHEAT_RESULT = 32,
+  OP_CLOCK = 33,
   OP_GRANT_RESULT = 17,
   OP_GRANT_SPELL = 5,
   OP_HELD_ITEM = 3,

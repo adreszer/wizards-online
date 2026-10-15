@@ -41,3 +41,7 @@ signal level_completed()
 ## The local player walked into / out of a named castle area (see AreaZone).
 signal area_entered(area_id: StringName, zone: Node)
 signal area_exited(area_id: StringName, zone: Node)
+
+## The school's time of day entered a new phase (SchoolClock.Phase: night, dawn, day,
+## dusk). Emitted by the level's DayNightCycle, also once when it starts.
+signal time_phase_changed(phase: int)
