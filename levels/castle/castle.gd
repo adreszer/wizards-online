@@ -8,6 +8,9 @@ var world_object_sync: WorldObjectSync
 
 
 func _ready() -> void:
+	var batch := get_node_or_null("StaticBatch") as StaticBatch
+	if batch != null:
+		batch.flush()
 	world_object_sync = WorldObjectSync.new()
 	world_object_sync.name = "WorldObjectSync"
 	add_child(world_object_sync)

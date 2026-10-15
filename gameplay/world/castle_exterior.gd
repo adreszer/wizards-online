@@ -19,6 +19,9 @@ const DETAIL_CONTAINERS := ["Geometry", "Floors", "Walls", "Pillars", "Ceilings"
 @export var detail_range: float = 170.0
 ## Interior lights fade out from this distance (m) over 30 m.
 @export var light_fade_begin: float = 90.0
+## Interior lights stop casting shadows beyond this distance (m): near lights keep the
+## shadows that stop them leaking through walls, far ones stop re-rendering shadow maps.
+@export var shadow_fade: float = 32.0
 
 var data: Dictionary = {}
 var _stone: StandardMaterial3D
@@ -309,4 +312,5 @@ func _detail_range(node: Node) -> void:
 			l.distance_fade_enabled = true
 			l.distance_fade_begin = light_fade_begin
 			l.distance_fade_length = 30.0
+			l.distance_fade_shadow = shadow_fade
 		_detail_range(child)

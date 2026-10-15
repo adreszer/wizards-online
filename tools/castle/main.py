@@ -72,6 +72,12 @@ def main(argv=None):
     gexport.write_data(g)
     gexport.write_scene(g, kit)
     stats, text = build.build(plan, kit)
+    from . import budgets
+    over = budgets.check(plan, build.units, build.placed_nodes)
+    if over:
+        for v in over:
+            print(v, file=sys.stderr)
+        sys.exit(f"{len(over)} budget violation(s); nothing written")
     with open(OUT, "w") as f:
         f.write(text)
     from . import exterior

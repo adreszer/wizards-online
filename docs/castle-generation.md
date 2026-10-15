@@ -166,6 +166,10 @@ What that needs:
 
 ---
 
+### Measured (Milestone 28)
+
+`tools/perf_castle.tscn` (windowed) reports instancing time, node and body counts, and per-view frame time, draw calls and primitives; `--copies=5` places five castles side by side as the target-scale stress fixture, `--no-batch` turns batching off for comparison. What mattered, in order: per-frame scripts (thousands of candle flames) were the CPU floor, shadow-casting lights re-rendering shadow maps over very dense art meshes were the GPU cost, and per-module nodes were the load-time and draw-call cost. The fixes: `SectorStreamer` pauses processing beyond 90 m, lights drop shadows beyond 32 m, `StaticBatch` instances repeated modules per 8 m cell (24 m cells were too coarse: a MultiMesh is culled, LOD-selected and shadow-rendered as a whole). Sector scenes that load and unload were not needed at this scale.
+
 ## 6. Milestones
 
 Each milestone ships green (`tools/check.sh`), is pushed, and leaves the game playable. The owner playtests between them.

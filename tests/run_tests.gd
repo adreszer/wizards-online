@@ -1071,10 +1071,13 @@ func _test_castle() -> void:
 	t.check(shell_ok, "the castle has its exterior shell (roofs, stone, far view)")
 	await get_tree().process_frame
 	var ranged := 0
-	for w in castle.get_node("Walls").find_children("*", "MeshInstance3D", true, false):
-		if (w as MeshInstance3D).visibility_range_end > 0.0:
+	for w in castle.get_node("Walls").find_children("*", "GeometryInstance3D", true, false) + castle.get_node("StaticBatch").get_children():
+		if w is GeometryInstance3D and (w as GeometryInstance3D).visibility_range_end > 0.0:
 			ranged += 1
-	t.check(ranged > 100, "interior detail fades out at the far-view range (%d wall meshes)" % ranged)
+	t.check(ranged > 100, "interior detail fades out at the far-view range (%d meshes)" % ranged)
+	var batch: StaticBatch = castle.get_node("StaticBatch")
+	t.check(batch.instance_count > 3000 and castle.get_node("Walls").find_children("*", "StaticBody3D", true, false).size() < 400,
+		"static modules are batched (%d modules in %d nodes)" % [batch.instance_count, batch.get_child_count()])
 	t.check(get_tree().get_nodes_in_group("secret_walls").size() >= 3, "castle has secret passages")
 	# Stable object ids: unique "<area>/<name>", the area exists, and every placement is in the scene.
 	var area_ids: Dictionary = {}

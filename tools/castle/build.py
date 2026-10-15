@@ -45,6 +45,7 @@ def ext_id(kind, path):
     return ext[key]
 
 nodes = []
+placed_nodes = []   # (parent container, (x, y, z), scene path): for the budget rules (budgets.py)
 def xf(pos, rot_y=0.0):
     c = math.cos(rot_y); s = math.sin(rot_y)
     return f'Transform3D({c:.6f}, 0, {s:.6f}, 0, 1, 0, {-s:.6f}, 0, {c:.6f}, {pos[0]:.3f}, {pos[1]:.3f}, {pos[2]:.3f})'
@@ -57,6 +58,7 @@ def block(name, center, size, parent="Geometry"):
 
 def inst(name, path, pos, parent=".", rot_y=0.0, props=None, groups=None):
     i = ext_id("PackedScene", path)
+    placed_nodes.append((parent, pos, path))
     g = f' groups=[{", ".join(chr(34) + x + chr(34) for x in groups)}]' if groups else ""
     body = f'[node name="{name}" parent="{parent}"{g} instance=ExtResource("{i}")]\ntransform = {xf(pos, rot_y)}\n'
     for k, v in (props or {}).items():
@@ -884,6 +886,7 @@ def reset(plan, kit):
         state.clear()
     del nodes[:]
     del torch_points[:]
+    del placed_nodes[:]
 
 
 def build(plan, kit, placements=PLACEMENTS):
@@ -917,6 +920,8 @@ def scene_text(plan):
     level_script = ext_id("Script", "res://levels/castle/castle.gd")
     grounds = ext_id("PackedScene", "res://levels/grounds/grounds.tscn")
     exterior = ext_id("Script", "res://gameplay/world/castle_exterior.gd")
+    static_batch = ext_id("Script", "res://gameplay/world/static_batch.gd")
+    sectors = ext_id("Script", "res://gameplay/world/sector_streamer.gd")
     exts = ""
     for (kind, path), i in sorted(ext.items(), key=lambda kv: kv[1]):
         exts += f'[ext_resource type="{kind}" path="{path}" id="{i}"]\n'
@@ -934,6 +939,9 @@ light_color = Color(0.85, 0.86, 0.95, 1)
 light_energy = 0.06
 shadow_enabled = false
 
+[node name="StaticBatch" type="Node3D" parent="."]
+script = ExtResource("{static_batch}")
+
 [node name="StartPoint" type="Marker3D" parent="."]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
 '''
@@ -941,6 +949,7 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, {sx}, {sy + 0.05}, {sz})
         root += f'\n[node name="{c}" type="Node3D" parent="."]\n'
     root += f'\n[node name="Grounds" parent="." instance=ExtResource("{grounds}")]\n'
     root += f'\n[node name="Exterior" type="Node3D" parent="."]\nscript = ExtResource("{exterior}")\n'
+    root += f'\n[node name="Sectors" type="Node" parent="."]\nscript = ExtResource("{sectors}")\n'
     root += f'''
 [node name="Moon" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 60, 0)

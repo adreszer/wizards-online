@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3 uid="uid://castle0000001"]
+[gd_scene load_steps=57 format=3 uid="uid://castle0000001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/modular_wall_run.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/environment/modular/wall_window.tscn" id="2"]
@@ -51,6 +51,8 @@
 [ext_resource type="Script" path="res://levels/castle/castle.gd" id="49"]
 [ext_resource type="PackedScene" path="res://levels/grounds/grounds.tscn" id="50"]
 [ext_resource type="Script" path="res://gameplay/world/castle_exterior.gd" id="51"]
+[ext_resource type="Script" path="res://gameplay/world/static_batch.gd" id="52"]
+[ext_resource type="Script" path="res://gameplay/world/sector_streamer.gd" id="53"]
 
 [sub_resource type="ProceduralSkyMaterial" id="NightSkyMat"]
 sky_top_color = Color(0.015, 0.02, 0.045, 1)
@@ -88,6 +90,9 @@ transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0
 light_color = Color(0.85, 0.86, 0.95, 1)
 light_energy = 0.06
 shadow_enabled = false
+
+[node name="StaticBatch" type="Node3D" parent="."]
+script = ExtResource("52")
 
 [node name="StartPoint" type="Marker3D" parent="."]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.0, 0.05, 84.0)
@@ -130,6 +135,9 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.0, 0.05, 84.0)
 
 [node name="Exterior" type="Node3D" parent="."]
 script = ExtResource("51")
+
+[node name="Sectors" type="Node" parent="."]
+script = ExtResource("53")
 
 [node name="Moon" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 60, 0)

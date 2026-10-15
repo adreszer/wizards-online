@@ -47,6 +47,17 @@ func _rebuild() -> void:
 			child.queue_free()
 	var count := maxi(1, int(round(length / module_width)))
 	var scale_x := length / (count * module_width)
+	# In the castle the modules go to its StaticBatch (MultiMeshes, one body per cell).
+	var batch := StaticBatch.for_node(self)
+	if batch != null and StaticBatch.can_batch(module_scene):
+		for i in range(count):
+			var local := Transform3D(Basis().scaled(Vector3(scale_x, 1.0, 1.0)), Vector3((i + 0.5) * module_width * scale_x, 0.0, 0.0))
+			batch.add(module_scene, global_transform * local)
+		if backing:
+			var slab := Transform3D(Basis().scaled(Vector3(length, module_height, backing_depth)), Vector3(length / 2.0, module_height / 2.0, 0.0))
+			batch.add_mesh(_unit_box(), _get_backing_material(), global_transform * slab)
+		_add_occluder()
+		return
 	for i in range(count):
 		var module := module_scene.instantiate()
 		module.set_meta("wall_run_generated", true)
@@ -62,6 +73,10 @@ func _rebuild() -> void:
 		slab.position = Vector3(length / 2.0, module_height / 2.0, 0.0)
 		slab.set_meta("wall_run_generated", true)
 		add_child(slab)
+	_add_occluder()
+
+
+func _add_occluder() -> void:
 	if occluder and not Engine.is_editor_hint():
 		var occ := OccluderInstance3D.new()
 		var box := BoxOccluder3D.new()
@@ -70,6 +85,15 @@ func _rebuild() -> void:
 		occ.position = Vector3(length / 2.0, module_height / 2.0, 0.0)
 		occ.set_meta("wall_run_generated", true)
 		add_child(occ)
+
+
+static var _box: BoxMesh
+
+
+static func _unit_box() -> BoxMesh:
+	if _box == null:
+		_box = BoxMesh.new()
+	return _box
 
 
 static func _get_backing_material() -> StandardMaterial3D:

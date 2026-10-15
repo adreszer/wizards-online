@@ -41,13 +41,14 @@ func _rebuild() -> void:
 	var nz := maxi(1, int(round(size_z / module_size)))
 	var sx := size_x / (nx * module_size)
 	var sz := size_z / (nz * module_size)
-	for ix in range(nx):
-		for iz in range(nz):
-			var tile := module_scene.instantiate()
-			tile.set_meta("floor_generated", true)
-			tile.position = Vector3((ix + 0.5) * module_size * sx, 0.0, (iz + 0.5) * module_size * sz)
-			tile.scale = Vector3(sx, 1.0, sz)
-			add_child(tile)
+	var batch := StaticBatch.for_node(self)
+	if batch != null and StaticBatch.can_batch(module_scene):
+		for ix in range(nx):
+			for iz in range(nz):
+				var local := Transform3D(Basis().scaled(Vector3(sx, 1.0, sz)), Vector3((ix + 0.5) * module_size * sx, 0.0, (iz + 0.5) * module_size * sz))
+				batch.add(module_scene, global_transform * local)
+	else:
+		_instance_tiles(nx, nz, sx, sz)
 	if occluder and not Engine.is_editor_hint():
 		var occ := OccluderInstance3D.new()
 		var box := BoxOccluder3D.new()
@@ -56,3 +57,13 @@ func _rebuild() -> void:
 		occ.position = Vector3(size_x / 2.0, occluder_y, size_z / 2.0)
 		occ.set_meta("floor_generated", true)
 		add_child(occ)
+
+
+func _instance_tiles(nx: int, nz: int, sx: float, sz: float) -> void:
+	for ix in range(nx):
+		for iz in range(nz):
+			var tile := module_scene.instantiate()
+			tile.set_meta("floor_generated", true)
+			tile.position = Vector3((ix + 0.5) * module_size * sx, 0.0, (iz + 0.5) * module_size * sz)
+			tile.scale = Vector3(sx, 1.0, sz)
+			add_child(tile)

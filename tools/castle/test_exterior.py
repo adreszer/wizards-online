@@ -47,6 +47,10 @@ class ExteriorTest(unittest.TestCase):
                               and q[4] <= y0 + 0.01 and q[5] >= y0 + 3.99 for q in quads)
                     self.assertTrue(hit, f"wall unit {key} row {row} side {sign} has no facade")
 
+    def test_budgets_hold(self):
+        from castle import budgets
+        self.assertEqual([str(v) for v in budgets.check(self.plan, build.units, build.placed_nodes)], [])
+
     def test_far_view_has_every_roofed_room(self):
         n = sum(1 for r in self.plan.rooms.values() if exterior.built(r) and not exterior.open_air(r))
         self.assertEqual(len(self.data["hlod"]), n)
