@@ -10,7 +10,7 @@ at runtime (merged per material, so the shell costs a handful of draw calls):
   chimneys     over hearth rooms (common rooms, the kitchens, feast halls)
   bartizans    corner turrets on the outer corners of tall halls' roofs
   corbels      stepped brackets under corbelled rooms
-  foundations  plinths from the terrain up to the ground-floor slab where the ground falls away
+  foundations  a plinth under every ground-floor room, from below the ground to just under the floor
   covers       slabs over underground rooms where the terrain was cut back (the lake gate)
   facade       an outward-facing stone skin on every blank exterior wall module (lit by the
                moon on the outdoor layer, never seen from inside)
@@ -226,9 +226,14 @@ def foundations(plan, terrain, data):
     for r in plan.rooms.values():
         if not built(r) or r.inside is not None or r.storey != 0:
             continue
+        # Always: the terrain is cut away under the castle's floors, so a plinth must close the
+        # ground line under every wall (a few centimetres of gap show the world behind it).
         low = terrain_min(terrain, (r.x0 - 1, r.x1 + 1, r.z0 - 1, r.z1 + 1))
-        if low < r.y - 1.05:
-            data["foundations"].append([r.x0 - 0.3, r.x1 + 0.3, r.z0 - 0.3, r.z1 + 0.3, round(low - 2.0, 2), r.y - 1.0])
+        bottom = round(min(low, r.y - 1.0) - 1.5, 2)
+        if any(built(u) and u.top_storey < 0 and u.x0 < r.x1 + 0.4 and r.x0 - 0.4 < u.x1 and u.z0 < r.z1 + 0.4 and r.z0 - 0.4 < u.z1
+               for u in plan.rooms.values()):
+            bottom = r.y - 0.98     # a dungeon below: stay within the floor slab
+        data["foundations"].append([r.x0 - 0.4, r.x1 + 0.4, r.z0 - 0.4, r.z1 + 0.4, bottom, r.y - 0.03])
 
 
 def covers(plan, terrain, data):
