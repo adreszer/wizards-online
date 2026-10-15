@@ -11,6 +11,7 @@ const ITEMS_DIR := "res://resources/items/"
 ## Every item in the game.
 const ITEM_IDS: Array[String] = [
 	"torch",
+	"broom",
 ]
 ## Items every new character owns (offline default; the server creates the
 ## same set on first join).

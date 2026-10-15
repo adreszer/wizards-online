@@ -33,6 +33,15 @@ extends Node3D
 @export var position_smoothing: float = 22.0
 @export var initial_pitch_degrees: float = -9.0
 @export var input_enabled: bool = true
+@export_group("Flight")
+## Extra distance behind the player while flying, so the view opens up.
+@export var flight_distance_bonus: float = 2.4
+## Field of view gained at full boost speed (speed_ratio 1).
+@export var flight_fov_kick: float = 14.0
+## Pitch range in flight, wider so the mouse can steer steep climbs and dives.
+@export var flight_min_pitch_degrees: float = -80.0
+@export var flight_max_pitch_degrees: float = 80.0
+@export_group("")
 ## World-space offset added to the follow point (the player sets it while easing a step-up).
 var follow_offset: Vector3 = Vector3.ZERO
 
@@ -40,11 +49,16 @@ var yaw: float = 0.0
 var pitch: float = 0.0
 ## Mouse look wanted by the player (` or F1 toggles it off to get a free cursor).
 var mouse_look_enabled: bool = true
+## 0..1 flight speed relative to full boost (the player sets it); widens the FOV.
+var speed_ratio: float = 0.0
+var flight_mode: bool = false
 
 var _active: bool = false
 ## Set when the window lost focus; the next click into the window recaptures.
 var _awaiting_click: bool = false
 var _target_distance: float = 0.0
+var _flight_extra: float = 0.0
+var _base_fov: float = 75.0
 
 @onready var _pitch_node: Node3D = $Pitch
 @onready var _spring_arm: SpringArm3D = $Pitch/SpringArm3D
@@ -55,6 +69,7 @@ func _ready() -> void:
 	top_level = true
 	pitch = deg_to_rad(initial_pitch_degrees)
 	_target_distance = distance
+	_base_fov = _camera.fov
 	_spring_arm.spring_length = distance
 	_spring_arm.position.x = shoulder_offset
 	if target != null:
@@ -75,6 +90,20 @@ func get_camera() -> Camera3D:
 
 func get_yaw() -> float:
 	return yaw
+
+
+func get_pitch() -> float:
+	return pitch
+
+
+## Flying pulls the camera back (and speed widens the view, see speed_ratio).
+func set_flight_mode(value: bool) -> void:
+	flight_mode = value
+	if not value:
+		speed_ratio = 0.0
+		# Back to the walking range.
+		pitch = clampf(pitch, deg_to_rad(min_pitch_degrees), deg_to_rad(max_pitch_degrees))
+		_apply_rotation()
 
 
 ## Ray from the centre of the screen. Returns {origin: Vector3, direction: Vector3}.
@@ -159,7 +188,9 @@ func set_distance(value: float) -> void:
 func apply_look_delta(relative: Vector2) -> void:
 	yaw -= deg_to_rad(relative.x * mouse_sensitivity)
 	pitch -= deg_to_rad(relative.y * mouse_sensitivity)
-	pitch = clampf(pitch, deg_to_rad(min_pitch_degrees), deg_to_rad(max_pitch_degrees))
+	var low := flight_min_pitch_degrees if flight_mode else min_pitch_degrees
+	var high := flight_max_pitch_degrees if flight_mode else max_pitch_degrees
+	pitch = clampf(pitch, deg_to_rad(low), deg_to_rad(high))
 	_apply_rotation()
 
 
@@ -175,8 +206,15 @@ func _process(delta: float) -> void:
 		distance = lerpf(distance, _target_distance, 1.0 - exp(-zoom_smoothing * delta))
 		if absf(distance - _target_distance) < 0.005:
 			distance = _target_distance
-	if _spring_arm.spring_length != distance:
-		_spring_arm.spring_length = distance
+	var extra := flight_distance_bonus if flight_mode else 0.0
+	_flight_extra = lerpf(_flight_extra, extra, 1.0 - exp(-3.0 * delta))
+	if absf(_flight_extra - extra) < 0.005:
+		_flight_extra = extra
+	if _spring_arm.spring_length != distance + _flight_extra:
+		_spring_arm.spring_length = distance + _flight_extra
+	var fov := _base_fov + flight_fov_kick * clampf(speed_ratio, 0.0, 1.0)
+	if not is_equal_approx(_camera.fov, fov):
+		_camera.fov = lerpf(_camera.fov, fov, 1.0 - exp(-4.0 * delta))
 
 
 func _apply_rotation() -> void:

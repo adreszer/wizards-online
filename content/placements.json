@@ -54,9 +54,11 @@
     {"id": "fragment_a", "kind": "fragment", "at": [-4, 4]}
   ],
   "grounds": [
-    {"id": "plaque_grounds", "kind": "plaque", "text": "PLAQUE_GROUNDS", "wall": "n", "along": 0.3}
+    {"id": "plaque_grounds", "kind": "plaque", "text": "PLAQUE_GROUNDS", "wall": "n", "along": 0.3},
+    {"id": "broom_rack", "kind": "item_rack", "at": [5, 7], "yaw": -20}
   ],
   "class_skyriding": [
+    {"id": "broom_rack", "kind": "item_rack", "wall": "w", "along": 0.5, "inset": 0.8},
     {"id": "tome_galewind", "kind": "spell_tome", "spell": "galewind", "beside_lectern": 0.0}
   ],
   "kitchens": [

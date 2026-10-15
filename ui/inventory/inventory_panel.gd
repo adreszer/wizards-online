@@ -2,8 +2,9 @@ extends CanvasLayer
 ## Inventory ("satchel") UI. Opens with the `inventory` action, closes with
 ## `inventory` or `pause` (Esc). While open it captures keyboard input
 ## (GameSession.ui_input_captured) and frees the mouse, like the chat panel.
-## Clicking an item holds it in the off hand or puts it away; the panel only
-## asks the player's Inventory, which is the single source of truth.
+## Clicking an item holds it in the off hand or puts it away (a broom: mounts
+## it and closes the panel); the panel only asks the player's Inventory and
+## BroomRider, which own the state.
 
 @onready var _root: Control = %Root
 @onready var _slots: VBoxContainer = %Slots
@@ -13,6 +14,7 @@ extends CanvasLayer
 
 var is_open: bool = false
 var _inventory: Inventory
+var _rider: BroomRider
 var _selected: ItemDefinition
 
 
@@ -25,6 +27,7 @@ func _ready() -> void:
 
 func _bind_player(player: Node) -> void:
 	_inventory = player.inventory
+	_rider = player.broom_rider
 	_inventory.changed.connect(_refresh)
 	_refresh()
 
@@ -34,6 +37,7 @@ func _unbind_player(_player: Node) -> void:
 	if _inventory != null and _inventory.changed.is_connected(_refresh):
 		_inventory.changed.disconnect(_refresh)
 	_inventory = null
+	_rider = null
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -98,12 +102,20 @@ func _slot_text(def: ItemDefinition, count: int) -> String:
 		text += " ×%d" % count
 	if def == _inventory.held_item:
 		text += "  " + tr("INVENTORY_HELD_MARK")
+	elif _rider != null and def == _rider.mount:
+		text += "  " + tr("INVENTORY_RIDING_MARK")
 	return text
 
 
 func _on_slot_pressed(def: ItemDefinition) -> void:
 	_selected = def
-	if def.holdable:
+	if def.is_mount() and _rider != null:
+		close()
+		if _rider.mount == def:
+			_rider.dismount()
+		else:
+			_rider.mount_item(def)
+	elif def.holdable:
 		_inventory.toggle_hold(def)
 	else:
 		_update_details()
@@ -118,7 +130,9 @@ func _update_details() -> void:
 		_description.text = tr("INVENTORY_HINT")
 	else:
 		var text := tr(_selected.description) if not _selected.description.is_empty() else ""
-		if _selected.holdable:
+		if _selected.is_mount():
+			text += ("\n" if not text.is_empty() else "") + tr("INVENTORY_CLICK_TO_RIDE")
+		elif _selected.holdable:
 			text += ("\n" if not text.is_empty() else "") + tr("INVENTORY_CLICK_TO_HOLD")
 		_description.text = text
 

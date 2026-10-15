@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3 uid="uid://itembroom0001"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://objects/items/broom.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"broom"
+display_name = "ITEM_BROOM_NAME"
+description = "ITEM_BROOM_DESC"
+max_stack = 1
+holdable = false
+burn_seconds = 0.0
+mount_scene = ExtResource("2")

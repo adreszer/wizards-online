@@ -14,6 +14,10 @@ const LEVEL_SCENE := preload("res://levels/mvp/mvp_level.tscn")
 const CASTLE_SCENE := preload("res://levels/castle/castle.tscn")
 const ARCANE_PULSE := preload("res://resources/spells/arcane_pulse.tres")
 const TORCH := preload("res://resources/items/torch.tres")
+const BROOM := preload("res://resources/items/broom.tres")
+const BROOM_RACK_SCENE := preload("res://objects/interactables/broom_rack.tscn")
+const AREA_ZONE_SCENE := preload("res://gameplay/world/area_zone.tscn")
+const CHAT_PANEL_SCENE := preload("res://ui/chat/chat_panel.tscn")
 const INVENTORY_PANEL_SCENE := preload("res://ui/inventory/inventory_panel.tscn")
 const BLOCK_SCENE := preload("res://objects/puzzles/pushable_block.tscn")
 const WALL_TORCH_SCENE := preload("res://objects/environment/props/wall_torch.tscn")
@@ -60,6 +64,7 @@ func _run() -> void:
 	await _test_school()
 	await _test_houses()
 	await _test_inventory()
+	await _test_flying()
 	await _test_interaction()
 	await _test_moving_platform()
 	await _test_level_wiring()
@@ -979,6 +984,204 @@ func _test_inventory() -> void:
 	await _clear(fixtures)
 
 
+# --- Brooms and flying ---------------------------------------------------------------
+
+func _test_flying() -> void:
+	t.section("Brooms and flying")
+	t.check(ItemRegistry.load_definition("broom") == BROOM and BROOM.is_mount() and not BROOM.holdable, "broom is a registered mount, not a hand item")
+	t.check(not TORCH.is_mount(), "the torch is not a mount")
+	var fixtures: Array = []
+	fixtures.append(TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(200, 1, 200)))
+	await _spawn_player(Vector3(0, 0.1, 0))
+	player.inventory.load_state(ItemRegistry.default_state())
+	var movement := player.movement
+
+	# No broom, no flight.
+	t.check(not player.broom_rider.toggle() and not movement.is_flying, "cannot fly without a broom")
+
+	# Broom rack (offline): gives one broom, never a second.
+	var rack: BroomRack = BROOM_RACK_SCENE.instantiate()
+	add_child(rack)
+	rack.global_position = Vector3(3, 0, 0)
+	fixtures.append(rack)
+	await get_tree().process_frame
+	t.check(rack.get_child_count() > 4, "rack builds its stand and brooms")
+	(rack.get_meta("interactable") as Interactable).interact(player)
+	t.check(player.inventory.count_of(&"broom") == 1, "rack gives a broom")
+	(rack.get_meta("interactable") as Interactable).interact(player)
+	t.check(player.inventory.count_of(&"broom") == 1, "rack gives at most one broom")
+
+	# Mount: takes off and shows the broom under the rider.
+	var ground_y := player.global_position.y
+	t.check(player.broom_rider.toggle() and movement.is_flying, "B mounts the broom")
+	t.check(player.broom_rider.mount_node != null and player.broom_rider.mount_node.get_parent() == player.visual, "broom model sits under the character visual")
+	await _wait(0.5)
+	t.check(movement.state == PlayerMovement.State.FLY and movement.get_state_name() == "fly", "fly state while mounted")
+	t.check(player.global_position.y > ground_y + 0.5, "mounting on the ground lifts off (%.2f m)" % (player.global_position.y - ground_y))
+
+	# Hover: no gravity with nothing pressed.
+	await _wait(1.0)
+	var hover_y := player.global_position.y
+	await _wait(1.0)
+	t.check(absf(player.global_position.y - hover_y) < 0.1, "hovers without input (drift %.3f m)" % (player.global_position.y - hover_y))
+
+	# Climb and sink.
+	movement.set_external_vertical(1.0)
+	await _wait(1.0)
+	var climbed := player.global_position.y - hover_y
+	t.check(climbed > 4.0, "Space climbs (%.1f m in 1 s)" % climbed)
+	var top := player.global_position.y
+	movement.set_external_vertical(-1.0)
+	await _wait(1.0)
+	t.check(player.global_position.y < top - 3.0, "C sinks (%.1f m in 1 s)" % (top - player.global_position.y))
+	movement.set_external_vertical(0.0)
+
+	# Cruise and boost are far faster than running.
+	movement.set_external_move(Vector3(0, 0, -1), false)
+	await _wait(1.5)
+	var start := player.global_position
+	await _wait(1.0)
+	var cruise := Vector2(player.global_position.x - start.x, player.global_position.z - start.z).length()
+	t.check(cruise > movement.run_speed * 1.5, "cruising flight beats running (%.1f m/s)" % cruise)
+	movement.set_external_move(Vector3(0, 0, -1), true)
+	await _wait(1.5)
+	start = player.global_position
+	await _wait(1.0)
+	var boosted := Vector2(player.global_position.x - start.x, player.global_position.z - start.z).length()
+	t.check(boosted > cruise * 1.6, "Shift boosts (%.1f m/s)" % boosted)
+	t.check(player.broom_rider.pose != Transform3D.IDENTITY, "the rider leans into fast flight")
+	movement.set_external_move(Vector3.ZERO)
+	await _wait(3.0)
+	t.check(player.velocity.length() < 1.0, "slows to a hover when released")
+
+	# Mouse steering: the broom turns to the camera's yaw and W climbs toward a raised crosshair.
+	movement.frame_yaw_provider = func() -> float: return PI / 2.0
+	movement.frame_pitch_provider = func() -> float: return deg_to_rad(30.0)
+	await _wait(1.0)
+	t.check(absf(angle_difference(player.rotation.y, PI / 2.0)) < 0.1, "the hovering broom turns to face the mouse")
+	var before_w := player.global_position
+	player.player_input.set_process(false)
+	player.player_input.move_axis = Vector2(0, 1)
+	await _wait(1.5)
+	player.player_input.move_axis = Vector2.ZERO
+	player.player_input.set_process(true)
+	var flown := player.global_position - before_w
+	t.check(flown.x < -5.0 and flown.y > 3.0, "W flies toward the crosshair: west and up (%s)" % str(flown))
+	movement.frame_yaw_provider = player.camera_rig.get_yaw
+	movement.frame_pitch_provider = player.camera_rig.get_pitch
+	await _wait(3.0)
+
+	# Altitude cap.
+	var cap := movement.max_flight_height
+	movement.max_flight_height = player.global_position.y + 2.0
+	movement.set_external_vertical(1.0)
+	await _wait(2.0)
+	t.check(player.global_position.y < movement.max_flight_height + 1.0, "cannot climb past the flight ceiling")
+	movement.set_external_vertical(0.0)
+	movement.max_flight_height = cap
+
+	# Dismount in the air: gravity takes over, the landing is soft.
+	player.broom_rider.toggle()
+	t.check(not movement.is_flying and player.broom_rider.mount_node == null, "B again dismounts and hides the broom")
+	await _wait(3.0)
+	t.check(movement.is_grounded and player.health.current == player.health.max_health, "falls back to the ground unharmed")
+
+	# Landing by holding Descend on the floor.
+	player.broom_rider.toggle()
+	await _wait(0.3)
+	movement.set_external_vertical(-1.0)
+	await _wait(2.0)
+	t.check(not movement.is_flying and player.broom_rider.mount == null, "holding C on the ground lands and dismounts")
+	movement.set_external_vertical(0.0)
+
+	# No flying in classrooms: mounting refused, entering one in flight lands you.
+	var zone: AreaZone = AREA_ZONE_SCENE.instantiate()
+	zone.area_id = &"test_classroom"
+	zone.kind = "classroom"
+	zone.size = Vector3(10, 10, 10)
+	add_child(zone)
+	zone.global_position = Vector3(0, 5, -40)
+	fixtures.append(zone)
+	player.broom_rider.toggle()
+	await _wait(0.3)
+	movement.set_external_move(Vector3(0, 0, -1), false)
+	var entered := false
+	for i in 40:
+		await _wait(0.1)
+		if player.area_tracker.current_kind() == "classroom":
+			entered = true
+			break
+	await get_tree().physics_frame
+	t.check(entered and not movement.is_flying, "flying into a classroom lands the rider")
+	movement.set_external_move(Vector3.ZERO)
+	await _wait(0.5)
+	t.check(not player.broom_rider.toggle() and not movement.is_flying, "cannot mount inside a classroom")
+
+	# Respawning (death, falling out of the world) lands the rider.
+	player.global_position = Vector3(0, 0.1, 20)
+	await _wait(0.5)
+	player.broom_rider.toggle()
+	t.check(movement.is_flying, "mounts again outside the classroom")
+	player.respawn_handler.respawn()
+	t.check(not movement.is_flying and player.broom_rider.mount == null, "respawning dismounts")
+
+	# Losing the broom (server inventory) ends the flight.
+	player.global_position = Vector3(0, 0.1, 20)
+	await _wait(0.5)
+	player.broom_rider.toggle()
+	t.check(movement.is_flying, "mounts again after respawning")
+	player.inventory.load_state(ItemRegistry.default_state())
+	t.check(not movement.is_flying, "losing the broom ends the flight")
+
+	# Snapshots carry the mount; remote players show it.
+	player.inventory.add(BROOM)
+	player.broom_rider.toggle()
+	var remote: Player = PLAYER_SCENE.instantiate()
+	remote.is_local = false
+	add_child(remote)
+	await _wait(0.2)
+	remote.synchronizer.receive_state({"p": [0, 5, 0], "y": 0.0, "v": [0, 0, 0], "s": "fly", "m": "broom"})
+	t.check(remote.broom_rider.mount == BROOM and remote.broom_rider.mount_node != null, "remote player shows the replicated broom")
+	remote.synchronizer.receive_state({"p": [0, 5, 0], "y": 0.0, "v": [0, 0, 0], "s": "idle"})
+	t.check(remote.broom_rider.mount == null, "remote player puts it away")
+	remote.synchronizer.receive_state({"p": [0, 5, 0], "y": 0.0, "v": [0, 0, 0], "s": "fly", "m": "torch"})
+	t.check(remote.broom_rider.mount == null, "a non-mount id in a snapshot is ignored")
+	remote.queue_free()
+	player.broom_rider.dismount()
+
+	# Satchel: clicking the broom mounts it.
+	var panel := INVENTORY_PANEL_SCENE.instantiate()
+	add_child(panel)
+	panel._bind_player(player)
+	panel.open()
+	for button: Button in panel.get_node("%Slots").get_children().filter(func(n: Node) -> bool: return n is Button):
+		if button.text.begins_with(tr(BROOM.display_name)):
+			button.pressed.emit()
+	t.check(movement.is_flying and not panel.is_open, "clicking the broom in the satchel mounts it and closes the panel")
+	player.broom_rider.dismount()
+	panel._unbind_player(player)
+	panel.queue_free()
+
+	# Cheat commands (offline: straight into the inventory).
+	player.inventory.load_state(ItemRegistry.default_state())
+	t.check(ChatCommands.is_command("/broom") and not ChatCommands.is_command("hello"), "slash lines are commands")
+	ChatCommands.run("/miotla", player)
+	t.check(player.inventory.count_of(&"broom") == 1, "/miotla gives a broom offline")
+	ChatCommands.run("/broom", player)
+	t.check(player.inventory.count_of(&"broom") == 1, "a second /broom does not duplicate it")
+	var unknown := ChatCommands.run("/give dragon", player)
+	t.check(unknown.contains("dragon") and player.inventory.slots.size() == 2, "/give with an unknown item is refused")
+	t.check(not ChatCommands.run("/help", player).is_empty(), "/help lists the commands")
+	var chat := CHAT_PANEL_SCENE.instantiate()
+	add_child(chat)
+	player.inventory.load_state(ItemRegistry.default_state())
+	chat.open()
+	chat._on_submitted("/broom")
+	t.check(player.inventory.has(&"broom") and not chat.is_open, "the chat box runs commands offline")
+	chat.queue_free()
+	await _clear(fixtures)
+
+
 func _find_light(p: Node) -> OmniLight3D:
 	return p.find_child("Flame", true, false) as OmniLight3D
 
@@ -1596,7 +1799,7 @@ func _test_characters() -> void:
 		var ap: AnimationPlayer = tree.get_node(tree.anim_player)
 		var missing := []
 		for state in PlayerMovement.STATE_NAMES:
-			var node_name: String = state.capitalize()
+			var node_name: String = str(player.animation_controller.movement_state_map.get(state, "")).capitalize()
 			var anim_node := (tree.tree_root as AnimationNodeBlendTree).get_node(node_name) as AnimationNodeAnimation
 			if anim_node == null or not ap.has_animation(anim_node.animation):
 				missing.append(state)

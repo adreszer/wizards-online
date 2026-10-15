@@ -21,7 +21,15 @@ extends Resource
 ## by anything yet: the first torch never expires, and future consumable
 ## light sources will count this down server-side.
 @export var burn_seconds: float = 0.0
+## Scene shown under the rider while the item is ridden (a broom). Non-null
+## makes the item a mount: the satchel and the Mount action fly on it instead
+## of taking it in hand (see BroomRider).
+@export var mount_scene: PackedScene
 
 
 func is_stackable() -> bool:
 	return max_stack > 1
+
+
+func is_mount() -> bool:
+	return mount_scene != null

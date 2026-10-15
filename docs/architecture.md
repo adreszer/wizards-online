@@ -156,15 +156,20 @@ Enemies are placed through `content/placements.json` (kind `crystal_guardian`, u
 ## Inventory and held items
 
 ```
-ItemDefinition (Resource)   id, name/description keys, icon, max_stack, holdable, held_scene, burn_seconds (0 = never expires)
+ItemDefinition (Resource)   id, name/description keys, icon, max_stack, holdable, held_scene, burn_seconds (0 = never expires), mount_scene (non-null = rideable: is_mount())
 ItemRegistry (static)       id → resources/items/<id>.tres, sanitize(), default_state() (starting kit: one torch)
 Inventory (Node)            slots [{def, count}], held_item; add/remove/hold/release, to_state/load_state; meta "inventory"
 HeldItemMount (Node)        show_item(def): frees the previous held scene, instantiates def.held_scene under the OffHand socket
 HeldTorch (objects/items)   handle mesh + flickering OmniLight; the first light source a player can carry
+BroomRider (Node)           mount/dismount (inventory + area rules), mount scene under the visual, `pose` (bank, pitch, bob) the Player applies to the visual
+BroomModel (objects/items)  procedural broom (shaft, bindings, twigs, spark trail); origin = seat, shaft toward -Z
+BroomRack (objects/interactables)  world object kind `item_rack`: Interact takes one `item_id` (online: OP_WORLD_EVENT, the server grants it)
 ```
 
 - Every character body exposes an `OffHand` socket (a `BoneAttachment3D` on the left hand for rigged bodies, a `Marker3D` on the placeholder; `tools/build_character.gd` emits it). `Player` falls back to a generated marker if a body lacks one.
 - Local players change what they hold through their `Inventory` (the Tab satchel panel calls `toggle_hold`); the `held_item_changed` signal drives both `HeldItemMount` and, online, `NetworkManager.send_held_item`. Remote players skip the inventory: the server-validated id goes straight to `Player.set_remote_held_item`.
+- **Brooms and flight.** A mount item is not held: the Mount action (B) or a click in the satchel calls `BroomRider.toggle()`, which needs an owned mount and an area whose kind is not in `NO_FLY_KINDS` (classrooms), then `PlayerMovement.set_flying(true)`. Flight is a movement mode (state `fly`): no gravity, steered by the mouse: the broom faces the camera's yaw and forward flies toward the crosshair (camera pitch beyond a ±3° level band; the camera's pitch range widens to ±80° in flight), Jump/Descend climb and sink, Sprint boosts (14 → 30 m/s), releasing everything slows to a hover, a hard ceiling at `max_flight_height`; holding Descend on the floor (or B) lands. Entering a no-fly area or losing the broom lands the rider. The camera pulls back 2.4 m in flight and widens its FOV with speed. Flight is client-side like all movement; snapshots carry the ridden item as `m`, so remote players show the broom and bank from their interpolated motion.
+- **Getting a broom.** Broom racks on the grounds (beside the spawn) and in the flying classroom (`content/placements.json`, kind `item_rack`); online the server's `give_item` adds one (at most a full stack, so one broom), stores the inventory and resends `OP_INVENTORY`. Dev cheat: chat commands `/broom` (`/miotla`) and `/give <id>` (`ChatCommands`), offline straight into the inventory, online as `OP_CHEAT`, accepted from admins or from anyone while `cheats_enabled` is set in `nakama/content/school_rules.json` (on for development, off by default in `school.lua`; switch it off for release).
 - **Lighting direction.** The torch is the first step toward a world lit only by light sources: carried lights are plain children of a held scene, so no lighting code needs to know about items. Ambient light and the sun will be dimmed once every area has placed light sources.
 
 ## Level mechanics
@@ -211,7 +216,8 @@ Offline, `WorldObjectSync` starts an `OfflineMysteryEngine` with the public `con
 | Character profile: role, house, spellbook | **Server** | Nakama storage (`character` / `profile`, per user). Roles change only through the admin RPC; spells only through grants (professor in the same classroom) or, interim, practice tomes. Hotbar layout is the one thing the client dictates (validated against known spells). |
 | Current area | Client-reported, server-recorded | `OP_AREA` on zone change; the server maps ids to kinds/houses via `world_areas.lua`, gates classroom-only actions and drops reports for another house's area. Position checks can be added later. |
 | House membership | **Server** | Assigned once by the sorting ceremony (`OP_SORT`, tallied server-side) or by an admin. House doors compare the profile's house client-side; the physical gate is a local per-player check. |
-| Inventory contents, held item | **Server** | Nakama storage (`inventory` / `items`, per user). Clients only request `hold`; the server validates ownership and relays. Offline mode uses the same starting kit locally. |
+| Inventory contents, held item | **Server** | Nakama storage (`inventory` / `items`, per user). Clients only request `hold`; the server validates ownership and relays. Items are added only by the server (item racks the player stands at, `OP_CHEAT` when allowed). Offline mode uses the same starting kit locally. |
+| Broom flight | Client (like movement) | Mounting checks owning a broom and the area's kind locally; the server does not validate it yet. |
 | Enemies (position, health, target) | **Local only** | Each client fights its own copy. `Enemy` keeps target selection and damage in/out behind small methods so a server-driven variant can replace them. |
 | World object state (secret walls, switches, torches, levers, statues, doors) | **Server** | Online, local triggers only *request* (`OP_WORLD_EVENT`); `object_rules.lua` validates (object exists, sender in its area, spell known and accepted, rate limit, per-object cooldown), stores the state in the match and broadcasts `OP_OBJECT_STATE`; joiners get `OP_WORLD_SNAPSHOT`. Offline, objects act on local triggers. State lives in the match (resets on server restart). |
 | Physics objects (pushable blocks, pressure plates), collectibles | **Local only** | Continuous physics is not synced; fragment pickups are per player and not yet persisted. |
@@ -221,7 +227,7 @@ Offline, `WorldObjectSync` starts an `OfflineMysteryEngine` with the public `con
 
 ### Replication details
 
-- Local players sample at `game/network/state_send_rate` (12 Hz) and send `{p, y, v, s, g}` as JSON (position, yaw, velocity, state name, grounded).
+- Local players sample at `game/network/state_send_rate` (12 Hz) and send `{p, y, v, s, g}` as JSON (position, yaw, velocity, state name, grounded), plus `m` (ridden mount item id) while flying.
 - Remote players keep a snapshot buffer and render 120 ms behind the newest snapshot, interpolating between surrounding snapshots and extrapolating briefly on velocity if starved. Large jumps (respawn) snap.
 - Animation on remote players is driven by the replicated movement state name; casts trigger the same `play_cast()` and a cosmetic projectile.
 - Held items are events, not part of the 12 Hz snapshot: `OP_HELD_ITEM {id}` client → server (validated) → `{sid, id}` to the others; the current value also rides in roster / join entries.

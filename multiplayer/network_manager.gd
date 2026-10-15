@@ -47,6 +47,8 @@ signal house_totals_changed(totals: PackedInt32Array)
 signal house_points_result_received(ok: bool, house: int, delta: int, reason: String)
 ## A professor spoke to the local player's classroom (also shown in chat).
 signal lecture_received(by_name: String, text: String)
+## Outcome of a cheat the local player sent (see ChatCommands).
+signal cheat_result_received(ok: bool, item_id: String, reason: String)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal system_message(text: String)
 
@@ -89,6 +91,7 @@ func _ready() -> void:
 	state_synchronizer.house_totals_changed.connect(house_totals_changed.emit)
 	state_synchronizer.house_points_result_received.connect(house_points_result_received.emit)
 	state_synchronizer.lecture_received.connect(_on_lecture)
+	state_synchronizer.cheat_result_received.connect(cheat_result_received.emit)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 	world_session.server_clock_received.connect(func(server_ms: float, sent_ms: int) -> void:
@@ -240,6 +243,12 @@ func send_study_tome(spell_id: String) -> void:
 func send_world_event(object_id: String, event: String, spell_id: String = "") -> void:
 	if is_online():
 		state_synchronizer.send_world_event(object_id, event, spell_id)
+
+
+## Cheat: ask the server for an item (answer: cheat_result_received, then the inventory).
+func send_cheat_give(item_id: String) -> void:
+	if is_online():
+		state_synchronizer.send_cheat_give(item_id)
 
 
 ## Professor/admin: open or close the lesson in the current classroom.

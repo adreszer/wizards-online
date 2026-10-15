@@ -8,7 +8,7 @@ MENU_PORT,Nakama port,Port Nakama
 MENU_PLAY_OFFLINE,Play OFFLINE,Graj OFFLINE
 MENU_PLAY_ONLINE,Play ONLINE,Graj ONLINE
 MENU_QUIT,Quit,Wyjdź
-MENU_CONTROLS,WASD move · Shift run · Space jump · Mouse look · Wheel zoom · LMB cast · E interact · Tab satchel · Enter chat · ` free cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · Mysz rozglądanie · Kółko zoom · LPM czar · E interakcja · Tab sakwa · Enter czat · ` uwolnij kursor · F3 debug · Esc pauza
+MENU_CONTROLS,WASD move · Shift run · Space jump · Mouse look · Wheel zoom · LMB cast · E interact · Tab satchel · B broom · Enter chat · ` free cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · Mysz rozglądanie · Kółko zoom · LPM czar · E interakcja · Tab sakwa · B miotła · Enter czat · ` uwolnij kursor · F3 debug · Esc pauza
 MENU_CONNECTING,Connecting…,Łączenie…
 MENU_CONNECT_FAILED_HINT,"Start the backend with `docker compose up -d`, or play OFFLINE.",Uruchom backend poleceniem `docker compose up -d` albo graj OFFLINE.
 PAUSE_TITLE,Paused,Pauza
@@ -332,3 +332,24 @@ PLAN_LINE_SENT,Line %d of %d said.,Wypowiedziano linię %d z %d.
 HUD_HOUSE_POINTS,%s %d,%s %d
 OFFLINE_MYST_UNDERCROFT_CLUE,"The plaque mentions a crypt beneath the dungeon corridor, sealed behind a carved stone.","Tablica wspomina kryptę pod korytarzem lochów, zamkniętą za rzeźbionym kamieniem."
 OFFLINE_MYST_STUDY_CLUE,The reader's statue turns toward the western wall.,Posąg czytelnika obraca się ku zachodniej ścianie.
+ITEM_BROOM_NAME,Flying broom,Latająca miotła
+ITEM_BROOM_DESC,A school broom bound with brass. Press B to mount it and fly over the castle and the grounds.,"Szkolna miotła okuta mosiądzem. Naciśnij B, aby na nią wsiąść i latać nad zamkiem i błoniami."
+INTERACT_TAKE_BROOM,Take a broom,Weź miotłę
+NOTIFY_BROOM_TAKEN,You took a flying broom. Press B to mount it (or click it in the satchel).,"Bierzesz latającą miotłę. Naciśnij B, aby na nią wsiąść (albo kliknij ją w sakwie)."
+NOTIFY_ALREADY_HAVE_ITEM,You already have: %s.,Masz już: %s.
+NOTIFY_NO_BROOM,You have no broom. Take one from a broom stand (on the grounds or in the flying classroom).,Nie masz miotły. Weź ją ze stojaka na miotły (na błoniach albo w sali lotów).
+NOTIFY_NO_FLYING_HERE,No flying here: you land and go on foot.,Tu nie wolno latać: lądujesz i idziesz pieszo.
+NOTIFY_FLIGHT_CONTROLS,Flying: the broom follows the mouse · W forward · Space up · C or Ctrl down · Shift faster · hold C on the ground or press B to land.,"Lot: miotła leci za myszą · W naprzód · Spacja w górę · C lub Ctrl w dół · Shift szybciej · przytrzymaj C przy ziemi albo naciśnij B, aby wylądować."
+INVENTORY_RIDING_MARK,(riding),(w locie)
+INVENTORY_CLICK_TO_RIDE,Click to mount it or land (shortcut: B).,"Kliknij, aby wsiąść albo wylądować (skrót: B)."
+CHAT_OFFLINE_COMMANDS_ONLY,Offline there is nobody to talk to; only commands work here (/help).,Offline nie ma z kim rozmawiać; działają tylko komendy (/pomoc).
+CHEAT_HELP,Commands: /broom (/miotla) gives a flying broom · /give <item> gives any item · /help this list.,Komendy: /miotla (/broom) daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /pomoc ta lista.
+CHEAT_GIVE_USAGE,Usage: /give <item>. Items: %s,Użycie: /daj <przedmiot>. Przedmioty: %s
+CHEAT_UNKNOWN,Unknown command: %s (try /help).,Nieznana komenda: %s (spróbuj /pomoc).
+CHEAT_UNKNOWN_ITEM,"No item called ""%s"". Items: %s",Nie ma przedmiotu „%s”. Przedmioty: %s
+CHEAT_REQUESTED,Asking the server for: %s…,Prośba do serwera o: %s…
+CHEAT_NO_PLAYER,No character to give it to yet.,"Nie ma jeszcze postaci, której można to dać."
+CHEAT_GIVEN,Added to the satchel: %s.,Dodano do sakwy: %s.
+CHEAT_BROOM_HINT,Press B to fly.,"Naciśnij B, aby latać."
+CHEAT_NOT_ALLOWED,Cheats are switched off on this server.,Kody są wyłączone na tym serwerze.
+CHEAT_FAILED,The server refused (%s).,Serwer odmówił (%s).

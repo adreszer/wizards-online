@@ -9,8 +9,9 @@ extends Node
 
 @export var animation_tree: AnimationTree
 ## Movement state name (from PlayerMovement.STATE_NAMES) -> transition input name.
+## Broom flight shows the idle clip until a riding clip exists.
 @export var movement_state_map: Dictionary = {
-	"idle": "idle", "walk": "walk", "run": "run", "jump": "jump", "fall": "fall", "land": "land",
+	"idle": "idle", "walk": "walk", "run": "run", "jump": "jump", "fall": "fall", "land": "land", "fly": "idle",
 }
 @export var movement_transition_param: String = "parameters/Movement/transition_request"
 @export var cast_oneshot_param: String = "parameters/Cast/request"

@@ -19,6 +19,9 @@
 -- grants need an open lesson there and a spell of the room's subject, the
 -- lesson records attendance and carries the lecture text. House points go
 -- through a stored ledger and a running total broadcast to everyone.
+-- Items are granted by item racks (world objects of kind "item_rack", e.g. the
+-- broom stands: one per character) and by OP_CHEAT (admins, or anyone while
+-- the school rules have cheats_enabled).
 -- Movement is relayed but not yet validated.
 
 local nk = require("nakama")
@@ -39,6 +42,7 @@ local OP_SERVER_TEXT = P.OP_SERVER_TEXT
 local OP_LESSON, OP_LESSON_STATE, OP_LESSON_RESULT = P.OP_LESSON, P.OP_LESSON_STATE, P.OP_LESSON_RESULT
 local OP_HOUSE_POINTS, OP_HOUSE_TOTALS, OP_HOUSE_POINTS_RESULT = P.OP_HOUSE_POINTS, P.OP_HOUSE_TOTALS, P.OP_HOUSE_POINTS_RESULT
 local OP_LECTURE, OP_LECTURE_TEXT = P.OP_LECTURE, P.OP_LECTURE_TEXT
+local OP_CHEAT, OP_CHEAT_RESULT = P.OP_CHEAT, P.OP_CHEAT_RESULT
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
 local MAX_AREA_ID_BYTES = 48
@@ -136,6 +140,28 @@ local function owns(inventory, id)
     end
   end
   return false
+end
+
+-- Adds one `id` to the inventory of `sid` (up to a full stack), stores it and
+-- sends the player its inventory. Returns nil on success, else a reason.
+local function give_item(dispatcher, state, sid, id)
+  local inv, p = state.inventories[sid], state.presences[sid]
+  local def = type(id) == "string" and ITEMS[id] or nil
+  if not inv or not p then return "no_player" end
+  if not def then return "unknown_item" end
+  local entry
+  for _, e in ipairs(inv.items) do
+    if e.id == id then entry = e end
+  end
+  if entry and entry.count >= (def.max_stack or 1) then return "already_owned" end
+  if entry then
+    entry.count = entry.count + 1
+  else
+    table.insert(inv.items, { id = id, count = 1 })
+  end
+  write_inventory(p.user_id, inv)
+  dispatcher.broadcast_message(OP_INVENTORY, nk.json_encode(inv), { p }, nil, true)
+  return nil
 end
 
 local function others(state, except_sid)
@@ -556,11 +582,26 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           if value ~= nil then
             broadcast_object(dispatcher, ev.oid, value)
           end
+          if ev.obj.kind == "item_rack" and ev.event == "interact" then
+            give_item(dispatcher, state, sid, ev.obj.item_id)
+          end
           feed_mysteries(dispatcher, state, sid, { event = ev.event, object = ev.oid, effect_type = ev.effect_type, state = Objects.state_of(state.world, ev.oid) })
         else
           nk.logger_debug(string.format("world event from %s refused: %s", sid, tostring(reason)))
         end
       end
+    elseif message.op_code == OP_CHEAT then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local profile = state.profiles[sid]
+      local id = ok and type(payload) == "table" and type(payload.give) == "string" and payload.give or ""
+      local reason
+      if not profile or not (state.rules.cheats_enabled or profile.role == "admin") then
+        reason = "not_allowed"
+      else
+        reason = give_item(dispatcher, state, sid, id)
+        nk.logger_info(string.format("cheat: %s gave themselves %s (%s)", state.names[sid] or sid, id, tostring(reason or "ok")))
+      end
+      dispatcher.broadcast_message(OP_CHEAT_RESULT, nk.json_encode({ ok = reason == nil, id = ITEMS[id] and id or "", reason = reason or "" }), { message.sender }, nil, true)
     elseif message.op_code == OP_LESSON then
       local ok, payload = pcall(nk.json_decode, message.data)
       local action = ok and type(payload) == "table" and payload.action or ""
@@ -645,7 +686,7 @@ function M.match_terminate(context, dispatcher, tick, state, grace_seconds)
 end
 
 -- Signals come from world.lua's admin RPCs:
---   { op = "set_profile", user_id | name, role?, house?, forget_spells?, forget_mysteries? }
+--   { op = "set_profile", user_id | name, role?, house?, forget_spells?, forget_mysteries?, reset_inventory? }
 --   { op = "reset_world" }  every object to its default, world/house mysteries unsolved
 -- Answers { ok, sid, user_id, role, house } or { ok = false, reason }.
 function M.match_signal(context, dispatcher, tick, state, data)
@@ -680,6 +721,12 @@ function M.match_signal(context, dispatcher, tick, state, data)
     local uid = state.presences[sid].user_id
     state.progress[uid] = {}
     save_progress(uid, state.progress[uid])
+  end
+  if request.reset_inventory == true then
+    local inv = sanitize_inventory({ items = STARTING_ITEMS, held = "" })
+    state.inventories[sid] = inv
+    write_inventory(state.presences[sid].user_id, inv)
+    dispatcher.broadcast_message(OP_INVENTORY, nk.json_encode(inv), { state.presences[sid] }, nil, true)
   end
   Profile.write(state.presences[sid].user_id, profile)
   send_profile(dispatcher, state, sid)

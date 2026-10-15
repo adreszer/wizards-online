@@ -7,9 +7,9 @@ extends Node
 ## state through signals so animation and networking stay decoupled.
 ## All tuning values are exported.
 
-enum State { IDLE, WALK, RUN, JUMP, FALL, LAND }
+enum State { IDLE, WALK, RUN, JUMP, FALL, LAND, FLY }
 
-const STATE_NAMES: PackedStringArray = ["idle", "walk", "run", "jump", "fall", "land"]
+const STATE_NAMES: PackedStringArray = ["idle", "walk", "run", "jump", "fall", "land", "fly"]
 
 signal state_changed(new_state: State, old_state: State)
 signal jumped()
@@ -18,6 +18,8 @@ signal landed(impact_speed: float)
 ## jump. The body then stands still for `duration` seconds (the time it would have taken
 ## to walk that distance), so visuals subtract the jump and close it at constant speed.
 signal stepped(displacement: Vector3, duration: float)
+## Flight on a broom started or ended (see [method set_flying]).
+signal flying_changed(is_flying: bool)
 
 @export_group("Ground")
 @export var walk_speed: float = 4.2
@@ -47,10 +49,38 @@ signal stepped(displacement: Vector3, duration: float)
 @export var land_state_duration: float = 0.18
 @export var hard_landing_speed: float = 12.0
 
+@export_group("Flight")
+## Cruising speed on a broom; Sprint boosts to fly_boost_speed.
+@export var fly_speed: float = 14.0
+@export var fly_boost_speed: float = 30.0
+## Climb / sink rate from Jump / Descend, on top of the camera-pitch climb.
+@export var fly_vertical_speed: float = 8.0
+@export var fly_acceleration: float = 16.0
+## Slows to a hover when nothing is pressed.
+@export var fly_deceleration: float = 12.0
+## Vertical response (climb, sink, stopping either).
+@export var fly_vertical_acceleration: float = 30.0
+## How fast the broom swings round to where the mouse (camera) points.
+@export var fly_turn_speed: float = 10.0
+## Camera pitch within this small band flies level; beyond it forward flight
+## climbs or dives toward the crosshair.
+@export var fly_pitch_deadzone_degrees: float = 3.0
+## Upward pop when mounting on the ground.
+@export var takeoff_speed: float = 6.0
+## Nothing climbs above this height (world y); the grounds' sky has a lid.
+@export var max_flight_height: float = 160.0
+## Holding Descend this long while touching the floor lands and dismounts.
+@export var land_hold_seconds: float = 0.35
+
 var body: CharacterBody3D
 var input: PlayerInput
 ## Called with no arguments, returns the yaw (radians) the movement is relative to.
 var frame_yaw_provider: Callable
+## Called with no arguments, returns the camera pitch (radians, negative = looking
+## down); in flight, forward follows it.
+var frame_pitch_provider: Callable
+## True while riding a broom: no gravity, free 3D movement.
+var is_flying: bool = false
 
 var state: State = State.IDLE
 var is_grounded: bool = false
@@ -73,6 +103,9 @@ var _external_sprint: bool = false
 var _step_stall: float = 0.0
 ## Horizontal speed the body would have had during the stall (keeps the walk state alive).
 var _stall_speed: float = 0.0
+## Scripted climb (+1) / sink (-1) in flight (tests).
+var _external_vertical: float = 0.0
+var _land_hold: float = 0.0
 
 
 func setup(p_body: CharacterBody3D, p_input: PlayerInput) -> void:
@@ -103,6 +136,29 @@ func is_held() -> bool:
 	return _held > 0.0
 
 
+## Scripted climb (> 0) or sink (< 0) while flying, -1..1.
+func set_external_vertical(value: float) -> void:
+	_external_vertical = clampf(value, -1.0, 1.0)
+
+
+## Starts or ends broom flight. Mounting on the ground pops the body up; ending
+## it hands the body back to gravity (falling from a height is harmless).
+func set_flying(value: bool) -> void:
+	if value == is_flying:
+		return
+	is_flying = value
+	_step_stall = 0.0
+	_held = 0.0
+	_land_hold = 0.0
+	if body != null:
+		if value and body.is_on_floor():
+			body.velocity.y = takeoff_speed
+		_peak_fall_speed = 0.0
+	flying_changed.emit(value)
+	if body != null:
+		_update_state(false, false)
+
+
 func request_jump(hold_seconds: float = 0.35) -> void:
 	_jump_requested_externally = true
 	_external_jump_hold = hold_seconds
@@ -118,6 +174,9 @@ func get_state_name() -> String:
 
 func _physics_process(delta: float) -> void:
 	if body == null:
+		return
+	if is_flying:
+		_physics_fly(delta)
 		return
 	var move_dir := _compute_move_direction()
 	var sprint := (input != null and input.sprint_held) or _external_sprint
@@ -242,7 +301,9 @@ func _compute_move_direction() -> Vector3:
 
 func _update_state(sprint: bool, did_jump: bool) -> void:
 	var new_state := state
-	if not is_grounded:
+	if is_flying:
+		new_state = State.FLY
+	elif not is_grounded:
 		new_state = State.JUMP if body.velocity.y > 0.5 or did_jump else State.FALL
 	elif _land_timer > 0.0:
 		new_state = State.LAND
@@ -258,6 +319,71 @@ func _update_state(sprint: bool, did_jump: bool) -> void:
 		var old := state
 		state = new_state
 		state_changed.emit(state, old)
+
+
+## Broom flight steers with the mouse: forward is where the camera (the
+## crosshair) points, yaw and pitch, and the broom always faces that way.
+## Jump / Descend climb and sink, Sprint boosts; with nothing pressed
+## the broom slows to a hover. Collisions still slide along walls. Holding
+## Descend while touching the floor lands and ends the flight.
+func _physics_fly(delta: float) -> void:
+	var axis := Vector2.ZERO
+	if _external_move.length_squared() > 0.0001:
+		# Scripted world-space direction (tests): x/z only, like walking.
+		var flat := _external_move.limit_length(1.0)
+		axis = Vector2(flat.x, flat.z)
+	elif input != null:
+		axis = input.move_axis.limit_length(1.0)
+	var boost := (input != null and input.sprint_held) or _external_sprint
+	var up := (input != null and input.jump_held) or _external_vertical > 0.0
+	var down := (input != null and input.descend_held) or _external_vertical < 0.0
+	var desired := Vector3.ZERO
+	if _external_move.length_squared() > 0.0001:
+		desired = Vector3(axis.x, 0.0, axis.y)
+	elif axis.length_squared() > 0.0001:
+		var yaw := float(frame_yaw_provider.call()) if frame_yaw_provider.is_valid() else 0.0
+		var pitch := float(frame_pitch_provider.call()) if frame_pitch_provider.is_valid() else 0.0
+		var deadzone := deg_to_rad(fly_pitch_deadzone_degrees)
+		var climb := signf(pitch) * maxf(0.0, absf(pitch) - deadzone)
+		var forward := Vector3(-sin(yaw) * cos(climb), sin(climb), -cos(yaw) * cos(climb))
+		var right := Vector3(cos(yaw), 0.0, -sin(yaw))
+		desired = (forward * axis.y + right * axis.x).limit_length(1.0)
+	desired *= fly_boost_speed if boost else fly_speed
+	var vertical := (1.0 if up else 0.0) - (1.0 if down else 0.0)
+	desired.y += vertical * fly_vertical_speed
+	var accel := fly_acceleration if desired.length_squared() > 0.01 else fly_deceleration
+	var velocity := body.velocity
+	var vertical_velocity := velocity.y
+	velocity = velocity.move_toward(desired, accel * delta)
+	# Climb and sink answer the keys at once, even against the current motion.
+	velocity.y = move_toward(vertical_velocity, desired.y, fly_vertical_acceleration * delta)
+	if body.global_position.y >= max_flight_height and velocity.y > 0.0:
+		velocity.y = 0.0
+	body.velocity = velocity
+
+	# Face the mouse: the camera's yaw (scripted moves: the direction of travel).
+	var target_yaw := facing_yaw
+	if _external_move.length_squared() > 0.0001:
+		target_yaw = atan2(-_external_move.x, -_external_move.z)
+	elif frame_yaw_provider.is_valid():
+		target_yaw = float(frame_yaw_provider.call())
+	facing_yaw = lerp_angle(facing_yaw, target_yaw, minf(1.0, fly_turn_speed * delta))
+	body.rotation.y = facing_yaw
+	var horizontal := Vector3(body.velocity.x, 0.0, body.velocity.z)
+	if horizontal.length_squared() > 1.0:
+		last_move_direction = horizontal.normalized()
+
+	body.move_and_slide()
+	is_grounded = body.is_on_floor()
+	if is_grounded and down:
+		_land_hold += delta
+		if _land_hold >= land_hold_seconds:
+			set_flying(false)
+			landed.emit(0.0)
+			return
+	else:
+		_land_hold = 0.0
+	_update_state(boost, false)
 
 
 ## Stair descent: a rounded capsule rolls over a tread edge and briefly "falls" to the

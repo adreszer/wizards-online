@@ -767,6 +767,7 @@ KINDS = {
     "rotating_statue": ("res://objects/puzzles/rotating_statue.tscn", "Puzzles", True),
     "lever": ("res://objects/interactables/lever.tscn", "Puzzles", True),
     "sorting_stone": ("res://objects/school/sorting_stone.tscn", ".", True),
+    "item_rack": ("res://objects/interactables/broom_rack.tscn", "Props", True),
 }
 PLAQUE_HEIGHT = 1.6
 WALL_FLUSH = T / 2 + 0.05

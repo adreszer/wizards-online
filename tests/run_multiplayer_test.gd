@@ -25,6 +25,7 @@ var server_texts: Array[String] = []
 var lesson_results: Array = []
 var points_results: Array = []
 var lectures: Array[String] = []
+var cheat_results: Array = []
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
@@ -54,6 +55,7 @@ func _ready() -> void:
 	NetworkManager.lesson_result_received.connect(func(ok: bool, action: String, reason: String) -> void: lesson_results.append({"ok": ok, "action": action, "reason": reason}))
 	NetworkManager.house_points_result_received.connect(func(ok: bool, house: int, delta: int, reason: String) -> void: points_results.append({"ok": ok, "house": house, "delta": delta, "reason": reason}))
 	NetworkManager.lecture_received.connect(func(by: String, text: String) -> void: lectures.append("%s: %s" % [by, text]))
+	NetworkManager.cheat_result_received.connect(func(ok: bool, id: String, reason: String) -> void: cheat_results.append({"ok": ok, "id": id, "reason": reason}))
 	await _run()
 
 
@@ -311,7 +313,14 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("loft"), 10.0)
 	t.check(ok, "both players of a cooperative mystery get the discovery")
 
-	ok = await _wait_until(func() -> bool: return _remote(spawner) == null, 30.0)
+	# Meanwhile B fetches a broom and flies: the snapshots carry it here.
+	var saw_broom := [false]
+	ok = await _wait_until(func() -> bool:
+		var r := _remote(spawner)
+		if r != null and (r as Player).broom_rider.mount != null:
+			saw_broom[0] = true
+		return r == null, 60.0)
+	t.check(saw_broom[0], "B's broom shows on the remote player while B flies")
 	t.check(ok, "remote player removed when B disconnects")
 	t.check(leaves.has("ClientB"), "leave event received for ClientB")
 	ok = await _wait_until(func() -> bool: return _remote(spawner) != null, 30.0)
@@ -438,6 +447,30 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(ok, "the student's house tally shows the professor's award (%d → %s)" % [my_house_points, str(NetworkManager.get_house_totals())])
 	var hud := world.get_node_or_null("HUD")
 	t.check(hud == null or hud.house_tally_text().contains(str(NetworkManager.get_house_totals()[2])), "the HUD tally shows the totals")
+
+	t.section("Brooms (student)")
+	var reset_inv: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "reset_inventory": true}, HTTP_KEY)
+	ok = await _wait_until(func() -> bool: return not player.inventory.has(&"broom") and player.inventory.has(&"torch"), 10.0)
+	t.check(reset_inv.get("ok", false) == true and ok, "admin reset the inventory to the starting kit")
+	t.check(not player.broom_rider.toggle(), "no broom, no flight")
+	t.check(await _enter_zone(spawner, &"grounds"), "the student reaches the grounds")
+	var rack: Node = _world_object("grounds/broom_rack")
+	t.check(rack is BroomRack, "the grounds broom rack is a synced world object")
+	rack._on_interacted(player)
+	ok = await _wait_until(func() -> bool: return player.inventory.has(&"broom"), 10.0)
+	t.check(ok and NetworkManager.get_local_inventory().get("items", []).any(func(e: Dictionary) -> bool: return e.get("id", "") == "broom"), "the rack's broom comes from the server inventory")
+	NetworkManager.send_cheat_give("broom")
+	NetworkManager.send_cheat_give("dragon")
+	ok = await _wait_until(func() -> bool: return cheat_results.size() >= 2, 10.0)
+	t.check(ok and cheat_results[0]["reason"] == "already_owned" and cheat_results[1]["reason"] == "unknown_item", "cheats: an owned broom and an unknown item are refused (%s)" % str(cheat_results))
+	t.check(player.inventory.count_of(&"broom") == 1, "still exactly one broom")
+	t.check(player.broom_rider.toggle() and player.movement.is_flying, "the student mounts the broom")
+	player.movement.set_external_vertical(1.0)
+	await _wait(1.5)
+	player.movement.set_external_vertical(0.0)
+	await _wait(2.0)
+	player.broom_rider.dismount()
+	await _wait(1.0)
 	var glow := SpellRegistry.load_definition("glowmote")
 	player.spell_caster.assign_slot(5, glow)
 	player.spell_caster.equip(ARCANE_PULSE)

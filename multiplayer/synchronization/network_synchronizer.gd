@@ -8,6 +8,8 @@ extends Node
 ## Gameplay code never touches Nakama; this node is the only bridge.
 
 signal movement_state_received(state_name: String)
+## A remote player mounted (item id) or dismounted ("") a broom.
+signal mount_received(item_id: String)
 
 @export var send_rate: float = float(ProjectSettings.get_setting("game/network/state_send_rate", 12.0))
 ## How far behind the newest snapshot remote bodies are rendered (seconds).
@@ -21,6 +23,7 @@ var _send_accumulator: float = 0.0
 var _last_sent_state: String = ""
 var _buffer: Array[Dictionary] = []
 var _remote_state_name: String = "idle"
+var _remote_mount: String = ""
 var _last_received_time: float = 0.0
 
 
@@ -65,13 +68,18 @@ func _tick_local(delta: float) -> void:
 	_send_accumulator = 0.0
 	var body := player as CharacterBody3D
 	var movement: PlayerMovement = player.movement
-	NetworkManager.send_player_state({
+	var snapshot := {
 		"p": [snappedf(body.global_position.x, 0.001), snappedf(body.global_position.y, 0.001), snappedf(body.global_position.z, 0.001)],
 		"y": snappedf(body.rotation.y, 0.001),
 		"v": [snappedf(body.velocity.x, 0.01), snappedf(body.velocity.y, 0.01), snappedf(body.velocity.z, 0.01)],
 		"s": movement.get_state_name(),
 		"g": movement.is_grounded,
-	})
+	}
+	# The ridden mount (broom) only while flying.
+	var rider: BroomRider = player.broom_rider
+	if rider.is_riding():
+		snapshot["m"] = rider.mount_id()
+	NetworkManager.send_player_state(snapshot)
 
 
 func _on_local_spell_cast(definition: SpellDefinition, origin: Vector3, direction: Vector3) -> void:
@@ -143,6 +151,10 @@ func receive_state(state: Dictionary) -> void:
 	if snapshot["state"] != _remote_state_name:
 		_remote_state_name = snapshot["state"]
 		movement_state_received.emit(_remote_state_name)
+	var mount := ItemRegistry.sanitize(str(state.get("m", "")))
+	if mount != _remote_mount:
+		_remote_mount = mount
+		mount_received.emit(mount)
 
 
 func receive_spell_cast(definition: SpellDefinition, origin: Vector3, direction: Vector3) -> void:

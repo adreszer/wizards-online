@@ -164,7 +164,17 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Server-owned inventories: Nakama storage `inventory/items` per user, starting kit created on first join, `OP_INVENTORY` to the joiner, `OP_HELD_ITEM` validated (owned + holdable) and relayed, `held` in roster entries; offline uses the same starting kit locally
 - [x] Headless tests: inventory data/visuals/panel (run_tests), held torch replication + server-issued inventory (two-client test)
 - [ ] Lighting overhaul proper: dim ambient/sun so only placed and carried light sources light the castle; add light sources to every area first
-- [ ] Ways to obtain items in the world / from professors (server-granted, like spells), consumable torches that burn down (`burn_seconds`)
+- [x] Ways to obtain items in the world: `item_rack` world objects (server-granted via `OP_WORLD_EVENT`), dev cheats `/give` (`OP_CHEAT`)
+- [ ] Items from professors (granted in lessons, like spells), consumable torches that burn down (`burn_seconds`)
+
+### Milestone 13b — Brooms and flying
+- [x] Broom item (`resources/items/broom.tres`, `ItemDefinition.mount_scene`), procedural `BroomModel` (tapered shaft, brass bindings, twig bundle, spark trail)
+- [x] `PlayerMovement` flight mode (state `fly`): mouse-steered (the broom faces the camera, W flies toward the crosshair), Space/C(Ctrl) climb and sink, Shift boost 30 m/s, hover when released, ceiling at 160 m, hold C on the floor to land; camera pulls back and widens FOV with speed
+- [x] `BroomRider`: B / satchel click mounts, no flying in classrooms (refused, or lands you on entry), losing the broom lands you, banking and nose pitch from motion; snapshots carry `m` so remote players ride visibly
+- [x] Broom racks (`BroomRack`, kind `item_rack`) beside the grounds spawn and in the flying classroom; server `give_item` (one per character)
+- [x] Cheats: chat commands `/broom` `/miotla` `/give <id>` `/help` (offline too); server `OP_CHEAT` / `OP_CHEAT_RESULT`, admins or `cheats_enabled` (school rules, on in dev)
+- [x] Headless tests: flight (lift-off, hover, climb/sink, cruise/boost, ceiling, landing, no-fly zone, lost broom), rack, remote mount, satchel, cheats
+- [ ] Flying lessons: grant brooms in Skyriding lessons instead of open racks; server-side checks on flight (owns a broom, allowed area); a modelled broom and a riding pose/animation
 
 ### Milestone 14 — The castle (open world)
 - [x] `tools/generate_castle.py`: declarative plan (rooms on a 4 m grid, doors, stairs, secrets) → `levels/castle/castle.tscn`; shared walls emitted once, doorway modules where doors are declared, stair holes cut in floors/ceilings, pillars, torches, band fillers for multi-storey rooms, overlap + reachability checks

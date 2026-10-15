@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://player000001"]
+[gd_scene load_steps=18 format=3 uid="uid://player000001"]
 
 [ext_resource type="Script" path="res://characters/player/player.gd" id="1"]
 [ext_resource type="Script" path="res://characters/player/player_movement.gd" id="2"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://gameplay/inventory/inventory.gd" id="12"]
 [ext_resource type="Script" path="res://characters/components/held_item_mount.gd" id="13"]
 [ext_resource type="Script" path="res://gameplay/world/area_tracker.gd" id="14"]
+[ext_resource type="Script" path="res://characters/components/broom_rider.gd" id="15"]
 
 [sub_resource type="CapsuleShape3D" id="BodyShape"]
 radius = 0.35
@@ -54,6 +55,9 @@ script = ExtResource("12")
 
 [node name="HeldItemMount" type="Node" parent="."]
 script = ExtResource("13")
+
+[node name="BroomRider" type="Node" parent="."]
+script = ExtResource("15")
 
 [node name="Nameplate" type="Label3D" parent="."]
 cast_shadow = 0

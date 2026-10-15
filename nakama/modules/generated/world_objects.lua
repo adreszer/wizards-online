@@ -702,6 +702,14 @@ return {
     kind = "spell_tome",
     pos = { -41, 0, -4.4 },
   },
+  ["class_skyriding/broom_rack"] = {
+    accepts = {},
+    area = "class_skyriding",
+    areas = { "class_skyriding" },
+    item_id = "broom",
+    kind = "item_rack",
+    pos = { 20.8, 0, -16 },
+  },
   ["class_skyriding/door_1"] = {
     accepts = { "unlock" },
     area = "class_skyriding",
@@ -2936,6 +2944,14 @@ return {
     locked = false,
     pos = { 40, 0, 62 },
     start_open = false,
+  },
+  ["grounds/broom_rack"] = {
+    accepts = {},
+    area = "grounds",
+    areas = { "grounds" },
+    item_id = "broom",
+    kind = "item_rack",
+    pos = { 5, 0, 79 },
   },
   ["grounds/plaque_grounds"] = {
     accepts = {},

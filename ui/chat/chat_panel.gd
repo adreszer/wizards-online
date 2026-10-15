@@ -1,6 +1,8 @@
 extends CanvasLayer
 ## Text chat UI. Opens with the `chat` action, closes with `pause` (Esc) or
 ## after sending. While open it captures keyboard input (GameSession.ui_input_captured).
+## Lines starting with "/" are commands (ChatCommands: dev cheats such as
+## /broom); they work offline too, where the box takes nothing else.
 
 const MAX_LINES := 60
 
@@ -18,6 +20,7 @@ func _ready() -> void:
 	_input_field.focus_exited.connect(_on_focus_exited)
 	NetworkManager.chat_message_received.connect(_on_message)
 	NetworkManager.system_message.connect(add_system_line)
+	NetworkManager.cheat_result_received.connect(_on_cheat_result)
 	_panel.visible = GameSession.is_online()
 	_input_field.visible = false
 	if GameSession.is_online():
@@ -27,7 +30,7 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if get_tree().paused:
 		return
-	if not is_open and event.is_action_pressed("chat") and GameSession.is_online() and not GameSession.ui_input_captured:
+	if not is_open and event.is_action_pressed("chat") and not GameSession.ui_input_captured:
 		open()
 		get_viewport().set_input_as_handled()
 
@@ -61,8 +64,14 @@ func close() -> void:
 
 func _on_submitted(text: String) -> void:
 	var clean := NetworkProtocol.sanitize_chat(text)
-	if not clean.is_empty():
-		NetworkManager.send_chat(clean)
+	if ChatCommands.is_command(clean):
+		add_system_line(clean)
+		add_system_line(ChatCommands.run(clean, get_tree().get_first_node_in_group(&"local_player")))
+	elif not clean.is_empty():
+		if GameSession.is_online():
+			NetworkManager.send_chat(clean)
+		else:
+			add_system_line(tr("CHAT_OFFLINE_COMMANDS_ONLY"))
 	close()
 
 
@@ -74,6 +83,10 @@ func _on_focus_exited() -> void:
 func _on_message(sender_name: String, text: String, is_self: bool) -> void:
 	var color := "#c9b3ff" if is_self else "#9fd3ff"
 	_append("[color=%s][%s][/color] %s" % [color, _escape(sender_name), _escape(text)])
+
+
+func _on_cheat_result(ok: bool, item_id: String, reason: String) -> void:
+	add_system_line(ChatCommands.result_line(ok, ItemRegistry.load_definition(item_id), reason))
 
 
 func add_system_line(text: String) -> void:

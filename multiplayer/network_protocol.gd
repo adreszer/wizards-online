@@ -69,6 +69,11 @@ const OP_HOUSE_POINTS_RESULT := 28
 const OP_LECTURE := 29
 ## server → everyone in that classroom: {by, text}
 const OP_LECTURE_TEXT := 30
+## client → server: {give: item id} a cheat (dev / admin): accepted from admins,
+## or from anyone while the school rules say cheats_enabled
+const OP_CHEAT := 31
+## server → sender: {ok, id, reason} outcome of OP_CHEAT (the inventory follows as OP_INVENTORY)
+const OP_CHEAT_RESULT := 32
 
 const CHAT_ROOM := "world"
 ## Server RPC that finds (or creates) the shared world match.

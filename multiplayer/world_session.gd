@@ -38,6 +38,7 @@ signal lesson_result_received(ok: bool, action: String, reason: String)
 ## House points tally, index 0 = house 1.
 signal house_totals_received(totals: Array)
 signal house_points_result_received(ok: bool, house: int, delta: int, reason: String)
+signal cheat_result_received(ok: bool, item_id: String, reason: String)
 ## A professor's lecture line in the local player's classroom.
 signal lecture_received(by_name: String, text: String)
 
@@ -146,6 +147,8 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 			house_totals_received.emit(totals if totals is Array else [])
 		NetworkProtocol.OP_HOUSE_POINTS_RESULT:
 			house_points_result_received.emit(bool(payload.get("ok", false)), int(payload.get("house", 0)), int(payload.get("delta", 0)), str(payload.get("reason", "")))
+		NetworkProtocol.OP_CHEAT_RESULT:
+			cheat_result_received.emit(bool(payload.get("ok", false)), str(payload.get("id", "")), str(payload.get("reason", "")))
 		NetworkProtocol.OP_LECTURE_TEXT:
 			lecture_received.emit(str(payload.get("by", "")), str(payload.get("text", "")))
 		NetworkProtocol.OP_WORLD_SNAPSHOT:

@@ -14,6 +14,9 @@ var jump_held: bool = false
 var jump_just_pressed: bool = false
 var cast_just_pressed: bool = false
 var interact_just_pressed: bool = false
+## Broom: the Mount action (B) toggles riding; Descend (C / Ctrl) sinks while flying.
+var mount_just_pressed: bool = false
+var descend_held: bool = false
 ## Hotbar slot pressed this frame (0-based), -1 = none.
 var spell_slot_pressed: int = -1
 ## +1 / -1 when the next / previous spell action was pressed, 0 = none.
@@ -35,6 +38,7 @@ func _process(_delta: float) -> void:
 	move_axis.y = -move_axis.y
 	sprint_held = Input.is_action_pressed("sprint")
 	jump_held = Input.is_action_pressed("jump")
+	descend_held = Input.is_action_pressed("descend")
 	# "just pressed" flags accumulate until consumed so physics never misses them.
 	if Input.is_action_just_pressed("jump"):
 		jump_just_pressed = true
@@ -42,6 +46,8 @@ func _process(_delta: float) -> void:
 		cast_just_pressed = true
 	if Input.is_action_just_pressed("interact"):
 		interact_just_pressed = true
+	if Input.is_action_just_pressed("mount"):
+		mount_just_pressed = true
 	for i in SLOT_ACTIONS.size():
 		if Input.is_action_just_pressed(SLOT_ACTIONS[i]):
 			spell_slot_pressed = i
@@ -58,6 +64,8 @@ func clear() -> void:
 	jump_just_pressed = false
 	cast_just_pressed = false
 	interact_just_pressed = false
+	mount_just_pressed = false
+	descend_held = false
 	spell_slot_pressed = -1
 	spell_cycle = 0
 
@@ -77,6 +85,12 @@ func consume_cast() -> bool:
 func consume_interact() -> bool:
 	var v := interact_just_pressed
 	interact_just_pressed = false
+	return v
+
+
+func consume_mount() -> bool:
+	var v := mount_just_pressed
+	mount_just_pressed = false
 	return v
 
 

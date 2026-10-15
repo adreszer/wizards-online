@@ -5,7 +5,7 @@ extends CharacterBody3D
 ## This script only wires components together. Behaviour lives in:
 ## PlayerInput, PlayerMovement, CameraRig, AnimationController, SpellCaster,
 ## InteractionController, Health, RespawnHandler, NetworkSynchronizer, Nameplate,
-## Inventory, HeldItemMount.
+## Inventory, HeldItemMount, BroomRider.
 ## Everything under `LocalPlayer` exists only for the locally controlled
 ## instance and is freed for remote players.
 
@@ -34,6 +34,7 @@ const RENDER_LAYER_CHARACTER := 1 << 1
 @onready var nameplate: Nameplate = $Nameplate
 @onready var inventory: Inventory = $Inventory
 @onready var held_item_mount: HeldItemMount = $HeldItemMount
+@onready var broom_rider: BroomRider = $BroomRider
 @onready var local_root: Node = $LocalPlayer
 @onready var player_input: PlayerInput = $LocalPlayer/PlayerInput
 @onready var camera_rig: CameraRig = $LocalPlayer/CameraRig
@@ -72,6 +73,8 @@ func _ready() -> void:
 	off_hand = _find_off_hand()
 	held_item_mount.setup(off_hand)
 	inventory.held_item_changed.connect(held_item_mount.show_item)
+	broom_rider.setup(self, movement, inventory, visual)
+	_visual_base = visual.transform
 	nameplate.set_display_name(display_name)
 	if is_local:
 		_setup_local()
@@ -112,14 +115,19 @@ func _setup_local() -> void:
 	camera_rig.target = self
 	movement.setup(self, player_input)
 	_tick_start = global_transform
-	_visual_base = visual.transform
 	movement.frame_yaw_provider = camera_rig.get_yaw
+	movement.frame_pitch_provider = camera_rig.get_pitch
 	movement.state_changed.connect(animation_controller.set_movement_state)
+	movement.flying_changed.connect(broom_rider.on_flying_changed)
+	movement.flying_changed.connect(_on_flying_changed)
+	area_tracker.area_changed.connect(broom_rider.on_area_changed)
+	inventory.changed.connect(broom_rider.on_inventory_changed)
 	movement.stepped.connect(_on_stepped)
 	spell_caster.setup(self, peer_id, camera_rig, cast_origin)
 	spell_caster.spell_cast.connect(_on_spell_cast)
 	interaction_controller.setup(self, camera_rig)
 	respawn_handler.setup(self, health)
+	respawn_handler.respawned.connect(func(_at: Transform3D) -> void: broom_rider.dismount())
 	synchronizer.setup_local(self)
 	camera_rig.activate()
 	GameEvents.local_player_spawned.emit(self)
@@ -166,6 +174,7 @@ func _setup_remote() -> void:
 	spell_caster.spell_cast.connect(_on_spell_cast)
 	synchronizer.setup_remote(self)
 	synchronizer.movement_state_received.connect(animation_controller.set_movement_state_name)
+	synchronizer.mount_received.connect(broom_rider.set_remote_mount)
 
 
 func _on_stepped(displacement: Vector3, duration: float) -> void:
@@ -178,6 +187,7 @@ func _on_stepped(displacement: Vector3, duration: float) -> void:
 
 func _process(delta: float) -> void:
 	if not is_local:
+		visual.transform = broom_rider.pose * _visual_base
 		return
 	if _visual_offset != Vector3.ZERO:
 		_visual_offset = _visual_offset.move_toward(Vector3.ZERO, _visual_catchup_speed * delta)
@@ -190,8 +200,9 @@ func _process(delta: float) -> void:
 		yaw_lag = angle_difference(rotation.y, lerp_angle(start_yaw, rotation.y, fraction))
 	var offset := _visual_offset + lag
 	# The body yaws with facing, so convert the world offset into its local frame.
-	visual.transform = Transform3D(Basis(Vector3.UP, yaw_lag), global_basis.inverse() * offset) * _visual_base
+	visual.transform = Transform3D(Basis(Vector3.UP, yaw_lag), global_basis.inverse() * offset) * broom_rider.pose * _visual_base
 	camera_rig.follow_offset = offset
+	camera_rig.speed_ratio = velocity.length() / movement.fly_boost_speed if movement.is_flying else 0.0
 	nameplate.position = Vector3(0.0, 2.25, 0.0) + visual.position
 
 
@@ -210,6 +221,14 @@ func _physics_process(_delta: float) -> void:
 		spell_caster.try_cast()
 	if player_input.consume_interact():
 		interaction_controller.try_interact()
+	if player_input.consume_mount():
+		broom_rider.toggle()
+
+
+func _on_flying_changed(is_flying: bool) -> void:
+	camera_rig.set_flight_mode(is_flying)
+	if is_flying:
+		GameEvents.notification_requested.emit(tr("NOTIFY_FLIGHT_CONTROLS"), 7.0)
 
 
 func _on_spell_cast(_definition: SpellDefinition, _origin: Vector3, _direction: Vector3) -> void:

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://broommodel01"]
+
+[ext_resource type="Script" path="res://objects/items/broom.gd" id="1"]
+
+[node name="Broom" type="Node3D"]
+script = ExtResource("1")

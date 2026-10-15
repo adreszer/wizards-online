@@ -142,7 +142,7 @@ Goal: attending a lesson is fun, and progress over weeks is visible.
 
 1. **Duelling club** (L ★★★). A duelling hall with a stage and an audience. A professor (or a prefect, later) runs a duel: both players accept, bow, a countdown, then spells hit each other only inside the arena volume. Server validates targets and damage; health is a separate duel meter so nothing persists. Rules sets: first to three hits, disarm only, shields allowed. Spectators cheer with emotes; house points stay professor-awarded, never wagered.
 2. **Duel ladder** (M ★★). Ranked duels during scheduled club hours; season rewards are cosmetic.
-3. **Flying lessons for real** (L ★★★). Skyriding gets an actual flying mount (a staff, a cloak that glides, a flying carpet: owner picks something original), taught and granted in lessons. Flying is allowed on the grounds and in a few towers, not inside classrooms.
+3. **Flying lessons for real** (L ★★★). The broom and the flight mode exist (Milestone 13b: racks and a dev cheat hand them out, classrooms are no-fly). Next: the Skyriding professor grants brooms in lessons instead of open racks, flight rules per area checked server-side, a modelled broom and a riding animation.
 4. **An original flying sport** (L ★★★). Design proposal, *Lantern Chase* (placeholder): two teams of four fly around the grounds; one lit lantern per team must be carried through the opponents' rings; defenders try to snuff it with Galewind or Wellspring, carriers relight with Emberkindle. Uses existing spells, rewards teamwork, and is clearly our own. Inter-house matches feed the house cup.
 5. **Shared enemies** (L ★★). Already planned (Milestone 17): server-authoritative guardians in the dungeons, co-op for groups, curfew-only spawns.
 
@@ -299,7 +299,7 @@ In parallel, asset generation can target the **clutter kits per subject** (5.2) 
 - Real-time timetable (fixed weekly hours) vs. an in-game clock that cycles faster than real time, or both (recommended: both; lessons on real time, atmosphere on game time).
 - How many school years, and does a character advance by passing exams or by time served?
 - Does offline progress ever carry over to online? (Recommended: no, except settings and cosmetics that cannot affect play.)
-- Flying: what is the original mount or method (staff, gliding cloak, carpet, something new)?
+- Flying: the owner chose brooms (a generic folklore broom; no franchise broom models or names). Open: final name for the school broom model, and whether other mounts follow.
 - Prefects: appointed by the admin, by professors, or elected by the house?
 - Private servers for communities: in scope for launch or later?
 - Final names for everything marked as a placeholder (subjects already have placeholder names; the year system, the map, the Echoes, the flying sport, the village, the warden).

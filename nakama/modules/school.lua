@@ -20,6 +20,8 @@ M.DEFAULT_RULES = {
   points_cooldown_seconds = 5,
   session_max_minutes = 120,
   practice_tomes_enabled = true,
+  -- Dev cheats (OP_CHEAT, chat commands such as /broom) for everyone; admins always may.
+  cheats_enabled = false,
   max_reason_bytes = 120,
   max_lecture_bytes = 400,
 }
