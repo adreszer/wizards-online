@@ -44,13 +44,13 @@ POLISHED = [
 ]
 TEMPLATES = {
     "clue": (("A note scratched beside the {room}'s fireplace reads: “Push where the mortar is new.”",
-              "Notatka wydrapana obok kominka w sali {room_pl} brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"),
-             ("Behind the wall of the {room} something gives way.", "Za ścianą sali {room_pl} coś ustępuje.")),
+              "{room_pl}: notatka wydrapana obok kominka brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"),
+             ("Behind the wall of the {room} something gives way.", "{room_pl}: za ścianą coś ustępuje.")),
     "torchlit": (("Your torch flickers toward one stone of the {room}, as if a draught came through it.",
-                  "Płomień pochodni chyli się ku jednemu kamieniowi w sali {room_pl}, jakby wiał przez niego przeciąg."),
+                  "{room_pl}: płomień pochodni chyli się ku jednemu z kamieni, jakby wiał przez niego przeciąg."),
                  ("The draught was a doorway: the stone slides away into darkness.", "Przeciąg był przejściem: kamień odsuwa się w ciemność.")),
     "together": (("The flagstones of the {room} hum when more than one of you stands on them.",
-                  "Płyty posadzki w sali {room_pl} brzęczą, gdy stoi na nich więcej niż jedna osoba."),
+                  "{room_pl}: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."),
                  ("Your shared weight wakes the old mechanism: the wall rolls open.", "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa.")),
 }
 PUBLIC_KINDS = ("hall", "corridor", "classroom", "library", "room")
@@ -145,7 +145,7 @@ def generate(plan, spec, names_for):
         else:
             (ce, cp), (se, sp) = TEMPLATES[ch["pattern"]]
             ch["clue"] = (ce.format(room=en_room), cp.format(room_pl=pl_room))
-            ch["solved"] = (se, sp)
+            ch["solved"] = (se.format(room=en_room), sp.format(room_pl=pl_room))
         if ch.get("plaque"):
             plan.generated_names.append((f"PLAQUE_{ch['key']}", ch["clue"][0], ch["clue"][1]))
             plan.generated_names.append((f"OFFLINE_MYST_{ch['key']}_SOLVED", ch["solved"][0], ch["solved"][1]))

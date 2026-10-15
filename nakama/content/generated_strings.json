@@ -25,7 +25,7 @@
  },
  "MYST_GEN_04_CLUE": {
   "en": "The flagstones of the Potions Classroom hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Sala Eliksirów brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Sala Eliksirów: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_04_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -33,7 +33,7 @@
  },
  "MYST_GEN_05_CLUE": {
   "en": "The flagstones of the Care of Magical Creatures Classroom hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Sala Opieki nad Magicznymi Stworzeniami brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Sala Opieki nad Magicznymi Stworzeniami: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_05_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -41,7 +41,7 @@
  },
  "MYST_GEN_06_CLUE": {
   "en": "Your torch flickers toward one stone of the Storeroom II, as if a draught came through it.",
-  "pl": "Płomień pochodni chyli się ku jednemu kamieniowi w sali Składzik II, jakby wiał przez niego przeciąg."
+  "pl": "Składzik II: płomień pochodni chyli się ku jednemu z kamieni, jakby wiał przez niego przeciąg."
  },
  "MYST_GEN_06_SOLVED": {
   "en": "The draught was a doorway: the stone slides away into darkness.",
@@ -49,7 +49,7 @@
  },
  "MYST_GEN_07_CLUE": {
   "en": "The flagstones of the Quiet Room hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Pokój Ciszy brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Pokój Ciszy: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_07_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -57,15 +57,15 @@
  },
  "MYST_GEN_08_CLUE": {
   "en": "A note scratched beside the Wine Cellar's fireplace reads: “Push where the mortar is new.”",
-  "pl": "Notatka wydrapana obok kominka w sali Piwniczka brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+  "pl": "Piwniczka: notatka wydrapana obok kominka brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
  },
  "MYST_GEN_08_SOLVED": {
-  "en": "Behind the wall of the {room} something gives way.",
-  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+  "en": "Behind the wall of the Wine Cellar something gives way.",
+  "pl": "Piwniczka: za ścianą coś ustępuje."
  },
  "MYST_GEN_09_CLUE": {
   "en": "Your torch flickers toward one stone of the Office II, as if a draught came through it.",
-  "pl": "Płomień pochodni chyli się ku jednemu kamieniowi w sali Gabinet II, jakby wiał przez niego przeciąg."
+  "pl": "Gabinet II: płomień pochodni chyli się ku jednemu z kamieni, jakby wiał przez niego przeciąg."
  },
  "MYST_GEN_09_SOLVED": {
   "en": "The draught was a doorway: the stone slides away into darkness.",
@@ -73,7 +73,7 @@
  },
  "MYST_GEN_10_CLUE": {
   "en": "The flagstones of the Records Room hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Archiwum brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Archiwum: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_10_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -81,23 +81,23 @@
  },
  "MYST_GEN_11_CLUE": {
   "en": "A note scratched beside the East Wing, cellar level corridor's fireplace reads: “Push where the mortar is new.”",
-  "pl": "Notatka wydrapana obok kominka w sali Skrzydło Wschodnie, korytarz (poziom piwnic) brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+  "pl": "Skrzydło Wschodnie, korytarz (poziom piwnic): notatka wydrapana obok kominka brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
  },
  "MYST_GEN_11_SOLVED": {
-  "en": "Behind the wall of the {room} something gives way.",
-  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+  "en": "Behind the wall of the East Wing, cellar level corridor something gives way.",
+  "pl": "Skrzydło Wschodnie, korytarz (poziom piwnic): za ścianą coś ustępuje."
  },
  "MYST_GEN_12_CLUE": {
   "en": "A note scratched beside the Guest Chamber's fireplace reads: “Push where the mortar is new.”",
-  "pl": "Notatka wydrapana obok kominka w sali Komnata Gościnna brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+  "pl": "Komnata Gościnna: notatka wydrapana obok kominka brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
  },
  "MYST_GEN_12_SOLVED": {
-  "en": "Behind the wall of the {room} something gives way.",
-  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+  "en": "Behind the wall of the Guest Chamber something gives way.",
+  "pl": "Komnata Gościnna: za ścianą coś ustępuje."
  },
  "MYST_GEN_13_CLUE": {
   "en": "The flagstones of the Charms Classroom hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Sala Zaklęć brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Sala Zaklęć: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_13_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -105,7 +105,7 @@
  },
  "MYST_GEN_14_CLUE": {
   "en": "The flagstones of the Old Classroom IV hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Stara Klasa IV brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Stara Klasa IV: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_14_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -113,7 +113,7 @@
  },
  "MYST_GEN_15_CLUE": {
   "en": "The flagstones of the Study Hall hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Sala Nauki brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Sala Nauki: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_15_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -121,15 +121,15 @@
  },
  "MYST_GEN_16_CLUE": {
   "en": "A note scratched beside the Storeroom II's fireplace reads: “Push where the mortar is new.”",
-  "pl": "Notatka wydrapana obok kominka w sali Składzik II brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+  "pl": "Składzik II: notatka wydrapana obok kominka brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
  },
  "MYST_GEN_16_SOLVED": {
-  "en": "Behind the wall of the {room} something gives way.",
-  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+  "en": "Behind the wall of the Storeroom II something gives way.",
+  "pl": "Składzik II: za ścianą coś ustępuje."
  },
  "MYST_GEN_17_CLUE": {
   "en": "The flagstones of the Archive Room IV hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Sala Archiwalna IV brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Sala Archiwalna IV: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_17_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -137,7 +137,7 @@
  },
  "MYST_GEN_18_CLUE": {
   "en": "The flagstones of the Portrait Gallery hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Galeria Portretów brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Galeria Portretów: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_18_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -145,7 +145,7 @@
  },
  "MYST_GEN_19_CLUE": {
   "en": "The flagstones of the Quiet Room II hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Pokój Ciszy II brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Pokój Ciszy II: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_19_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -153,15 +153,15 @@
  },
  "MYST_GEN_20_CLUE": {
   "en": "A note scratched beside the Records Office III's fireplace reads: “Push where the mortar is new.”",
-  "pl": "Notatka wydrapana obok kominka w sali Kancelaria III brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+  "pl": "Kancelaria III: notatka wydrapana obok kominka brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
  },
  "MYST_GEN_20_SOLVED": {
-  "en": "Behind the wall of the {room} something gives way.",
-  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+  "en": "Behind the wall of the Records Office III something gives way.",
+  "pl": "Kancelaria III: za ścianą coś ustępuje."
  },
  "MYST_GEN_21_CLUE": {
   "en": "The flagstones of the Reading Alcove hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Wnęka Czytelnicza brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "pl": "Wnęka Czytelnicza: płyty posadzki brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_21_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -169,7 +169,7 @@
  },
  "MYST_GEN_22_CLUE": {
   "en": "Your torch flickers toward one stone of the Reading Alcove IV, as if a draught came through it.",
-  "pl": "Płomień pochodni chyli się ku jednemu kamieniowi w sali Wnęka Czytelnicza IV, jakby wiał przez niego przeciąg."
+  "pl": "Wnęka Czytelnicza IV: płomień pochodni chyli się ku jednemu z kamieni, jakby wiał przez niego przeciąg."
  },
  "MYST_GEN_22_SOLVED": {
   "en": "The draught was a doorway: the stone slides away into darkness.",

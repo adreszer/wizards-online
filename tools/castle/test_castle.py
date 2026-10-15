@@ -67,6 +67,14 @@ class CastleGeneratorTest(unittest.TestCase):
         self.assertAlmostEqual(z, r.z1 - 1)
         self.assertTrue(r.x0 < x < r.x1)
 
+    def test_generated_texts_are_filled_in(self):
+        # Every placeholder is substituted, and the Polish never puts a room's
+        # nominative name after "sali" (it would need a declined form).
+        for key, en, pl in self.plan().generated_names:
+            for text in (en, pl):
+                self.assertNotIn("{", text, key)
+            self.assertNotIn("sali Sala", pl, key)
+
     def test_denylist(self):
         self.assertEqual(denylist.scan(ROOT), [])
         fake = {denylist.h("zzforbiddenzz")}
