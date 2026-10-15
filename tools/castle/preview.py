@@ -77,7 +77,7 @@ def svg_storey(plan, s, extra=None):
                 out.append(f'<rect x="{X(rect[0]):.1f}" y="{Z(rect[2]):.1f}" width="{(rect[1] - rect[0]) * SCALE:.1f}" '
                            f'height="{(rect[3] - rect[2]) * SCALE:.1f}" fill="none" stroke="{colour}" stroke-dasharray="3,2"/>')
         if st.get("kind") == "spiral":
-            out.append(f'<circle cx="{X(st["x"]):.1f}" cy="{Z(st["z"]):.1f}" r="{st["radius"] * SCALE:.1f}" fill="#555" stroke="#ffd34d" stroke-width="2"/>')
+            out.append(f'<circle cx="{X(st["x"]):.1f}" cy="{Z(st["z"]):.1f}" r="{st["half"] * SCALE:.1f}" fill="#555" stroke="#ffd34d" stroke-width="2"/>')
             continue
         fx0, fx1, fz0, fz1 = plan.stair_footprint(st)
         colour = "#ff9a3d" if st.get("moving") else "#ffd34d"

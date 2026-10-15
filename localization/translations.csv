@@ -137,6 +137,9 @@ AREA_TOWER_NW_0,Northwest Tower,Wieża Północno-Zachodnia
 AREA_TOWER_NW_1,Grypheon Landing,Podest Grypheonu
 AREA_TOWER_NW_2,Grypheon Common Room,Pokój wspólny Grypheonu
 AREA_TOWER_NW_3,Grypheon Dormitory,Sypialnie Grypheonu
+AREA_TOWER_NE_STAIR,Drakoryn Stair Turret,Wieżyczka Schodowa Drakorynu
+AREA_TOWER_NW_STAIR,Grypheon Stair Turret,Wieżyczka Schodowa Grypheonu
+AREA_TOWER_SW_STAIR,Southwest Stair Turret,Południowo-Zachodnia Wieżyczka Schodowa
 AREA_TOWER_SW_0,Southwest Tower,Wieża Południowo-Zachodnia
 AREA_TOWER_SW_1,"Southwest Tower, first floor","Wieża Południowo-Zachodnia, pierwsze piętro"
 AREA_TOWER_SW_2,"Southwest Tower, second floor","Wieża Południowo-Zachodnia, drugie piętro"

@@ -48,7 +48,7 @@ content/placements.json        gameplay objects, positioned by slot (not raw off
 
 ## 3. Rules
 
-Each rule has an id. The validator reports violations by id and room, and each rule has a test.
+Each rule has an id. The validator reports violations by id and room, and each rule has a test. A rule can be **waived** for one place only by a `waivers` entry in the program naming the rule, the place, the milestone that lifts it and why; the generator tests list them, so they cannot pile up silently.
 
 ### 3.1 Anchors (never move)
 
@@ -62,12 +62,12 @@ Each rule has an id. The validator reports violations by id and room, and each r
 
 The current stairs break rule S1: tower flights start 0.2 m from the south wall, and the grand staircase's first flight starts at the hall's south wall.
 
-- **S1 Approach landing.** Before the bottom step there must be a clear rectangle the width of the flight and at least **4 m long** (one module), in the same room. No wall, door swing, pillar, furniture or other flight may be in it. A flight never starts against a wall.
+- **S1 Approach landing.** Before the bottom step there must be a clear rectangle the width of the flight and at least **4 m long** (one module), in the same room, on a floor or landing. No wall, door-leaf swing, pillar or other flight may be in it (a flight passing overhead with full headroom is fine). A flight never starts against a wall.
 - **S2 Arrival landing.** After the top step there must be a clear rectangle at least 4 m long before any wall, rail or doorway. The player keeps walking straight off the flight without walking into something.
 - **S3 Headroom.** Clearance of at least 2.6 m above every tread, measured against ceilings, ceiling holes, flights above and landings.
 - **S4 Tread comfort.** Riser at most 0.36 m (PlayerMovement step height 0.42) and tread at least 0.45 m. With the 9 m storey, a straight flight runs about 11.5–14 m. A flight that doesn't fit with S1+S2 must become a **switchback** (two half flights and a mid landing) or a **spiral** (towers). The generator chooses; it never shortens the landings.
 - **S5 Towers get spirals.** Any room smaller than 20 × 20 m that needs a stair gets a spiral staircase (new `SpiralStaircase` @tool module) around a central column, or a newel stair in a corner turret. 16 m tower rooms can't hold a straight flight that also has two landings.
-- **S6 Wall the flight hugs.** No doorway, window, torch or placed object on the wall section behind a flight or its landings. (Torches are already suppressed, but doors and windows aren't.)
+- **S6 Wall the flight hugs.** No doorway or secret wall on the wall section behind a flight where its underside comes down into the opening (3.5 m). Torches and windows are kept off a flight's wall by the builder; landings may have doors beside them.
 - **S7 Fall protection.** Every walkable edge with a drop over 1.2 m gets a railing or parapet. The only exceptions are volumes tagged `jump_route` or `drop_ok` (set pieces, section 4). Open sides of flights get balustrades.
 - **S8 Where stairs may be.** Flights only in stair halls, corridors, towers, halls and house landings. Never in classrooms, the library reading floor, the great hall floor or dormitories.
 - **S9 Two ways up.** Every public storey is reachable from the entrance by at least **two independent stair routes**, so one closed or shifting stair never cuts off part of the school.
@@ -77,12 +77,13 @@ The current stairs break rule S1: tower flights start 0.2 m from the south wall,
 - **C1 Reachable.** Every room is reachable from the gate (as today). Every *public* room is reachable **without** secrets, house gates, locked doors or jump routes.
 - **C2 Walking budget.** From the great hall, any classroom is at most 180 m of walking (path length through doors and stairs, not straight-line distance), and any common room is at most 220 m. This keeps lesson changes and meals practical on a massive map. The preview prints the worst offenders.
 - **C3 Corridor widths.** Main corridors are 8 m (two modules). Service corridors and passages are 4 m. Galleries and cloisters are 8–12 m. A dead-end longer than 3 modules must end in something: a window seat, a statue, a secret, a stair.
-- **C4 Room proportions.** Aspect ratio at most 3:1 except corridors and galleries. Minimum sizes per kind: classroom 16 × 16, common room 16 × 24, great hall 32 × 48, library 40 × 24, dormitory 16 × 16.
+- **C4 Room proportions.** Aspect ratio at most 3:1 except corridors, halls, galleries and shafts. Minimum sizes per kind: classroom 16 × 16, common room 16 × 16, dormitory 16 × 16, library 24 × 40, great hall 32 × 40 (the pinned hub keeps today's great hall).
 - **C5 Classroom layout.** The door is in the back or side wall, never the front (teaching) wall, so students enter behind the desks. The front wall has no window over the boards. At least 12 desk seats for the wing rooms.
 - **C6 House gates.** Every doorway between a house room and a non-house room is a house gate. Each house territory has exactly one gate from public space (plus secret exits, if the owner wants them).
-- **C7 Doors.** At least one module from a room corner. Door swing clear of furniture and stair landings (S1/S2). No two doorways on the same wall closer than 4 m (except double doors).
+- **C7 Doors.** A doorway with leaves stays at least one module from a room corner (walls of 12 m or more). Door swing clear of furniture and stair landings (S1/S2). No two doorways on the same wall closer than 4 m (except double doors).
 - **C8 Windows.** Only on walls facing the outside or an open-air area. None in dungeons or secret rooms (a secret room with a window would show from outside). Hidden-room voids get blind wall on the exterior shell.
-- **C9 Structure.** A room on storey s > 0 stands over a room, a vault or a solid plinth. Bridges, balconies and galleries are the only exceptions. Tall rooms (bands > 1) block the storeys they span. Towers rise continuously from the ground or a buttressed corbel.
+- **C9 Structure.** A room on storey s > 0 stands over rooms below. A room marked `support: corbel` may instead hang off a neighbour on the same storey, reaching out at most 8 m (exterior corbels are drawn in Milestone 27). Tall rooms (bands > 1) block the storeys they span. Towers rise continuously from the ground.
+- **C11 Doorways land somewhere.** Every doorway opens, on both sides, onto a floor, landing or stair turn at its storey (reachability is computed per level: a tall room with landings is several walkable levels joined only by its flights).
 - **C10 Naming and ids.** Area ids come from the program. Generated rooms (corridor segments, passages, voids) get ids from their wing and index along it, so regenerating one wing never renames another.
 
 ### 3.4 Moving pieces

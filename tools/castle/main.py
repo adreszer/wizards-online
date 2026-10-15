@@ -8,7 +8,7 @@ import argparse
 import json
 import sys
 
-from . import build, export, program, rules
+from . import build, circulation, export, program, rules
 from .geometry import PlanError
 
 PROGRAM = "content/castle/program.json"
@@ -23,7 +23,7 @@ def load_kit(path=KIT):
 
 
 def make_plan(path=PROGRAM):
-    return program.load(path)
+    return circulation.derive(program.load(path))
 
 
 def main(argv=None):

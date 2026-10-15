@@ -13,6 +13,8 @@
   "ceiling_tile": "res://objects/environment/modular/ceiling_tile.tscn",
   "pillar": "res://objects/environment/modular/pillar.tscn",
   "staircase": "res://objects/environment/modular/staircase.tscn",
+  "spiral_staircase": "res://objects/environment/modular/spiral_staircase.tscn",
+  "railing": "res://objects/environment/modular/railing.tscn",
   "wall_torch": "res://objects/environment/props/wall_torch.tscn",
   "chandelier": "res://objects/environment/props/chandelier.tscn",
   "area_zone": "res://gameplay/world/area_zone.tscn",

@@ -4,7 +4,7 @@ import json
 import os
 import unittest
 
-from castle import build, denylist, main, preview, program, rules
+from castle import build, circulation, denylist, main, preview, program, rules
 from castle.geometry import PlanError
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -23,7 +23,7 @@ class CastleGeneratorTest(unittest.TestCase):
         cls.kit = main.load_kit()
 
     def plan(self, data=None):
-        return program.from_data(copy.deepcopy(data or self.data))
+        return circulation.derive(program.from_data(copy.deepcopy(data or self.data)))
 
     def test_program_passes_every_rule(self):
         violations = rules.validate(self.plan())
@@ -37,13 +37,13 @@ class CastleGeneratorTest(unittest.TestCase):
     def test_overlap_is_refused(self):
         data = copy.deepcopy(self.data)
         data["rooms"].append({"id": "intruder", "rect": [-8, 8, 28, 44], "kind": "room"})
-        ids = {v.rule for v in rules.validate(program.from_data(data))}
+        ids = {v.rule for v in rules.validate(circulation.derive(program.from_data(data)))}
         self.assertIn("C0", ids)
 
     def test_unreachable_is_refused(self):
         data = copy.deepcopy(self.data)
         data["rooms"].append({"id": "island", "rect": [200, 216, 200, 216], "kind": "room"})
-        self.assertIn("C1", {v.rule for v in rules.validate(program.from_data(data))})
+        self.assertIn("C1", {v.rule for v in rules.validate(circulation.derive(program.from_data(data)))})
 
     def test_off_grid_room_is_a_plan_error(self):
         data = copy.deepcopy(self.data)

@@ -14,6 +14,8 @@ fixes node names and object ids in the generated scene.
   stairs:   {lo, hi, side, direction, start, run, width, rise, hole, y, kind}
   landings: {room, rect, y}            extra floors inside tall rooms
   parapets: {centre, size}             railings the rules cannot derive
+  waivers:  {rule, where, until, why}  tracked exceptions (each names the milestone that removes it)
+  stairs of kind "spiral": {kind: "spiral", lo: <stair turret room>}
 """
 import json
 
@@ -59,9 +61,13 @@ def apply_connections(plan, data):
     for s in data.get("secrets", []):
         plan.secret(s["a"], s["b"], s.get("at"), s.get("storey"), s.get("name", "secret_wall"))
     for s in data.get("stairs", []):
+        if s.get("kind") == "spiral":
+            plan.spiral(s["lo"], **{k: v for k, v in s.items() if k not in ("lo", "kind")})
+            continue
         kw = {k: v for k, v in s.items() if k not in ("lo", "hi", "side", "direction", "start")}
         plan.stair(s["lo"], s.get("hi"), s["side"], s["direction"], s["start"], **kw)
     for l in data.get("landings", []):
         plan.rooms[l["room"]].extra_floors.append((tuple(l["rect"]), l["y"]))
     for p in data.get("parapets", []):
         plan.parapets.append((tuple(p["centre"]), tuple(p["size"])))
+    plan.waivers = list(data.get("waivers", []))

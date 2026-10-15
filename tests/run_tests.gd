@@ -40,6 +40,15 @@ func _ready() -> void:
 
 
 func _run() -> void:
+	# `-- --only=castle` runs one section (any _test_<name>), for quick iteration.
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--only="):
+			var method := "_test_" + arg.get_slice("=", 1)
+			if has_method(method):
+				await call(method)
+			print(t.summary())
+			get_tree().quit(1 if t.failed > 0 else 0)
+			return
 	await _test_movement()
 	await _test_camera()
 	await _test_health_and_checkpoints()
@@ -1162,12 +1171,47 @@ func _test_castle() -> void:
 	await _wait(8.0)
 	player.movement.set_external_move(Vector3.ZERO)
 	t.check(player.global_position.y > 8.5 and player.global_position.z < 32.5, "stairs: walking up the first flight reaches the landing (y %.2f, z %.2f)" % [player.global_position.y, player.global_position.z])
-	# Tower flight: from the foot of the southwest tower's stair to its first floor.
-	await _spawn_player(Vector3(-38.025, 1.2, 38.5))
-	player.movement.set_external_move(Vector3(0, 0, -1), false)
-	await _wait(8.0)
-	player.movement.set_external_move(Vector3.ZERO)
-	t.check(player.global_position.y > 8.5, "stairs: tower flight reaches the first floor (y %.2f, z %.2f)" % [player.global_position.y, player.global_position.z])
+	# Stair turret: walk the southwest turret's spiral from its ground-floor doorway up one turn.
+	var spiral: SpiralStaircase = null
+	for node in castle.get_node("Stairs").get_children():
+		if node is SpiralStaircase and absf(node.global_position.x - -56.0) < 0.1:
+			spiral = node
+	t.check(spiral != null, "the southwest tower has a spiral stair turret")
+	if spiral != null:
+		var centre := spiral.global_position
+		var door_angle := deg_to_rad(spiral.start_angle_degrees) - TAU / spiral.steps_per_turn
+		await _spawn_player(centre + Vector3(cos(door_angle), 0, sin(door_angle)) * 2.3 + Vector3(0, 0.3, 0))
+		for i in range(int(14.0 * Engine.physics_ticks_per_second)):
+			var rel := player.global_position - centre
+			var radial := Vector3(rel.x, 0, rel.z)
+			var tangent := Vector3(-rel.z, 0, rel.x).normalized()
+			# Hold the walking line at 2.3 m from the column while climbing.
+			player.movement.set_external_move((tangent + radial.normalized() * (2.3 - radial.length()) * 0.8).normalized(), false)
+			await get_tree().physics_frame
+			if player.global_position.y > centre.y + 9.2:
+				break
+		player.movement.set_external_move(Vector3.ZERO)
+		t.check(player.global_position.y > centre.y + 8.5, "stairs: the turret's spiral climbs a full storey (y %.2f)" % player.global_position.y)
+	# Every straight flight: from the middle of its approach landing straight up to its arrival landing.
+	var flights_ok: Array[String] = []
+	for node in castle.get_node("Stairs").get_children():
+		if not node is Staircase:
+			continue
+		var flight := node as Staircase
+		var along := flight.global_transform.basis.x.normalized()
+		await _spawn_player(flight.global_position - along * 2.0 + Vector3(0, 0.3, 0))
+		player.movement.set_external_move(along, false)
+		var reached := false
+		for i in range(int(12.0 * Engine.physics_ticks_per_second)):
+			await get_tree().physics_frame
+			if player.global_position.y > flight.global_position.y + flight.rise - 0.2 and \
+					(player.global_position - flight.global_position).dot(along) > flight.run + 0.5:
+				reached = true
+				break
+		player.movement.set_external_move(Vector3.ZERO)
+		if not reached:
+			flights_ok.append("%s (y %.1f)" % [flight.name, player.global_position.y])
+	t.check(flights_ok.is_empty(), "every straight flight is walkable from its approach to its arrival landing (stuck: %s)" % ", ".join(flights_ok))
 	castle.queue_free()
 	await get_tree().process_frame
 

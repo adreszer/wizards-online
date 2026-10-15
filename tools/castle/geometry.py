@@ -166,6 +166,10 @@ class Plan:
         self.door_rooms = {}    # (axis, coord, off, storey) -> (room a, room b, openings in that doorway)
         self.parapets = []      # (centre, size) railings placed by the program
         self.start = (0.0, 0.0, 84.0)
+        self.railings = []      # derived (circulation.py): dicts pos, rot, length, rise
+        self.pads = []          # derived: (rect, y) walkable slabs beside holes
+        self.keepout = []       # derived: (rect, y_lo, y_hi) where pillars may not stand
+        self.waivers = []       # {rule, where, until, why}: tracked exceptions to a rule
         self.meta = {}
 
     # -- declarations ---------------------------------------------------------------------
@@ -233,12 +237,22 @@ class Plan:
             self.edges.append((lo, hi, "stair"))
         return st
 
+    def spiral(self, room, **extra):
+        """A spiral stair filling stair turret `room` from its bottom floor to its top storey
+        (circulation.derive_spiral computes the rest)."""
+        st = dict(lo=room, hi=None, kind="spiral")
+        st.update(extra)
+        self.stairs.append(st)
+        return st
+
     # -- queries --------------------------------------------------------------------------
     def stair_y(self, st):
         return st.get("y", self.rooms[st["lo"]].y)
 
     def stair_footprint(self, st):
         """(x0, x1, z0, z1) of a flight's treads in plan."""
+        if st.get("kind") == "spiral":
+            return self.rooms[st["lo"]].rect
         corners = [local_to_world(st["x"], st["z"], st["rot"], (lx, lz))
                    for lx in (0.0, st["run"]) for lz in (-st["width"] / 2, st["width"] / 2)]
         xs = [c[0] for c in corners]; zs = [c[1] for c in corners]

@@ -33,6 +33,8 @@ secrets = []
 stairs = []
 door_rooms = {}
 CLASSROOM_FRONT = {}
+RAILINGS = []
+KEEPOUT = []
 
 # --------------------------------------------------------------------------- scene writer
 ext = {}
@@ -281,54 +283,27 @@ def ceiling_piece(name, rect, y):
                 "module_scene": f'ExtResource("{ext_id("PackedScene", K("ceiling_tile"))}")'})
 
 def emit_stairs():
+    """Flights and spirals as derived by circulation.py; pads carry the player from a top
+    step to the far edge of its hole."""
     for st in stairs:
-        L = rooms[st["lo"]]
-        y = st.get("y", L.y)
-        run, width, rise, rot = st["run"], st["width"], st["rise"], st["rot"]
-        inst(uname(f"Stairs_{st['lo']}"), K("staircase"), (st["x"], y, st["z"]),
-             parent="Stairs", rot_y=math.radians(rot),
-             props={"rise": f"{rise:.3f}", "run": f"{run:.3f}", "width": f"{width:.3f}"})
-        if not st["hole"] or st["hi"] is None:
+        if st.get("kind") == "spiral":
+            inst(uname(f"Spiral_{st['lo']}"), K("spiral_staircase"), (st["x"], st["y0"], st["z"]), parent="Stairs",
+                 props={"turns": f"{st['turns']:.3f}", "rise_per_turn": f"{st['rise_per_turn']:.3f}",
+                        "steps_per_turn": str(st["steps_per_turn"]), "half_size": f"{st['half']:.3f}",
+                        "start_angle_degrees": f"{st['start_angle']:.3f}"})
             continue
-        H = rooms[st["hi"]]
-        # Part of the flight that needs headroom through the ceiling / floor above.
-        lx0 = run * STAIR_HOLE_FROM_HEIGHT / rise
-        corners = [local_to_world(st["x"], st["z"], rot, (lx, lz)) for lx in (lx0, run + 1.5) for lz in (-width / 2, width / 2)]
-        xs = [c[0] for c in corners]; zs = [c[1] for c in corners]
-        hole = snap_rect(min(xs), max(xs), min(zs), max(zs))
-        hole = (max(hole[0], H.x0), min(hole[1], H.x1), max(hole[2], H.z0), min(hole[3], H.z1))
-        H.holes.append(hole)
-        L.ceiling_holes.append(hole)
-        # Landing pad from the top step to the far wall of the hole (player keeps walking straight).
-        end = local_to_world(st["x"], st["z"], rot, (run, 0))
-        far = {90.0: hole[2] + T / 2, -90.0: hole[3] - T / 2, 0.0: hole[1] - T / 2, 180.0: hole[0] + T / 2}[rot]
-        along = abs((far - end[1]) if rot in (90.0, -90.0) else (far - end[0]))
-        if along > 0.15:
-            pc = local_to_world(st["x"], st["z"], rot, (run + along / 2, 0))
-            size = (width, 1.0, along) if rot in (90.0, -90.0) else (along, 1.0, width)
-            block(uname(f"StairPad_{st['lo']}"), (pc[0], y + rise - 0.5, pc[1]), size)
-        # Parapets around the hole on the upper floor, except where the flight lets out.
-        yp = y + rise
-        for side, (ax0, ax1, az0, az1) in (("w", (hole[0], hole[0], hole[2], hole[3])), ("e", (hole[1], hole[1], hole[2], hole[3])),
-                                            ("n", (hole[0], hole[1], hole[2], hole[2])), ("s", (hole[0], hole[1], hole[3], hole[3]))):
-            on_wall = (side == "w" and ax0 == H.x0) or (side == "e" and ax1 == H.x1) or (side == "n" and az0 == H.z0) or (side == "s" and az1 == H.z1)
-            if on_wall:
-                continue
-            if side in "we":
-                dist = abs(end[0] - ax0); lo, hi = az0, az1; proj = end[1]
-            else:
-                dist = abs(end[1] - az0); lo, hi = ax0, ax1; proj = end[0]
-            segs = [(lo, hi)]
-            if dist <= width / 2 + 0.6:
-                segs = [(lo, proj - 2.2), (proj + 2.2, hi)]
-            for a, b in segs:
-                a, b = max(a, lo), min(b, hi)
-                if b - a < 0.3:
-                    continue
-                if side in "we":
-                    block(uname(f"Parapet_{st['hi']}"), (ax0, yp + 0.5, (a + b) / 2), (0.25, 1.0, b - a))
-                else:
-                    block(uname(f"Parapet_{st['hi']}"), ((a + b) / 2, yp + 0.5, az0), (b - a, 1.0, 0.25))
+        inst(uname(f"Stairs_{st['lo']}"), K("staircase"), (st["x"], st["y0"], st["z"]),
+             parent="Stairs", rot_y=math.radians(st["rot"]),
+             props={"rise": f"{st['rise']:.3f}", "run": f"{st['run']:.3f}", "width": f"{st['width']:.3f}"})
+        if st.get("pad"):
+            x0, x1, z0, z1 = st["pad"]
+            block(uname(f"StairPad_{st['lo']}"), ((x0 + x1) / 2, st["y0"] + st["rise"] - 0.5, (z0 + z1) / 2), (x1 - x0, 1.0, z1 - z0))
+
+def emit_railings():
+    for rl in RAILINGS:
+        inst(uname("Railing"), K("railing"), rl["pos"], parent="Stairs", rot_y=math.radians(rl["rot"]),
+             props={"length": f"{rl['length']:.3f}", "rise": f"{rl['rise']:.3f}"})
+    return len(RAILINGS)
 
 def emit_floors_and_ceilings():
     for r in rooms.values():
@@ -347,6 +322,13 @@ def door_centres(axis, coord, storey):
 
 pillar_points = set()   # (x, z, storey) of every placed pillar
 torch_points = []       # (x, z, storey) of every placed torch
+
+def kept_out(x, z, y, margin=0.6):
+    """Is (x, z) at height y inside a stair's treads or landings (circulation keepout)?"""
+    for (x0, x1, z0, z1), ylo, yhi in KEEPOUT:
+        if ylo - 0.1 <= y <= yhi + 0.1 and x0 - margin <= x <= x1 + margin and z0 - margin <= z <= z1 + margin:
+            return True
+    return False
 
 def emit_pillars():
     placed = pillar_points
@@ -367,7 +349,7 @@ def emit_pillars():
                     if x % PILLAR_SPACING == 0 and all(abs(x - c) > 2.4 for c in door_centres("x", z, s)):
                         pts.add((x, z))
             for x, z in pts:
-                if (x, z, s) in placed:
+                if (x, z, s) in placed or kept_out(x, z, y):
                     continue
                 placed.add((x, z, s))
                 inst(uname(f"Pillar_{r.id}"), K("pillar"), (x, y, z), parent="Pillars")
@@ -378,7 +360,7 @@ CHANDELIER_CANDLE_HEIGHT = 4.3   # candles this high above the floor, whatever t
 
 def has_chandeliers(r):
     """Roofed rooms are lit from above; corridors and outdoor areas keep wall torches."""
-    return r.ceiling and r.kind not in ("corridor", "outdoor")
+    return r.ceiling and r.kind not in ("corridor", "outdoor", "stair_turret")
 
 def emit_chandeliers():
     n = 0
@@ -862,9 +844,10 @@ CONTAINERS = ["Geometry", "Floors", "Walls", "Pillars", "Ceilings", "Stairs", "T
 
 def reset(plan, kit):
     """Bind the plan and clear every piece of working state."""
-    global rooms, doors, house_gates, secrets, stairs, door_rooms, CLASSROOM_FRONT, KIT
+    global rooms, doors, house_gates, secrets, stairs, door_rooms, CLASSROOM_FRONT, KIT, RAILINGS, KEEPOUT
     rooms = plan.rooms; doors = plan.doors; house_gates = plan.house_gates
     secrets = plan.secrets; stairs = plan.stairs; door_rooms = plan.door_rooms
+    RAILINGS = plan.railings; KEEPOUT = plan.keepout
     CLASSROOM_FRONT = {r.id: r.get("front") for r in rooms.values() if r.get("front")}
     KIT = kit
     for state in (ext, object_ids, _names, units, pillar_points):
@@ -882,8 +865,9 @@ def build(plan, kit, placements=PLACEMENTS):
     emit_secret_walls()
     emit_band_fillers()
     emit_stairs()
+    railing_count = emit_railings()
     for centre, size in plan.parapets:
-        block(uname("Parapet_stair_hall"), centre, size)
+        block(uname("Parapet"), centre, size)
     emit_floors_and_ceilings()
     emit_pillars()
     torch_count = emit_torches()
@@ -893,7 +877,7 @@ def build(plan, kit, placements=PLACEMENTS):
     placed = emit_placements(placements)
     door_count = emit_castle_doors()
     furniture_count = emit_furniture() + emit_shelves() + emit_great_hall()
-    stats = dict(rooms=len(rooms), wall_units=len(units), doors=len(doors), secrets=len(secrets), stairs=len(stairs),
+    stats = dict(rooms=len(rooms), wall_units=len(units), doors=len(doors), secrets=len(secrets), stairs=len(stairs), railings=railing_count,
                  torches=torch_count, windows=window_count, castle_doors=door_count, chandeliers=chandelier_count,
                  furniture=furniture_count, enemies=placed["crystal_guardian"], nodes=len(nodes))
     return stats, scene_text(plan)
