@@ -1,0 +1,592 @@
+{
+ "mysteries": [
+  {
+   "id": "gen_gen_01",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "east_wing_r8/plaque_gen_01",
+     "text": "MYST_GEN_01_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_east_wing_r8/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_east_wing_r8/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_01_SOLVED",
+    "discovery": "gen_gen_01",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_02",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "east_wing_r13",
+     "holding": "torch",
+     "text": "MYST_GEN_02_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_east_wing_r13/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_east_wing_r13/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_02_SOLVED",
+    "discovery": "gen_gen_02",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_03",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "north_wing_r10",
+     "players": 2,
+     "text": "MYST_GEN_03_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r10/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r10/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_03_SOLVED",
+    "discovery": "gen_gen_03",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_04",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "class_elixirs",
+     "players": 2,
+     "text": "MYST_GEN_04_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_class_elixirs/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_class_elixirs/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_04_SOLVED",
+    "discovery": "gen_gen_04",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_05",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "class_beastlore",
+     "players": 2,
+     "text": "MYST_GEN_05_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_class_beastlore/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_class_beastlore/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_05_SOLVED",
+    "discovery": "gen_gen_05",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_06",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "north_wing_r18",
+     "holding": "torch",
+     "text": "MYST_GEN_06_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r18/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r18/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_06_SOLVED",
+    "discovery": "gen_gen_06",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_07",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "north_wing_r7",
+     "players": 2,
+     "text": "MYST_GEN_07_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r7/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r7/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_07_SOLVED",
+    "discovery": "gen_gen_07",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_08",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "wine_cellar/plaque_gen_08",
+     "text": "MYST_GEN_08_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_wine_cellar/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_wine_cellar/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_08_SOLVED",
+    "discovery": "gen_gen_08",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_09",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "east_wing_r10",
+     "holding": "torch",
+     "text": "MYST_GEN_09_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_east_wing_r10/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_east_wing_r10/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_09_SOLVED",
+    "discovery": "gen_gen_09",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_10",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "records_room",
+     "players": 2,
+     "text": "MYST_GEN_10_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_records_room/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_records_room/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_10_SOLVED",
+    "discovery": "gen_gen_10",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_11",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "east_wing_cm1/plaque_gen_11",
+     "text": "MYST_GEN_11_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_east_wing_cm1/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_east_wing_cm1/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_11_SOLVED",
+    "discovery": "gen_gen_11",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_12",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "north_wing_r1/plaque_gen_12",
+     "text": "MYST_GEN_12_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r1/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r1/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_12_SOLVED",
+    "discovery": "gen_gen_12",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_13",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "class_sigilcraft",
+     "players": 2,
+     "text": "MYST_GEN_13_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_class_sigilcraft/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_class_sigilcraft/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_13_SOLVED",
+    "discovery": "gen_gen_13",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_14",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "north_wing_r39",
+     "players": 2,
+     "text": "MYST_GEN_14_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r39/secret_wall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r39/secret_wall": "revealed"
+    },
+    "text": "MYST_GEN_14_SOLVED",
+    "discovery": "gen_gen_14",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_15",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "study_hall",
+     "players": 2,
+     "text": "MYST_GEN_15_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "trophy_room/secret_from_study_hall",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "trophy_room/secret_from_study_hall": "revealed"
+    },
+    "text": "MYST_GEN_15_SOLVED",
+    "discovery": "gen_gen_15",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_16",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "north_wing_r18/plaque_gen_16",
+     "text": "MYST_GEN_16_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "north_wing_r19/secret_from_north_wing_r18",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "north_wing_r19/secret_from_north_wing_r18": "revealed"
+    },
+    "text": "MYST_GEN_16_SOLVED",
+    "discovery": "gen_gen_16",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_17",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "archive_wing_r16",
+     "players": 2,
+     "text": "MYST_GEN_17_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "archive_wing_r17/secret_from_archive_wing_r16",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "archive_wing_r17/secret_from_archive_wing_r16": "revealed"
+    },
+    "text": "MYST_GEN_17_SOLVED",
+    "discovery": "gen_gen_17",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_18",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "portrait_gallery",
+     "players": 2,
+     "text": "MYST_GEN_18_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "north_wing_r31/secret_from_portrait_gallery",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "north_wing_r31/secret_from_portrait_gallery": "revealed"
+    },
+    "text": "MYST_GEN_18_SOLVED",
+    "discovery": "gen_gen_18",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_19",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "north_wing_r19",
+     "players": 2,
+     "text": "MYST_GEN_19_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "north_wing_r20/secret_from_north_wing_r19",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "north_wing_r20/secret_from_north_wing_r19": "revealed"
+    },
+    "text": "MYST_GEN_19_SOLVED",
+    "discovery": "gen_gen_19",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_20",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "east_wing_r23/plaque_gen_20",
+     "text": "MYST_GEN_20_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "east_wing_r24/secret_from_east_wing_r23",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "east_wing_r24/secret_from_east_wing_r23": "revealed"
+    },
+    "text": "MYST_GEN_20_SOLVED",
+    "discovery": "gen_gen_20",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_21",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "together",
+     "area": "archive_wing_r2",
+     "players": 2,
+     "text": "MYST_GEN_21_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "archive_wing_r3/secret_from_archive_wing_r2",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "archive_wing_r3/secret_from_archive_wing_r2": "revealed"
+    },
+    "text": "MYST_GEN_21_SOLVED",
+    "discovery": "gen_gen_21",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  },
+  {
+   "id": "gen_gen_22",
+   "scope": "world",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "archive_wing_r17",
+     "holding": "torch",
+     "text": "MYST_GEN_22_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "archive_wing_r18/secret_from_archive_wing_r17",
+     "effect_type": "force",
+     "within_seconds": 180
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "archive_wing_r18/secret_from_archive_wing_r17": "revealed"
+    },
+    "text": "MYST_GEN_22_SOLVED",
+    "discovery": "gen_gen_22",
+    "house_points": 5
+   },
+   "reset_after_minutes": 30
+  }
+ ]
+}

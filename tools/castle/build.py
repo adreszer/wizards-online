@@ -134,12 +134,11 @@ def wall_line(r, side):
 def placed_wall_points(path):
     """(x, z, storey) of every content/placements.json object, to keep windows clear of them."""
     pts = []
-    with open(path) as f:
-        for area, entries in json.load(f).items():
-            r = rooms[area]
-            for e in entries:
-                (x, _y, z), _ = placement_point(r, e)
-                pts.append((x, z, r.storey))
+    for area, entries in load_placements(path).items():
+        r = rooms[area]
+        for e in entries:
+            (x, _y, z), _ = placement_point(r, e)
+            pts.append((x, z, r.storey))
     return pts
 
 WINDOW_EVERY_OTHER = False
@@ -778,6 +777,8 @@ def placement_point(r, e):
     if "at" in e:
         dx, dz = e["at"]
         return (cx + dx, r.y + e.get("dy", 0.0), cz + dz), math.radians(e.get("yaw", 0.0))
+    if e.get("wall") == "auto":
+        e = dict(e, **auto_wall(r))
     if "wall" in e:
         side, along = e["wall"], e.get("along", 0.5)
         d = e.get("inset", WALL_FLUSH)
@@ -823,15 +824,32 @@ def check_inside(r, e, pos):
     assert r.x0 + m <= x <= r.x1 - m and r.z0 + m <= z <= r.z1 - m, \
         f"{r.id}/{e['id']}: position ({x:.1f}, {z:.1f}) is outside the room {r.rect}"
 
+def auto_wall(r):
+    """A wall spot clear of doorways and secret walls for a plaque ("wall": "auto")."""
+    best = None
+    for side in "nswe":
+        axis, coord, lo, hi = r.wall_line(side)
+        busy = [k[2] for k, u in units.items() if k[0] == axis and k[1] == coord and k[3] == r.storey and (u["door"] or u["secret"])]
+        for off in range(int(lo) + 4, int(hi) - 4, 4):
+            if any(abs(off - b) < 8 for b in busy):
+                continue
+            along = (off + 2 - lo) / (hi - lo)
+            return {"wall": side, "along": round(along, 4)}
+    return {"wall": "n", "along": 0.5} if best is None else best
+
 def godot_literal(value):
     if isinstance(value, bool): return "true" if value else "false"
     if isinstance(value, (int, float)): return repr(value)
     if isinstance(value, str): return json.dumps(value)
     raise AssertionError(f"unsupported property value {value!r}")
 
+GENERATED_PLACEMENTS = {}
+
 def load_placements(path):
     with open(path) as f:
         data = json.load(f)
+    for area, entries in GENERATED_PLACEMENTS.items():
+        data.setdefault(area, []).extend(entries)
     for area, entries in data.items():
         assert area in rooms, f"{path}: unknown area {area!r}"
         for e in entries:
@@ -907,10 +925,11 @@ CONTAINERS = ["Movers", "Geometry", "Floors", "Walls", "Pillars", "Ceilings", "S
 
 def reset(plan, kit):
     """Bind the plan and clear every piece of working state."""
-    global rooms, doors, house_gates, secrets, stairs, door_rooms, CLASSROOM_FRONT, KIT, RAILINGS, KEEPOUT
+    global rooms, doors, house_gates, secrets, stairs, door_rooms, CLASSROOM_FRONT, KIT, RAILINGS, KEEPOUT, GENERATED_PLACEMENTS
     rooms = plan.rooms; doors = plan.doors; house_gates = plan.house_gates
     secrets = plan.secrets; stairs = plan.stairs; door_rooms = plan.door_rooms
     RAILINGS = plan.railings; KEEPOUT = plan.keepout
+    GENERATED_PLACEMENTS = getattr(plan, "generated_placements", {})
     CLASSROOM_FRONT = {r.id: r.get("front") for r in rooms.values() if r.get("front")}
     KIT = kit
     for state in (ext, object_ids, _names, units, pillar_points):

@@ -1,0 +1,178 @@
+{
+ "MYST_GEN_01_CLUE": {
+  "en": "The plaque ends mid-sentence: “...and the north stone answers only to a firm push of will.”",
+  "pl": "Tablica urywa się w pół zdania: „...a północny kamień ustępuje tylko stanowczemu pchnięciu woli.”"
+ },
+ "MYST_GEN_01_SOLVED": {
+  "en": "Stone grinds on stone and a forgotten room breathes out a century of dust.",
+  "pl": "Kamień zgrzyta o kamień, a zapomniana komnata wydycha kurz całego stulecia."
+ },
+ "MYST_GEN_02_CLUE": {
+  "en": "In the torchlight a soot mark shaped like a keyhole appears on the wall, then fades.",
+  "pl": "W blasku pochodni na ścianie pojawia się ślad sadzy w kształcie dziurki od klucza i znika."
+ },
+ "MYST_GEN_02_SOLVED": {
+  "en": "The keyhole flares, the wall folds aside, and warm air smelling of old wax rolls out.",
+  "pl": "Dziurka od klucza rozbłyska, ściana składa się na bok, a ze środka bucha ciepłe powietrze pachnące starym woskiem."
+ },
+ "MYST_GEN_03_CLUE": {
+  "en": "Two sets of footprints are carved into the floor here, side by side, facing the wall.",
+  "pl": "W posadzce wyryto dwie pary śladów stóp, obok siebie, zwrócone ku ścianie."
+ },
+ "MYST_GEN_03_SOLVED": {
+  "en": "Standing together was the key: the wall swings open like a door that was always there.",
+  "pl": "Kluczem było stanąć razem: ściana otwiera się jak drzwi, które zawsze tu były."
+ },
+ "MYST_GEN_04_CLUE": {
+  "en": "The flagstones of the Elixirs Classroom hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Sala Eliksirów brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_04_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_05_CLUE": {
+  "en": "The flagstones of the Beastlore Classroom hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Sala Bestiologii brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_05_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_06_CLUE": {
+  "en": "Your torch flickers toward one stone of the Storeroom II, as if a draught came through it.",
+  "pl": "Płomień pochodni chyli się ku jednemu kamieniowi w sali Składzik II, jakby wiał przez niego przeciąg."
+ },
+ "MYST_GEN_06_SOLVED": {
+  "en": "The draught was a doorway: the stone slides away into darkness.",
+  "pl": "Przeciąg był przejściem: kamień odsuwa się w ciemność."
+ },
+ "MYST_GEN_07_CLUE": {
+  "en": "The flagstones of the Quiet Room hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Pokój Ciszy brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_07_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_08_CLUE": {
+  "en": "A note scratched beside the Wine Cellar's fireplace reads: “Push where the mortar is new.”",
+  "pl": "Notatka wydrapana obok kominka w sali Piwniczka brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+ },
+ "MYST_GEN_08_SOLVED": {
+  "en": "Behind the wall of the {room} something gives way.",
+  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+ },
+ "MYST_GEN_09_CLUE": {
+  "en": "Your torch flickers toward one stone of the Office II, as if a draught came through it.",
+  "pl": "Płomień pochodni chyli się ku jednemu kamieniowi w sali Gabinet II, jakby wiał przez niego przeciąg."
+ },
+ "MYST_GEN_09_SOLVED": {
+  "en": "The draught was a doorway: the stone slides away into darkness.",
+  "pl": "Przeciąg był przejściem: kamień odsuwa się w ciemność."
+ },
+ "MYST_GEN_10_CLUE": {
+  "en": "The flagstones of the Records Room hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Archiwum brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_10_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_11_CLUE": {
+  "en": "A note scratched beside the East Wing, cellar level corridor's fireplace reads: “Push where the mortar is new.”",
+  "pl": "Notatka wydrapana obok kominka w sali Skrzydło Wschodnie, korytarz (poziom piwnic) brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+ },
+ "MYST_GEN_11_SOLVED": {
+  "en": "Behind the wall of the {room} something gives way.",
+  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+ },
+ "MYST_GEN_12_CLUE": {
+  "en": "A note scratched beside the Guest Chamber's fireplace reads: “Push where the mortar is new.”",
+  "pl": "Notatka wydrapana obok kominka w sali Komnata Gościnna brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+ },
+ "MYST_GEN_12_SOLVED": {
+  "en": "Behind the wall of the {room} something gives way.",
+  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+ },
+ "MYST_GEN_13_CLUE": {
+  "en": "The flagstones of the Sigilcraft Classroom hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Sala Sigilistyki brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_13_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_14_CLUE": {
+  "en": "The flagstones of the Old Classroom IV hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Stara Klasa IV brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_14_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_15_CLUE": {
+  "en": "The flagstones of the Study Hall hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Sala Nauki brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_15_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_16_CLUE": {
+  "en": "A note scratched beside the Storeroom II's fireplace reads: “Push where the mortar is new.”",
+  "pl": "Notatka wydrapana obok kominka w sali Składzik II brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+ },
+ "MYST_GEN_16_SOLVED": {
+  "en": "Behind the wall of the {room} something gives way.",
+  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+ },
+ "MYST_GEN_17_CLUE": {
+  "en": "The flagstones of the Archive Room IV hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Sala Archiwalna IV brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_17_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_18_CLUE": {
+  "en": "The flagstones of the Portrait Gallery hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Galeria Portretów brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_18_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_19_CLUE": {
+  "en": "The flagstones of the Quiet Room II hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Pokój Ciszy II brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_19_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_20_CLUE": {
+  "en": "A note scratched beside the Records Office III's fireplace reads: “Push where the mortar is new.”",
+  "pl": "Notatka wydrapana obok kominka w sali Kancelaria III brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+ },
+ "MYST_GEN_20_SOLVED": {
+  "en": "Behind the wall of the {room} something gives way.",
+  "pl": "Za ścianą sali {room_pl} coś ustępuje."
+ },
+ "MYST_GEN_21_CLUE": {
+  "en": "The flagstones of the Reading Alcove hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Wnęka Czytelnicza brzęczą, gdy stoi na nich więcej niż jedna osoba."
+ },
+ "MYST_GEN_21_SOLVED": {
+  "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
+  "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
+ },
+ "MYST_GEN_22_CLUE": {
+  "en": "Your torch flickers toward one stone of the Reading Alcove IV, as if a draught came through it.",
+  "pl": "Płomień pochodni chyli się ku jednemu kamieniowi w sali Wnęka Czytelnicza IV, jakby wiał przez niego przeciąg."
+ },
+ "MYST_GEN_22_SOLVED": {
+  "en": "The draught was a doorway: the stone slides away into darkness.",
+  "pl": "Przeciąg był przejściem: kamień odsuwa się w ciemność."
+ }
+}

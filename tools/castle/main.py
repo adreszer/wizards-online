@@ -37,10 +37,23 @@ def plan_from_data(data, grounds_cfg=None, seed=None):
         spec = data["layout"]
         lay = layout.generate(plan, spec, spec.get("seed", 0) if seed is None else seed)
         plan.generated_names = lay.generated
-    from . import setpieces
+    from . import setpieces, secrets
     setpieces.prepare(plan)
+    if data.get("layout"):
+        secrets.generate(plan, data["layout"], names_lookup(plan))
     zones.add_terrain_rooms(plan, grounds_cfg or load_grounds())
     return circulation.derive(plan)
+
+
+def names_lookup(plan):
+    """room id -> (en, pl) display names (generated names first, then translations.csv)."""
+    import csv
+    names = {k: (en, pl) for k, en, pl in plan.generated_names}
+    with open("localization/translations.csv", newline="") as f:
+        for row in csv.reader(f):
+            if len(row) >= 3 and row[0].startswith("AREA_"):
+                names.setdefault(row[0], (row[1], row[2]))
+    return lambda rid: names.get(plan.rooms[rid].name_key, (rid.replace("_", " "), rid.replace("_", " ")))
 
 
 def make_plan(path=PROGRAM, grounds_path=GROUNDS, seed=None):
@@ -115,8 +128,9 @@ def main(argv=None):
     from . import exterior
     shell = exterior.write(exterior.generate(plan, build.units, g.terrain))
     export.area_map(plan, AREA_MAP)
-    from . import layout
+    from . import layout, secrets
     layout.write_names(plan.generated_names)
+    print("secrets:", secrets.write(plan), "chains")
     print("name keys:", " ".join(sorted({r.name_key for r in plan.rooms.values()})))
     print("  ".join(f"{k.replace('_', ' ')}: {v}" for k, v in stats.items()))
     print("exterior:", "  ".join(f"{k}: {v}" for k, v in shell.items()))

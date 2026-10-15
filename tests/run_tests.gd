@@ -1104,10 +1104,13 @@ func _test_castle() -> void:
 	t.check(placements is Dictionary and missing_placed.is_empty(), "every world object in content/placements.json is in the castle (missing: %s)" % ", ".join(missing_placed))
 	# Offline practice mysteries: the secret walls follow the public offline set.
 	var engine: OfflineMysteryEngine = castle.world_object_sync.offline_engine
-	t.check(engine != null and engine.mystery_count() == 3 and engine.drives("undercroft/secret_wall"), "offline, the castle runs the practice mysteries")
+	var generated_offline: Variant = JSON.parse_string(FileAccess.get_file_as_string(OfflineMysteryEngine.GENERATED_PATH))
+	var gen_count: int = (generated_offline as Dictionary).get("mysteries", []).size() if generated_offline is Dictionary else 0
+	t.check(engine != null and engine.mystery_count() == 3 + gen_count and gen_count >= 15 and engine.drives("undercroft/secret_wall"),
+		"offline, the castle runs the practice mysteries and the generated secrets (%d)" % gen_count)
 	var offline_problems: Array[String] = []
 	var offline_data: Variant = JSON.parse_string(FileAccess.get_file_as_string(OfflineMysteryEngine.CONTENT_PATH))
-	for m: Dictionary in offline_data.get("mysteries", []):
+	for m: Dictionary in offline_data.get("mysteries", []) + (generated_offline.get("mysteries", []) if generated_offline is Dictionary else []):
 		for step: Dictionary in m.get("steps", []):
 			if step.has("object") and not object_ids.has(str(step["object"])):
 				offline_problems.append("unknown object %s" % step["object"])
@@ -1140,6 +1143,29 @@ func _test_castle() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	t.check(undercroft.is_revealed, "reading the cellar plaque first, then striking the wall, opens it offline")
+	# A generated secret: read its clue plaque, then strike its wall.
+	var gen_solved := false
+	for m: Dictionary in (generated_offline as Dictionary).get("mysteries", []):
+		var first: Dictionary = m["steps"][0]
+		if first.get("event") != "interact":
+			continue
+		var plaque_node: Node = null
+		var wall_node: SecretWall = null
+		for node in get_tree().get_nodes_in_group("world_objects"):
+			if node.get("object_id") == first["object"]:
+				plaque_node = node
+			elif node.get("object_id") == m["steps"][1]["object"]:
+				wall_node = node
+		if plaque_node == null or wall_node == null:
+			continue
+		plaque_node._on_interacted(null)
+		await get_tree().process_frame
+		wall_node._on_spell_received(SpellEffect.create(ARCANE_PULSE, null, "", wall_node.global_position, Vector3.FORWARD))
+		await get_tree().process_frame
+		await get_tree().process_frame
+		gen_solved = wall_node.is_revealed
+		break
+	t.check(gen_solved, "a generated secret opens offline after its clue plaque is read")
 	t.check(GameSession.get_total(&"arcane_fragment") >= 10, "castle registers its fragments (got %d)" % GameSession.get_total(&"arcane_fragment"))
 	var tome_spells: Dictionary = {}
 	for tome in castle.get_node("Tomes").get_children():
@@ -1788,6 +1814,13 @@ func _test_mysteries() -> void:
 	t.section("Mysteries (server content)")
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/mysteries.json"))
 	var strings: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/strings.json"))
+	# Generated secrets (tools/castle/secrets.py) are merged like the server does.
+	var gen_data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/generated_mysteries.json"))
+	var gen_strings: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/generated_strings.json"))
+	if data is Dictionary and gen_data is Dictionary:
+		data["mysteries"] = (data["mysteries"] as Array) + (gen_data["mysteries"] as Array)
+	if strings is Dictionary and gen_strings is Dictionary:
+		strings.merge(gen_strings)
 	if not t.check(data is Dictionary and strings is Dictionary, "mysteries.json and strings.json parse"):
 		return
 	var objects := ServerContentExporter.world_objects(ServerContentExporter.CASTLE_SCENE)

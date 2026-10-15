@@ -453,12 +453,13 @@ def walking_distances(plan, origin):
         p = (off + 2, s * _STOREY, coord) if axis == "x" else (coord, s * _STOREY, off + 2)
         k = node_for(("d", axis, coord, off, s), p)
         room_nodes.setdefault(a, []).append(k); room_nodes.setdefault(b, []).append(k)
-    for st in flights(plan):
-        if st["hi"] is None:
+    for st in plan.stairs:
+        if st.get("kind") == "spiral" or st["hi"] is None:
             continue
         f = _c.local_to_world(st["x"], st["z"], st["rot"], (0, 0))
         t = _c.local_to_world(st["x"], st["z"], st["rot"], (st["run"], 0))
-        kf = node_for(("sf", id(st)), (f[0], st["y0"], f[1])); kt = node_for(("st", id(st)), (t[0], st["y0"] + st["rise"], t[1]))
+        y0 = plan.stair_y(st)
+        kf = node_for(("sf", id(st)), (f[0], y0, f[1])); kt = node_for(("st", id(st)), (t[0], y0 + st["rise"], t[1]))
         room_nodes.setdefault(st["lo"], []).append(kf); room_nodes.setdefault(st["hi"], []).append(kt)
         links.setdefault(kf, []).append((kt, _math.hypot(st["run"], st["rise"])))
         links.setdefault(kt, []).append((kf, _math.hypot(st["run"], st["rise"])))
@@ -717,3 +718,26 @@ def shared_schedule(plan):
     for m in getattr(plan, "movers", []):
         if not isinstance(m.get("phase"), (int, float)):
             yield m.get("room", "?"), "a mover without a fixed phase"
+
+
+# --------------------------------------------------------------------------- secrets
+@rule("X1", "every generated chain ends at a real secret wall struck with a learnable spell")
+def chains_solvable(plan):
+    walls = {f"{b}/{name}" for a, b, _ax, _c, _off, _s, name in plan.secrets}
+    for ch in getattr(plan, "chains", []):
+        if ch["wall"] not in walls:
+            yield ch["key"], f"chain ends at unknown wall {ch['wall']}"
+
+
+@rule("X2", "every hidden room is opened by a chain")
+def hidden_rooms_have_chains(plan):
+    opened = {ch.get("hidden") for ch in getattr(plan, "chains", [])}
+    for r in plan.rooms.values():
+        if r.get("generated_secret") and r.id not in opened:
+            yield r.id, "no mystery opens it"
+
+
+@rule("X3", "the castle keeps at least 20 secrets")
+def enough_secrets(plan):
+    if plan.meta.get("layout") and len(plan.secrets) < 20:
+        yield "castle", f"only {len(plan.secrets)} secret walls"

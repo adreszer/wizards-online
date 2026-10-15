@@ -26,6 +26,9 @@ local M = {}
 
 M.CONTENT_PATH = "../content/mysteries.json"
 M.STRINGS_PATH = "../content/strings.json"
+-- Secrets generated with the castle (tools/castle/secrets.py); optional, merged after the hand-written ones.
+M.GENERATED_CONTENT_PATH = "../content/generated_mysteries.json"
+M.GENERATED_STRINGS_PATH = "../content/generated_strings.json"
 M.LOCALES = { "pl", "en" }
 M.FALLBACK_LOCALE = "pl"
 M.SCOPES = { world = true, house = true, player = true }
@@ -112,14 +115,22 @@ function M.load()
     nk.logger_warn("mysteries: " .. serr)
     strings = {}
   end
+  local gstrings = read_json(M.GENERATED_STRINGS_PATH)
+  for k, v in pairs(gstrings or {}) do
+    strings[k] = v
+  end
   engine.strings = strings
   local data, derr = read_json(M.CONTENT_PATH)
   if not data then
     nk.logger_warn("mysteries: " .. derr)
     return engine
   end
+  local list = {}
+  for _, m in ipairs(data.mysteries or {}) do table.insert(list, m) end
+  local gdata = read_json(M.GENERATED_CONTENT_PATH)
+  for _, m in ipairs((gdata or {}).mysteries or {}) do table.insert(list, m) end
   local seen = {}
-  for _, m in ipairs(data.mysteries or {}) do
+  for _, m in ipairs(list) do
     local errors = M.validate(m, strings, seen)
     if #errors == 0 then
       seen[m.id] = true

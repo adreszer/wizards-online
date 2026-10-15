@@ -84,6 +84,20 @@ AREA_EAST_WING_STAIR_A,"East Wing, stair turret","Skrzydło Wschodnie, wieżyczk
 AREA_FACULTY_LOUNGE,Faculty Lounge,Pokój Profesorski
 AREA_GLOBE_ROOM,Globe Room,Sala Globusów
 AREA_GREAT_ARCHIVE,Great Archive,Wielkie Archiwum
+AREA_HIDDEN_CLASS_BEASTLORE,Echoing Chamber,Komnata Echa
+AREA_HIDDEN_CLASS_ELIXIRS,Feather Nook,Pierzasty Kącik
+AREA_HIDDEN_CLASS_SIGILCRAFT,Clockmaker's Den,Pracownia Zegarmistrza
+AREA_HIDDEN_EAST_WING_CM1,Dusty Alcove,Zakurzona Wnęka
+AREA_HIDDEN_EAST_WING_R10,Scribe's Refuge,Schronienie Skryby
+AREA_HIDDEN_EAST_WING_R13,Silent Chapel of Bells,Cicha Kaplica Dzwonów
+AREA_HIDDEN_EAST_WING_R8,Old Map Cupboard,Schowek Starych Map
+AREA_HIDDEN_NORTH_WING_R1,Star Chart Cupboard,Szafa Map Nieba
+AREA_HIDDEN_NORTH_WING_R10,Painter's Hideaway,Kryjówka Malarza
+AREA_HIDDEN_NORTH_WING_R18,Whispering Closet,Szepcząca Komórka
+AREA_HIDDEN_NORTH_WING_R39,Locksmith's Hole,Nora Ślusarza
+AREA_HIDDEN_NORTH_WING_R7,Moth Room,Pokój Ćm
+AREA_HIDDEN_RECORDS_ROOM,Forgotten Study,Zapomniany Gabinet
+AREA_HIDDEN_WINE_CELLAR,Glass Room,Szklany Pokój
 AREA_NORTH_WING_C0,"North Wing, ground floor corridor","Skrzydło Północne, korytarz (parter)"
 AREA_NORTH_WING_C1,"North Wing, first floor corridor","Skrzydło Północne, korytarz (pierwsze piętro)"
 AREA_NORTH_WING_C2,"North Wing, second floor corridor","Skrzydło Północne, korytarz (drugie piętro)"
@@ -170,3 +184,31 @@ AREA_UNFINISHED_WING_R8,Unfinished Hall III,Niedokończona Sala III
 AREA_UNFINISHED_WING_R9,Bare Room III,Pusta Komnata III
 AREA_UNFINISHED_WING_STAIR_A,"Unfinished Wing, stair turret","Niedokończone Skrzydło, wieżyczka schodowa"
 AREA_WINE_CELLAR,Wine Cellar,Piwniczka
+OFFLINE_MYST_GEN_01_SOLVED,Stone grinds on stone and a forgotten room breathes out a century of dust.,"Kamień zgrzyta o kamień, a zapomniana komnata wydycha kurz całego stulecia."
+OFFLINE_MYST_GEN_02_CLUE,"In the torchlight a soot mark shaped like a keyhole appears on the wall, then fades.",W blasku pochodni na ścianie pojawia się ślad sadzy w kształcie dziurki od klucza i znika.
+OFFLINE_MYST_GEN_03_CLUE,"Two sets of footprints are carved into the floor here, side by side, facing the wall.","W posadzce wyryto dwie pary śladów stóp, obok siebie, zwrócone ku ścianie."
+OFFLINE_MYST_GEN_04_CLUE,The flagstones of the Elixirs Classroom hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Eliksirów brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_05_CLUE,The flagstones of the Beastlore Classroom hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Bestiologii brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_06_CLUE,"Your torch flickers toward one stone of the Storeroom II, as if a draught came through it.","Płomień pochodni chyli się ku jednemu kamieniowi w sali Składzik II, jakby wiał przez niego przeciąg."
+OFFLINE_MYST_GEN_07_CLUE,The flagstones of the Quiet Room hum when more than one of you stands on them.,"Płyty posadzki w sali Pokój Ciszy brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_08_SOLVED,Behind the wall of the {room} something gives way.,Za ścianą sali {room_pl} coś ustępuje.
+OFFLINE_MYST_GEN_09_CLUE,"Your torch flickers toward one stone of the Office II, as if a draught came through it.","Płomień pochodni chyli się ku jednemu kamieniowi w sali Gabinet II, jakby wiał przez niego przeciąg."
+OFFLINE_MYST_GEN_10_CLUE,The flagstones of the Records Room hum when more than one of you stands on them.,"Płyty posadzki w sali Archiwum brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_11_SOLVED,Behind the wall of the {room} something gives way.,Za ścianą sali {room_pl} coś ustępuje.
+OFFLINE_MYST_GEN_12_SOLVED,Behind the wall of the {room} something gives way.,Za ścianą sali {room_pl} coś ustępuje.
+OFFLINE_MYST_GEN_13_CLUE,The flagstones of the Sigilcraft Classroom hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Sigilistyki brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_14_CLUE,The flagstones of the Old Classroom IV hum when more than one of you stands on them.,"Płyty posadzki w sali Stara Klasa IV brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_15_CLUE,The flagstones of the Study Hall hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Nauki brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_16_SOLVED,Behind the wall of the {room} something gives way.,Za ścianą sali {room_pl} coś ustępuje.
+OFFLINE_MYST_GEN_17_CLUE,The flagstones of the Archive Room IV hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Archiwalna IV brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_18_CLUE,The flagstones of the Portrait Gallery hum when more than one of you stands on them.,"Płyty posadzki w sali Galeria Portretów brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_19_CLUE,The flagstones of the Quiet Room II hum when more than one of you stands on them.,"Płyty posadzki w sali Pokój Ciszy II brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_20_SOLVED,Behind the wall of the {room} something gives way.,Za ścianą sali {room_pl} coś ustępuje.
+OFFLINE_MYST_GEN_21_CLUE,The flagstones of the Reading Alcove hum when more than one of you stands on them.,"Płyty posadzki w sali Wnęka Czytelnicza brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_22_CLUE,"Your torch flickers toward one stone of the Reading Alcove IV, as if a draught came through it.","Płomień pochodni chyli się ku jednemu kamieniowi w sali Wnęka Czytelnicza IV, jakby wiał przez niego przeciąg."
+PLAQUE_GEN_01,The plaque ends mid-sentence: “...and the north stone answers only to a firm push of will.”,Tablica urywa się w pół zdania: „...a północny kamień ustępuje tylko stanowczemu pchnięciu woli.”
+PLAQUE_GEN_08,A note scratched beside the Wine Cellar's fireplace reads: “Push where the mortar is new.”,"Notatka wydrapana obok kominka w sali Piwniczka brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+PLAQUE_GEN_11,"A note scratched beside the East Wing, cellar level corridor's fireplace reads: “Push where the mortar is new.”","Notatka wydrapana obok kominka w sali Skrzydło Wschodnie, korytarz (poziom piwnic) brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+PLAQUE_GEN_12,A note scratched beside the Guest Chamber's fireplace reads: “Push where the mortar is new.”,"Notatka wydrapana obok kominka w sali Komnata Gościnna brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+PLAQUE_GEN_16,A note scratched beside the Storeroom II's fireplace reads: “Push where the mortar is new.”,"Notatka wydrapana obok kominka w sali Składzik II brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"
+PLAQUE_GEN_20,A note scratched beside the Records Office III's fireplace reads: “Push where the mortar is new.”,"Notatka wydrapana obok kominka w sali Kancelaria III brzmi: „Pchnij tam, gdzie zaprawa jest świeża.”"

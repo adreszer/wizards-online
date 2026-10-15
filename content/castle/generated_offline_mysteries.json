@@ -1,0 +1,444 @@
+{
+ "mysteries": [
+  {
+   "id": "offline_gen_gen_01",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "east_wing_r8/plaque_gen_01",
+     "text": "OFFLINE_MYST_GEN_01_SOLVED"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_east_wing_r8/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_east_wing_r8/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_02",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "east_wing_r13",
+     "text": "OFFLINE_MYST_GEN_02_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_east_wing_r13/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_east_wing_r13/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_03",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "north_wing_r10",
+     "text": "OFFLINE_MYST_GEN_03_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r10/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r10/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_04",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "class_elixirs",
+     "text": "OFFLINE_MYST_GEN_04_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_class_elixirs/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_class_elixirs/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_05",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "class_beastlore",
+     "text": "OFFLINE_MYST_GEN_05_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_class_beastlore/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_class_beastlore/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_06",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "north_wing_r18",
+     "text": "OFFLINE_MYST_GEN_06_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r18/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r18/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_07",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "north_wing_r7",
+     "text": "OFFLINE_MYST_GEN_07_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r7/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r7/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_08",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "wine_cellar/plaque_gen_08",
+     "text": "OFFLINE_MYST_GEN_08_SOLVED"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_wine_cellar/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_wine_cellar/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_09",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "east_wing_r10",
+     "text": "OFFLINE_MYST_GEN_09_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_east_wing_r10/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_east_wing_r10/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_10",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "records_room",
+     "text": "OFFLINE_MYST_GEN_10_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_records_room/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_records_room/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_11",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "east_wing_cm1/plaque_gen_11",
+     "text": "OFFLINE_MYST_GEN_11_SOLVED"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_east_wing_cm1/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_east_wing_cm1/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_12",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "north_wing_r1/plaque_gen_12",
+     "text": "OFFLINE_MYST_GEN_12_SOLVED"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r1/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r1/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_13",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "class_sigilcraft",
+     "text": "OFFLINE_MYST_GEN_13_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_class_sigilcraft/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_class_sigilcraft/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_14",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "north_wing_r39",
+     "text": "OFFLINE_MYST_GEN_14_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "hidden_north_wing_r39/secret_wall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "hidden_north_wing_r39/secret_wall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_15",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "study_hall",
+     "text": "OFFLINE_MYST_GEN_15_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "trophy_room/secret_from_study_hall",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "trophy_room/secret_from_study_hall": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_16",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "north_wing_r18/plaque_gen_16",
+     "text": "OFFLINE_MYST_GEN_16_SOLVED"
+    },
+    {
+     "event": "spell",
+     "object": "north_wing_r19/secret_from_north_wing_r18",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "north_wing_r19/secret_from_north_wing_r18": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_17",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "archive_wing_r16",
+     "text": "OFFLINE_MYST_GEN_17_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "archive_wing_r17/secret_from_archive_wing_r16",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "archive_wing_r17/secret_from_archive_wing_r16": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_18",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "portrait_gallery",
+     "text": "OFFLINE_MYST_GEN_18_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "north_wing_r31/secret_from_portrait_gallery",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "north_wing_r31/secret_from_portrait_gallery": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_19",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "north_wing_r19",
+     "text": "OFFLINE_MYST_GEN_19_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "north_wing_r20/secret_from_north_wing_r19",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "north_wing_r20/secret_from_north_wing_r19": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_20",
+   "steps": [
+    {
+     "event": "interact",
+     "object": "east_wing_r23/plaque_gen_20",
+     "text": "OFFLINE_MYST_GEN_20_SOLVED"
+    },
+    {
+     "event": "spell",
+     "object": "east_wing_r24/secret_from_east_wing_r23",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "east_wing_r24/secret_from_east_wing_r23": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_21",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "archive_wing_r2",
+     "text": "OFFLINE_MYST_GEN_21_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "archive_wing_r3/secret_from_archive_wing_r2",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "archive_wing_r3/secret_from_archive_wing_r2": "revealed"
+    }
+   }
+  },
+  {
+   "id": "offline_gen_gen_22",
+   "steps": [
+    {
+     "event": "enter",
+     "area": "archive_wing_r17",
+     "text": "OFFLINE_MYST_GEN_22_CLUE"
+    },
+    {
+     "event": "spell",
+     "object": "archive_wing_r18/secret_from_archive_wing_r17",
+     "effect_type": "force"
+    }
+   ],
+   "on_solved": {
+    "set_state": {
+     "archive_wing_r18/secret_from_archive_wing_r17": "revealed"
+    }
+   }
+  }
+ ]
+}

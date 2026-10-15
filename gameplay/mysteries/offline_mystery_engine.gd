@@ -12,6 +12,8 @@ extends Node
 ## local triggers come here instead of changing them (see WorldObjectSync).
 
 const CONTENT_PATH := "res://content/offline_mysteries.json"
+## Offline versions of the secrets generated with the castle (tools/castle/secrets.py).
+const GENERATED_PATH := "res://content/castle/generated_offline_mysteries.json"
 
 ## object id → node, for applying states and reading a statue's state
 var objects: Dictionary = {}
@@ -26,13 +28,14 @@ func setup(p_objects: Dictionary, path: String = CONTENT_PATH) -> void:
 	objects = p_objects
 	_mysteries.clear()
 	driven.clear()
-	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path)) if FileAccess.file_exists(path) else null
-	if not data is Dictionary:
-		return
-	for m: Dictionary in data.get("mysteries", []):
-		_mysteries.append(m)
-		for oid: String in m.get("on_solved", {}).get("set_state", {}):
-			driven[oid] = true
+	for p in [path, GENERATED_PATH] if path == CONTENT_PATH else [path]:
+		var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(p)) if FileAccess.file_exists(p) else null
+		if not data is Dictionary:
+			continue
+		for m: Dictionary in data.get("mysteries", []):
+			_mysteries.append(m)
+			for oid: String in m.get("on_solved", {}).get("set_state", {}):
+				driven[oid] = true
 
 
 func _ready() -> void:

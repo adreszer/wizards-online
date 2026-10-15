@@ -33,7 +33,8 @@ for path in files:
     rel = path[len("res://"):]
     if rel.split("/")[0] in ("nakama", "tools", "tests", "docs") or rel.startswith("levels/dev/") or rel.startswith("levels/mvp/"):
         problems.append("dev/server file in the pack: " + path)
-    if rel.startswith("content/") and rel != "content/offline_mysteries.json":
+    if rel.startswith("content/") and rel not in ("content/offline_mysteries.json", "content/castle/kit.json",
+                                                   "content/castle/generated_offline_mysteries.json"):
         problems.append("unexpected content file: " + path)
 needles = {}
 strings = json.load(open("nakama/content/strings.json"))
@@ -44,6 +45,17 @@ for key, entry in strings.items():
             needles[text] = f"strings.json {key}.{loc}"
 for m in json.load(open("nakama/content/mysteries.json")).get("mysteries", []):
     needles[m["id"]] = "mystery id"
+# Generated secrets: their keys and ids are server-only; clue texts that also stand on a
+# public plaque (localization/castle_generated.csv) are public by design.
+import csv
+public = {cell for row in csv.reader(open("localization/castle_generated.csv", newline="")) for cell in row[1:]}
+for key, entry in json.load(open("nakama/content/generated_strings.json")).items():
+    needles[key] = "generated_strings.json key"
+    for loc, text in entry.items():
+        if len(text) >= 12 and text not in public:
+            needles[text] = f"generated_strings.json {key}.{loc}"
+for m in json.load(open("nakama/content/generated_mysteries.json")).get("mysteries", []):
+    needles[m["id"]] = "generated mystery id"
 data = open(pck, "rb").read()
 for needle, what in needles.items():
     raw = needle.encode("utf-8")
