@@ -233,6 +233,7 @@ func _on_flying_changed(is_flying: bool) -> void:
 
 func _on_spell_cast(_definition: SpellDefinition, _origin: Vector3, _direction: Vector3) -> void:
 	animation_controller.play_cast()
+	broom_rider.on_cast()
 
 
 func _exit_tree() -> void:

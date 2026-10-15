@@ -6,7 +6,9 @@ extends Node
 ## PlayerMovement. Remote players get the ridden item id from their movement
 ## snapshots ([method set_remote_mount]). Either way the mount's scene sits
 ## under the character visual and [member pose] banks and pitches it with the
-## flight, which Player applies to the visual each frame.
+## flight, which Player applies to the visual each frame, while a
+## BroomRidePose modifier on the skeleton seats the character astride the
+## shaft (lean, grip, legs) and blends in and out with [member ride_blend].
 ##
 ## Flight is client-side like the rest of movement (the server relays it
 ## unvalidated); owning the broom is the only gate besides area rules.
@@ -24,11 +26,17 @@ var mount: ItemDefinition
 var mount_node: Node3D
 ## Transform for the character visual (bank, pitch, hover bob) around the seat.
 var pose: Transform3D = Transform3D.IDENTITY
+## Riding pose on the character's skeleton (null when the rig has no Mixamo bones).
+var ride_pose: BroomRidePose
+## 0 on foot … 1 seated; eases over ~0.3 s on mounting and landing.
+var ride_blend: float = 0.0
 
 var _player: Node
 var _movement: PlayerMovement
 var _inventory: Inventory
 var _attach: Node3D
+## The wand's mesh: tucked away while both hands hold the shaft.
+var _wand_mesh: Node3D
 var _pitch: float = 0.0
 var _roll: float = 0.0
 var _bob_time: float = 0.0
@@ -44,6 +52,14 @@ func setup(player: Node, movement: PlayerMovement, inventory: Inventory, attach:
 	_attach = attach
 	_last_yaw = (player as Node3D).rotation.y
 	_last_position = (player as Node3D).global_position
+	var skeleton := attach.find_child("Skeleton3D", true, false) as Skeleton3D if attach != null else null
+	_wand_mesh = attach.find_child("WandMesh", true, false) as Node3D if attach != null else null
+	if skeleton != null:
+		ride_pose = BroomRidePose.new()
+		ride_pose.name = "BroomRidePose"
+		ride_pose.influence = 0.0
+		ride_pose.active = false
+		skeleton.add_child(ride_pose)
 
 
 ## Local player: start riding the first mount item carried, or land.
@@ -115,6 +131,12 @@ func set_remote_mount(item_id: String) -> void:
 	_show(definition)
 
 
+## A spell went off: the wand hand lets go of the shaft for the cast clip.
+func on_cast() -> void:
+	if ride_pose != null and mount != null:
+		ride_pose.release_wand_hand()
+
+
 func mount_id() -> String:
 	return String(mount.id) if mount != null else ""
 
@@ -169,9 +191,27 @@ func _process(delta: float) -> void:
 	var t := 1.0 - exp(-6.0 * delta)
 	_pitch = lerpf(_pitch, target_pitch, t)
 	_roll = lerpf(_roll, target_roll, t)
+	_update_ride_pose(delta, yaw_rate)
 	if mount == null and absf(_pitch) < 0.001 and absf(_roll) < 0.001:
 		pose = Transform3D.IDENTITY
 		return
 	var pivot := Vector3(0.0, SEAT_HEIGHT, 0.0)
 	var tilt := Basis(Vector3.RIGHT, _pitch) * Basis(Vector3.BACK, _roll)
 	pose = Transform3D(Basis.IDENTITY, pivot + Vector3.UP * bob) * Transform3D(tilt, Vector3.ZERO) * Transform3D(Basis.IDENTITY, -pivot)
+
+
+func _update_ride_pose(delta: float, yaw_rate: float) -> void:
+	ride_blend = move_toward(ride_blend, 1.0 if mount != null else 0.0, delta / 0.3)
+	if ride_pose == null:
+		return
+	ride_pose.active = ride_blend > 0.0
+	ride_pose.influence = ease(ride_blend, -1.8)
+	if mount_node != null:
+		ride_pose.mount = mount_node
+	if _wand_mesh != null:
+		_wand_mesh.visible = ride_blend < 0.5 or ride_pose.wand_grip < 0.5
+	var top_speed: float = _movement.fly_boost_speed if _movement != null else 30.0
+	var t := 1.0 - exp(-5.0 * delta)
+	ride_pose.speed = lerpf(ride_pose.speed, clampf(_velocity.length() / top_speed, 0.0, 1.0), t)
+	ride_pose.climb = lerpf(ride_pose.climb, clampf(_velocity.y / 12.0, -1.0, 1.0), t)
+	ride_pose.turn = lerpf(ride_pose.turn, clampf(-yaw_rate / 2.5, -1.0, 1.0), t)

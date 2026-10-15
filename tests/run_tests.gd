@@ -91,12 +91,13 @@ func _wait(seconds: float) -> void:
 		await get_tree().physics_frame
 
 
-func _spawn_player(at: Vector3) -> Player:
+func _spawn_player(at: Vector3, character_id: String = "") -> Player:
 	if player != null:
 		player.queue_free()
 		await get_tree().process_frame
 	player = PLAYER_SCENE.instantiate()
 	player.is_local = true
+	player.character_id = character_id
 	player.display_name = "Tester"
 	add_child(player)
 	player.global_position = at
@@ -1015,7 +1016,8 @@ func _test_flying() -> void:
 	t.check(not TORCH.is_mount(), "the torch is not a mount")
 	var fixtures: Array = []
 	fixtures.append(TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(200, 1, 200)))
-	await _spawn_player(Vector3(0, 0.1, 0))
+	# A rigged character, for the riding pose.
+	await _spawn_player(Vector3(0, 0.1, 0), "apprentice_m")
 	player.inventory.load_state(ItemRegistry.default_state())
 	var movement := player.movement
 
@@ -1073,6 +1075,23 @@ func _test_flying() -> void:
 	var boosted := Vector2(player.global_position.x - start.x, player.global_position.z - start.z).length()
 	t.check(boosted > cruise * 1.6, "Shift boosts (%.1f m/s)" % boosted)
 	t.check(player.broom_rider.pose != Transform3D.IDENTITY, "the rider leans into fast flight")
+	var ride := player.broom_rider.ride_pose
+	t.check(ride != null and ride.get_parent() is Skeleton3D and ride.active and ride.influence > 0.99, "the riding pose is blended in on the skeleton")
+	var skeleton := ride.get_skeleton()
+	# Bone poses carry the modification right after the modifier ran.
+	await ride.modification_processed
+	var hand := skeleton.global_transform * skeleton.get_bone_global_pose(skeleton.find_bone("mixamorig_LeftHand")).origin
+	var broom_local := player.broom_rider.mount_node.global_transform.affine_inverse() * hand
+	# The wrist joint, so a hand's width above the shaft.
+	t.check(broom_local.z < -0.3 and Vector2(broom_local.x, broom_local.y).length() < 0.25, "the rider grips the shaft ahead of the seat (%s)" % broom_local)
+	var hips := skeleton.global_transform * skeleton.get_bone_global_pose(skeleton.find_bone("mixamorig_Hips")).origin
+	t.check(absf((player.broom_rider.mount_node.global_transform.affine_inverse() * hips).y - ride.seat_clearance) < 0.02, "the rider sits on the shaft")
+	t.check(ride.speed > 0.6, "boosting drives the tucked pose (%.2f)" % ride.speed)
+	var wand := player.visual.find_child("WandMesh", true, false) as Node3D
+	t.check(wand == null or not wand.visible, "the wand is put away while both hands hold the broom")
+	player.broom_rider.on_cast()
+	await _wait(0.3)
+	t.check(ride.wand_grip < 0.5 and (wand == null or wand.visible), "casting frees the wand hand")
 	movement.set_external_move(Vector3.ZERO)
 	await _wait(3.0)
 	t.check(player.velocity.length() < 1.0, "slows to a hover when released")
@@ -1106,6 +1125,8 @@ func _test_flying() -> void:
 	# Dismount in the air: gravity takes over, the landing is soft.
 	player.broom_rider.toggle()
 	t.check(not movement.is_flying and player.broom_rider.mount_node == null, "B again dismounts and hides the broom")
+	await _wait(0.5)
+	t.check(not ride.active and ride.influence < 0.01, "landing blends the riding pose back out")
 	await _wait(3.0)
 	t.check(movement.is_grounded and player.health.current == player.health.max_health, "falls back to the ground unharmed")
 
