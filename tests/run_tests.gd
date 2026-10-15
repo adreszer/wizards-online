@@ -33,6 +33,8 @@ const GUARDIAN_SCENE := preload("res://characters/enemies/crystal_guardian.tscn"
 const SECRET_WALL_SCENE := preload("res://objects/puzzles/secret_wall.tscn")
 const STATUE_SCENE := preload("res://objects/puzzles/rotating_statue.tscn")
 const DOOR_SCENE := preload("res://objects/puzzles/magic_door.tscn")
+const MINIMAP_SCENE := preload("res://ui/map/minimap.tscn")
+const MAP_PANEL_SCENE := preload("res://ui/map/map_panel.tscn")
 const TestHelpers := preload("res://tests/test_helpers.gd")
 
 var t := TestHelpers.new()
@@ -70,6 +72,7 @@ func _run() -> void:
 	await _test_level_wiring()
 	await _test_castle()
 	await _test_grounds()
+	await _test_map()
 	await _test_setpieces()
 	_test_localization()
 	await _test_characters()
@@ -1551,6 +1554,101 @@ func _test_grounds() -> void:
 	player.global_position = Vector3(-420.0, terrain.water_level - 4.0, 20.0)
 	await _wait(0.3)
 	t.check(player.global_position.distance_to(shore) < 6.0, "deep water carries the player back to the shore (at %s)" % str(player.global_position))
+	castle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_map() -> void:
+	t.section("Map")
+	# The map is read from whatever level it is given: a two-room fixture maps to two rooms.
+	var fixture := Node3D.new()
+	add_child(fixture)
+	var fixture_zones := Node3D.new()
+	fixture_zones.name = "Zones"
+	fixture.add_child(fixture_zones)
+	for spec: Array in [[&"hall_a", "hall", Vector3(0, 4.5, 0), Vector3(16, 9, 16)], [&"nook", "secret", Vector3(12, 13.5, 0), Vector3(8, 9, 8)]]:
+		var z := _make_zone(spec[0], spec[1], spec[2], spec[3])
+		z.reparent(fixture_zones)
+	var small := CastleMap.new()
+	add_child(small)
+	small.build(fixture)
+	t.check(small.rooms.size() == 2 and small.min_storey == 0 and small.max_storey == 1 and small.terrain == null,
+		"the map is built from the level's zones (%d rooms, storeys %d..%d)" % [small.rooms.size(), small.min_storey, small.max_storey])
+	t.check(small.rooms_on(0).size() == 1 and small.rooms_on(1).is_empty(), "an unfound secret room is not on the map")
+	small.reveal("nook")
+	t.check(small.rooms_on(1).size() == 1 and small.room_at(Vector3(12, 9.2, 0)).get("id", "") == "nook", "a found secret room appears on its storey")
+	small.queue_free()
+	fixture.queue_free()
+
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var castle_map := CastleMap.new()
+	add_child(castle_map)
+	castle_map.build(castle)
+	var non_grounds := 0
+	var secret_id := ""
+	for z: AreaZone in castle.get_zones():
+		if z.kind != "grounds":
+			non_grounds += 1
+		if z.kind == "secret" and secret_id.is_empty():
+			secret_id = str(z.area_id)
+	t.check(castle_map.rooms.size() == non_grounds and castle_map.grounds.size() > 3, "every castle zone is a map room (%d), named grounds places are labels (%d)" % [castle_map.rooms.size(), castle_map.grounds.size()])
+	t.check(castle_map.min_storey <= -1 and castle_map.max_storey >= 3, "the map spans the dungeons to the towers (%d..%d)" % [castle_map.min_storey, castle_map.max_storey])
+	t.check(castle_map.stairs.size() > 5 and not castle_map.stairs_on(0).is_empty(), "stairs are on the map (%d)" % castle_map.stairs.size())
+	var hall := castle_map.room_at(Vector3(0, 0.1, 36))
+	t.check(hall.get("id", "") == "entrance_hall" and castle_map.view_storey_at(Vector3(0, 0.1, 36)) == 0, "the room under a position is found (%s)" % hall.get("id", "none"))
+	t.check(castle_map.view_storey_at(Vector3(0, 9.1, 36)) == 1, "standing on the first floor shows the first floor")
+	var shown_secrets := castle_map.rooms.filter(func(r: Dictionary) -> bool: return r["secret"] and castle_map.is_known(r))
+	t.check(not secret_id.is_empty() and shown_secrets.is_empty(), "secret areas start hidden")
+	NetworkManager.profile_received.emit({"discoveries": ["map:" + secret_id, "founders_tale"]})
+	t.check(castle_map.is_revealed(secret_id), "a \"map:<area>\" discovery from the server reveals that secret area")
+	# The relief: the height image carries the terrain's quantised samples.
+	var terrain := castle_map.terrain
+	var heights := terrain.height_image() if terrain != null else null
+	var decoded_ok := heights != null and heights.get_width() == terrain.size_x
+	if decoded_ok:
+		for probe: Vector2i in [Vector2i(10, 20), Vector2i(500, 600), Vector2i(1000, 3)]:
+			var c := heights.get_pixelv(probe)
+			var h := terrain.h_min + (roundi(c.r8) + roundi(c.g8) * 256) * terrain.h_scale
+			decoded_ok = decoded_ok and absf(h - terrain.sample(probe.x, probe.y)) < 0.01
+	t.check(decoded_ok, "the map's relief image decodes to the terrain's heights")
+
+	# Minimap and full map.
+	await _spawn_player(Vector3(0, 0.2, 36))
+	var minimap: Minimap = MINIMAP_SCENE.instantiate()
+	add_child(minimap)
+	minimap.set_map(castle_map)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var minimap_view: MapView = minimap.get_node("%View")
+	t.check(minimap.get_node("%Root").visible and minimap_view.storey == 0 and minimap_view.centre.distance_to(Vector2(0, 36)) < 2.0,
+		"the minimap follows the player (centre %s, storey %d)" % [str(minimap_view.centre), minimap_view.storey])
+	t.check((minimap.get_node("%PlaceLabel") as Label).text.begins_with(tr("AREA_ENTRANCE_HALL")), "the minimap names the place (%s)" % (minimap.get_node("%PlaceLabel") as Label).text)
+	var panel: MapPanel = MAP_PANEL_SCENE.instantiate()
+	add_child(panel)
+	panel.set_map(castle_map)
+	var open_ev := InputEventAction.new()
+	open_ev.action = &"map"
+	open_ev.pressed = true
+	panel._unhandled_input(open_ev)
+	t.check(panel.is_open and GameSession.ui_input_captured, "M opens the map and it takes the keyboard")
+	var view: MapView = panel.get_node("%View")
+	for i in range(12):
+		panel.change_storey(1)
+	t.check(view.storey == castle_map.max_storey, "the floor buttons stop at the top storey (%d)" % view.storey)
+	panel.centre_on_player()
+	var before := view.screen_to_world(Vector2(100, 80))
+	panel.zoom_at(2.0, Vector2(100, 80))
+	t.check(view.screen_to_world(Vector2(100, 80)).distance_to(before) < 0.01, "zooming keeps the point under the cursor")
+	await get_tree().process_frame
+	panel._input(open_ev)
+	t.check(not panel.is_open and not GameSession.ui_input_captured, "M closes the map again")
+	panel.queue_free()
+	minimap.queue_free()
+	castle_map.queue_free()
+	player.queue_free()
+	player = null
 	castle.queue_free()
 	await get_tree().process_frame
 

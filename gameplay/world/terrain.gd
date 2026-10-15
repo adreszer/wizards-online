@@ -113,6 +113,19 @@ func height_at(x: float, z: float) -> float:
 	return lerpf(a, b, tz)
 
 
+## The quantised height grid as an RGBA8 image (R low byte, G high byte of each
+## sample; metres = h_min + q * h_scale), for the map's relief. Null without data.
+func height_image() -> Image:
+	if _q.size() != size_x * size_z or _q.is_empty():
+		return null
+	return Image.create_from_data(size_x, size_z, false, Image.FORMAT_RGBA8, _q.to_byte_array())
+
+
+## XZ extent covered by the height grid.
+func extent() -> Rect2:
+	return Rect2(origin, Vector2(size_x - 1, size_z - 1) * spacing)
+
+
 func is_hole(ix: int, iz: int) -> bool:
 	if _holes.is_empty() or ix < 0 or iz < 0 or ix >= size_x - 1 or iz >= size_z - 1:
 		return false

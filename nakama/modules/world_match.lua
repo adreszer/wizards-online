@@ -483,6 +483,12 @@ function M.match_loop(context, dispatcher, tick, state, messages)
             lesson.attendance[message.sender.user_id] = state.names[sid] or ""
           end
           feed_mysteries(dispatcher, state, sid, { event = "enter", area = area })
+          -- A secret area, once walked into, stays on this character's map.
+          local profile = state.profiles[sid]
+          if AREAS[area].kind == "secret" and profile and Profile.discover(profile, "map:" .. area) then
+            Profile.write(message.sender.user_id, profile)
+            send_profile(dispatcher, state, sid)
+          end
         end
       end
     elseif message.op_code == OP_SORT then

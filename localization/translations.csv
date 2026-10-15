@@ -8,7 +8,7 @@ MENU_PORT,Nakama port,Port Nakama
 MENU_PLAY_OFFLINE,Play OFFLINE,Graj OFFLINE
 MENU_PLAY_ONLINE,Play ONLINE,Graj ONLINE
 MENU_QUIT,Quit,Wyjdź
-MENU_CONTROLS,WASD move · Shift run · Space jump · Mouse look · Wheel zoom · LMB cast · E interact · Tab satchel · B broom · Enter chat · ` free cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · Mysz rozglądanie · Kółko zoom · LPM czar · E interakcja · Tab sakwa · B miotła · Enter czat · ` uwolnij kursor · F3 debug · Esc pauza
+MENU_CONTROLS,WASD move · Shift run · Space jump · Mouse look · Wheel zoom · LMB cast · E interact · Tab satchel · M map · B broom · Enter chat · ` free cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · Mysz rozglądanie · Kółko zoom · LPM czar · E interakcja · Tab sakwa · M mapa · B miotła · Enter czat · ` uwolnij kursor · F3 debug · Esc pauza
 MENU_CONNECTING,Connecting…,Łączenie…
 MENU_CONNECT_FAILED_HINT,"Start the backend with `docker compose up -d`, or play OFFLINE.",Uruchom backend poleceniem `docker compose up -d` albo graj OFFLINE.
 PAUSE_TITLE,Paused,Pauza
@@ -353,3 +353,11 @@ CHEAT_GIVEN,Added to the satchel: %s.,Dodano do sakwy: %s.
 CHEAT_BROOM_HINT,Press B to fly.,"Naciśnij B, aby latać."
 CHEAT_NOT_ALLOWED,Cheats are switched off on this server.,Kody są wyłączone na tym serwerze.
 CHEAT_FAILED,The server refused (%s).,Serwer odmówił (%s).
+MAP_TITLE,Map of the Castle,Mapa zamku
+MAP_NORTH,N,N
+MAP_FLOOR_GROUND,Ground floor,Parter
+MAP_FLOOR_N,Floor %d,Piętro %d
+MAP_FLOOR_DUNGEONS,Dungeons (level %d),Lochy (poziom %d)
+MAP_OUTDOORS,Outdoors,Na zewnątrz
+MAP_FIND_ME,Find me,Gdzie jestem
+MAP_HINT,Drag to move · wheel to zoom · PgUp/PgDn change floor · M or Esc closes,Przeciągnij aby przesunąć · kółko przybliża · PgUp/PgDn zmienia piętro · M lub Esc zamyka

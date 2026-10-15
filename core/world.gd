@@ -7,11 +7,14 @@ signal return_to_menu_requested()
 @onready var _spawner: PlayerSpawner = $PlayerSpawner
 @onready var _level: Node = $Level
 @onready var _pause_menu: CanvasLayer = $PauseMenu
+@onready var _minimap: Minimap = $Minimap
+@onready var _map_panel: MapPanel = $MapPanel
 
 
 func _ready() -> void:
 	_pause_menu.return_to_menu_requested.connect(return_to_menu_requested.emit)
 	_spawner.spawn_point = _level.get_node("StartPoint")
+	_build_map()
 	var player: Node = _spawner.spawn_local(GameSession.display_name, NetworkManager.local_user_id)
 	GameEvents.level_completed.connect(_on_level_completed)
 	_show_satchel_hint(player)
@@ -23,6 +26,17 @@ func _ready() -> void:
 				NetworkManager.send_study_tome(String(definition.id))
 			else:
 				player.spell_caster.learn_spell(definition)
+
+
+## The map is read from the level as it stands, so a regenerated castle maps itself.
+func _build_map() -> void:
+	var castle_map := CastleMap.new()
+	castle_map.name = "CastleMap"
+	add_child(castle_map)
+	castle_map.build(_level)
+	_minimap.set_map(castle_map)
+	_map_panel.set_map(castle_map)
+	_map_panel.toggled.connect(func(open: bool) -> void: _minimap.visible = not open)
 
 
 ## First-time nudge toward the torch (the server inventory may arrive a moment
