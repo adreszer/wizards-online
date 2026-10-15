@@ -221,7 +221,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Questions to students, timetables
 - [x] Sorting into houses: the Choosing Stone in the great hall opens a four-question ceremony; the server tallies (`OP_SORT`), balances ties by house population, stores the house once, updates nameplates/HUD/roster; offline runs the same rule locally; houses Drakoryn / Grypheon / Phoenara / Hipporys with emblem animals and colours
 - [x] House-gated common rooms: `HouseDoor` on every doorway into a house area (dungeon and kitchen-side common rooms, the two tower landings that now own the stairs up), members open by interacting, others refused; server drops area reports for another house's area
-- [ ] House crests (dragon, griffin, phoenix, hippocampus) on doors and banners; a visible ceremony (others watching in the great hall), house-cup tally
+- [x] House columns (`HouseTally`, placement kind `house_tally`) at the head of the great hall: four glass columns that fill with light in house colours from the server tally (`house_totals_changed`), against whole hundreds above the leader; rank numerals I–IV above (ties share a rank, the leader glows brightest), house name and points on the plinth, a spark burst up the column on a gain and down it on a loss; empty and unranked offline. `tools/capture_model.tscn -- --house-totals=a,b,c,d` previews a tally
+- [ ] House crests (dragon, griffin, phoenix, hippocampus) on doors and banners; a visible ceremony (others watching in the great hall); house cup at term end
 - [ ] Server-side position sanity for area reports (today the area id is client-reported, validated only against the map)
 - [ ] In-game admin UI for `admin_set_profile` (today: script/console)
 

@@ -29,6 +29,7 @@ const PROFESSOR_PANEL_SCENE := preload("res://ui/school/professor_panel.tscn")
 const SORTING_PANEL_SCENE := preload("res://ui/school/sorting_panel.tscn")
 const HOUSE_DOOR_SCENE := preload("res://objects/school/house_door.tscn")
 const SORTING_STONE_SCENE := preload("res://objects/school/sorting_stone.tscn")
+const HOUSE_TALLY_SCENE := preload("res://objects/school/house_tally.tscn")
 const GUARDIAN_SCENE := preload("res://characters/enemies/crystal_guardian.tscn")
 const SECRET_WALL_SCENE := preload("res://objects/puzzles/secret_wall.tscn")
 const STATUE_SCENE := preload("res://objects/puzzles/rotating_statue.tscn")
@@ -900,6 +901,24 @@ func _test_houses() -> void:
 	t.check(not panel.is_open, "the stone does not sort a player twice")
 	panel.queue_free()
 	stone.queue_free()
+
+	# The house columns rank the tally and fill against whole hundreds above the leader.
+	var tally: HouseTally = HOUSE_TALLY_SCENE.instantiate()
+	add_child(tally)
+	tally.global_position = Vector3(-4, 0, -4)
+	await get_tree().process_frame
+	t.check(tally.totals.is_empty() and tally.ranks == PackedInt32Array([0, 0, 0, 0]) and tally.fill_target(1) == 0.0, "offline the columns stand empty and unranked")
+	t.check(HouseTally.rank_of(PackedInt32Array([30, 120, 30, -5])) == PackedInt32Array([2, 1, 2, 4]), "ranks follow the points, ties share a rank")
+	tally.set_totals(PackedInt32Array([30, 120, 30, -5]))
+	t.check(tally.ranks == PackedInt32Array([2, 1, 2, 4]) and is_equal_approx(tally.fill_target(2), 0.6) and is_equal_approx(tally.fill_target(1), 0.15) and tally.fill_target(4) == 0.0, "the leader fills against 200, a negative house stays empty")
+	t.check((tally.get_node("Column2/Rank") as Label3D).text == "I" and (tally.get_node("Column4/Rank") as Label3D).text == "IV", "rank numerals stand above the columns")
+	t.check((tally.get_node("Column2/Points") as Label3D).text == "%s\n%s" % [tr("HOUSE_2_NAME"), tr("TALLY_POINTS") % 120], "the plinth names each house and its points")
+	t.check(tally.burst_count == 0, "the first tally does not burst")
+	tally.set_totals(PackedInt32Array([45, 120, 30, -5]))
+	t.check(tally.burst_count == 1 and tally.ranks[0] == 2 and tally.ranks[2] == 3, "a change bursts on that column and re-ranks")
+	await _wait(0.3)
+	t.check(tally.get_node("Column1").get_child(4).scale.y > 0.01, "the column rises toward its fill")
+	tally.queue_free()
 	await _clear([floor_body])
 
 
@@ -1304,7 +1323,7 @@ func _test_castle() -> void:
 	if placements is Dictionary:
 		for area: String in placements:
 			for entry: Dictionary in placements[area]:
-				if entry["kind"] in ["checkpoint", "crystal_guardian"]:
+				if entry["kind"] in ["checkpoint", "crystal_guardian", "house_tally"]:
 					continue
 				if not object_ids.has(area + "/" + str(entry["id"])):
 					missing_placed.append(area + "/" + str(entry["id"]))
@@ -1385,6 +1404,9 @@ func _test_castle() -> void:
 			gate_houses[door.house] = true
 	t.check(gate_houses.size() == 4, "every house has a gated door (%s)" % str(gate_houses.keys()))
 	t.check(get_tree().get_nodes_in_group("world_objects").any(func(n: Node) -> bool: return n is SortingStone), "the Choosing Stone stands in the castle")
+	var tallies := castle.get_node("Props").get_children().filter(func(n: Node) -> bool: return n is HouseTally)
+	var tally_at: Vector3 = (tallies[0] as Node3D).position if tallies.size() == 1 else Vector3.INF
+	t.check(tally_at.x > 12 and tally_at.x < 44 and tally_at.z > 8 and tally_at.z < 22, "the house columns stand at the head of the great hall (%s)" % str(tally_at))
 	var guardians := 0
 	for enemy in castle.get_node("Enemies").get_children():
 		if enemy is Enemy and (enemy as Enemy).global_position.y < -5.0:

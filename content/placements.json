@@ -1,6 +1,7 @@
 {
   "great_hall": [
     {"id": "sorting_stone", "kind": "sorting_stone", "wall": "n", "along": 0.5, "inset": 5},
+    {"id": "house_tally", "kind": "house_tally", "wall": "n", "along": 0.78, "inset": 2.4},
     {"id": "plaque_sorting_stone", "kind": "plaque", "text": "PLAQUE_SORTING_STONE", "wall": "n", "along": 0.3},
     {"id": "plaque_great_hall", "kind": "plaque", "text": "PLAQUE_GREAT_HALL", "wall": "n", "along": 0.5}
   ],

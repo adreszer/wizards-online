@@ -6,7 +6,8 @@ extends Node
 ## With --eye=x,y,z --target=x,y,z a full scene (.tscn, no extra floor/lights) is
 ## rendered once from that viewpoint instead, e.g. to look into a castle room;
 ## --open-doors swings every CastleDoor and HouseDoor in it open first; --frames=N waits N
-## frames after placing the camera (streamed terrain detail needs a few dozen).
+## frames after placing the camera (streamed terrain detail needs a few dozen);
+## --house-totals=a,b,c,d shows that tally on every HouseTally in it.
 
 const FLOOR := preload("res://objects/environment/modular/floor_tile.tscn")
 
@@ -27,6 +28,7 @@ var _eye := Vector3.INF
 var _double_sided := false
 var _target := Vector3.INF
 var _settle_frames := 20
+var _house_totals := PackedInt32Array()
 
 
 func _ready() -> void:
@@ -45,6 +47,9 @@ func _ready() -> void:
 			_eye = _vec(arg.trim_prefix("--eye="))
 		elif arg.begins_with("--frames="):
 			_settle_frames = int(arg.trim_prefix("--frames="))
+		elif arg.begins_with("--house-totals="):
+			for part in arg.trim_prefix("--house-totals=").split(","):
+				_house_totals.append(int(part))
 		elif arg.begins_with("--target="):
 			_target = _vec(arg.trim_prefix("--target="))
 	if _scene.is_empty():
@@ -79,6 +84,10 @@ func _run() -> void:
 					(node as HouseDoor).open_seconds = 60.0
 					(node as HouseDoor).open()
 			await _frames(90)
+		if not _house_totals.is_empty():
+			for node in scene_root.find_children("*", "HouseTally", true, false):
+				(node as HouseTally).set_totals(_house_totals)
+			await _frames(240)
 		var cam := Camera3D.new()
 		cam.fov = 60.0
 		cam.near = 0.05

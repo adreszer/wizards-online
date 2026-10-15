@@ -373,3 +373,5 @@ TIME_DUSK,dusk,zmierzch
 HUD_CLOCK,%s · %s,%s · %s
 NOTIFY_DAWN,Dawn breaks over the castle.,Nad zamkiem wstaje świt.
 NOTIFY_NIGHTFALL,Night falls over the castle.,Nad zamkiem zapada noc.
+TALLY_TITLE,House Columns,Kolumny Domów
+TALLY_POINTS,%d pts,%d pkt
