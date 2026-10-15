@@ -233,7 +233,13 @@ def foundations(plan, terrain, data):
         if any(built(u) and u.top_storey < 0 and u.x0 < r.x1 + 0.4 and r.x0 - 0.4 < u.x1 and u.z0 < r.z1 + 0.4 and r.z0 - 0.4 < u.z1
                for u in plan.rooms.values()):
             bottom = r.y - 0.98     # a dungeon below: stay within the floor slab
-        data["foundations"].append([r.x0 - 0.4, r.x1 + 0.4, r.z0 - 0.4, r.z1 + 0.4, bottom, r.y - 0.03])
+        # A rim under the walls (0.4 m outside, 0.1 m inside): it closes the ground line and
+        # never covers a stair hole in the floor.
+        top = r.y - 0.03
+        o, i = 0.4, 0.1
+        for rect in ((r.x0 - o, r.x1 + o, r.z0 - o, r.z0 + i), (r.x0 - o, r.x1 + o, r.z1 - i, r.z1 + o),
+                     (r.x0 - o, r.x0 + i, r.z0 + i, r.z1 - i), (r.x1 - i, r.x1 + o, r.z0 + i, r.z1 - i)):
+            data["foundations"].append([*rect, bottom, top])
 
 
 def covers(plan, terrain, data):
