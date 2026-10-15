@@ -7137,222 +7137,6 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 [node name="Bench_class_glyphs_9" parent="Furniture" instance=ExtResource("44")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 0.000, -29.000)
 
-[node name="Lectern_class_numeromancy" parent="Furniture" instance=ExtResource("39")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -41.000, 9.000, 16.000)
-
-[node name="SlateBoard_class_numeromancy" parent="Furniture" instance=ExtResource("40")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -42.900, 9.000, 16.000)
-
-[node name="ProfessorDesk_class_numeromancy" parent="Furniture" instance=ExtResource("41")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -42.400, 9.000, 19.500)
-
-[node name="WallBoard_class_numeromancy" parent="Furniture" instance=ExtResource("42")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -43.825, 11.000, 14.000)
-
-[node name="Desk_class_numeromancy" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 13.000)
-
-[node name="Bench_class_numeromancy" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 13.000)
-
-[node name="Desk_class_numeromancy_2" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 16.000)
-
-[node name="Bench_class_numeromancy_2" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 16.000)
-
-[node name="Desk_class_numeromancy_3" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 19.000)
-
-[node name="Bench_class_numeromancy_3" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 19.000)
-
-[node name="Desk_class_numeromancy_4" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 13.000)
-
-[node name="Bench_class_numeromancy_4" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 13.000)
-
-[node name="Desk_class_numeromancy_5" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 16.000)
-
-[node name="Bench_class_numeromancy_5" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 16.000)
-
-[node name="Desk_class_numeromancy_6" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 19.000)
-
-[node name="Bench_class_numeromancy_6" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 19.000)
-
-[node name="Desk_class_numeromancy_7" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 13.000)
-
-[node name="Bench_class_numeromancy_7" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 13.000)
-
-[node name="Desk_class_numeromancy_8" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 16.000)
-
-[node name="Bench_class_numeromancy_8" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 16.000)
-
-[node name="Desk_class_numeromancy_9" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 19.000)
-
-[node name="Bench_class_numeromancy_9" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 19.000)
-
-[node name="Lectern_class_warding" parent="Furniture" instance=ExtResource("39")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -41.000, 9.000, 0.000)
-
-[node name="SlateBoard_class_warding" parent="Furniture" instance=ExtResource("40")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -42.900, 9.000, 0.000)
-
-[node name="ProfessorDesk_class_warding" parent="Furniture" instance=ExtResource("41")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -42.400, 9.000, 3.500)
-
-[node name="WallBoard_class_warding" parent="Furniture" instance=ExtResource("42")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -43.825, 11.000, -2.000)
-
-[node name="Desk_class_warding" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, -3.000)
-
-[node name="Bench_class_warding" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, -3.000)
-
-[node name="Desk_class_warding_2" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 0.000)
-
-[node name="Bench_class_warding_2" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 0.000)
-
-[node name="Desk_class_warding_3" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 3.000)
-
-[node name="Bench_class_warding_3" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 3.000)
-
-[node name="Desk_class_warding_4" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, -3.000)
-
-[node name="Bench_class_warding_4" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, -3.000)
-
-[node name="Desk_class_warding_5" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 0.000)
-
-[node name="Bench_class_warding_5" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 0.000)
-
-[node name="Desk_class_warding_6" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 3.000)
-
-[node name="Bench_class_warding_6" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 3.000)
-
-[node name="Desk_class_warding_7" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, -3.000)
-
-[node name="Bench_class_warding_7" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, -3.000)
-
-[node name="Desk_class_warding_8" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 0.000)
-
-[node name="Bench_class_warding_8" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 0.000)
-
-[node name="Desk_class_warding_9" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 3.000)
-
-[node name="Bench_class_warding_9" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 3.000)
-
-[node name="Lectern_class_elixirs" parent="Furniture" instance=ExtResource("39")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -41.000, -9.000, 12.000)
-
-[node name="SlateBoard_class_elixirs" parent="Furniture" instance=ExtResource("40")]
-transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -42.900, -9.000, 12.000)
-
-[node name="ProfessorDesk_class_elixirs" parent="Furniture" instance=ExtResource("41")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -42.400, -9.000, 15.500)
-
-[node name="WallBoard_class_elixirs" parent="Furniture" instance=ExtResource("42")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -43.825, -7.000, 10.000)
-
-[node name="Desk_class_elixirs" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, -9.000, 7.500)
-
-[node name="Bench_class_elixirs" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, -9.000, 7.500)
-
-[node name="Desk_class_elixirs_2" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, -9.000, 10.500)
-
-[node name="Bench_class_elixirs_2" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, -9.000, 10.500)
-
-[node name="Desk_class_elixirs_3" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, -9.000, 13.500)
-
-[node name="Bench_class_elixirs_3" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, -9.000, 13.500)
-
-[node name="Desk_class_elixirs_4" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, -9.000, 16.500)
-
-[node name="Bench_class_elixirs_4" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, -9.000, 16.500)
-
-[node name="Desk_class_elixirs_5" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, -9.000, 7.500)
-
-[node name="Bench_class_elixirs_5" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, -9.000, 7.500)
-
-[node name="Desk_class_elixirs_6" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, -9.000, 10.500)
-
-[node name="Bench_class_elixirs_6" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, -9.000, 10.500)
-
-[node name="Desk_class_elixirs_7" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, -9.000, 13.500)
-
-[node name="Bench_class_elixirs_7" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, -9.000, 13.500)
-
-[node name="Desk_class_elixirs_8" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, -9.000, 16.500)
-
-[node name="Bench_class_elixirs_8" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, -9.000, 16.500)
-
-[node name="Desk_class_elixirs_9" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, -9.000, 7.500)
-
-[node name="Bench_class_elixirs_9" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, -9.000, 7.500)
-
-[node name="Desk_class_elixirs_10" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, -9.000, 10.500)
-
-[node name="Bench_class_elixirs_10" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, -9.000, 10.500)
-
-[node name="Desk_class_elixirs_11" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, -9.000, 13.500)
-
-[node name="Bench_class_elixirs_11" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, -9.000, 13.500)
-
-[node name="Desk_class_elixirs_12" parent="Furniture" instance=ExtResource("43")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, -9.000, 16.500)
-
-[node name="Bench_class_elixirs_12" parent="Furniture" instance=ExtResource("44")]
-transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, -9.000, 16.500)
-
 [node name="Lectern_class_herblore" parent="Furniture" instance=ExtResource("39")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 41.000, 0.000, 0.000)
 
@@ -7551,6 +7335,138 @@ transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 
 [node name="Bench_class_beastlore_9" parent="Furniture" instance=ExtResource("44")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 33.150, 0.000, -29.000)
 
+[node name="Lectern_class_numeromancy" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -41.000, 9.000, 16.000)
+
+[node name="SlateBoard_class_numeromancy" parent="Furniture" instance=ExtResource("40")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -42.900, 9.000, 16.000)
+
+[node name="ProfessorDesk_class_numeromancy" parent="Furniture" instance=ExtResource("41")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -42.400, 9.000, 19.500)
+
+[node name="WallBoard_class_numeromancy" parent="Furniture" instance=ExtResource("42")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -43.825, 11.000, 14.000)
+
+[node name="Desk_class_numeromancy" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 13.000)
+
+[node name="Bench_class_numeromancy" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 13.000)
+
+[node name="Desk_class_numeromancy_2" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 16.000)
+
+[node name="Bench_class_numeromancy_2" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 16.000)
+
+[node name="Desk_class_numeromancy_3" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 19.000)
+
+[node name="Bench_class_numeromancy_3" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 19.000)
+
+[node name="Desk_class_numeromancy_4" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 13.000)
+
+[node name="Bench_class_numeromancy_4" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 13.000)
+
+[node name="Desk_class_numeromancy_5" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 16.000)
+
+[node name="Bench_class_numeromancy_5" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 16.000)
+
+[node name="Desk_class_numeromancy_6" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 19.000)
+
+[node name="Bench_class_numeromancy_6" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 19.000)
+
+[node name="Desk_class_numeromancy_7" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 13.000)
+
+[node name="Bench_class_numeromancy_7" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 13.000)
+
+[node name="Desk_class_numeromancy_8" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 16.000)
+
+[node name="Bench_class_numeromancy_8" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 16.000)
+
+[node name="Desk_class_numeromancy_9" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 19.000)
+
+[node name="Bench_class_numeromancy_9" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 19.000)
+
+[node name="Lectern_class_warding" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -41.000, 9.000, 0.000)
+
+[node name="SlateBoard_class_warding" parent="Furniture" instance=ExtResource("40")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -42.900, 9.000, 0.000)
+
+[node name="ProfessorDesk_class_warding" parent="Furniture" instance=ExtResource("41")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -42.400, 9.000, 3.500)
+
+[node name="WallBoard_class_warding" parent="Furniture" instance=ExtResource("42")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -43.825, 11.000, -2.000)
+
+[node name="Desk_class_warding" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, -3.000)
+
+[node name="Bench_class_warding" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, -3.000)
+
+[node name="Desk_class_warding_2" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 0.000)
+
+[node name="Bench_class_warding_2" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 0.000)
+
+[node name="Desk_class_warding_3" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, 9.000, 3.000)
+
+[node name="Bench_class_warding_3" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, 9.000, 3.000)
+
+[node name="Desk_class_warding_4" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, -3.000)
+
+[node name="Bench_class_warding_4" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, -3.000)
+
+[node name="Desk_class_warding_5" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 0.000)
+
+[node name="Bench_class_warding_5" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 0.000)
+
+[node name="Desk_class_warding_6" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, 9.000, 3.000)
+
+[node name="Bench_class_warding_6" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, 9.000, 3.000)
+
+[node name="Desk_class_warding_7" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, -3.000)
+
+[node name="Bench_class_warding_7" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, -3.000)
+
+[node name="Desk_class_warding_8" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 0.000)
+
+[node name="Bench_class_warding_8" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 0.000)
+
+[node name="Desk_class_warding_9" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, 9.000, 3.000)
+
+[node name="Bench_class_warding_9" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, 9.000, 3.000)
+
 [node name="Lectern_class_stargazing" parent="Furniture" instance=ExtResource("39")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 41.000, 9.000, 0.000)
 
@@ -7712,6 +7628,90 @@ transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 
 
 [node name="Bench_tower_sw_3_6" parent="Furniture" instance=ExtResource("44")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -44.750, 27.000, 35.000)
+
+[node name="Lectern_class_elixirs" parent="Furniture" instance=ExtResource("39")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -41.000, -9.000, 12.000)
+
+[node name="SlateBoard_class_elixirs" parent="Furniture" instance=ExtResource("40")]
+transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -42.900, -9.000, 12.000)
+
+[node name="ProfessorDesk_class_elixirs" parent="Furniture" instance=ExtResource("41")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -42.400, -9.000, 15.500)
+
+[node name="WallBoard_class_elixirs" parent="Furniture" instance=ExtResource("42")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -43.825, -7.000, 10.000)
+
+[node name="Desk_class_elixirs" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, -9.000, 7.500)
+
+[node name="Bench_class_elixirs" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, -9.000, 7.500)
+
+[node name="Desk_class_elixirs_2" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, -9.000, 10.500)
+
+[node name="Bench_class_elixirs_2" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, -9.000, 10.500)
+
+[node name="Desk_class_elixirs_3" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, -9.000, 13.500)
+
+[node name="Bench_class_elixirs_3" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, -9.000, 13.500)
+
+[node name="Desk_class_elixirs_4" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -39.000, -9.000, 16.500)
+
+[node name="Bench_class_elixirs_4" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -38.150, -9.000, 16.500)
+
+[node name="Desk_class_elixirs_5" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, -9.000, 7.500)
+
+[node name="Bench_class_elixirs_5" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, -9.000, 7.500)
+
+[node name="Desk_class_elixirs_6" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, -9.000, 10.500)
+
+[node name="Bench_class_elixirs_6" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, -9.000, 10.500)
+
+[node name="Desk_class_elixirs_7" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, -9.000, 13.500)
+
+[node name="Bench_class_elixirs_7" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, -9.000, 13.500)
+
+[node name="Desk_class_elixirs_8" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -36.500, -9.000, 16.500)
+
+[node name="Bench_class_elixirs_8" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -35.650, -9.000, 16.500)
+
+[node name="Desk_class_elixirs_9" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, -9.000, 7.500)
+
+[node name="Bench_class_elixirs_9" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, -9.000, 7.500)
+
+[node name="Desk_class_elixirs_10" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, -9.000, 10.500)
+
+[node name="Bench_class_elixirs_10" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, -9.000, 10.500)
+
+[node name="Desk_class_elixirs_11" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, -9.000, 13.500)
+
+[node name="Bench_class_elixirs_11" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, -9.000, 13.500)
+
+[node name="Desk_class_elixirs_12" parent="Furniture" instance=ExtResource("43")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -34.000, -9.000, 16.500)
+
+[node name="Bench_class_elixirs_12" parent="Furniture" instance=ExtResource("44")]
+transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -33.150, -9.000, 16.500)
 
 [node name="Shelf_library" parent="Furniture" instance=ExtResource("45")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -13.900, 0.000, -63.825)

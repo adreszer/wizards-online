@@ -23,6 +23,10 @@ fail() { echo "FAILED: $1 (log: $2)" >&2; exit 1; }
 step "import"
 "$GODOT" --headless --path . --import >"$LOGS/import.log" 2>&1 || true
 
+step "castle generator tests"
+python3 -m unittest discover -s tools -p 'test_*.py' >"$LOGS/castle_tests.log" 2>&1 || fail "castle generator tests" "$LOGS/castle_tests.log"
+(cd tools && python3 -m castle.denylist) >"$LOGS/denylist.log" 2>&1 || fail "forbidden names (B3)" "$LOGS/denylist.log"
+
 step "generate castle"
 python3 tools/generate_castle.py >"$LOGS/castle.log" 2>&1 || fail "castle generator" "$LOGS/castle.log"
 

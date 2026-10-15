@@ -269,7 +269,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 
 ### Milestones 24–32 — Generated castle and grounds at scale (design: docs/castle-generation.md)
 Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B) are validators that refuse to write the scene; ids and details in the design doc.
-- [ ] M24 Generator foundation: `tools/castle/` split, `content/castle/program.json` with every room pinned (byte-identical output), rules engine, `kit.json` role → scene, SVG preview per storey, slot-based placements, hashed name denylist
+- [x] M24 Generator foundation: `tools/castle/` split, `content/castle/program.json` with every room pinned (byte-identical output), rules engine, `kit.json` role → scene, SVG preview per storey, slot-based placements, hashed name denylist (node set verified identical to the hand-written generator's; Python tests + denylist in `tools/check.sh`)
 - [ ] M25 Stairs and circulation: rules S1–S9 / C1–C10 / A1 / A3 enforced; fix the current castle (4 m approach and arrival landings, grand staircase re-cut, `SpiralStaircase` in towers, balustrades and railings, no doors/windows behind flights); walk-every-flight test
 - [ ] M26 Grounds v1: headless terrain generator (plateau, lake, ravine, cliffs, paths between pinned landmarks, scatter, soft boundary, outdoor zones), fixed arrival causeway and lake crossing
 - [ ] M27 Exterior shell: roofs, spires, battlements, buttresses, turrets, bridges, plinth meeting the terrain, far-view HLOD with lit windows
