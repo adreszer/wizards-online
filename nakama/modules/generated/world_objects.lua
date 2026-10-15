@@ -810,6 +810,13 @@ return {
     pos = { -14, 45, -176 },
     start_open = false,
   },
+  ["clock_tower_5/fragment_clock"] = {
+    accepts = {},
+    area = "clock_tower_5",
+    areas = { "clock_tower_5" },
+    kind = "collectible",
+    pos = { -8.4, 52.8, -163.71 },
+  },
   ["cold_store/door_1"] = {
     accepts = { "unlock" },
     area = "cold_store",

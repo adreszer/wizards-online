@@ -60,6 +60,7 @@ INTERACT_STUDY_TOME,Study the tome,Przestudiuj księgę
 NOTIFY_SPELL_LEARNED,Learned %s — it sits on your hotbar (keys 1–0). Aim with the centre of the screen and press Cast (LMB).,Poznajesz czar %s — trafił na pasek czarów (klawisze 1–0). Celuj środkiem ekranu i naciśnij Czar (LPM).
 NOTIFY_SECRET_PASSAGE,A hidden passage opens!,Otwiera się ukryte przejście!
 NOTIFY_DEEP_WATER,"The water is too deep, so you scramble back to the shore.","Woda jest za głęboka, więc wracasz na brzeg."
+NOTIFY_TRICK_STEP,"A step gives way under your foot! Jump to pull free.","Stopień zapada się pod stopą! Skocz, żeby się uwolnić."
 NOTIFY_CHECKPOINT,Checkpoint reached,Punkt kontrolny
 NOTIFY_STATUES_ALIGNED,The statues' gaze aligns. Something unlocked.,Spojrzenia posągów się zbiegają. Coś się odblokowało.
 NOTIFY_LEVER_STUCK,The lever will not budge while the statues look away.,"Dźwignia ani drgnie, dopóki posągi patrzą w inną stronę."

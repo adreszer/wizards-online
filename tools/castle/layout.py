@@ -412,10 +412,13 @@ class Layout:
             rid = f"{wid}_{sid(s)}"
             kind, house = kinds.get(str(s), ("tower", w.get("house", 0)))
             top = s == s1 and w.get("open_top")
-            P.room(rid, *map(int, rect), storey=s, kind="outdoor" if top else kind, house=house, tower=wid, wing=wid,
-                   ceiling=not top, rows=1 if top else 2, pillars=not top, torches=not top,
-                   tile="ornate" if kind in ("common_room", "classroom") else "plain",
-                   **({"battlements": True} if top else {}))
+            kw = dict(storey=s, kind="outdoor" if top else kind, house=house, tower=wid, wing=wid,
+                      ceiling=not top, rows=1 if top else 2, pillars=not top, torches=not top,
+                      tile="ornate" if kind in ("common_room", "classroom") else "plain")
+            if top:
+                kw["battlements"] = True
+            kw.update(w.get("features", {}).get(str(s), {}))
+            P.room(rid, *map(int, rect), **kw)
             sn = STOREY_NAMES[s]
             label = w.get("labels", {}).get(str(s))
             if label:

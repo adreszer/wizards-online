@@ -65,6 +65,7 @@ func _run() -> void:
 	await _test_level_wiring()
 	await _test_castle()
 	await _test_grounds()
+	await _test_setpieces()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -1321,6 +1322,76 @@ func _test_grounds() -> void:
 	player.global_position = Vector3(-420.0, terrain.water_level - 4.0, 20.0)
 	await _wait(0.3)
 	t.check(player.global_position.distance_to(shore) < 6.0, "deep water carries the player back to the shore (at %s)" % str(player.global_position))
+	castle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_setpieces() -> void:
+	t.section("Set pieces")
+	# The shared clock prefers the least-delayed sample.
+	var clock := ServerClock.new()
+	clock.add_sample((ServerClock.local_seconds() + 100.0) * 1000.0, 400)
+	clock.add_sample((ServerClock.local_seconds() + 100.0) * 1000.0, 20)
+	t.check(absf(clock.now() - (ServerClock.local_seconds() + 100.01)) < 0.05, "the server clock keeps the shortest round trip")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var stairs: Array[ShiftingStair] = []
+	var gates: Array[RailGate] = []
+	var gears := 0
+	var tricks: Array[TrickStep] = []
+	for node in castle.get_node("Movers").get_children():
+		if node is ShiftingStair:
+			stairs.append(node)
+		elif node is RailGate:
+			gates.append(node)
+		elif node is Gear:
+			gears += 1
+		elif node is TrickStep:
+			tricks.append(node)
+	t.check(stairs.size() >= 4 and gates.size() == stairs.size() * 2, "the Hall of Turning Stairs has shifting stairs with rail gates (%d, %d)" % [stairs.size(), gates.size()])
+	t.check(gears >= 4 and tricks.size() >= 2, "the clockwork loft has gears and the shaft has trick steps (%d, %d)" % [gears, tricks.size()])
+	if stairs.size() > 0:
+		var st := stairs[0]
+		var t0 := st.cycle() * 100.0 - st.phase   # the start of a cycle
+		t.check(st.stop_at(t0 + 1.0) == 0 and st.stop_at(t0 + st.hold + st.move + 1.0) == 1 and st.stop_at(t0 + st.hold + 1.0) == -1,
+			"a shifting stair rests at its stops and swings between them on the schedule")
+		var twin: ShiftingStair = load("res://objects/setpieces/shifting_stair.tscn").instantiate()
+		twin.stops = st.stops
+		twin.hold = st.hold
+		twin.move = st.move
+		twin.phase = st.phase
+		t.check(is_equal_approx(twin.yaw_at(12345.6), st.yaw_at(12345.6)), "two copies agree on the pose at the same moment")
+		twin.free()
+		# Ride it: pin the clock at stop 0, walk from the ring up to the tongue.
+		for s in stairs:
+			s.time_override = t0 + 2.0
+		for i in range(4):
+			await get_tree().physics_frame
+		var gate_ok := true
+		for g in gates:
+			if g.stair == g.get_path_to(st) and g.is_open != (g.open_stop == 0):
+				gate_ok = false
+		t.check(gate_ok, "rail gates open only where the stair rests")
+		var dir := st.global_transform.basis.x.normalized()
+		var foot := st.global_position - dir * 2.0 + Vector3(0, 0.3, 0)
+		await _spawn_player(foot)
+		player.movement.set_external_move(Vector3(dir.x, 0, dir.z).normalized(), false)
+		for i in range(int(10.0 * Engine.physics_ticks_per_second)):
+			await get_tree().physics_frame
+			if player.global_position.y > st.global_position.y + 8.8:
+				break
+		player.movement.set_external_move(Vector3.ZERO)
+		await _wait(0.4)
+		t.check(player.global_position.y > st.global_position.y + 8.8 and player.movement.is_grounded,
+			"a shifting stair at rest carries a player up to the landing above (y %.1f)" % player.global_position.y)
+	if tricks.size() > 0:
+		await _spawn_player(tricks[0].global_position + Vector3(0, 0.6, 0))
+		await _wait(0.3)
+		t.check(player.movement.is_held(), "a trick step grips the foot")
+		player.movement.request_jump()
+		await _wait(0.1)
+		t.check(not player.movement.is_held(), "a jump frees it")
 	castle.queue_free()
 	await get_tree().process_frame
 

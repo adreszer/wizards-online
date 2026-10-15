@@ -62,6 +62,7 @@ var local_display_name: String = ""
 @onready var state_synchronizer: StateSynchronizer = $StateSynchronizer
 @onready var chat_manager: ChatManager = $ChatManager
 
+var clock := ServerClock.new()
 var _reconnect_attempts: int = 0
 var _reconnecting: bool = false
 
@@ -90,6 +91,8 @@ func _ready() -> void:
 	state_synchronizer.lecture_received.connect(_on_lecture)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
+	world_session.server_clock_received.connect(func(server_ms: float, sent_ms: int) -> void:
+		clock.add_sample(server_ms, Time.get_ticks_msec() - sent_ms if sent_ms >= 0 else -1))
 
 
 func is_online() -> bool:
@@ -106,6 +109,13 @@ func is_in_world() -> bool:
 ## empty offline.
 func get_world_object_states() -> Dictionary:
 	return state_synchronizer.world_objects if is_online() else {}
+
+
+## The world's shared time in seconds (the server's clock when online, the local system
+## clock offline). Scheduled movers (shifting stairs, clockwork) take their pose from it,
+## so every client sees the same castle at the same moment.
+func server_time() -> float:
+	return clock.now() if is_online() else ServerClock.local_seconds()
 
 
 func get_ping_ms() -> int:

@@ -372,7 +372,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     dispatcher.broadcast_message(OP_ROSTER, nk.json_encode({ players = roster, self_sid = p.session_id }), { p }, nil, true)
     dispatcher.broadcast_message(OP_INVENTORY, nk.json_encode(state.inventories[p.session_id]), { p }, nil, true)
     send_profile(dispatcher, state, p.session_id)
-    dispatcher.broadcast_message(OP_WORLD_SNAPSHOT, nk.json_encode({ objects = state.world.objects }), { p }, nil, true)
+    dispatcher.broadcast_message(OP_WORLD_SNAPSHOT, nk.json_encode({ objects = state.world.objects, s = nk.time() }), { p }, nil, true)
     send_lessons(dispatcher, state, { p })
     send_house_totals(dispatcher, state, { p })
     local rest = others(state, p.session_id)
@@ -630,7 +630,11 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         dispatcher.broadcast_message(OP_LECTURE_TEXT, nk.json_encode({ by = state.names[sid] or "", text = text }), listeners, nil, true)
       end
     elseif message.op_code == OP_PING then
-      dispatcher.broadcast_message(OP_PING, message.data, { message.sender }, nil, false)
+      -- Echo the client's send time with the server's clock (ms since the epoch), so
+      -- clients can agree on one time for scheduled movers (shifting stairs, clockwork).
+      local ok, data = pcall(nk.json_decode, message.data)
+      local t = (ok and type(data) == "table") and data.t or 0
+      dispatcher.broadcast_message(OP_PING, nk.json_encode({ t = t, s = nk.time() }), { message.sender }, nil, false)
     end
   end
   return state

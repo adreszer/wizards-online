@@ -51,13 +51,19 @@ func _rebuild() -> void:
 		if child.has_meta("stair_generated"):
 			remove_child(child)
 			child.queue_free()
-	var n := step_count()
-	var h := rise / n
-	var d := run / n
+	build_steps(self, rise, run, width, max_step_height, slab_thickness, "stair_generated")
+
+
+## Steps of a straight flight (climbing along local +X from the origin) as children of
+## `parent`: a stone mesh and a box shape per step. Moving flights (ShiftingStair) reuse it.
+static func build_steps(parent: Node3D, p_rise: float, p_run: float, p_width: float, p_max_step: float, p_slab: float, meta: String) -> void:
+	var n := maxi(1, int(ceil(p_rise / p_max_step - 0.0001)))
+	var h := p_rise / n
+	var d := p_run / n
 	for i in range(n):
 		var top := (i + 1) * h
-		var bottom := maxf(0.0, top - slab_thickness)
-		var size := Vector3(d, top - bottom, width)
+		var bottom := maxf(0.0, top - p_slab)
+		var size := Vector3(d, top - bottom, p_width)
 		var centre := Vector3((i + 0.5) * d, (top + bottom) / 2.0, 0.0)
 		var mesh := MeshInstance3D.new()
 		var box := BoxMesh.new()
@@ -65,12 +71,12 @@ func _rebuild() -> void:
 		mesh.mesh = box
 		mesh.material_override = STONE_MATERIAL
 		mesh.position = centre
-		mesh.set_meta("stair_generated", true)
-		add_child(mesh)
+		mesh.set_meta(meta, true)
+		parent.add_child(mesh)
 		var shape := CollisionShape3D.new()
 		var box_shape := BoxShape3D.new()
 		box_shape.size = size
 		shape.shape = box_shape
 		shape.position = centre
-		shape.set_meta("stair_generated", true)
-		add_child(shape)
+		shape.set_meta(meta, true)
+		parent.add_child(shape)

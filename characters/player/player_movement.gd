@@ -67,6 +67,7 @@ var _peak_fall_speed: float = 0.0
 var _jump_requested_externally: bool = false
 var _external_jump_hold: float = 0.0
 var _external_move: Vector3 = Vector3.ZERO
+var _held: float = 0.0
 var _external_sprint: bool = false
 ## Seconds the body still owes for the last step teleport (horizontal motion is held).
 var _step_stall: float = 0.0
@@ -93,6 +94,15 @@ func set_external_move(direction: Vector3, sprint: bool = false) -> void:
 
 
 ## Scripted jump; the button counts as held for `hold_seconds` (full-height jump).
+## Keep the body from walking for `seconds` (a trick step gripping a foot); a jump frees it.
+func hold(seconds: float) -> void:
+	_held = maxf(_held, seconds)
+
+
+func is_held() -> bool:
+	return _held > 0.0
+
+
 func request_jump(hold_seconds: float = 0.35) -> void:
 	_jump_requested_externally = true
 	_external_jump_hold = hold_seconds
@@ -115,6 +125,10 @@ func _physics_process(delta: float) -> void:
 	var jump_held := (input != null and input.jump_held) or _external_jump_hold > 0.0
 	_jump_requested_externally = false
 	_external_jump_hold = maxf(0.0, _external_jump_hold - delta)
+	if _held > 0.0:
+		_held = 0.0 if jump_pressed else _held - delta
+		if _held > 0.0:
+			move_dir = Vector3.ZERO
 
 	_was_grounded = is_grounded
 	is_grounded = body.is_on_floor()

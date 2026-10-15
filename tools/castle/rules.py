@@ -633,3 +633,87 @@ def doors_clear_of_holes(plan):
             for h, hs in holes:
                 if hs == s and _rect_overlap(thr, h):
                     yield f"{a}/{b}", f"doorway on storey {s} opens onto the stair hole {_fmt(h)}"
+
+
+# --------------------------------------------------------------------------- moving pieces
+import math
+def _shifting(plan):
+    return [m for m in getattr(plan, "movers", []) if m["kind"] == "shifting_stair"]
+
+
+@rule("M1", "the castle is fully reachable with every moving piece away")
+def reachable_without_movers(plan):
+    # Movers are never part of the reachability graph; this checks that the rooms they
+    # serve (the shaft's landings) are reached by fixed flights at every storey they span.
+    for m in _shifting(plan):
+        R = plan.rooms[m["room"]]
+        for s in (m["storey"], m["storey"] + 1):
+            if s not in room_levels(plan, R):
+                yield R.id, f"no fixed landing at storey {s} for the shifting stair"
+
+
+@rule("M2", "with movers away, no classroom is more than twice as far from the great hall")
+def worst_detour(plan):
+    if not _shifting(plan) or "great_hall" not in plan.rooms:
+        return
+    # Movers only add shortcuts; the fixed network's distances are the worst case. The rule
+    # holds while the fixed distance stays within the walking budget doubled (C2 limits).
+    dist = walking_distances(plan, "great_hall")
+    for r in plan.rooms.values():
+        limit = WALK_BUDGET.get(r.kind)
+        if limit and dist.get(r.id) and dist[r.id] > 2 * limit:
+            yield r.id, f"{dist[r.id]:.0f} m with every mover away"
+
+
+@rule("M3", "every stop of a shifting stair meets a landing edge")
+def clean_ends(plan):
+    from . import setpieces
+    for m in _shifting(plan):
+        R = plan.rooms[m["room"]]
+        for i in range(len(m["stops"])):
+            x, y, z = setpieces.mover_top(m, i)
+            # The top step's far edge must land on a walkable surface a short step ahead.
+            a = math.radians(m["stops"][i])
+            ax, az = x + 0.8 * math.cos(a), z - 0.8 * math.sin(a)
+            if not _c.walkable(plan, ax, az, y):
+                yield R.id, f"stop {i} of the stair at storey {m['storey']} ends over nothing ({ax:.1f}, {az:.1f}, y {y:.0f})"
+
+
+@rule("M4", "a shifting stair's sweep is clear of fixed geometry")
+def clear_sweep(plan):
+    for m in _shifting(plan):
+        R = plan.rooms[m["room"]]
+        a0, a1 = m["stops"][0], m["stops"][1]
+        px, py, pz = m["pivot"]
+        for k in range(21):
+            a = math.radians(a0 + (a1 - a0) * k / 20)
+            for frac in (0.25, 0.5, 0.75):
+                lx = m["run"] * frac
+                x, z = px + lx * math.cos(a), pz - lx * math.sin(a)
+                h = py + m["rise"] * frac
+                if not (R.x0 + 0.5 < x < R.x1 - 0.5 and R.z0 + 0.5 < z < R.z1 - 0.5):
+                    yield R.id, f"stair at storey {m['storey']} sweeps into a wall"
+                    break
+                for rect, ly in R.extra_floors:
+                    if py + 0.5 < ly < h + 1.0 and _c.inside(rect, x, z):
+                        yield R.id, f"stair at storey {m['storey']} sweeps through the landing at y {ly:.0f}"
+                        break
+                for st in flights(plan):
+                    if st["lo"] == R.id and _c.inside(st["footprint"], x, z) and st["y0"] - 2 < h < st["y0"] + st["rise"] + 2:
+                        yield R.id, f"stair at storey {m['storey']} sweeps through a fixed flight"
+                        break
+
+
+@rule("M5", "rail gates close every landing a shifting stair can leave")
+def rail_gates(plan):
+    for m in _shifting(plan):
+        stops = {g["stop"] for g in m["gates"]}
+        if stops != set(range(len(m["stops"]))):
+            yield m["room"], f"stair at storey {m['storey']} has rail gates for stops {sorted(stops)} of {len(m['stops'])}"
+
+
+@rule("M6", "moving pieces follow the shared schedule (no local randomness)")
+def shared_schedule(plan):
+    for m in getattr(plan, "movers", []):
+        if not isinstance(m.get("phase"), (int, float)):
+            yield m.get("room", "?"), "a mover without a fixed phase"

@@ -307,6 +307,37 @@ def emit_stairs():
             x0, x1, z0, z1 = st["pad"]
             block(uname(f"StairPad_{st['lo']}"), ((x0 + x1) / 2, st["y0"] + st["rise"] - 0.5, (z0 + z1) / 2), (x1 - x0, 1.0, z1 - z0))
 
+def emit_movers(plan):
+    """Shifting stairs with their rail gates, clockwork gears and the clock ledge, trick steps."""
+    n = 0
+    for m in plan.movers:
+        if m["kind"] == "shifting_stair":
+            name = uname(f"ShiftingStair_{m['room']}_s{m['storey']}")
+            inst(name, K("shifting_stair"), m["pivot"], parent="Movers",
+                 props={"stops": "PackedFloat32Array(" + ", ".join(f"{a:.3f}" for a in m["stops"]) + ")",
+                        "hold": f"{m['hold']:.3f}", "move": f"{m['move']:.3f}", "phase": f"{m['phase']:.3f}",
+                        "rise": f"{m['rise']:.3f}", "run": f"{m['run']:.3f}", "width": f"{m['width']:.3f}"})
+            for g in m["gates"]:
+                inst(uname(f"RailGate_{m['room']}_s{m['storey']}"), K("rail_gate"), g["pos"], parent="Movers",
+                     rot_y=math.radians(g["rot"]), props={"stair": f'NodePath("../{name}")', "open_stop": str(g["stop"]),
+                                                          "length": f"{g['length']:.3f}"})
+            n += 1
+        elif m["kind"] == "gear":
+            inst(uname(f"Gear_{m['room']}"), K("gear"), m["pos"], parent="Movers",
+                 props={"mode": "1", "speed": f"{m['speed']:.3f}", "phase": f"{m['phase']:.3f}", "radius": f"{m['radius']:.3f}"})
+            n += 1
+    for r in rooms.values():
+        ledge = r.get("clock_ledge")
+        if ledge:
+            lx, ly, lz = ledge
+            block(uname(f"ClockLedge_{r.id}"), (lx, ly - 0.25, lz), (3.0, 0.5, 3.0))
+            oid = f"{r.id}/fragment_clock"
+            inst(f"Fragment_{node_name(oid)}", "res://gameplay/collectibles/collectible.tscn", (lx, ly + 0.8, lz),
+                 parent="Collectibles", props=oid_props(oid), groups=["world_objects"])
+    for (x, y, z, rot) in plan.trick_steps:
+        inst(uname("TrickStep"), K("trick_step"), (x, y + 0.2, z), parent="Movers", rot_y=math.radians(rot))
+    return n
+
 def emit_railings():
     for rl in RAILINGS:
         inst(uname("Railing"), K("railing"), rl["pos"], parent="Stairs", rot_y=math.radians(rl["rot"]),
@@ -870,7 +901,7 @@ fog_sky_affect = 0.35
 # so moonlight never reaches the castle's interiors.
 OUTDOOR_LAYER = 11
 OUTDOOR_LAYER_MASK = 1 << (OUTDOOR_LAYER - 1)
-CONTAINERS = ["Geometry", "Floors", "Walls", "Pillars", "Ceilings", "Stairs", "Torches", "Lights", "Zones",
+CONTAINERS = ["Movers", "Geometry", "Floors", "Walls", "Pillars", "Ceilings", "Stairs", "Torches", "Lights", "Zones",
               "Collectibles", "Checkpoints", "Tomes", "Doors", "Furniture", "Enemies", "Props", "Puzzles"]
 
 
@@ -899,6 +930,7 @@ def build(plan, kit, placements=PLACEMENTS):
     emit_band_fillers()
     emit_stairs()
     railing_count = emit_railings()
+    mover_count = emit_movers(plan)
     for centre, size in plan.parapets:
         block(uname("Parapet"), centre, size)
     emit_floors_and_ceilings()
@@ -910,7 +942,7 @@ def build(plan, kit, placements=PLACEMENTS):
     placed = emit_placements(placements)
     door_count = emit_castle_doors()
     furniture_count = emit_furniture() + emit_shelves() + emit_great_hall()
-    stats = dict(rooms=len(rooms), wall_units=len(units), doors=len(doors), secrets=len(secrets), stairs=len(stairs), railings=railing_count,
+    stats = dict(rooms=len(rooms), wall_units=len(units), doors=len(doors), secrets=len(secrets), stairs=len(stairs), railings=railing_count, movers=mover_count,
                  torches=torch_count, windows=window_count, castle_doors=door_count, chandeliers=chandelier_count,
                  furniture=furniture_count, enemies=placed["crystal_guardian"], nodes=len(nodes))
     return stats, scene_text(plan)

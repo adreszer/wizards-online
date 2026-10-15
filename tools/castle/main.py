@@ -37,6 +37,8 @@ def plan_from_data(data, grounds_cfg=None, seed=None):
         spec = data["layout"]
         lay = layout.generate(plan, spec, spec.get("seed", 0) if seed is None else seed)
         plan.generated_names = lay.generated
+    from . import setpieces
+    setpieces.prepare(plan)
     zones.add_terrain_rooms(plan, grounds_cfg or load_grounds())
     return circulation.derive(plan)
 

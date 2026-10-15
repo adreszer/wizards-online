@@ -182,7 +182,7 @@ def walkable(plan, x, z, y, eps=0.05):
 
 def flight_end_lines(plan):
     """(rect, y) of every flight's foot and top edge, where a landing may stay open."""
-    out = []
+    out = list(getattr(plan, "mover_ends", []))
     for st in plan.stairs:
         if st.get("kind") == "spiral":
             continue
