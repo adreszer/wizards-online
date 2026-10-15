@@ -95,7 +95,7 @@ ITEM_TORCH_NAME,Torch,Pochodnia
 ITEM_TORCH_DESC,An everburning torch. Held in hand it lights the halls around you and never goes out.,"Wieczna pochodnia. Trzymana w dłoni oświetla sale wokół ciebie i nigdy nie gaśnie."
 AREA_UNKNOWN,Unknown place,Nieznane miejsce
 AREA_GROUNDS,The Grounds,Błonia
-AREA_GREENHOUSE,Greenhouse (Herb Lore),Szklarnia (Zielnictwo)
+AREA_GREENHOUSE,Greenhouse (Herbology),Szklarnia (Zielarstwo)
 AREA_PADDOCK,Beast Paddock,Zagroda dla stworzeń
 AREA_ENTRANCE_HALL,Entrance Hall,Sień
 AREA_GREAT_HALL,Great Hall,Wielka Sala
@@ -113,18 +113,18 @@ AREA_CORRIDOR_W_0,West Corridor,Korytarz Zachodni
 AREA_CORRIDOR_W_1,"West Corridor, upper floor","Korytarz Zachodni, piętro"
 AREA_CORRIDOR_E_0,East Corridor,Korytarz Wschodni
 AREA_CORRIDOR_E_1,"East Corridor, upper floor","Korytarz Wschodni, piętro"
-AREA_CLASS_SHAPESHAPING,Shapeshaping Classroom,Sala Przekształceń
-AREA_CLASS_SIGILCRAFT,Sigilcraft Classroom,Sala Sigilistyki
-AREA_CLASS_CHRONICLES,Chronicles of Magic Classroom,Sala Kronik Magii
-AREA_CLASS_GLYPHS,Glyph Lore Classroom,Sala Glifów
-AREA_CLASS_NUMEROMANCY,Numeromancy Classroom,Sala Numeromancji
-AREA_CLASS_WARDING,Warding Classroom,Sala Sztuk Ochronnych
-AREA_CLASS_HERBLORE,Herb Lore Classroom,Sala Zielnictwa
-AREA_CLASS_SKYRIDING,Skyriding Classroom,Sala Jazdy Podniebnej
-AREA_CLASS_BEASTLORE,Beastlore Classroom,Sala Bestiologii
-AREA_CLASS_STARGAZING,Stargazing Classroom,Sala Gwiazdoznawstwa
-AREA_CLASS_ELIXIRS,Elixirs Classroom,Sala Eliksirów
-AREA_CLASS_FARSIGHT,Farsight Classroom,Sala Dalekowidzenia
+AREA_CLASS_SHAPESHAPING,Transfiguration Classroom,Sala Transmutacji
+AREA_CLASS_SIGILCRAFT,Charms Classroom,Sala Zaklęć
+AREA_CLASS_CHRONICLES,History of Magic Classroom,Sala Historii Magii
+AREA_CLASS_GLYPHS,Ancient Runes Classroom,Sala Starożytnych Run
+AREA_CLASS_NUMEROMANCY,Arithmancy Classroom,Sala Numerologii
+AREA_CLASS_WARDING,Defence Against the Dark Arts Classroom,Sala Obrony przed Czarną Magią
+AREA_CLASS_HERBLORE,Herbology Classroom,Sala Zielarstwa
+AREA_CLASS_SKYRIDING,Flying Classroom,Sala Latania
+AREA_CLASS_BEASTLORE,Care of Magical Creatures Classroom,Sala Opieki nad Magicznymi Stworzeniami
+AREA_CLASS_STARGAZING,Astronomy Classroom,Sala Astronomii
+AREA_CLASS_ELIXIRS,Potions Classroom,Sala Eliksirów
+AREA_CLASS_FARSIGHT,Divination Classroom,Sala Wróżbiarstwa
 AREA_STAFF_ROOM,Staff Room,Pokój Nauczycielski
 AREA_HOSPITAL_WING,Infirmary,Izba Chorych
 AREA_SONG_ROOM,Song Room,Sala Pieśni
@@ -150,7 +150,7 @@ AREA_TOWER_SW_STAIR,Southwest Stair Turret,Południowo-Zachodnia Wieżyczka Scho
 AREA_TOWER_SW_0,Southwest Tower,Wieża Południowo-Zachodnia
 AREA_TOWER_SW_1,"Southwest Tower, first floor","Wieża Południowo-Zachodnia, pierwsze piętro"
 AREA_TOWER_SW_2,"Southwest Tower, second floor","Wieża Południowo-Zachodnia, drugie piętro"
-AREA_STARGAZING_PLATFORM,Stargazing Platform,Taras Gwiazdoznawstwa
+AREA_STARGAZING_PLATFORM,Astronomy Platform,Taras Astronomiczny
 AREA_DUNGEON_CORRIDOR,Dungeon Corridor,Korytarz Lochów
 AREA_CELLARS,Cellars,Piwnice
 AREA_LAKE_PASSAGE,Lake Passage,Korytarz Jeziorny
@@ -174,12 +174,12 @@ AREA_LOFT,Forgotten Loft,Zapomniany Strych
 PLAQUE_CASTLE_ENTRANCE,"Welcome to the school. The Great Hall lies east, the Stair Hall west, the courtyard ahead. Look closely: the castle keeps its secrets from the hasty.","Witaj w szkole. Wielka Sala jest na wschód, Hala Schodów na zachód, dziedziniec na wprost. Patrz uważnie: zamek skrywa tajemnice przed niecierpliwymi."
 PLAQUE_GREAT_HALL,"The Great Hall. Feasts, announcements and the house tallies happen here.","Wielka Sala. Tu odbywają się uczty, ogłoszenia i liczenie punktów domów."
 PLAQUE_LIBRARY,"Silence, please. The towers on either side hold the common rooms of two houses.",Proszę o ciszę. Wieże po obu stronach kryją pokoje wspólne dwóch domów.
-PLAQUE_SIGILCRAFT,"Sigilcraft classroom. Until lessons begin, a practice tome waits in the middle of the room; purple glimmers answer to magic.","Sala Sigilistyki. Zanim zaczną się lekcje, na środku sali czeka księga do ćwiczeń; fioletowe błyski odpowiadają na magię."
+PLAQUE_SIGILCRAFT,"Charms classroom. Until lessons begin, a practice tome waits in the middle of the room; purple glimmers answer to magic.","Sala Zaklęć. Zanim zaczną się lekcje, na środku sali czeka księga do ćwiczeń; fioletowe błyski odpowiadają na magię."
 PLAQUE_STAIR_HALL,The Stair Hall climbs three storeys. Mind the drop from the landings.,Hala Schodów wznosi się przez trzy piętra. Uważaj na przepaść z podestów.
 PLAQUE_UNDERCROFT,Few know of the undercroft. Fewer still leave with its fragments.,Niewielu wie o krypcie. Jeszcze mniej wychodzi z niej z fragmentami.
 PLAQUE_HIDDEN_STUDY,"A chronicler once wrote here in secret. The wall answered to a spell, as it did for you.","Pewien kronikarz pisał tu w tajemnicy. Ściana odpowiadała na zaklęcie, tak jak dla ciebie."
 PLAQUE_LOFT,"Above the Great Hall, forgotten. The dust here has not been disturbed in years.","Nad Wielką Salą, zapomniany. Kurz nie był tu ruszany od lat."
-PLAQUE_STARGAZING,The stargazing platform. Lessons happen after dark; the sky is the classroom.,Taras Gwiazdoznawstwa. Lekcje odbywają się po zmroku; niebo jest salą.
+PLAQUE_STARGAZING,The astronomy platform. Lessons happen after dark; the sky is the classroom.,Taras Astronomiczny. Lekcje odbywają się po zmroku; niebo jest salą.
 PLAQUE_GROUNDS,"The school grounds. Greenhouse to the east, the beast paddock to the west, the entrance hall straight ahead.","Błonia szkoły. Szklarnia na wschód, zagroda dla stworzeń na zachód, sień na wprost."
 SPELL_UPLIFT_NAME,Uplift,Wzniesienie
 SPELL_UPLIFT_DESC,Lifts a loose object off the ground and lets it hover for a few heartbeats.,Unosi luźny przedmiot nad ziemię i pozwala mu zawisnąć na kilka uderzeń serca.
@@ -274,18 +274,18 @@ SORT_Q4_A4,"Listen, learn what it wants, and decide later.","Słuchasz, poznajes
 ENEMY_CRYSTAL_GUARDIAN_NAME,Crystalstone Guardian,Strażnik Kryształu
 NOTIFY_ENEMY_DEFEATED,%s shatters and falls silent.,%s rozpada się i milknie.
 PLAQUE_CELLARS,Something stirs in the cellars. Spells hurt it; its blows hurt you.,Coś porusza się w piwnicach. Czary je ranią; jego ciosy ranią ciebie.
-SUBJECT_SIGILCRAFT_NAME,Sigilcraft,Sigilistyka
-SUBJECT_SHAPESHAPING_NAME,Shapeshaping,Przekształcenia
-SUBJECT_CHRONICLES_NAME,Chronicles of Magic,Kroniki Magii
-SUBJECT_GLYPHS_NAME,Glyph Lore,Glify
-SUBJECT_NUMEROMANCY_NAME,Numeromancy,Numeromancja
-SUBJECT_WARDING_NAME,Warding,Sztuki Ochronne
-SUBJECT_ELIXIRS_NAME,Elixirs,Eliksiry
-SUBJECT_HERBLORE_NAME,Herb Lore,Zielnictwo
-SUBJECT_SKYRIDING_NAME,Skyriding,Jazda Podniebna
-SUBJECT_BEASTLORE_NAME,Beastlore,Bestiologia
-SUBJECT_STARGAZING_NAME,Stargazing,Gwiazdoznawstwo
-SUBJECT_FARSIGHT_NAME,Farsight,Dalekowidzenie
+SUBJECT_SIGILCRAFT_NAME,Charms,Zaklęcia
+SUBJECT_SHAPESHAPING_NAME,Transfiguration,Transmutacja
+SUBJECT_CHRONICLES_NAME,History of Magic,Historia Magii
+SUBJECT_GLYPHS_NAME,Ancient Runes,Starożytne Runy
+SUBJECT_NUMEROMANCY_NAME,Arithmancy,Numerologia
+SUBJECT_WARDING_NAME,Defence Against the Dark Arts,Obrona przed Czarną Magią
+SUBJECT_ELIXIRS_NAME,Potions,Eliksiry
+SUBJECT_HERBLORE_NAME,Herbology,Zielarstwo
+SUBJECT_SKYRIDING_NAME,Flying,Latanie
+SUBJECT_BEASTLORE_NAME,Care of Magical Creatures,Opieka nad Magicznymi Stworzeniami
+SUBJECT_STARGAZING_NAME,Astronomy,Astronomia
+SUBJECT_FARSIGHT_NAME,Divination,Wróżbiarstwo
 LESSON_NONE,No lesson,Brak lekcji
 LESSON_OPEN,Open lesson,Rozpocznij lekcję
 LESSON_CLOSE,End lesson,Zakończ lekcję

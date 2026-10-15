@@ -224,7 +224,7 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	NetworkManager.send_chat("hello from A")
 	t.check(NetworkManager.get_ping_ms() >= 0, "ping measured (%d ms)" % NetworkManager.get_ping_ms())
 
-	# Lesson: both walk into the Sigilcraft classroom; A teaches B.
+	# Lesson: both walk into the Charms classroom; A teaches B.
 	t.section("Lesson (professor)")
 	_enter_classroom(spawner, Vector3(-2, 0, 0))
 	ok = await _wait_until(func() -> bool: return spawner.local_player.area_tracker.current_area_id() == CLASSROOM, 5.0)
@@ -251,7 +251,7 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(panel.current_subject() == "sigilcraft" and panel.spell_index("galewind") == -1 and panel.spell_index("uplift") >= 0, "the panel lists only the classroom subject's spells")
 	NetworkManager.send_lesson("open")
 	ok = await _wait_until(func() -> bool: return lesson_results.size() >= 1 and NetworkManager.get_lessons().has(str(CLASSROOM)), 10.0)
-	t.check(ok and lesson_results[0]["ok"] == true and NetworkManager.get_lessons()[str(CLASSROOM)]["subject"] == "sigilcraft", "the professor opens a Sigilcraft lesson (%s)" % str(lesson_results))
+	t.check(ok and lesson_results[0]["ok"] == true and NetworkManager.get_lessons()[str(CLASSROOM)]["subject"] == "sigilcraft", "the professor opens a Charms lesson (%s)" % str(lesson_results))
 	NetworkManager.send_lesson("open")
 	ok = await _wait_until(func() -> bool: return lesson_results.size() >= 2, 10.0)
 	t.check(ok and lesson_results[1]["reason"] == "already_open", "a second lesson in the same room is refused")

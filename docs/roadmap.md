@@ -142,16 +142,16 @@ Goal: attending a lesson is fun, and progress over weeks is visible.
 
 1. **Duelling club** (L ★★★). A duelling hall with a stage and an audience. A professor (or a prefect, later) runs a duel: both players accept, bow, a countdown, then spells hit each other only inside the arena volume. Server validates targets and damage; health is a separate duel meter so nothing persists. Rules sets: first to three hits, disarm only, shields allowed. Spectators cheer with emotes; house points stay professor-awarded, never wagered.
 2. **Duel ladder** (M ★★). Ranked duels during scheduled club hours; season rewards are cosmetic.
-3. **Flying lessons for real** (L ★★★). The broom and the flight mode exist (Milestone 13b: racks and a dev cheat hand them out, classrooms are no-fly). Next: the Skyriding professor grants brooms in lessons instead of open racks, flight rules per area checked server-side, a modelled broom and a riding animation.
+3. **Flying lessons for real** (L ★★★). The broom and the flight mode exist (Milestone 13b: racks and a dev cheat hand them out, classrooms are no-fly). Next: the Flying professor grants brooms in lessons instead of open racks, flight rules per area checked server-side, a modelled broom and a riding animation.
 4. **An original flying sport** (L ★★★). Design proposal, *Lantern Chase* (placeholder): two teams of four fly around the grounds; one lit lantern per team must be carried through the opponents' rings; defenders try to snuff it with Galewind or Wellspring, carriers relight with Emberkindle. Uses existing spells, rewards teamwork, and is clearly our own. Inter-house matches feed the house cup.
 5. **Shared enemies** (L ★★). Already planned (Milestone 17): server-authoritative guardians in the dungeons, co-op for groups, curfew-only spawns.
 
 ### Term G: "Beyond the walls" (grounds and the wider world)
 
 1. **The grounds properly** (L ★★★). A lake with a water shader, a forest edge (forbidden at night, original name), the greenhouse in glass, the beast paddock with creatures, a stone circle, a boathouse, a clock tower. The castle silhouette visible from outside with lit windows. Planned as generated grounds in `docs/castle-generation.md` (Milestones 26–27).
-2. **Herb Lore gardening** (M ★★). Plant, water, grow and harvest magical plants in the greenhouse (Quicksprout helps). Plants are ingredients for Elixirs.
-3. **Elixir brewing** (M ★★★). A cauldron minigame (order, stirring, heat, timing). Brewed elixirs are consumables (glow-in-dark, featherfall, voice-change, colour-change robes for an hour). Professors can grade the results.
-4. **Beastlore creatures and familiars** (L ★★★). Original creatures to care for in lessons; later a personal familiar that follows you, sits on your shoulder, sleeps on your dorm bed. Huge for attachment.
+2. **Herbology gardening** (M ★★). Plant, water, grow and harvest magical plants in the greenhouse (Quicksprout helps). Plants are ingredients for Potions.
+3. **Potion brewing** (M ★★★). A cauldron minigame (order, stirring, heat, timing). Brewed potions are consumables (glow-in-dark, featherfall, voice-change, colour-change robes for an hour). Professors can grade the results.
+4. **Care of Magical Creatures and familiars** (L ★★★). Original creatures to care for in lessons; later a personal familiar that follows you, sits on your shoulder, sleeps on your dorm bed. Huge for attachment.
 5. **The village weekend** (L ★★). An original nearby village reachable on scheduled weekends: shops for cosmetics, a tea house to meet, a post office for paper birds. Needs an economy (below).
 6. **Economy (careful)** (M ★). A small currency earned by attendance, homework and events, spent on cosmetics and decoration. No buying spells or points. Defer until there is something worth buying.
 
@@ -167,11 +167,11 @@ Ordered by "biggest change on screen per day of work".
 - **Finish the lighting overhaul** already in `plan.md`: dim ambient so darkness is real, carried light matters, and night in the dungeons is scary. (S ★★★)
 - **Windows and light shafts.** Real window modules with stained glass; volumetric fog with light shafts from windows by day and moonlight at night; colour cast from the glass on the floor. (M ★★★)
 - **Per-area atmosphere.** `AreaZone` blends a WorldEnvironment profile per area: warm and hazy great hall, cold blue dungeons, green greenhouse, starry tower. Fog density, exposure, colour grading LUT. (S–M ★★)
-- **Light flicker and life.** Candle and torch flicker already exists; add wind gusts that dim torches in corridors, magical floating candles in the great hall, glowing runes in the Glyphs classroom. (S ★★)
+- **Light flicker and life.** Candle and torch flicker already exists; add wind gusts that dim torches in corridors, magical floating candles in the great hall, glowing runes in the Ancient Runes classroom. (S ★★)
 
 ### 5.2 Materials and set dressing
 
-- **Break repetition.** Two or three variants per wall module, random 180° flips, vertex colour or decal grime near floors, moss in the dungeons, scorch marks near the Elixirs room. (M ★★★)
+- **Break repetition.** Two or three variants per wall module, random 180° flips, vertex colour or decal grime near floors, moss in the dungeons, scorch marks near the Potions room. (M ★★★)
 - **Decals.** Rugs, cracks, stains, wax drips, chalk circles, house sigils painted on floors. Godot `Decal` nodes placed by the generator. (S ★★)
 - **Clutter kits per subject.** Each classroom gets 10–20 props that say what it is: cauldrons and shelves of jars, telescopes and star charts, potted plants and trowels, cages and feeding buckets, crystal balls, abacus-like instruments, rune stones. Common rooms get armchairs, fireplaces, rugs, banners. This is the asset list to generate next. (L ★★★)
 - **Trim sheets and hero materials.** Carved wood, worn stone stairs, iron fittings, gold leaf for the great hall. (M ★★)
@@ -179,7 +179,7 @@ Ordered by "biggest change on screen per day of work".
 
 ### 5.3 Exterior and sky
 
-- Night sky with moon phases and real constellations (Stargazing lessons can use it), clouds, sunrise/sunset tied to the clock. (M ★★★)
+- Night sky with moon phases and real constellations (Astronomy lessons can use it), clouds, sunrise/sunset tied to the clock. (M ★★★)
 - Terrain, trees, the lake (water shader with reflections), weather (rain on windows, snow on the grounds, fog in the morning). (L ★★★)
 - A castle silhouette with towers, battlements and lit windows: the shot for the store page and the menu. (L ★★★)
 
@@ -237,7 +237,7 @@ Required before opening to the public:
 - **Server-side position sanity** for area reports (already in `plan.md`) so lesson and house logic cannot be spoofed.
 - **CI** running `tools/check.sh` and `tools/check_build.sh` on every push.
 - **Analytics (privacy-respecting)**: which areas people visit, where they get lost, which mysteries stall, lesson attendance. Guides content work.
-- **Steam**: store page, achievements tied to discoveries and ceremonies (not grind), rich presence ("In the Elixirs classroom"), PL + EN.
+- **Steam**: store page, achievements tied to discoveries and ceremonies (not grind), rich presence ("In the Potions classroom"), PL + EN.
 - **Accessibility**: rebindable keys, subtitles for all audio cues, colour-blind safe house colours (crests and patterns, not colour alone), text size, motion reduction (camera bob, fog), click-casting alternative to gestures.
 
 ---
@@ -302,4 +302,4 @@ In parallel, asset generation can target the **clutter kits per subject** (5.2) 
 - Flying: the owner chose brooms (a generic folklore broom; no franchise broom models or names). Open: final name for the school broom model, and whether other mounts follow.
 - Prefects: appointed by the admin, by professors, or elected by the house?
 - Private servers for communities: in scope for launch or later?
-- Final names for everything marked as a placeholder (subjects already have placeholder names; the year system, the map, the Echoes, the flying sport, the village, the warden).
+- Final names for everything marked as a placeholder (subjects are named; the year system, the map, the Echoes, the flying sport, the village, the warden).

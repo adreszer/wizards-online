@@ -503,7 +503,7 @@ def emit_zones():
 # room ("front" = the wall opposite the entrance door); wall id -> (desks per row, rows).
 # Desk rows (m from the front wall) keep the room's centre clear: the area test drops the
 # player there, and it is where players naturally cross a room.
-DESK_ROWS_DEEP = (5.0, 7.5, 10.0)         # 24 m deep rooms (wing classrooms, Elixirs)
+DESK_ROWS_DEEP = (5.0, 7.5, 10.0)         # 24 m deep rooms (wing classrooms, Potions)
 DESK_ROWS_TOWER = (4.0, 6.4)              # 16 m tower rooms
 DESK_PITCH = 3.0                          # m between desk centres along a row (desk is 1.9 wide)
 BENCH_BEHIND_DESK = 0.85                  # bench centre this far behind the desk centre

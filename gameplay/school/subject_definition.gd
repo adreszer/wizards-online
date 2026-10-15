@@ -3,7 +3,7 @@ extends Resource
 ## One school subject (resources/school/subjects/<id>.tres): where it is taught
 ## and which spells it teaches. Exported to the server (generated/subjects.lua)
 ## so lesson sessions only grant a subject's own spells in its own classrooms.
-## Names are placeholders until the owner names the subjects.
+## Display names are the owner's final subject names; ids stay as they were.
 
 ## Stable identifier, equal to the resource file name.
 @export var id: StringName = &""

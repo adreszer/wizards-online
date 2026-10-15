@@ -24,7 +24,7 @@
   "pl": "Kluczem było stanąć razem: ściana otwiera się jak drzwi, które zawsze tu były."
  },
  "MYST_GEN_04_CLUE": {
-  "en": "The flagstones of the Elixirs Classroom hum when more than one of you stands on them.",
+  "en": "The flagstones of the Potions Classroom hum when more than one of you stands on them.",
   "pl": "Płyty posadzki w sali Sala Eliksirów brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_04_SOLVED": {
@@ -32,8 +32,8 @@
   "pl": "Wspólny ciężar budzi stary mechanizm: ściana się rozsuwa."
  },
  "MYST_GEN_05_CLUE": {
-  "en": "The flagstones of the Beastlore Classroom hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Sala Bestiologii brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "en": "The flagstones of the Care of Magical Creatures Classroom hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Sala Opieki nad Magicznymi Stworzeniami brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_05_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",
@@ -96,8 +96,8 @@
   "pl": "Za ścianą sali {room_pl} coś ustępuje."
  },
  "MYST_GEN_13_CLUE": {
-  "en": "The flagstones of the Sigilcraft Classroom hum when more than one of you stands on them.",
-  "pl": "Płyty posadzki w sali Sala Sigilistyki brzęczą, gdy stoi na nich więcej niż jedna osoba."
+  "en": "The flagstones of the Charms Classroom hum when more than one of you stands on them.",
+  "pl": "Płyty posadzki w sali Sala Zaklęć brzęczą, gdy stoi na nich więcej niż jedna osoba."
  },
  "MYST_GEN_13_SOLVED": {
   "en": "Your shared weight wakes the old mechanism: the wall rolls open.",

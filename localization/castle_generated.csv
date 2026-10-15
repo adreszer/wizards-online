@@ -143,13 +143,13 @@ AREA_NORTH_WING_R7,Quiet Room,Pokój Ciszy
 AREA_NORTH_WING_R8,Lost Property,Biuro Rzeczy Znalezionych
 AREA_NORTH_WING_R9,Linen Store,Bieliźniarnia
 AREA_NORTH_WING_STAIR_B,"North Wing, stair turret","Skrzydło Północne, wieżyczka schodowa"
-AREA_OFFICE_CHRONICLES,Chronicles Office,Gabinet Kronik
-AREA_OFFICE_ELIXIRS,Elixirs Office,Gabinet Eliksirów
-AREA_OFFICE_HERBLORE,Herblore Office,Gabinet Zielarstwa
-AREA_OFFICE_SHAPESHAPING,Shapeshaping Office,Gabinet Przemian
-AREA_OFFICE_SIGILCRAFT,Sigilcraft Office,Gabinet Znakarstwa
-AREA_OFFICE_STARGAZING,Stargazing Office,Gabinet Gwiazdoznawstwa
-AREA_OFFICE_WARDING,Warding Office,Gabinet Osłon
+AREA_OFFICE_CHRONICLES,History of Magic Office,Gabinet Historii Magii
+AREA_OFFICE_ELIXIRS,Potions Office,Gabinet Eliksirów
+AREA_OFFICE_HERBLORE,Herbology Office,Gabinet Zielarstwa
+AREA_OFFICE_SHAPESHAPING,Transfiguration Office,Gabinet Transmutacji
+AREA_OFFICE_SIGILCRAFT,Charms Office,Gabinet Zaklęć
+AREA_OFFICE_STARGAZING,Astronomy Office,Gabinet Astronomii
+AREA_OFFICE_WARDING,Defence Against the Dark Arts Office,Gabinet Obrony przed Czarną Magią
 AREA_OLD_CELLS,Old Cells,Stare Cele
 AREA_PORTRAIT_GALLERY,Portrait Gallery,Galeria Portretów
 AREA_READING_ROOM,Reading Room,Czytelnia
@@ -187,8 +187,8 @@ AREA_WINE_CELLAR,Wine Cellar,Piwniczka
 OFFLINE_MYST_GEN_01_SOLVED,Stone grinds on stone and a forgotten room breathes out a century of dust.,"Kamień zgrzyta o kamień, a zapomniana komnata wydycha kurz całego stulecia."
 OFFLINE_MYST_GEN_02_CLUE,"In the torchlight a soot mark shaped like a keyhole appears on the wall, then fades.",W blasku pochodni na ścianie pojawia się ślad sadzy w kształcie dziurki od klucza i znika.
 OFFLINE_MYST_GEN_03_CLUE,"Two sets of footprints are carved into the floor here, side by side, facing the wall.","W posadzce wyryto dwie pary śladów stóp, obok siebie, zwrócone ku ścianie."
-OFFLINE_MYST_GEN_04_CLUE,The flagstones of the Elixirs Classroom hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Eliksirów brzęczą, gdy stoi na nich więcej niż jedna osoba."
-OFFLINE_MYST_GEN_05_CLUE,The flagstones of the Beastlore Classroom hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Bestiologii brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_04_CLUE,The flagstones of the Potions Classroom hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Eliksirów brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_05_CLUE,The flagstones of the Care of Magical Creatures Classroom hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Opieki nad Magicznymi Stworzeniami brzęczą, gdy stoi na nich więcej niż jedna osoba."
 OFFLINE_MYST_GEN_06_CLUE,"Your torch flickers toward one stone of the Storeroom II, as if a draught came through it.","Płomień pochodni chyli się ku jednemu kamieniowi w sali Składzik II, jakby wiał przez niego przeciąg."
 OFFLINE_MYST_GEN_07_CLUE,The flagstones of the Quiet Room hum when more than one of you stands on them.,"Płyty posadzki w sali Pokój Ciszy brzęczą, gdy stoi na nich więcej niż jedna osoba."
 OFFLINE_MYST_GEN_08_SOLVED,Behind the wall of the {room} something gives way.,Za ścianą sali {room_pl} coś ustępuje.
@@ -196,7 +196,7 @@ OFFLINE_MYST_GEN_09_CLUE,"Your torch flickers toward one stone of the Office II,
 OFFLINE_MYST_GEN_10_CLUE,The flagstones of the Records Room hum when more than one of you stands on them.,"Płyty posadzki w sali Archiwum brzęczą, gdy stoi na nich więcej niż jedna osoba."
 OFFLINE_MYST_GEN_11_SOLVED,Behind the wall of the {room} something gives way.,Za ścianą sali {room_pl} coś ustępuje.
 OFFLINE_MYST_GEN_12_SOLVED,Behind the wall of the {room} something gives way.,Za ścianą sali {room_pl} coś ustępuje.
-OFFLINE_MYST_GEN_13_CLUE,The flagstones of the Sigilcraft Classroom hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Sigilistyki brzęczą, gdy stoi na nich więcej niż jedna osoba."
+OFFLINE_MYST_GEN_13_CLUE,The flagstones of the Charms Classroom hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Zaklęć brzęczą, gdy stoi na nich więcej niż jedna osoba."
 OFFLINE_MYST_GEN_14_CLUE,The flagstones of the Old Classroom IV hum when more than one of you stands on them.,"Płyty posadzki w sali Stara Klasa IV brzęczą, gdy stoi na nich więcej niż jedna osoba."
 OFFLINE_MYST_GEN_15_CLUE,The flagstones of the Study Hall hum when more than one of you stands on them.,"Płyty posadzki w sali Sala Nauki brzęczą, gdy stoi na nich więcej niż jedna osoba."
 OFFLINE_MYST_GEN_16_SOLVED,Behind the wall of the {room} something gives way.,Za ścianą sali {room_pl} coś ustępuje.

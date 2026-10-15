@@ -174,18 +174,18 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Broom racks (`BroomRack`, kind `item_rack`) beside the grounds spawn and in the flying classroom; server `give_item` (one per character)
 - [x] Cheats: chat commands `/broom` `/miotla` `/give <id>` `/help` (offline too); server `OP_CHEAT` / `OP_CHEAT_RESULT`, admins or `cheats_enabled` (school rules, on in dev)
 - [x] Headless tests: flight (lift-off, hover, climb/sink, cruise/boost, ceiling, landing, no-fly zone, lost broom), rack, remote mount, satchel, cheats
-- [ ] Flying lessons: grant brooms in Skyriding lessons instead of open racks; server-side checks on flight (owns a broom, allowed area); a modelled broom and a riding pose/animation
+- [ ] Flying lessons: grant brooms in Flying lessons instead of open racks; server-side checks on flight (owns a broom, allowed area); a modelled broom and a riding pose/animation
 
 ### Milestone 14 — The castle (open world)
 - [x] `tools/generate_castle.py`: declarative plan (rooms on a 4 m grid, doors, stairs, secrets) → `levels/castle/castle.tscn`; shared walls emitted once, doorway modules where doors are declared, stair holes cut in floors/ceilings, pillars, torches, band fillers for multi-storey rooms, overlap + reachability checks
 - [x] 54 named areas over six storeys: grounds (greenhouse, beast paddock), entrance hall, great hall (two storeys tall), stair hall (three storeys, two landings), courtyard, north hall, library, kitchens, two corridor wings on two floors with 12 subject classrooms (original subject names), staff room, infirmary, song room, records room, long gallery, roost, three towers (NE/NW house common rooms + dormitories on their upper floors, SW tower with the Farsight classroom and an open stargazing platform), dungeons (elixirs classroom, cellars, House Three common room + dormitory), House Four common room + dormitory off the kitchens
-- [x] Secrets: undercroft (dungeon corridor), hidden study (Chronicles classroom), forgotten loft (long gallery); 12 fragments hidden across them and the tower tops
+- [x] Secrets: undercroft (dungeon corridor), hidden study (History of Magic classroom), forgotten loft (long gallery); 12 fragments hidden across them and the tower tops
 - [x] `Staircase` module (25 slab steps per 9 m storey); PlayerMovement step-up rate-limited so long flights are climbed at walking pace instead of one hop per tick
 - [x] `AreaZone` per room → `GameEvents.area_entered/exited`, HUD area-name toast; zones carry kind/house metadata for chat, house access and lesson context
 - [x] Occlusion culling: box occluders on wall runs and floor/ceiling tilers, project setting enabled
 - [x] `core/world.tscn` loads the castle; `levels/mvp` stays as the test fixture for the puzzle wiring
 - [x] Headless castle test: areas translated, a floor under every area's centre, walking from the start into the entrance hall fires area events, grand staircase and tower flights climbable
-- [x] Classrooms furnished: 13 classrooms get rows of student desks + benches (4 × 3 in the 24 m wing rooms and Elixirs, 3 × 2 in the SW tower rooms) facing the wall opposite the door, rows kept clear of the room centre; the professor's end gets a lectern on the centre line 2 m ahead of the first row and a professor's desk to its right, with the practice tomes to its left a slate board on an easel by the front wall and a wall board hung on that wall beside its mid-wall pillar (`CLASSROOM_FRONT` in the generator; 228 props ≈ 2.3 M tris, the castle's largest render cost after the floor tiles — revisit with LODs/impostors if frame time suffers)
+- [x] Classrooms furnished: 13 classrooms get rows of student desks + benches (4 × 3 in the 24 m wing rooms and Potions, 3 × 2 in the SW tower rooms) facing the wall opposite the door, rows kept clear of the room centre; the professor's end gets a lectern on the centre line 2 m ahead of the first row and a professor's desk to its right, with the practice tomes to its left a slate board on an easel by the front wall and a wall board hung on that wall beside its mid-wall pillar (`CLASSROOM_FRONT` in the generator; 228 props ≈ 2.3 M tris, the castle's largest render cost after the floor tiles — revisit with LODs/impostors if frame time suffers)
 - [ ] Furnish the other rooms (great-hall tables, beds, bookshelves, cauldrons, greenhouse workbenches…) and give each classroom its subject props
 - [x] Windows: 195 `WallWindow` modules on walls facing outside or an open-air area (grounds, courtyard), in the lower row of every storey a room spans (two- and three-storey halls get a high second tier); every module except a wall's end modules and those next to a doorway, kept off stair walls, bookshelf walls and placed objects; a classroom's front wall gets a pair in its end modules, flanking the boards. Dungeons and secret rooms have none (`choose_windows` in the generator). Window type by room kind / room (`WINDOW_TYPES` / `WINDOW_ROOMS`): the wide rose window in classrooms and the great hall, the double in other halls, the library and common rooms, the single lancet elsewhere. Measured cost: windows add ≈1.2–2.3 M primitives per view (6–8 % incl. shadow passes), FPS unchanged
 - [ ] Outdoor lighting (the grounds are lit like night), daylight/moonlight through the windows; taller windows for the two-storey halls once a tall window type exists; glass greenhouse; tower exteriors (rooms currently share one plain exterior)
@@ -202,7 +202,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Spellbook in `SpellCaster`: known spells, ten quick slots, equip/select/cycle/assign, per-spell cooldowns + global lock, `to_state/load_state` (ids) ready for server persistence
 - [x] Quick select input: `spell_slot_1…10` (1–0), `spell_next`/`spell_prev` (R/Q, D-pad); HUD hotbar with key, name, colour, cooldown and the equipped highlight
 - [x] Reactions: PushableBlock floats under Uplift and is shoved by Galewind; WallTorch lit by Emberkindle, put out by Wellspring/Frostbind/Duskveil (relights after 45 s); Glowmote leaves a floating `LightMote` via the new `burst_scene` hook
-- [x] A practice tome per spell in the matching classroom (Sigilcraft ×2, Skyriding, Kitchens, Elixirs, Warding, Library, Stargazing, Glyphs, Shapeshaping, Herblore) + a practice block in Sigilcraft; `-- --all-spells` for playtesting
+- [x] A practice tome per spell in the matching classroom (Charms ×2, Flying, Kitchens, Potions, Defence Against the Dark Arts, Library, Astronomy, Ancient Runes, Transfiguration, Herbology) + a practice block in Sigilcraft; `-- --all-spells` for playtesting
 - [x] Headless tests: registry/translations, spellbook + input actions, block/torch/mote effects, cooldown rules, HUD hotbar, tomes in the castle
 - [ ] Receivers for unlock / mend / growth (locked doors and chests, breakables, plants) once rooms are furnished
 - [ ] Server-side spellbook: persist `SpellCaster.to_state()` per character in Nakama, grant spells from lessons, validate cast ids server-side (duel groundwork: target field + PvP flag per area)
@@ -269,7 +269,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] House points ledger (`school.lua`: one record per change + totals in one write), professor award/deduct with reason/caps/cooldown, mystery awards, `house_points_ledger` RPC, HUD tally
 - [x] Lecture text (`OP_LECTURE` → everyone in the room, shown in chat) and lesson plans stored per professor (`lesson_plan_save`/`lesson_plan_list`), read out line by line from the panel
 - [x] Two-client test: no lesson → refused, open lesson, other subject → refused, grant, lecture received, points checks and tally on both clients, ledger sums equal totals, plan stored
-- [ ] Final subject names from the owner; attendance is recorded but not shown anywhere yet
+- [x] Final subject names from the owner (display names only; ids unchanged)
+- [ ] Attendance is recorded but not shown anywhere yet
 
 ### Milestone 23 — Release hygiene
 - [x] Client export presets (Windows Desktop, macOS) with include/exclude filters, committed without signing secrets
