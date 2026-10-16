@@ -337,6 +337,18 @@ Outside the estate's outer gatehouse (whose gate now stands open), at the foot o
 - [ ] A way back and forth faster than walking (~800 m from the platform to the castle gate): carriages along the causeway, or the train itself
 - [ ] Real assets for the houses, the train and the station (asset-drop workflow); snow and seasons
 
+### Milestone 37 — Currency
+One school currency, server-authoritative, placeholder name "korony" / "crowns" (one unit, no denominations; only the `CURRENCY_*` translation keys name it).
+- [x] `nakama/modules/economy.lua`: balances in Nakama's wallet (atomic, never below zero, every change in Nakama's wallet ledger with source, reason, who, subject, area); `change`, `earn` (capped per school day: `max_daily_coins`), `spend` (for the shops), `reset`, `ledger`
+- [x] Earning: students still in the room when a lesson that ran at least `lesson_coin_minutes` closes get `coins_per_lesson` (staff and early leavers get nothing); a first solve of a mystery pays `on_solved.coins` or `coins_per_mystery` (the discovery is the receipt, so a re-armed world mystery never pays twice); rules in `nakama/content/school_rules.json`
+- [x] `OP_WALLET` {coins, delta?, source?, detail?} on join and on every change; `NetworkManager.wallet_changed` / `get_coins()`; HUD purse line ("Sakiewka: 30 koron") and a notification per change naming the lesson's subject; `Currency` formats amounts with Polish plural forms (1 korona, 3 korony, 5 koron)
+- [x] Admin: RPC `admin_grant_coins` {user_id | name, ±amount, reason} (online players update at once, offline ones by user id; `max_coin_grant`), RPC `wallet_ledger` (your own purse; admins any), `tools/grant_coins.sh`, `admin_set_profile` `reset_purse`; dev cheat `/coins ±n` (`/korony`), online through `OP_CHEAT` (cheats_enabled or admins), offline a practice purse
+- [x] Mystery content may set `on_solved.coins` (0–1000, needs a discovery; validated on load)
+- [x] Tests: Polish/English amounts, change lines, offline `/coins`, economy rules shipped; two clients against Nakama: purse on join and reset, a first solve pays and notifies, two solves, no going below zero, cheat through the server, own ledger (no pay for a too-short lesson), no reading another purse, admin grants by id and name, refusals (overdraft, no reason), ledger order and reasons. Lesson pay checked by hand with `lesson_coin_minutes` 0 (server log "10 coins paid")
+- [ ] Owner: the currency's name (and whether it should have denominations)
+- [ ] Spending: shops in the village (`Economy.spend`, stock, prices, purchases into the inventory), cosmetics and decoration only
+- [ ] More ways to earn: homework graded by professors, events, house-cup bonuses; a professor tool to reward a student in a lesson
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

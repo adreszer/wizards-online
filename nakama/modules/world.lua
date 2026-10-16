@@ -6,6 +6,7 @@ local nk = require("nakama")
 local Profile = require("character_profile")
 local P = require("generated.protocol")
 local School = require("school")
+local Economy = require("economy")
 
 local WORLD_LABEL = "world"
 local MAX_CHAT_LENGTH = P.MAX_CHAT_LENGTH
@@ -43,7 +44,7 @@ local function before_channel_message_send(context, payload)
 end
 nk.register_rt_before(before_channel_message_send, "ChannelMessageSend")
 
--- RPC "admin_set_profile": {user_id | name, role?, house?, forget_spells?, forget_mysteries?, reset_inventory?} → changes a
+-- RPC "admin_set_profile": {user_id | name, role?, house?, forget_spells?, forget_mysteries?, reset_inventory?, reset_purse?} → changes a
 -- character's role and/or house (and can wipe its spellbook, discoveries and mystery progress for testing). Allowed for server-to-server calls (HTTP key,
 -- no session), for users listed in ADMIN_USER_IDS and for admins by profile.
 -- The change is applied by the world match (so an online player is updated
@@ -72,7 +73,7 @@ local function rpc_admin_set_profile(context, payload)
   if data.house ~= nil and (type(data.house) ~= "number" or data.house < 0 or data.house > Profile.MAX_HOUSE) then
     error({ "house must be 0.." .. Profile.MAX_HOUSE, 3 })
   end
-  local request = { op = "set_profile", user_id = data.user_id, name = data.name, role = data.role, house = data.house, forget_spells = data.forget_spells == true, forget_mysteries = data.forget_mysteries == true, reset_inventory = data.reset_inventory == true }
+  local request = { op = "set_profile", user_id = data.user_id, name = data.name, role = data.role, house = data.house, forget_spells = data.forget_spells == true, forget_mysteries = data.forget_mysteries == true, reset_inventory = data.reset_inventory == true, reset_purse = data.reset_purse == true }
   local match_id = find_or_create_world()
   local result = nk.match_signal(match_id, nk.json_encode(request))
   local decoded = result and select(2, pcall(nk.json_decode, result)) or nil
@@ -95,6 +96,9 @@ local function rpc_admin_set_profile(context, payload)
     if data.reset_inventory == true then
       -- The next join recreates the starting kit.
       pcall(nk.storage_delete, { { collection = "inventory", key = "items", user_id = data.user_id } })
+    end
+    if data.reset_purse == true then
+      Economy.reset(data.user_id, "admin")
     end
     Profile.write(data.user_id, profile)
     decoded = { ok = true, user_id = data.user_id, role = profile.role, house = profile.house, offline = true }
@@ -170,3 +174,65 @@ local function rpc_lesson_plan_list(context, payload)
   return nk.json_encode({ plans = School.list_plans(context.user_id) })
 end
 nk.register_rpc(rpc_lesson_plan_list, P.RPC_LESSON_PLAN_LIST)
+
+-- RPC "admin_grant_coins": {user_id | name, amount, reason} → {ok, user_id, coins}: adds
+-- (amount > 0) or takes (amount < 0) coins with a reason in the wallet ledger. An online
+-- player is changed through the world match (their purse updates at once); an offline
+-- one by user id here. Admins or the HTTP key.
+local function rpc_admin_grant_coins(context, payload)
+  require_admin(context)
+  local ok, data = pcall(nk.json_decode, payload or "")
+  if not ok or type(data) ~= "table" then
+    error({ "invalid payload", 3 })
+  end
+  local rules = School.load_rules()
+  local amount = data.amount
+  if type(amount) ~= "number" or amount ~= math.floor(amount) or amount == 0 or math.abs(amount) > rules.max_coin_grant then
+    error({ "amount must be a whole number, not 0, at most " .. rules.max_coin_grant, 3 })
+  end
+  local reason = School.clean_text(data.reason, rules.max_reason_bytes)
+  if reason == "" then
+    error({ "a reason is required", 3 })
+  end
+  local by_name = ""
+  if context.user_id and context.user_id ~= "" then
+    by_name = context.username or ""
+  end
+  local request = { op = "grant_coins", user_id = data.user_id, name = data.name, amount = amount, reason = reason, by_name = by_name }
+  local result = nk.match_signal(find_or_create_world(), nk.json_encode(request))
+  local decoded = result and select(2, pcall(nk.json_decode, result)) or nil
+  if type(decoded) ~= "table" then
+    error({ "match did not answer", 13 })
+  end
+  if not decoded.ok and decoded.reason == "offline" and type(data.user_id) == "string" and data.user_id ~= "" then
+    local ok_users, users = pcall(nk.users_get_id, { data.user_id })
+    -- The nil id is Nakama's system user, never a player.
+    if not ok_users or not users or #users == 0 or data.user_id == "00000000-0000-0000-0000-000000000000" then
+      error({ "no such user", 5 })
+    end
+    local done, balance, why = Economy.change(data.user_id, amount, { source = "admin", reason = reason, by_name = by_name })
+    decoded = { ok = done, reason = why, user_id = data.user_id, coins = balance, offline = true }
+  end
+  if not decoded.ok then
+    error({ decoded.reason or "failed", decoded.reason == "insufficient" and 9 or 5 })  -- 9 = FAILED_PRECONDITION
+  end
+  return nk.json_encode(decoded)
+end
+nk.register_rpc(rpc_admin_grant_coins, P.RPC_ADMIN_GRANT_COINS)
+
+-- RPC "wallet_ledger": {limit?, user_id?} → {coins, entries}: the caller's own purse and
+-- its history, newest first; admins (or the HTTP key) may name any user_id.
+local function rpc_wallet_ledger(context, payload)
+  local ok, data = pcall(nk.json_decode, payload ~= "" and payload or "{}")
+  data = ok and type(data) == "table" and data or {}
+  local uid = context.user_id
+  if type(data.user_id) == "string" and data.user_id ~= "" and data.user_id ~= uid then
+    require_admin(context)
+    uid = data.user_id
+  end
+  if not uid or uid == "" then
+    error({ "name a user_id", 3 })
+  end
+  return nk.json_encode({ coins = Economy.balance(uid), entries = Economy.ledger(uid, data.limit) })
+end
+nk.register_rpc(rpc_wallet_ledger, P.RPC_WALLET_LEDGER)

@@ -27,6 +27,14 @@ M.DEFAULT_RULES = {
   max_lecture_bytes = 400,
   -- Real minutes per school day (the day/night cycle); clients get it as OP_CLOCK.
   day_length_minutes = 60,
+  -- Currency (economy.lua): paid to students still in the room when a lesson that ran
+  -- at least lesson_coin_minutes closes; for a first solve of a mystery without its own
+  -- on_solved.coins; earned coins per school day are capped; one admin grant at most.
+  coins_per_lesson = 10,
+  lesson_coin_minutes = 10,
+  coins_per_mystery = 15,
+  max_daily_coins = 100,
+  max_coin_grant = 1000,
 }
 M.HOUSES = 4
 M.POINTS_COLLECTION, M.TOTALS_KEY = "house_points", "totals"

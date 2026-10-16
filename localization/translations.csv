@@ -250,6 +250,14 @@ HOUSE_2_ANIMAL,Griffin,Gryf
 HOUSE_3_ANIMAL,Phoenix,Feniks
 HOUSE_4_ANIMAL,Hippocampus,Hipokamp
 HUD_HOUSE,House: %s,Dom: %s
+HUD_COINS,Purse: %s,Sakiewka: %s
+CURRENCY_ONE,%d crown,%d korona
+CURRENCY_FEW,%d crowns,%d korony
+CURRENCY_MANY,%d crowns,%d koron
+WALLET_FROM_LESSON,%s for attending %s,%s za obecność na lekcji: %s
+WALLET_FROM_MYSTERY,%s for solving a mystery,%s za rozwiązaną zagadkę
+WALLET_FROM_SHOP,Purchase: %s,Zakup: %s
+WALLET_FROM_ADMIN,Purse: %s,Sakiewka: %s
 HUD_HOUSE_NONE,House: not yet sorted,Dom: jeszcze nieprzydzielony
 INTERACT_HOUSE_DOOR,Enter,Wejdź
 INTERACT_SORTING,Touch the Choosing Stone,Dotknij Kamienia Wyboru
@@ -359,7 +367,7 @@ NOTIFY_FLIGHT_CONTROLS,Flying: the broom follows the mouse · W forward · Space
 INVENTORY_RIDING_MARK,(riding),(w locie)
 INVENTORY_CLICK_TO_RIDE,Click to mount it or land (shortcut: B).,"Kliknij, aby wsiąść albo wylądować (skrót: B)."
 CHAT_OFFLINE_COMMANDS_ONLY,Offline there is nobody to talk to; only commands work here (/help).,Offline nie ma z kim rozmawiać; działają tylko komendy (/pomoc).
-CHEAT_HELP,Commands: /broom (/miotla) gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /plan opens the timetable · /goto <place> takes you there (station, village, castle, an area) · /help this list.,Komendy: /miotla (/broom) daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /plan otwiera plan lekcji · /idz <miejsce> przenosi na miejsce (stacja, wioska, zamek, obszar) · /pomoc ta lista.
+CHEAT_HELP,Commands: /broom (/miotla) gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /plan opens the timetable · /coins <amount> changes your purse · /goto <place> takes you there (station, village, castle, an area) · /help this list.,Komendy: /miotla (/broom) daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /plan otwiera plan lekcji · /korony <ilość> zmienia zawartość sakiewki · /idz <miejsce> przenosi na miejsce (stacja, wioska, zamek, obszar) · /pomoc ta lista.
 CHEAT_GIVE_USAGE,Usage: /give <item>. Items: %s,Użycie: /daj <przedmiot>. Przedmioty: %s
 CHEAT_UNKNOWN,Unknown command: %s (try /help).,Nieznana komenda: %s (spróbuj /pomoc).
 CHEAT_UNKNOWN_ITEM,"No item called ""%s"". Items: %s",Nie ma przedmiotu „%s”. Przedmioty: %s
@@ -409,6 +417,10 @@ CHEAT_GOTO_USAGE,"Usage: /goto <place>: station, village, castle or an area id (
 CHEAT_GOTO_UNKNOWN,"No place called ""%s"".",Nie ma miejsca „%s”.
 CHEAT_GOTO_DONE,Moved to %s.,Przeniesiono: %s.
 CHEAT_GOTO_NOT_ALLOWED,Only professors and admins can jump around online.,W trybie online przenosić się mogą tylko profesorowie i administratorzy.
+CHEAT_COINS_NOW,In your purse: %s.,W sakiewce: %s.
+CHEAT_COINS_USAGE,Usage: /coins <amount> (a minus takes coins away).,Użycie: /korony <ilość> (minus zabiera).
+CHEAT_COINS_REQUESTED,Asking the server to change your purse…,Prośba do serwera o zmianę sakiewki…
+CHEAT_COINS_INSUFFICIENT,Not enough coins in the purse.,Za mało w sakiewce.
 HUD_LESSON_NOW,Now: %s (until %s),Teraz: %s (do %s)
 HUD_LESSON_NEXT,Next: %s · %s,Następna: %s · %s
 DAY_MON,Mon,pon.

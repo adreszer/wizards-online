@@ -34,8 +34,10 @@ return {
   OP_STATE = 1,
   OP_STUDY_TOME = 7,
   OP_TIMETABLE = 34,
+  OP_WALLET = 35,
   OP_WORLD_EVENT = 9,
   OP_WORLD_SNAPSHOT = 21,
+  RPC_ADMIN_GRANT_COINS = "admin_grant_coins",
   RPC_ADMIN_RELOAD_TIMETABLE = "admin_reload_timetable",
   RPC_ADMIN_RESET_WORLD = "admin_reset_world",
   RPC_ADMIN_SET_PROFILE = "admin_set_profile",
@@ -43,4 +45,5 @@ return {
   RPC_JOIN_WORLD = "join_world",
   RPC_LESSON_PLAN_LIST = "lesson_plan_list",
   RPC_LESSON_PLAN_SAVE = "lesson_plan_save",
+  RPC_WALLET_LEDGER = "wallet_ledger",
 }

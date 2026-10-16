@@ -12,7 +12,8 @@
 -- Optional per step: within_seconds (since the previous step), text (sent to the actor).
 -- Mystery fields: id, scope ("world" | "house" | "player"), steps, reset_on_wrong,
 -- reset_after_minutes (world/house), on_solved = { set_state = {oid = state},
--- text, discovery, house_points }.
+-- text, discovery, house_points, coins }. coins: paid with a first discovery (economy.lua);
+-- without it the school rules' coins_per_mystery apply.
 --
 -- The engine only decides; world_match.lua executes the returned actions.
 
@@ -104,6 +105,13 @@ function M.validate(m, strings, seen)
   end
   if m.scope == "player" and next(solved.set_state or {}) then err("player-scoped mysteries cannot change shared objects") end
   text_ok(solved.text, "on_solved")
+  if solved.coins ~= nil then
+    if type(solved.coins) ~= "number" or solved.coins < 0 or solved.coins > 1000 or solved.coins ~= math.floor(solved.coins) then
+      err("on_solved: coins must be a whole number 0..1000")
+    elseif not solved.discovery then
+      err("on_solved: coins are paid with a discovery (once per character); add one")
+    end
+  end
   return errors
 end
 
@@ -212,7 +220,7 @@ end
 -- effect_type?, state?, sid, uid, house, held, now }. `ctx` = { players_in(area)
 -- -> list of {sid, uid, house}, player_progress(uid) -> table, progress_changed(uid) }.
 -- Returns a list of actions:
---   { "text", sid, key }  { "set_state", oid, value }  { "discovery", sid, id }
+--   { "text", sid, key }  { "set_state", oid, value }  { "discovery", sid, id, mystery id, coins? }
 --   { "house_points", house, delta, reason }
 function M.on_event(engine, mstate, ev, ctx)
   local actions = {}
@@ -246,7 +254,7 @@ function M.on_event(engine, mstate, ev, ctx)
           end
           for _, sid in pairs(record.players) do
             if solved.text then table.insert(actions, { "text", sid, solved.text }) end
-            if solved.discovery then table.insert(actions, { "discovery", sid, solved.discovery, m.id }) end
+            if solved.discovery then table.insert(actions, { "discovery", sid, solved.discovery, m.id, solved.coins }) end
           end
           if solved.house_points and (ev.house or 0) > 0 then
             table.insert(actions, { "house_points", ev.house, solved.house_points, "mystery:" .. m.id, ev.sid })

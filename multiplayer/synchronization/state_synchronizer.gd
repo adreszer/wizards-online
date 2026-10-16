@@ -26,6 +26,7 @@ signal house_totals_changed(totals: PackedInt32Array)
 signal house_points_result_received(ok: bool, house: int, delta: int, reason: String)
 signal lecture_received(by_name: String, text: String)
 signal cheat_result_received(ok: bool, item_id: String, reason: String)
+signal wallet_changed(coins: int, delta: int, source: String, detail: String)
 signal clock_received(payload: Dictionary)
 signal timetable_received(payload: Dictionary)
 
@@ -44,6 +45,8 @@ var world_objects: Dictionary = {}
 var lessons: Dictionary = {}
 ## House points, index 0 = house 1; empty until received.
 var house_totals: PackedInt32Array = PackedInt32Array()
+## The local player's coins (server's wallet); -1 until OP_WALLET arrives.
+var coins: int = -1
 var ping_ms: int = -1
 var _ping_timer: float = 0.0
 
@@ -72,6 +75,7 @@ func bind(p_session: WorldSession) -> void:
 	session.house_points_result_received.connect(house_points_result_received.emit)
 	session.lecture_received.connect(lecture_received.emit)
 	session.cheat_result_received.connect(cheat_result_received.emit)
+	session.wallet_received.connect(_on_wallet)
 	session.clock_received.connect(clock_received.emit)
 	session.timetable_received.connect(timetable_received.emit)
 
@@ -83,6 +87,7 @@ func reset() -> void:
 	world_objects = {}
 	lessons = {}
 	house_totals = PackedInt32Array()
+	coins = -1
 	ping_ms = -1
 
 
@@ -147,6 +152,11 @@ func send_house_points(house: int, delta: int, reason: String) -> void:
 func send_cheat_give(item_id: String) -> void:
 	if session != null:
 		session.send(NetworkProtocol.OP_CHEAT, {"give": item_id})
+
+
+func send_cheat_coins(amount: int) -> void:
+	if session != null:
+		session.send(NetworkProtocol.OP_CHEAT, {"coins": amount})
 
 
 func send_cheat_time(hours: float) -> void:
@@ -274,6 +284,11 @@ func _on_world_snapshot(objects: Dictionary) -> void:
 func _on_lessons(p_lessons: Dictionary) -> void:
 	lessons = p_lessons.duplicate(true)
 	lessons_changed.emit(lessons)
+
+
+func _on_wallet(payload: Dictionary) -> void:
+	coins = maxi(0, int(payload.get("coins", 0)))
+	wallet_changed.emit(coins, int(payload.get("delta", 0)), str(payload.get("source", "")), str(payload.get("detail", "")))
 
 
 func _on_house_totals(totals: Array) -> void:

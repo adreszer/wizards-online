@@ -70,6 +70,12 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "HUD_HELD_NONE"
 
+[node name="CoinsLabel" type="Label" parent="TopLeft/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.86, 0.45, 1)
+text = "HUD_COINS"
+
 [node name="HouseLabel" type="Label" parent="TopLeft/VBox"]
 unique_name_in_owner = true
 layout_mode = 2

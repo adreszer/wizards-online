@@ -69,7 +69,7 @@ const OP_HOUSE_POINTS_RESULT := 28
 const OP_LECTURE := 29
 ## server → everyone in that classroom: {by, text}
 const OP_LECTURE_TEXT := 30
-## client → server: {give: item id} or {time: hours 0–24} a cheat (dev / admin): accepted from admins,
+## client → server: {give: item id}, {time: hours 0–24} or {coins: ±amount} a cheat (dev / admin): accepted from admins,
 ## or from anyone while the school rules say cheats_enabled
 const OP_CHEAT := 31
 ## server → sender: {ok, id, reason} outcome of OP_CHEAT (the inventory follows as OP_INVENTORY)
@@ -82,6 +82,10 @@ const OP_CLOCK := 33
 ## s: subject id, a: area id, p: professor name, t0, t1: start/end in epoch seconds}]}
 ## (see Timetable; the source is nakama/content/timetable.json)
 const OP_TIMETABLE := 34
+## server → one player, on join and whenever its purse changes: {coins: balance,
+## delta?: change, source?: "lesson" | "mystery" | "admin" | "shop", detail?: subject /
+## mystery / reason} (the currency, see nakama/modules/economy.lua)
+const OP_WALLET := 35
 
 const CHAT_ROOM := "world"
 ## Server RPC that finds (or creates) the shared world match.
@@ -98,6 +102,10 @@ const RPC_HOUSE_POINTS_LEDGER := "house_points_ledger"
 const RPC_LESSON_PLAN_SAVE := "lesson_plan_save"
 ## Staff RPC: {} → {plans: [{id, title, lines}]} the caller's lesson plans
 const RPC_LESSON_PLAN_LIST := "lesson_plan_list"
+## Admin RPC: {user_id | name, amount: ±coins, reason} → {ok, user_id, coins} (online players see it at once)
+const RPC_ADMIN_GRANT_COINS := "admin_grant_coins"
+## RPC: {limit?, user_id? (admins)} → {coins, entries: [{delta, source, reason, by_name, subject, area, at}]} newest first
+const RPC_WALLET_LEDGER := "wallet_ledger"
 const MAX_CHAT_LENGTH := 200
 
 

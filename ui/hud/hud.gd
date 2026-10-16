@@ -11,6 +11,7 @@ extends CanvasLayer
 @onready var _held_label: Label = %HeldLabel
 @onready var _role_label: Label = %RoleLabel
 @onready var _house_label: Label = %HouseLabel
+@onready var _coins_label: Label = %CoinsLabel
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _notification_label: Label = %NotificationLabel
 @onready var _status_label: Label = %StatusLabel
@@ -50,6 +51,7 @@ func _ready() -> void:
 	NetworkManager.status_changed.connect(_on_status_changed)
 	NetworkManager.profile_received.connect(_on_profile_received)
 	NetworkManager.house_totals_changed.connect(set_house_totals)
+	NetworkManager.wallet_changed.connect(_on_wallet_changed)
 	GameEvents.house_changed.connect(func(_h: int) -> void: _refresh_house())
 	_prompt_label.visible = false
 	_notification_label.visible = false
@@ -61,6 +63,7 @@ func _ready() -> void:
 	_refresh_role()
 	_refresh_house()
 	set_house_totals(NetworkManager.get_house_totals())
+	_refresh_coins()
 
 
 func _process(delta: float) -> void:
@@ -266,6 +269,18 @@ func house_tally_text() -> String:
 		if child is Label and not child.is_queued_for_deletion():
 			parts.append((child as Label).text)
 	return " ".join(parts)
+
+
+## The purse line; a gain or loss also shows as a notification.
+func _on_wallet_changed(_coins: int, delta: int, source: String, detail: String) -> void:
+	_refresh_coins()
+	var line := Currency.change_line(delta, source, detail)
+	if line != "":
+		GameEvents.notification_requested.emit(line, 5.0)
+
+
+func _refresh_coins() -> void:
+	_coins_label.text = tr("HUD_COINS") % Currency.format(NetworkManager.get_coins())
 
 
 func _refresh_house() -> void:

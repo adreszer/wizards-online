@@ -74,6 +74,7 @@ func _run() -> void:
 	await _test_castle()
 	await _test_grounds()
 	await _test_village()
+	_test_currency()
 	await _test_map()
 	await _test_setpieces()
 	await _test_day_night()
@@ -1682,6 +1683,46 @@ func _test_village() -> void:
 	t.check(ChatCommands.run("/goto nowhere_at_all", player).contains("nowhere_at_all"), "/goto names an unknown place back")
 	castle.queue_free()
 	await get_tree().process_frame
+
+
+func _test_currency() -> void:
+	t.section("Currency")
+	var forms := {1: "one", 2: "few", 4: "few", 5: "many", 11: "many", 12: "many", 14: "many", 21: "many", 22: "few", 25: "many", 112: "many", 122: "few", 0: "many"}
+	var wrong: Array = []
+	for n: int in forms:
+		if Currency.polish_form(n) != forms[n]:
+			wrong.append(n)
+	t.check(wrong.is_empty(), "Polish plural forms of the currency (wrong for %s)" % str(wrong))
+	var locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("pl")
+	var pl := [Currency.format(1), Currency.format(3), Currency.format(5)]
+	TranslationServer.set_locale("en")
+	var en := [Currency.format(1), Currency.format(5)]
+	t.check(pl[0] != pl[1] and pl[1] != pl[2] and en[0] != en[1] and pl[2].begins_with("5 ") and en[1].begins_with("5 "),
+		"amounts read naturally in both languages (%s / %s)" % [str(pl), str(en)])
+	var subject: SubjectDefinition = SubjectRegistry.all()[0]
+	var line := Currency.change_line(10, "lesson", str(subject.id))
+	t.check(line.begins_with("+10") and line.contains(tr(subject.display_name)), "a lesson's pay names the subject (%s)" % line)
+	t.check(Currency.change_line(0, "lesson", "") == "" and Currency.change_line(-4, "shop", "").contains("4"), "no line for nothing, a purchase shows what it cost")
+	TranslationServer.set_locale(locale)
+	# Offline the purse is a practice one: /coins changes it at once and never goes below zero.
+	NetworkManager.offline_coins = 0
+	var seen: Array = []
+	var on_wallet := func(coins: int, delta: int, _s: String, _d: String) -> void: seen.append([coins, delta])
+	NetworkManager.wallet_changed.connect(on_wallet)
+	ChatCommands.run("/coins 25", null)
+	ChatCommands.run("/korony -100", null)
+	var said := ChatCommands.run("/coins", null)
+	var usage := ChatCommands.run("/coins lots", null)
+	NetworkManager.wallet_changed.disconnect(on_wallet)
+	t.check(seen == [[25, 25], [0, -25]] and NetworkManager.get_coins() == 0, "offline /coins adds and takes, never below zero (%s)" % str(seen))
+	t.check(said.contains(Currency.format(0)) and usage == tr("CHEAT_COINS_USAGE"), "/coins alone says the balance, a bad amount shows the usage")
+	# The server's economy rules ship with sensible values.
+	var rules: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/school_rules.json"))
+	var ok := true
+	for key in ["coins_per_lesson", "lesson_coin_minutes", "coins_per_mystery", "max_daily_coins", "max_coin_grant"]:
+		ok = ok and rules.has(key) and float(rules[key]) > 0.0 and float(rules[key]) == floorf(float(rules[key]))
+	t.check(ok and float(rules["max_daily_coins"]) >= float(rules["coins_per_lesson"]), "school_rules.json sets the economy (pay, cap, grant limit)")
 
 
 ## Walks the player through the points in order (each within 8 s); "" or where it got stuck.

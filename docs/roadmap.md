@@ -153,7 +153,7 @@ Goal: attending a lesson is fun, and progress over weeks is visible.
 3. **Potion brewing** (M ★★★). A cauldron minigame (order, stirring, heat, timing). Brewed potions are consumables (glow-in-dark, featherfall, voice-change, colour-change robes for an hour). Professors can grade the results.
 4. **Care of Magical Creatures and familiars** (L ★★★). Original creatures to care for in lessons; later a personal familiar that follows you, sits on your shoulder, sleeps on your dorm bed. Huge for attachment.
 5. **The village weekend** (L ★★). An original nearby village reachable on scheduled weekends: shops for cosmetics, a tea house to meet, a post office for paper birds. Needs an economy (below). The village itself is built (Milestone 36: high street, square, nine shops, an inn, a tea house, the post office, all walk-in areas with stable ids) together with the railway station where new players will arrive; next come the shop logic, the weekend schedule and the arrival flow.
-6. **Economy (careful)** (M ★). A small currency earned by attendance, homework and events, spent on cosmetics and decoration. No buying spells or points. Defer until there is something worth buying.
+6. **Economy (careful)** (M ★). A small currency earned by attendance, homework and events, spent on cosmetics and decoration. No buying spells or points. The currency exists (Milestone 37: server wallet with a ledger, paid for attending lessons and first mystery solves, daily cap, admin grants); next: something to buy in the village shops, homework and event rewards.
 
 ---
 

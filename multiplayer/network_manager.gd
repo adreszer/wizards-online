@@ -49,6 +49,9 @@ signal house_points_result_received(ok: bool, house: int, delta: int, reason: St
 signal lecture_received(by_name: String, text: String)
 ## Outcome of a cheat the local player sent (see ChatCommands).
 signal cheat_result_received(ok: bool, item_id: String, reason: String)
+## The local player's purse changed: the new balance and what changed it (delta 0 on
+## join; source "lesson" | "mystery" | "admin" | "shop", detail: subject, mystery or reason).
+signal wallet_changed(coins: int, delta: int, source: String, detail: String)
 ## The school clock changed (server OP_CLOCK, or /time offline); `by_name` is who
 ## moved it ("" for the join snapshot).
 signal school_clock_changed(by_name: String)
@@ -74,6 +77,8 @@ var clock := ServerClock.new()
 var school_clock := SchoolClock.new()
 ## The school week in real time (empty offline; see Timetable).
 var timetable := Timetable.new()
+## Offline practice purse (the /coins cheat); never saved, the real one is the server's wallet.
+var offline_coins: int = 0
 var _reconnect_attempts: int = 0
 var _reconnecting: bool = false
 
@@ -101,6 +106,7 @@ func _ready() -> void:
 	state_synchronizer.house_points_result_received.connect(house_points_result_received.emit)
 	state_synchronizer.lecture_received.connect(_on_lecture)
 	state_synchronizer.cheat_result_received.connect(cheat_result_received.emit)
+	state_synchronizer.wallet_changed.connect(wallet_changed.emit)
 	state_synchronizer.clock_received.connect(func(payload: Dictionary) -> void:
 		school_clock.apply(payload)
 		school_clock_changed.emit(str(payload.get("by", ""))))
@@ -302,6 +308,37 @@ func send_lecture(text: String) -> void:
 ## Open lessons (area id → {subject, by, sid}); empty offline.
 func get_lessons() -> Dictionary:
 	return state_synchronizer.lessons if is_online() else {}
+
+
+## The local player's coins: the server's wallet online (0 before it arrives), a
+## practice purse offline (dev cheat only; it is not saved).
+func get_coins() -> int:
+	return maxi(0, state_synchronizer.coins) if is_online() else offline_coins
+
+
+## Dev cheat /coins: online the server changes the purse (answered by wallet_changed),
+## offline the practice purse changes at once.
+func cheat_coins(amount: int) -> void:
+	if is_in_world():
+		state_synchronizer.send_cheat_coins(amount)
+	else:
+		var before := offline_coins
+		offline_coins = maxi(0, offline_coins + amount)
+		wallet_changed.emit(offline_coins, offline_coins - before, "admin", "cheat")
+
+
+## The purse and its history, newest first: {coins, entries: [{delta, source, reason,
+## by_name, subject, area, at}]}; admins may pass `user_id`.
+func wallet_ledger(limit: int = 50, user_id: String = "", http_key: String = "") -> Dictionary:
+	var request := {"limit": limit}
+	if not user_id.is_empty():
+		request["user_id"] = user_id
+	return await _admin_rpc(NetworkProtocol.RPC_WALLET_LEDGER, request, http_key)
+
+
+## Admin RPC: add (amount > 0) or take coins from a player by user id or display name, with a reason.
+func admin_grant_coins(request: Dictionary, http_key: String = "") -> Dictionary:
+	return await _admin_rpc(NetworkProtocol.RPC_ADMIN_GRANT_COINS, request, http_key)
 
 
 ## House points tally (index 0 = house 1); empty offline or before it arrives.

@@ -26,6 +26,7 @@ var lesson_results: Array = []
 var points_results: Array = []
 var lectures: Array[String] = []
 var cheat_results: Array = []
+var wallets: Array = []
 ## Who moved the school clock, per OP_CLOCK ("" = the join snapshot)
 var clock_changes: Array[String] = []
 var timetables_received: int = 0
@@ -54,6 +55,7 @@ func _ready() -> void:
 	GameEvents.notification_requested.connect(func(text: String, _d: float) -> void: notifications.append(text))
 	NetworkManager.sort_result_received.connect(func(ok: bool, house: int, reason: String) -> void: sort_results.append({"ok": ok, "house": house, "reason": reason}))
 	NetworkManager.object_state_changed.connect(func(oid: String, s: Variant) -> void: object_events.append([oid, s]))
+	NetworkManager.wallet_changed.connect(func(c: int, d: int, s: String, x: String) -> void: wallets.append([c, d, s, x]))
 	NetworkManager.server_text_received.connect(func(text: String, _s: float) -> void: server_texts.append(text))
 	NetworkManager.lesson_result_received.connect(func(ok: bool, action: String, reason: String) -> void: lesson_results.append({"ok": ok, "action": action, "reason": reason}))
 	NetworkManager.house_points_result_received.connect(func(ok: bool, house: int, delta: int, reason: String) -> void: points_results.append({"ok": ok, "house": house, "delta": delta, "reason": reason}))
@@ -84,10 +86,12 @@ func _run() -> void:
 	var got_profile := await _wait_until(func() -> bool: return not NetworkManager.get_local_profile().is_empty(), 10.0)
 	t.check(got_profile, "server sent the character profile on join")
 	# Accounts persist between runs: start from a fresh student record (dev tooling path).
-	var reset: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "role": "student", "house": 0, "forget_spells": true, "forget_mysteries": true}, HTTP_KEY)
+	var reset: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "role": "student", "house": 0, "forget_spells": true, "forget_mysteries": true, "reset_purse": true}, HTTP_KEY)
 	t.check(reset.get("ok", false) == true, "test account reset to a fresh student (%s)" % str(reset))
 	got_profile = await _wait_until(func() -> bool: return NetworkManager.get_local_role() == "student" and NetworkManager.get_local_house() == 0 and _known_spells().is_empty(), 10.0)
 	t.check(got_profile and spawner.local_player.spell_caster.known_spells.is_empty(), "reset profile applied to the player")
+	var empty_purse := await _wait_until(func() -> bool: return wallets.size() > 0 and NetworkManager.get_coins() == 0, 10.0)
+	t.check(empty_purse, "the server sent the purse on join and emptied it on reset (%s)" % str(wallets))
 	if role == "b":
 		await _run_actor(spawner)
 	else:
@@ -310,6 +314,20 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	var switch_node: Node = _world_object(SWITCH)
 	t.check(ok and switch_node is MagicSwitch and switch_node.is_on == (NetworkManager.get_world_object_states().get(SWITCH, false) == true), "the student's switch change reaches the professor's castle")
 
+	t.section("Purse (admin RPC)")
+	var granted: Dictionary = await NetworkManager.admin_grant_coins({"user_id": NetworkManager.local_user_id, "amount": 50, "reason": "staff stipend"}, HTTP_KEY)
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 50, 10.0)
+	t.check(granted.get("ok", false) == true and ok and wallets.back()[2] == "admin", "an admin grant reaches an online player at once (%s)" % str(granted))
+	var by_name_grant: Dictionary = await NetworkManager.admin_grant_coins({"name": "ClientA", "amount": -20, "reason": "fine"}, HTTP_KEY)
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 30, 10.0)
+	t.check(by_name_grant.get("ok", false) == true and ok, "grants work by display name and can take coins")
+	var too_much: Dictionary = await NetworkManager.admin_grant_coins({"name": "ClientA", "amount": -100, "reason": "fine"}, HTTP_KEY)
+	var no_reason: Dictionary = await NetworkManager.admin_grant_coins({"name": "ClientA", "amount": 5, "reason": " "}, HTTP_KEY)
+	t.check(too_much.has("error") and no_reason.has("error") and NetworkManager.get_coins() == 30, "taking more than the purse holds, or a grant without a reason, is refused")
+	var ledger_a: Dictionary = await NetworkManager.wallet_ledger(10, NetworkManager.local_user_id, HTTP_KEY)
+	var first: Dictionary = (ledger_a.get("entries", [{}]) as Array)[0]
+	t.check(int(ledger_a.get("coins", -1)) == 30 and int(first.get("delta", 0)) == -20 and first.get("reason", "") == "fine", "the ledger records each change with its reason, newest first (%s)" % str(first))
+
 	t.section("Mystery (professor)")
 	t.check(await _enter_zone(spawner, &"gallery", Vector3(-2, 0, 0)), "the professor waits in the gallery")
 	var loft: Node = _world_object(LOFT_WALL)
@@ -456,6 +474,9 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 		t.check(ok, "reading %s earns a server text (%s)" % [TALE[i][1], str(server_texts.slice(texts_before))])
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("founders_tale"), 10.0)
 	t.check(ok, "solving a mystery records a discovery on the profile")
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 15, 10.0)
+	t.check(ok and wallets.back()[1] == 15 and wallets.back()[2] == "mystery", "a first solve pays coins (%s)" % str(wallets))
+	t.check(notifications.has(Currency.change_line(15, "mystery", "founders_tale")), "and says so")
 	t.check(server_texts.size() >= 3 and not server_texts.any(func(x: String) -> bool: return x.begins_with("MYST_")), "clues arrive as resolved text, not keys (%s)" % str(server_texts))
 	# World scope, two players: the loft opens only with someone else in the gallery.
 	var loft: Node = _world_object(LOFT_WALL)
@@ -472,11 +493,34 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(ok, "with two players present the spell solves the mystery and opens the loft")
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("loft"), 10.0)
 	t.check(ok, "the solver gets the loft discovery")
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 30, 10.0)
+	t.check(ok, "the second mystery pays too (%d)" % NetworkManager.get_coins())
 	await _enter_classroom(spawner, Vector3(2, 0, 0))
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_house_totals().size() == 4 and NetworkManager.get_house_totals()[2] >= my_house_points + 5, 20.0)
 	t.check(ok, "the student's house tally shows the professor's award (%d → %s)" % [my_house_points, str(NetworkManager.get_house_totals())])
 	var hud := world.get_node_or_null("HUD")
 	t.check(hud == null or hud.house_tally_text().contains(str(NetworkManager.get_house_totals()[2])), "the HUD tally shows the totals")
+
+	t.section("Purse (student)")
+	var refusals := cheat_results.size()
+	ChatCommands.run("/coins -500", player)
+	ok = await _wait_until(func() -> bool: return cheat_results.size() > refusals, 10.0)
+	t.check(ok and cheat_results.back()["reason"] == "insufficient" and NetworkManager.get_coins() == 30, "the purse never goes below zero (%s)" % str(cheat_results.back() if ok else {}))
+	ChatCommands.run("/coins 5", player)
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 35, 10.0)
+	t.check(ok, "the dev cheat adds coins through the server")
+	var mine: Dictionary = await NetworkManager.wallet_ledger(20)
+	# Accounts persist between runs: read the history back to this run's reset.
+	var sources: Array = []
+	for e: Dictionary in mine.get("entries", []):
+		if str(e.get("reason", "")) == "reset":
+			break
+		sources.append(str(e.get("source", "")))
+	t.check(int(mine.get("coins", -1)) == 35 and sources.count("mystery") == 2 and not sources.has("lesson"),
+		"the student's own ledger: two mysteries, no pay for a lesson shorter than the rules' minimum (%s)" % str(sources))
+	var theirs: Dictionary = await NetworkManager.wallet_ledger(5, "someone-else")
+	t.check(theirs.has("error"), "a student cannot read someone else's purse")
+	cheat_results.clear()   # the brooms section counts its own cheat answers
 
 	t.section("Brooms (student)")
 	var reset_inv: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "reset_inventory": true}, HTTP_KEY)

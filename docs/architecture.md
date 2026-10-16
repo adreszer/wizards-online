@@ -155,6 +155,16 @@ Houses: `HouseSorting` (client) and `SORTING` in `character_profile.lua` share o
 
 Administration: the `admin_set_profile` RPC (`{user_id | name, role?, house?}`) is allowed for server-to-server calls with the runtime HTTP key, for users in `ADMIN_USER_IDS` and for admins by profile. It signals the live world match (`match_signal`), which updates the online player by user id or display name, saves and broadcasts `OP_ROSTER_UPDATE`; an offline target given by user id is written to storage directly. `tools/set_role.sh` wraps the curl call.
 
+## Currency
+
+```
+nakama/modules/economy.lua   balances in Nakama's wallet ({coins = n}) + ledger metadata; change / earn (daily cap) / spend / reset / ledger
+storage economy/daily        per user {day, earned}: today's earned coins (school day from timetable.lua)
+Currency (static, client)    format(n) with Polish plurals (CURRENCY_ONE/FEW/MANY), change_line(delta, source, detail)
+```
+
+The server owns every balance. Coins live in each account's Nakama wallet, so a change is atomic and can never take a balance below zero, and Nakama's wallet ledger keeps every change with its metadata (`source`: lesson, mystery, admin, shop; `reason`, `by_name`, `subject`, `area`). The world match pays students who are still in the classroom when a lesson closes (if it ran `lesson_coin_minutes`; staff are not paid), and pays a mystery's solvers when its discovery is new to them, so a re-armed world mystery never pays the same character twice. Earned coins go through `Economy.earn`, capped per school day (`max_daily_coins`); admin grants (RPC `admin_grant_coins`, `tools/grant_coins.sh`, dev cheat `/coins`) and spending are not capped. Each player gets `OP_WALLET` {coins, delta, source, detail} on join and after every change; the client keeps the balance in `StateSynchronizer.coins` (`NetworkManager.get_coins()`, `wallet_changed`) and the HUD shows the purse and a line per change. Offline there is only a practice purse for the cheat, never saved. Shops will take coins with `Economy.spend` (source `shop`); nothing may buy spells or house points.
+
 ## Enemies
 
 ```

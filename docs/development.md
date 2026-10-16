@@ -68,6 +68,16 @@ Houses: students are sorted once at the Choosing Stone in the Great Hall (four q
 
 The script calls the `admin_set_profile` RPC with `http_key=defaulthttpkey`; the same RPC is available to logged-in admins (the lesson tools do not expose it yet). To make an account an admin permanently, put its user id (console → Accounts) in `ADMIN_USER_IDS` in `nakama/local.yml` (comma-separated) and recreate the container. Only professors and admins can open the lesson tools (`L`). Teaching goes: stand in a subject's classroom, **Open lesson**, then teach students standing in the same room; only the room's subject's spells are listed and accepted. The same panel sends lecture lines to the room (typed, or **Next line** from a saved lesson plan) and awards or deducts house points with a reason; limits are in `nakama/content/school_rules.json`. To audit house points, call the `house_points_ledger` RPC (`curl -sS "http://127.0.0.1:7350/v2/rpc/house_points_ledger?http_key=defaulthttpkey&unwrap" -d '{}'`). Casts of spells a character does not know are dropped by the server, so promote yourself before expecting to demonstrate anything you have not learned from a tome.
 
+Coins (the placeholder currency) are changed only on the server too:
+
+```bash
+tools/grant_coins.sh Elara 50 "helped at the open day"     # online player by display name
+tools/grant_coins.sh 1c9a…-uuid -20 "lost library book"    # by user id (offline players too); never below zero
+tools/grant_coins.sh --ledger 1c9a…-uuid                    # the purse and its history, newest first
+```
+
+Students earn coins by staying to the end of a lesson that ran at least `lesson_coin_minutes` and by a first solve of each mystery, up to `max_daily_coins` a school day (all in `nakama/content/school_rules.json`).
+
 Then launch the game and choose **Play ONLINE**. If the backend is not running you get an error message on the menu and can still play offline.
 
 ## Two clients on one machine
@@ -172,6 +182,7 @@ Open the chat (Enter or T; works offline too) and type a command:
 - `/broom` or `/miotla`: a flying broom (B to fly)
 - `/give <item id>` (`/daj`): any item from `ItemRegistry.ITEM_IDS`
 - `/plan` (`/lekcje`, `/timetable`): opens the timetable (online only; offline there is none)
+- `/coins [±n]` (`/korony`): shows your purse, or adds (minus: takes) coins; online through the server (cheats_enabled or admins), offline a practice purse
 - `/goto <place>` (`/idz`, `/tp`): jumps to `station` (`stacja`), `village` (`wioska`), `castle` (`zamek`) or any area id (`sweet_shop`, `great_hall`…); offline always, online professors and admins only
 - `/time` (`/czas`): the school time; `/time 14:30`, `/time dawn|day|dusk|night` (`swit|dzien|zmierzch|noc`) moves the clock (online: for everyone, and it stays moved across restarts)
 - `/help` (`/pomoc`): the list

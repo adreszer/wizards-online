@@ -7,5 +7,10 @@
   "cheats_enabled": true,
   "max_reason_bytes": 120,
   "max_lecture_bytes": 400,
-  "day_length_minutes": 60
+  "day_length_minutes": 60,
+  "coins_per_lesson": 10,
+  "lesson_coin_minutes": 10,
+  "coins_per_mystery": 15,
+  "max_daily_coins": 100,
+  "max_coin_grant": 1000
 }

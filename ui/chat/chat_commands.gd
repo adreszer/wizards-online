@@ -6,6 +6,7 @@ extends RefCounted
 ##   /give <item id> (/daj)      give any registered item
 ##   /time [hh[:mm]] (/czas)     show the school time, or move the clock (everyone's, online)
 ##   /plan (/timetable)          open the timetable
+##   /coins <±n> (/korony)      add coins to (or take them from) your own purse
 ##   /goto <place> (/idz)        jump to the station, the village, the castle gate or any area id
 ##                               (offline always; online only professors and admins)
 ##   /help (/pomoc)              list the commands
@@ -19,6 +20,7 @@ const HELP_ALIASES: Array[String] = ["help", "pomoc", "?"]
 const TIME_ALIASES: Array[String] = ["time", "czas", "godzina"]
 const PLAN_ALIASES: Array[String] = ["plan", "timetable", "lekcje"]
 const GOTO_ALIASES: Array[String] = ["goto", "tp", "idz", "idź"]
+const COINS_ALIASES: Array[String] = ["coins", "korony", "monety", "kasa"]
 ## Named places for /goto; anything else is looked up as an area id.
 const PLACE_ALIASES := {"station": "@station", "stacja": "@station", "dworzec": "@station", "pociag": "@station", "pociąg": "@station",
 	"village": "@village", "wioska": "@village", "rynek": "@village",
@@ -48,9 +50,24 @@ static func run(text: String, player: Node) -> String:
 		return _t("CHEAT_PLAN_OPENED")
 	if TIME_ALIASES.has(name):
 		return time(parts[1] if parts.size() > 1 else "")
+	if COINS_ALIASES.has(name):
+		return coins(parts[1] if parts.size() > 1 else "")
 	if GOTO_ALIASES.has(name):
 		return goto(parts[1] if parts.size() > 1 else "", player)
 	return _t("CHEAT_UNKNOWN") % text
+
+
+## No argument: says the balance. Otherwise adds (or with a minus, takes) coins: online
+## the server decides (cheats_enabled or admins) and the purse follows as OP_WALLET.
+static func coins(arg: String) -> String:
+	if arg.is_empty():
+		return _t("CHEAT_COINS_NOW") % Currency.format(NetworkManager.get_coins())
+	if not arg.is_valid_int() or int(arg) == 0:
+		return _t("CHEAT_COINS_USAGE")
+	NetworkManager.cheat_coins(int(arg))
+	if NetworkManager.is_in_world():
+		return _t("CHEAT_COINS_REQUESTED")
+	return _t("CHEAT_COINS_NOW") % Currency.format(NetworkManager.get_coins())
 
 
 ## Moves the local player to a named place or the floor of an area (a playtest shortcut:
@@ -144,6 +161,8 @@ static func result_line(ok: bool, definition: ItemDefinition, reason: String = "
 		return _t("NOTIFY_ALREADY_HAVE_ITEM") % name
 	if reason == "not_allowed":
 		return _t("CHEAT_NOT_ALLOWED")
+	if reason == "insufficient":
+		return _t("CHEAT_COINS_INSUFFICIENT")
 	return _t("CHEAT_FAILED") % reason
 
 

@@ -22,6 +22,10 @@
 -- Items are granted by item racks (world objects of kind "item_rack", e.g. the
 -- broom stands: one per character) and by OP_CHEAT (admins, or anyone while
 -- the school rules have cheats_enabled).
+-- Coins (economy.lua, Nakama's wallet): students still in the room when a lesson
+-- closes are paid for it, a first solve of a mystery pays, admins grant (RPC
+-- admin_grant_coins, signal "grant_coins") and the dev cheat {coins}; each player
+-- gets OP_WALLET on join and on every change of their purse.
 -- Movement is relayed but not yet validated.
 
 local nk = require("nakama")
@@ -31,6 +35,7 @@ local Objects = require("object_rules")
 local Mysteries = require("mysteries")
 local School = require("school")
 local Timetable = require("timetable")
+local Economy = require("economy")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -44,7 +49,7 @@ local OP_LESSON, OP_LESSON_STATE, OP_LESSON_RESULT = P.OP_LESSON, P.OP_LESSON_ST
 local OP_HOUSE_POINTS, OP_HOUSE_TOTALS, OP_HOUSE_POINTS_RESULT = P.OP_HOUSE_POINTS, P.OP_HOUSE_TOTALS, P.OP_HOUSE_POINTS_RESULT
 local OP_LECTURE, OP_LECTURE_TEXT = P.OP_LECTURE, P.OP_LECTURE_TEXT
 local OP_CHEAT, OP_CHEAT_RESULT, OP_CLOCK = P.OP_CHEAT, P.OP_CHEAT_RESULT, P.OP_CLOCK
-local OP_TIMETABLE = P.OP_TIMETABLE
+local OP_TIMETABLE, OP_WALLET = P.OP_TIMETABLE, P.OP_WALLET
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
 local MAX_AREA_ID_BYTES = 48
@@ -269,6 +274,38 @@ local function players_in(state, area)
   return out
 end
 
+-- A player's purse: the balance, and what just changed it (delta, source, detail).
+local function send_wallet(dispatcher, state, sid, balance, delta, source, detail)
+  local p = state.presences[sid]
+  if not p then return end
+  local payload = { coins = balance }
+  if delta and delta ~= 0 then
+    payload.delta, payload.source, payload.detail = delta, source or "", detail or ""
+  end
+  dispatcher.broadcast_message(OP_WALLET, nk.json_encode(payload), { p }, nil, true)
+end
+
+local function sid_of_user(state, uid)
+  for sid, p in pairs(state.presences) do
+    if p.user_id == uid then return sid end
+  end
+  return nil
+end
+
+-- Earned coins (lesson, mystery) for an online player: capped per school day.
+local function pay(dispatcher, state, sid, amount, meta, detail)
+  local p = state.presences[sid]
+  if not p or not amount or amount <= 0 then return 0 end
+  local day = Timetable.school_day(state.timetable, nk.time() / 1000)
+  local paid, balance, reason = Economy.earn(p.user_id, amount, meta, state.rules, day)
+  if paid > 0 then
+    send_wallet(dispatcher, state, sid, balance, paid, meta.source, detail)
+  elseif reason then
+    nk.logger_info(string.format("economy: %s not paid %d (%s, %s)", state.names[sid] or sid, amount, meta.source, reason))
+  end
+  return paid
+end
+
 local function send_house_totals(dispatcher, state, presences)
   dispatcher.broadcast_message(OP_HOUSE_TOTALS, nk.json_encode({ totals = state.totals }), presences, nil, true)
 end
@@ -302,9 +339,21 @@ local function close_lesson(dispatcher, state, area, why)
   local lesson = state.lessons[area]
   if not lesson then return end
   state.lessons[area] = nil
-  local count = 0
+  local count, paid = 0, 0
   for _ in pairs(lesson.attendance) do count = count + 1 end
-  nk.logger_info(string.format("lesson %s in %s by %s closed (%s), %d attended, %d points, slot %s", lesson.subject, area, lesson.by_name, why, count, lesson.points, lesson.slot or "-"))
+  -- Attendance pays: every student who attended and is still in the room, when the
+  -- lesson ran long enough (opening and closing at once pays nobody).
+  local minutes = (nk.time() / 1000 - lesson.opened_at) / 60
+  if minutes >= state.rules.lesson_coin_minutes then
+    for _, pl in ipairs(players_in(state, area)) do
+      local profile = state.profiles[pl.sid]
+      if pl.sid ~= lesson.by_sid and lesson.attendance[pl.uid] and profile and not Profile.is_staff(profile.role) then
+        paid = paid + pay(dispatcher, state, pl.sid, state.rules.coins_per_lesson,
+          { source = "lesson", subject = lesson.subject, area = area, by_name = lesson.by_name }, lesson.subject)
+      end
+    end
+  end
+  nk.logger_info(string.format("lesson %s in %s by %s closed (%s), %d attended, %d points, %d coins paid, slot %s", lesson.subject, area, lesson.by_name, why, count, lesson.points, paid, lesson.slot or "-"))
   send_lessons(dispatcher, state, nil)
 end
 
@@ -351,6 +400,8 @@ local function run_actions(dispatcher, state, actions)
       if profile and Profile.discover(profile, a[3]) then
         Profile.write(state.presences[a[2]].user_id, profile)
         send_profile(dispatcher, state, a[2])
+        -- A first solve pays (once per character: the discovery is the receipt).
+        pay(dispatcher, state, a[2], a[5] or state.rules.coins_per_mystery, { source = "mystery", reason = a[4] or a[3] }, a[4] or a[3])
       end
     elseif kind == "house_points" then
       award_house_points(dispatcher, state, a[2], a[3], a[4], a[5], "mystery")
@@ -418,6 +469,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     dispatcher.broadcast_message(OP_WORLD_SNAPSHOT, nk.json_encode({ objects = state.world.objects, s = nk.time() }), { p }, nil, true)
     send_lessons(dispatcher, state, { p })
     send_house_totals(dispatcher, state, { p })
+    send_wallet(dispatcher, state, p.session_id, Economy.balance(p.user_id))
     send_clock(dispatcher, state, { p })
     send_timetable(dispatcher, state, { p })
     local rest = others(state, p.session_id)
@@ -624,9 +676,22 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       local profile = state.profiles[sid]
       local id = ok and type(payload) == "table" and type(payload.give) == "string" and payload.give or ""
       local hours = ok and type(payload) == "table" and type(payload.time) == "number" and payload.time or nil
+      local coins = ok and type(payload) == "table" and type(payload.coins) == "number" and payload.coins or nil
       local reason
       if not profile or not (state.rules.cheats_enabled or profile.role == "admin") then
         reason = "not_allowed"
+      elseif coins ~= nil then
+        -- /coins: add to (or take from) your own purse, answered by OP_WALLET.
+        if coins ~= math.floor(coins) or coins == 0 or math.abs(coins) > state.rules.max_coin_grant then
+          reason = "bad_amount"
+        else
+          local done, balance, why = Economy.change(message.sender.user_id, coins, { source = "admin", reason = "cheat", by_name = state.names[sid] or "" })
+          reason = why
+          if done then
+            send_wallet(dispatcher, state, sid, balance, coins, "admin", "cheat")
+            nk.logger_info(string.format("cheat: %s changed their purse by %d", state.names[sid] or sid, coins))
+          end
+        end
       elseif hours ~= nil then
         -- /time: move the school clock for everyone (answered by OP_CLOCK, not a result).
         if hours ~= hours or hours < 0 or hours >= 24 then
@@ -641,7 +706,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         reason = give_item(dispatcher, state, sid, id)
         nk.logger_info(string.format("cheat: %s gave themselves %s (%s)", state.names[sid] or sid, id, tostring(reason or "ok")))
       end
-      if hours == nil or reason ~= nil then
+      if (hours == nil and coins == nil) or reason ~= nil then
         dispatcher.broadcast_message(OP_CHEAT_RESULT, nk.json_encode({ ok = reason == nil, id = ITEMS[id] and id or "", reason = reason or "" }), { message.sender }, nil, true)
       end
     elseif message.op_code == OP_LESSON then
@@ -731,7 +796,8 @@ function M.match_terminate(context, dispatcher, tick, state, grace_seconds)
 end
 
 -- Signals come from world.lua's admin RPCs:
---   { op = "set_profile", user_id | name, role?, house?, forget_spells?, forget_mysteries?, reset_inventory? }
+--   { op = "set_profile", user_id | name, role?, house?, forget_spells?, forget_mysteries?, reset_inventory?, reset_purse? }
+--   { op = "grant_coins", user_id | name, amount, reason, by_name }
 --   { op = "reset_world" }  every object to its default, world/house mysteries unsolved
 -- Answers { ok, sid, user_id, role, house } or { ok = false, reason }.
 function M.match_signal(context, dispatcher, tick, state, data)
@@ -740,6 +806,18 @@ function M.match_signal(context, dispatcher, tick, state, data)
     state.timetable = Timetable.load()
     send_timetable(dispatcher, state, nil)
     return state, nk.json_encode({ ok = true, slots = #state.timetable.slots })
+  end
+  if ok and type(request) == "table" and request.op == "grant_coins" then
+    local sid = find_sid(state, request.user_id, request.name)
+    if not sid then
+      return state, nk.json_encode({ ok = false, reason = "offline" })
+    end
+    local uid = state.presences[sid].user_id
+    local done, balance, why = Economy.change(uid, request.amount, { source = "admin", reason = request.reason, by_name = request.by_name })
+    if done then
+      send_wallet(dispatcher, state, sid, balance, request.amount, "admin", request.reason)
+    end
+    return state, nk.json_encode({ ok = done, reason = why, user_id = uid, coins = balance })
   end
   if ok and type(request) == "table" and request.op == "reset_world" then
     local driven = state.world.driven
@@ -777,6 +855,9 @@ function M.match_signal(context, dispatcher, tick, state, data)
     state.inventories[sid] = inv
     write_inventory(state.presences[sid].user_id, inv)
     dispatcher.broadcast_message(OP_INVENTORY, nk.json_encode(inv), { state.presences[sid] }, nil, true)
+  end
+  if request.reset_purse == true then
+    send_wallet(dispatcher, state, sid, Economy.reset(state.presences[sid].user_id, "admin"))
   end
   Profile.write(state.presences[sid].user_id, profile)
   send_profile(dispatcher, state, sid)
