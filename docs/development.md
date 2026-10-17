@@ -187,7 +187,7 @@ Open the chat (Enter or T; works offline too) and type a command:
 - `/time` (`/czas`): the school time; `/time 14:30`, `/time dawn|day|dusk|night` (`swit|dzien|zmierzch|noc`) moves the clock (online: for everyone, and it stays moved across restarts)
 - `/help` (`/pomoc`): the list
 
-Offline they change the local inventory. Online the server decides: admins always, everyone while `"cheats_enabled": true` in `nakama/content/school_rules.json` (the dev default; set it to false for a public server, then restart Nakama). Without a cheat, take a broom from the stand beside the spawn on the grounds or in the flying classroom.
+Offline they change the local inventory. Online the server decides: admins always, everyone while `"cheats_enabled": true` in `nakama/content/school_rules.json` (the dev default; set it to false for a public server, then restart Nakama). Without a cheat, take a broom from the stand beside the spawn on the grounds or in the flying classroom. Brooms fly only outdoors (grounds, courtyards, open sky overhead); flying into a building lands you.
 
 ## Editing the timetable
 

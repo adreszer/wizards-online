@@ -1141,7 +1141,7 @@ func _test_flying() -> void:
 	t.check(not movement.is_flying and player.broom_rider.mount == null, "holding C on the ground lands and dismounts")
 	movement.set_external_vertical(0.0)
 
-	# No flying in classrooms: mounting refused, entering one in flight lands you.
+	# Flying is for the open air: indoor zones (a classroom here) refuse mounting and land you on entry.
 	var zone: AreaZone = AREA_ZONE_SCENE.instantiate()
 	zone.area_id = &"test_classroom"
 	zone.kind = "classroom"
@@ -1163,6 +1163,19 @@ func _test_flying() -> void:
 	movement.set_external_move(Vector3.ZERO)
 	await _wait(0.5)
 	t.check(not player.broom_rider.toggle() and not movement.is_flying, "cannot mount inside a classroom")
+	for kind in ["room", "corridor", "hall", "tower", "common_room"]:
+		zone.kind = kind
+		t.check(not player.broom_rider.can_fly_here(), "no flying indoors (%s)" % kind)
+	for kind in ["grounds", "outdoor"]:
+		zone.kind = kind
+		t.check(player.broom_rider.can_fly_here(), "flying allowed in the open air (%s)" % kind)
+	zone.kind = "classroom"
+	# A roof overhead (a cottage in the grounds) also keeps the broom grounded.
+	player.global_position = Vector3(30, 0.1, 20)
+	var roof := TestHelpers.make_floor(self, Vector3(30, 4.0, 20), Vector3(6, 0.4, 6))
+	fixtures.append(roof)
+	await _wait(0.3)
+	t.check(not player.broom_rider.toggle() and not movement.is_flying, "cannot mount under a roof")
 
 	# Respawning (death, falling out of the world) lands the rider.
 	player.global_position = Vector3(0, 0.1, 20)

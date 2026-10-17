@@ -362,7 +362,8 @@ INTERACT_TAKE_BROOM,Take a broom,Weź miotłę
 NOTIFY_BROOM_TAKEN,You took a flying broom. Press B to mount it (or click it in the satchel).,"Bierzesz latającą miotłę. Naciśnij B, aby na nią wsiąść (albo kliknij ją w sakwie)."
 NOTIFY_ALREADY_HAVE_ITEM,You already have: %s.,Masz już: %s.
 NOTIFY_NO_BROOM,You have no broom. Take one from a broom stand (on the grounds or in the flying classroom).,Nie masz miotły. Weź ją ze stojaka na miotły (na błoniach albo w sali lotów).
-NOTIFY_NO_FLYING_HERE,No flying here: you land and go on foot.,Tu nie wolno latać: lądujesz i idziesz pieszo.
+NOTIFY_NO_FLYING_HERE,No flying indoors: you land and go on foot.,W budynkach nie wolno latać: lądujesz i idziesz pieszo.
+NOTIFY_FLY_OUTDOORS_ONLY,"You can only fly outdoors, under open sky.","Latać można tylko na zewnątrz, pod gołym niebem."
 NOTIFY_FLIGHT_CONTROLS,Flying: the broom follows the mouse · W forward · Space up · C or Ctrl down · Shift faster · hold C on the ground or press B to land.,"Lot: miotła leci za myszą · W naprzód · Spacja w górę · C lub Ctrl w dół · Shift szybciej · przytrzymaj C przy ziemi albo naciśnij B, aby wylądować."
 INVENTORY_RIDING_MARK,(riding),(w locie)
 INVENTORY_CLICK_TO_RIDE,Click to mount it or land (shortcut: B).,"Kliknij, aby wsiąść albo wylądować (skrót: B)."

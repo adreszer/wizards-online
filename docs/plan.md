@@ -170,7 +170,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 ### Milestone 13b — Brooms and flying
 - [x] Broom item (`resources/items/broom.tres`, `ItemDefinition.mount_scene`), procedural `BroomModel` (tapered shaft, brass bindings, twig bundle, spark trail)
 - [x] `PlayerMovement` flight mode (state `fly`): mouse-steered (the broom faces the camera, W flies toward the crosshair), Space/C(Ctrl) climb and sink, Shift boost 30 m/s, hover when released, ceiling at 160 m, hold C on the floor to land; camera pulls back and widens FOV with speed
-- [x] `BroomRider`: B / satchel click mounts, no flying in classrooms (refused, or lands you on entry), losing the broom lands you, banking and nose pitch from motion, a procedural riding pose (`BroomRidePose`: seated, two-hand grip, legs tucked by speed, wand hand freed for casts); snapshots carry `m` so remote players ride visibly
+- [x] `BroomRider`: B / satchel click mounts, flying only outdoors (open-air zone kinds plus an open-sky check; indoors mounting is refused and flying in lands you), losing the broom lands you, banking and nose pitch from motion, a procedural riding pose (`BroomRidePose`: seated, two-hand grip, legs tucked by speed, wand hand freed for casts); snapshots carry `m` so remote players ride visibly
 - [x] Broom racks (`BroomRack`, kind `item_rack`) beside the grounds spawn and in the flying classroom; server `give_item` (one per character)
 - [x] Cheats: chat commands `/broom` `/miotla` `/give <id>` `/help` (offline too); server `OP_CHEAT` / `OP_CHEAT_RESULT`, admins or `cheats_enabled` (school rules, on in dev)
 - [x] Headless tests: flight (lift-off, hover, climb/sink, cruise/boost, ceiling, landing, no-fly zone, lost broom), rack, remote mount, satchel, cheats

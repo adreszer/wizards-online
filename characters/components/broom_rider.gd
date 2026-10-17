@@ -15,9 +15,14 @@ extends Node
 
 signal mount_changed(definition: ItemDefinition)
 
-## AreaZone kinds where nobody may fly: lessons stay on the ground. Entering one
-## in flight lands the rider.
-const NO_FLY_KINDS: Array[String] = ["classroom"]
+## AreaZone kinds in the open air, the only places brooms fly: everything else
+## (rooms, corridors, classrooms, towers, shops…) is indoors. Outside every
+## zone counts as open air too. Flying into an indoor zone lands the rider.
+const FLY_KINDS: Array[String] = ["grounds", "outdoor"]
+## Mounting also needs open sky: nothing solid this far overhead (a cottage or
+## gatehouse inside an open-air zone still has a roof).
+const SKY_CHECK_HEIGHT := 40.0
+const LAYER_WORLD := 1 << 0
 ## Height of the broom's seat above the feet.
 const SEAT_HEIGHT := 0.76
 
@@ -83,7 +88,7 @@ func mount_item(definition: ItemDefinition) -> bool:
 	if _inventory != null and not _inventory.has(definition.id):
 		return false
 	if not can_fly_here():
-		GameEvents.notification_requested.emit(tr("NOTIFY_NO_FLYING_HERE"), 4.0)
+		GameEvents.notification_requested.emit(tr("NOTIFY_FLY_OUTDOORS_ONLY"), 4.0)
 		return false
 	_movement.set_flying(true)
 	_show(definition)
@@ -98,15 +103,31 @@ func dismount() -> void:
 	_show(null)
 
 
-## False inside areas where flying is forbidden (NO_FLY_KINDS).
+## True outdoors: in an open-air zone (or none) with open sky overhead.
 func can_fly_here() -> bool:
 	var tracker: AreaTracker = _player.get("area_tracker") if _player != null else null
-	return tracker == null or not NO_FLY_KINDS.has(tracker.current_kind())
+	if tracker != null and not is_open_air_kind(tracker.current_kind()):
+		return false
+	return _open_sky()
+
+
+static func is_open_air_kind(kind: String) -> bool:
+	return kind.is_empty() or FLY_KINDS.has(kind)
+
+
+func _open_sky() -> bool:
+	var body := _player as Node3D
+	if body == null or not body.is_inside_tree():
+		return true
+	var from := body.global_position + Vector3.UP * 2.0
+	var query := PhysicsRayQueryParameters3D.create(from, from + Vector3.UP * SKY_CHECK_HEIGHT, LAYER_WORLD)
+	query.exclude = [(body as CollisionObject3D).get_rid()]
+	return body.get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 ## Local: the area changed under the rider.
 func on_area_changed(zone: AreaZone) -> void:
-	if mount != null and zone != null and NO_FLY_KINDS.has(zone.kind):
+	if mount != null and zone != null and not is_open_air_kind(zone.kind):
 		dismount()
 		GameEvents.notification_requested.emit(tr("NOTIFY_NO_FLYING_HERE"), 4.0)
 
