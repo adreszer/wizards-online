@@ -2009,6 +2009,38 @@ func _test_day_night() -> void:
 		var playing := music.find_children("*", "AudioStreamPlayer", false, false).filter(func(p: Node) -> bool: return (p as AudioStreamPlayer).playing)
 		t.check(music.current == &"night" and playing.size() == 2, "night switches to the night music, crossfading from the day track")
 
+		# Out on the grounds by day: the grounds music, after a short delay.
+		t.check(MusicDirector.track_for(SchoolClock.Phase.DAY, true) == &"grounds" and MusicDirector.track_for(SchoolClock.Phase.NIGHT, true) == &"night",
+			"grounds music outdoors by day, night music outdoors at night")
+		var saved_tracker := music.tracker
+		var fake := AreaTracker.new()
+		var field := AreaZone.new()
+		field.kind = "grounds"
+		var yard := AreaZone.new()
+		yard.kind = "outdoor"
+		music.tracker = fake
+		cycle.time_override = 12.0
+		cycle.refresh()
+		music.update(0.25)
+		fake.current_zone = field
+		music.update(1.0)
+		t.check(music.current == &"day", "a step outside is not enough to change the music")
+		music.update(MusicDirector.OUTDOOR_DELAY)
+		t.check(music.current == &"grounds" and music.outdoors, "staying out on the grounds plays the grounds music")
+		fake.current_zone = yard
+		music.update(MusicDirector.OUTDOOR_DELAY)
+		t.check(music.current == &"day", "a walled courtyard counts as the castle")
+		fake.current_zone = field
+		music.update(MusicDirector.OUTDOOR_DELAY)
+		cycle.time_override = 23.0
+		cycle.refresh()
+		music.update(0.25)
+		t.check(music.current == &"night", "night outdoors plays the night music")
+		music.tracker = saved_tracker
+		fake.free()
+		field.free()
+		yard.free()
+
 	# The lamplighter: daylit rooms' candles go out by day and are lit at dusk.
 	t.check(Lamplighter.burns_at(23.0, 0.5) and Lamplighter.burns_at(3.0, 0.5) and not Lamplighter.burns_at(12.0, 0.0)
 		and Lamplighter.burns_at(7.2, 0.5) and not Lamplighter.burns_at(7.6, 0.5) and Lamplighter.burns_at(19.6, 0.5)
