@@ -33,6 +33,7 @@ return {
   OP_LESSON_STATE = 24,
   OP_LESSON_TOOL_RESULT = 46,
   OP_MASTERY = 51,
+  OP_MODERATION = 58,
   OP_OBJECT_STATE = 19,
   OP_PING = 20,
   OP_PLAYER_JOINED = 11,
@@ -74,6 +75,7 @@ return {
   RPC_LESSON_LOG = "lesson_log",
   RPC_LESSON_PLAN_LIST = "lesson_plan_list",
   RPC_LESSON_PLAN_SAVE = "lesson_plan_save",
+  RPC_MODERATION_REPORTS = "moderation_reports",
   RPC_SCHOOL_RECORD = "school_record",
   RPC_WALLET_LEDGER = "wallet_ledger",
 }

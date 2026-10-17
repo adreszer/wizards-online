@@ -643,3 +643,7 @@ QUEST_MYSTERIES,Solve %d mysteries,Rozwiążcie %d tajemnice
 QUEST_NONE,No house quests this week.,W tym tygodniu domy nie mają zadań.
 QUEST_DONE,"%s completed a house quest: %s (+%d points)!","%s wypełnia zadanie domu: %s (+%d punktów)!"
 QUEST_TALLY,"House points: %d · %d · %d · %d","Punkty domów: %d · %d · %d · %d"
+CHAT_MUTED,You are muted for now.,Masz teraz wyciszony czat.
+CHAT_BLOCKED,%s does not take your messages.,%s nie przyjmuje twoich wiadomości.
+MODERATION_USAGE,"/report name reason · /block name · /unblock name · staff: /mute name [minutes], /kick name · admins: /ban name reason","/zglos_gracza imię powód · /blokuj imię · /odblokuj imię · kadra: /wycisz imię [minuty], /wyrzuc imię · administratorzy: /ban imię powód"
+MODERATION_SENT,Sent.,Wysłano.

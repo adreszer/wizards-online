@@ -232,7 +232,7 @@ Professors are the scarcest resource; every minute a professor spends fighting t
 
 Required before opening to the public:
 
-- **Moderation** (M, required): word filter (PL + EN), report player, mute/kick/ban for admins and professors, chat logs retained for a limited time, block list for DMs, age-appropriate defaults. Young players are the natural audience of this genre, so this is not optional.
+- **Moderation** (M, required; *built in Milestone 52 except retained chat logs and an admin report view*): word filter (PL + EN), report player, mute/kick/ban for admins and professors, chat logs retained for a limited time, block list for DMs, age-appropriate defaults. Young players are the natural audience of this genre, so this is not optional.
 - **Account and identity** (M): device auth today; add Steam auth when GodotSteam lands, account recovery, display-name rules.
 - **Persistence of world state** across restarts (already in `plan.md`) and backups of Nakama storage.
 - **Server-side position sanity** for area reports (already in `plan.md`) so lesson and house logic cannot be spoofed.

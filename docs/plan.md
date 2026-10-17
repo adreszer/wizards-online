@@ -373,7 +373,7 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] `NetworkManager.server_message` / `send_op`: one generic path for new ops
 - [x] Tests: commands, line formats, bubbles; two clients: a conversation in the library is not heard in the gallery, a DM crosses the castle, unknown names are refused, a DM to an absent player waits in the mailbox and arrives on the next join
 - [ ] Paper birds: DMs drawn as a folded paper bird flying to the recipient (Term E)
-- [ ] Moderation: word filter, report, mute (section 7 of the roadmap)
+- [x] Moderation: word filter, report, mute, kick, ban, block (Milestone 52)
 
 ### Milestone 40 — Gestures and seats
 - [x] `SocialPose` (`characters/components/social_pose.gd`, on the shared `PoseModifier` base that `BroomRidePose` now uses too): procedural gestures over the animation (raise a hand, wave, bow, clap, point, shrug, cheer, take notes) and sitting (hips onto the seat, thighs along it, shins down, hands on the knees); only the bones a gesture needs are written
@@ -456,6 +456,12 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] `nakama/modules/house_quests.lua` + `nakama/content/house_quests.json`: each school week two quests rotate in (attend lessons, finish practicals, right answers, first mystery solves); every member's actions count for their house (lesson close, practical finish, marked answers, discoveries); reaching a target awards the quest's points once per week through the ledger (source `quest`); progress stored in `school/house_quests`, sent as `OP_HOUSE_QUESTS`
 - [x] Journal "House" tab: this week's quests with every house's progress (ours first) and the tally; a notification when a house completes one
 - [x] Tests: the house page; two clients: quests arrive with progress
+
+### Milestone 52 — Moderation
+- [x] `nakama/modules/moderation.lua`: a word filter (`nakama/content/word_filter.json`, Polish and English stems, diacritics folded) over chat, DMs, lecture lines and board text; mutes (staff, minutes, stored), kicks (staff), bans (admins; a banned account cannot join), reports (anyone; admin RPC `moderation_reports`), personal block lists (a blocked player's chat is not delivered and their DMs are refused)
+- [x] Chat commands `/report` `/block` `/unblock` `/mute` `/kick` `/ban` with Polish aliases
+- [x] Tests: command usage; two clients: filtered swearing, block/unblock, a student refused a ban
+- [ ] Chat logs kept for a limited time, an in-game admin view of reports, age-appropriate defaults (roadmap section 7)
 
 ## Production environment asset pipeline (in validation)
 

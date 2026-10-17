@@ -30,6 +30,9 @@ const LOOK_ALIASES: Array[String] = ["look", "wyglad", "wygląd", "postac", "pos
 const RUNES_ALIASES: Array[String] = ["runes", "runy", "rune"]
 const EXAM_ALIASES: Array[String] = ["exam", "egzamin"]
 const GUEST_ALIASES: Array[String] = ["guest", "gosc", "gość"]
+## Moderation: /report name reason, /block name, /unblock name; staff /mute name [minutes], /kick name; admins /ban name reason.
+const MODERATION_ALIASES := {"report": "report", "zglos_gracza": "report", "zgłoś_gracza": "report", "block": "block", "blokuj": "block",
+	"unblock": "unblock", "odblokuj": "unblock", "mute": "mute", "wycisz": "mute", "kick": "kick", "wyrzuc": "kick", "wyrzuć": "kick", "ban": "ban"}
 const DEDUCT_ALIASES: Array[String] = ["deduct", "odejmij"]
 const STAND_ALIASES: Array[String] = ["stand", "wstan", "wstań"]
 const GIVE_ALIASES: Array[String] = ["give", "daj"]
@@ -96,6 +99,13 @@ static func run(text: String, player: Node) -> String:
 	if LOOK_ALIASES.has(name):
 		GameEvents.character_creator_requested.emit.call_deferred()
 		return ""
+	if MODERATION_ALIASES.has(name):
+		if parts.size() < 2:
+			return _t("MODERATION_USAGE")
+		var action: String = MODERATION_ALIASES[name]
+		var minutes := int(parts[2]) if action == "mute" and parts.size() > 2 and parts[2].is_valid_int() else 10
+		NetworkManager.send_moderation(action, parts[1], " ".join(parts.slice(2)) if action in ["report", "ban"] else "", minutes)
+		return _t("MODERATION_SENT")
 	if GUEST_ALIASES.has(name):
 		if parts.size() < 2:
 			return _t("GUEST_USAGE")

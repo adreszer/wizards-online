@@ -42,6 +42,7 @@ local Quiz = require("quiz")
 local SelfStudy = require("self_study")
 local Homework = require("homework")
 local Quests = require("house_quests")
+local Moderation = require("moderation")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -64,6 +65,7 @@ local OP_APPEARANCE, OP_MASTERY = P.OP_APPEARANCE, P.OP_MASTERY
 local OP_HOMEWORK, OP_HOMEWORK_NEW = P.OP_HOMEWORK, P.OP_HOMEWORK_NEW
 local OP_GUEST_PASS, OP_GUEST_PASS_GRANTED = P.OP_GUEST_PASS, P.OP_GUEST_PASS_GRANTED
 local OP_HOUSE_CUP, OP_HOUSE_QUESTS = P.OP_HOUSE_CUP, P.OP_HOUSE_QUESTS
+local OP_MODERATION = P.OP_MODERATION
 -- Mastery: points per validated spell on a world object (practice targets give more),
 -- at most one award per spell per player every MASTERY_GAP seconds.
 local MASTERY_POINTS, MASTERY_PRACTICE_POINTS, MASTERY_GAP = 1, 2, 6
@@ -523,8 +525,10 @@ end
 local function listeners_of(state, sid, mode)
   local speaker = { pos = state.positions[sid], area = state.areas[sid] or "" }
   local out = {}
+  local uid = state.presences[sid] and state.presences[sid].user_id
   for other, p in pairs(state.presences) do
-    if other == sid or Chat.hears(mode, speaker, { pos = state.positions[other], area = state.areas[other] or "" }) then
+    local blocked = uid and state.blocks[other] and state.blocks[other][uid]
+    if other == sid or (not blocked and Chat.hears(mode, speaker, { pos = state.positions[other], area = state.areas[other] or "" })) then
       table.insert(out, p)
     end
   end
@@ -548,6 +552,10 @@ local function send_dm(dispatcher, state, sid, to_name, text)
     for other, name in pairs(state.names) do
       if string.lower(name) == string.lower(to_name) then target = other end
     end
+  end
+  if target and state.blocks[target] and state.blocks[target][from.user_id] then
+    chat_refused(dispatcher, from, "blocked", { to_name = state.names[target] })
+    return
   end
   if target then
     line.to_name = state.names[target] or to_name
@@ -753,12 +761,15 @@ function M.match_init(context, params)
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
                   positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup(),
-                  quests = Quests.load_state(), quest_defs = Quests.load_defs() }
+                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {} }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
 
 function M.match_join_attempt(context, dispatcher, tick, state, presence, metadata)
+  if Moderation.load(presence.user_id).banned then
+    return state, false, "banned"
+  end
   state.names[presence.session_id] = sanitize_name(metadata and metadata.display_name, presence.username)
   state.chars[presence.session_id] = sanitize_character(metadata and metadata.character)
   local locale = metadata and metadata.locale
@@ -786,6 +797,8 @@ function M.match_join(context, dispatcher, tick, state, presences)
     state.areas[p.session_id] = ""
     state.progress[p.user_id] = load_progress(p.user_id)
     Chat.remember_name(p.user_id, state.names[p.session_id])
+    state.blocks[p.session_id] = Moderation.load_blocks(p.user_id)
+    state.moderation[p.session_id] = Moderation.load(p.user_id)
   end
   for _, p in ipairs(presences) do
     local roster = {}
@@ -834,6 +847,8 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.chat_at[sid] = nil
       state.mastery_at[sid] = nil
       state.guest_passes[sid] = nil
+      state.blocks[sid] = nil
+      state.moderation[sid] = nil
       for area, lesson in pairs(state.lessons) do
         if lesson.by_sid == sid then
           close_lesson(dispatcher, state, area, "professor left")
@@ -1151,7 +1166,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       dispatcher.broadcast_message(OP_HOUSE_POINTS_RESULT, nk.json_encode({ ok = reason == nil, house = house, delta = delta, reason = reason or "" }), { message.sender }, nil, true)
     elseif message.op_code == OP_LECTURE then
       local ok, payload = pcall(nk.json_decode, message.data)
-      local text = School.clean_text(ok and type(payload) == "table" and payload.text or nil, state.rules.max_lecture_bytes)
+      local text = Moderation.filter(School.clean_text(ok and type(payload) == "table" and payload.text or nil, state.rules.max_lecture_bytes), state.filter)
       if text ~= "" and own_lesson(state, sid) then
         local listeners = {}
         for _, pl in ipairs(players_in(state, state.areas[sid])) do
@@ -1162,12 +1177,14 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     elseif message.op_code == OP_CHAT or message.op_code == OP_DM then
       local ok, payload = pcall(nk.json_decode, message.data)
       payload = ok and type(payload) == "table" and payload or {}
-      local text = Chat.clean(payload.text)
+      local text = Moderation.filter(Chat.clean(payload.text), state.filter)
       local mode = message.op_code == OP_DM and "dm" or (payload.mode or "say")
       local last = state.chat_at[sid] or {}
       state.chat_at[sid] = last
       local cooldown = mode == "shout" and state.rules.shout_cooldown_seconds or mode == "dm" and state.rules.dm_cooldown_seconds or state.rules.chat_cooldown_seconds
-      if text == "" then
+      if Moderation.is_muted(state.moderation[sid] or {}, now) then
+        chat_refused(dispatcher, message.sender, "muted")
+      elseif text == "" then
         chat_refused(dispatcher, message.sender, "empty")
       elseif mode ~= "dm" and not Chat.MODES[mode] then
         chat_refused(dispatcher, message.sender, "bad_mode")
@@ -1220,6 +1237,55 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           { state.presences[target] }, nil, true)
       end
       dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = "guest", reason = reason or "" }), { message.sender }, nil, true)
+    elseif message.op_code == OP_MODERATION then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local profile = state.profiles[sid]
+      local action = payload.action
+      local target = type(payload.name) == "string" and find_sid(state, nil, payload.name) or nil
+      local target_uid = target and state.presences[target].user_id or (type(payload.name) == "string" and Chat.uid_for_name(payload.name)) or nil
+      local reason
+      local staff = profile and Profile.is_staff(profile.role)
+      if not target_uid then
+        reason = "no_such_player"
+      elseif target_uid == message.sender.user_id then
+        reason = "self"
+      elseif action == "report" then
+        Moderation.report({ from = message.sender.user_id, from_name = state.names[sid] or "", about = target_uid, about_name = payload.name,
+                            reason = School.clean_text(payload.reason, state.rules.max_reason_bytes) })
+      elseif action == "block" or action == "unblock" then
+        local blocks = state.blocks[sid] or {}
+        blocks[target_uid] = action == "block" and payload.name or nil
+        state.blocks[sid] = blocks
+        Moderation.save_blocks(message.sender.user_id, blocks)
+      elseif action == "mute" or action == "kick" then
+        if not staff then
+          reason = "not_staff"
+        elseif action == "mute" then
+          local rec = Moderation.load(target_uid)
+          rec.muted_until = now + math.max(1, math.min(1440, math.floor(tonumber(payload.minutes) or 10))) * 60
+          rec.by = state.names[sid] or ""
+          Moderation.save(target_uid, rec)
+          if target then state.moderation[target] = rec end
+        elseif target then
+          dispatcher.match_kick({ state.presences[target] })
+        else
+          reason = "offline"
+        end
+      elseif action == "ban" then
+        if not profile or profile.role ~= "admin" then
+          reason = "not_admin"
+        else
+          local rec = Moderation.load(target_uid)
+          rec.banned, rec.reason, rec.by = true, School.clean_text(payload.reason, state.rules.max_reason_bytes), state.names[sid] or ""
+          Moderation.save(target_uid, rec)
+          if target then dispatcher.match_kick({ state.presences[target] }) end
+        end
+      else
+        reason = "bad_action"
+      end
+      nk.logger_info(string.format("moderation: %s %s %s (%s)", state.names[sid] or sid, tostring(action), tostring(payload.name), reason or "ok"))
+      dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = "moderation", reason = reason or "", action = action }), { message.sender }, nil, true)
     elseif message.op_code == OP_APPEARANCE then
       local ok, payload = pcall(nk.json_decode, message.data)
       local profile = state.profiles[sid]
@@ -1293,7 +1359,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         if not lesson then
           reason = "no_lesson"
         elseif message.op_code == OP_BOARD then
-          lesson.board = School.clean_text(payload.text, state.rules.max_board_bytes)
+          lesson.board = Moderation.filter(School.clean_text(payload.text, state.rules.max_board_bytes), state.filter)
           send_lessons(dispatcher, state, nil)
         elseif payload.action == "ask" then
           if lesson.quiz and lesson.quiz.open then record_marks(lesson, Quiz.close(lesson.quiz), dispatcher, state) end

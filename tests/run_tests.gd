@@ -2540,6 +2540,7 @@ func _test_prefects() -> void:
 	t.check(not door.admits(p), "until the pass runs out")
 	NetworkManager.guest_passes.clear()
 	door.queue_free()
+	t.check(ChatCommands.run("/blokuj", null) == tr("MODERATION_USAGE"), "moderation commands explain themselves")
 	t.check(ChatCommands.run("/odejmij 2", null) == tr("DEDUCT_USAGE") and ChatCommands.run("/gosc", null) == tr("GUEST_USAGE"), "prefect commands explain themselves")
 
 

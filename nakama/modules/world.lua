@@ -11,6 +11,7 @@ local Records = require("records")
 local Homework = require("homework")
 local Timetable = require("timetable")
 local Grades = require("grades")
+local Moderation = require("moderation")
 
 local WORLD_LABEL = "world"
 
@@ -360,3 +361,11 @@ nk.register_rpc(function(context, payload)
   if type(decoded) ~= "table" or not decoded.ok then error({ "match did not answer", 13 }) end
   return nk.json_encode(decoded)
 end, P.RPC_ADMIN_AWARD_CUP)
+
+-- RPC "moderation_reports": {limit?} → {reports}: player reports, newest first. Admins or the HTTP key.
+nk.register_rpc(function(context, payload)
+  require_admin(context)
+  local ok, data = pcall(nk.json_decode, payload ~= "" and payload or "{}")
+  local limit = ok and type(data) == "table" and tonumber(data.limit) or 50
+  return nk.json_encode({ reports = Moderation.list_reports(math.max(1, math.floor(limit))) })
+end, P.RPC_MODERATION_REPORTS)

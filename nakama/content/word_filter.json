@@ -1,0 +1,4 @@
+{
+  "_comment": "Words chat replaces with asterisks (Polish and English), matched as whole words or word stems, case-insensitive, Polish letters folded (ą→a…). Extend as needed; keep it to clearly offensive words.",
+  "stems": ["kurw", "chuj", "pierdol", "jeb", "pizd", "skurwysyn", "cipa", "fuck", "shit", "bitch", "cunt", "asshole", "bastard", "dick", "whore", "slut", "nigg", "faggot", "retard"]
+}

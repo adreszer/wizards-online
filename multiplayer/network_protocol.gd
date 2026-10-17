@@ -146,6 +146,9 @@ const OP_HOUSE_CUP := 56
 ## server → all (and joiners), when progress changes: {week, quests: [{id, name_key, target, points,
 ## progress: [4], done: [4]}]} this week's house quests
 const OP_HOUSE_QUESTS := 57
+## client → server: {action: "report" | "block" | "unblock" (anyone) | "mute" | "kick" (staff) | "ban" (admins),
+## name, minutes?, reason?} (answered by OP_LESSON_TOOL_RESULT, tool "moderation")
+const OP_MODERATION := 58
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"
@@ -188,6 +191,8 @@ const RPC_HOMEWORK_GRADE := "homework_grade"
 const RPC_ADMIN_ADVANCE_YEARS := "admin_advance_years"
 ## Admin RPC: {term?} → {winner, totals} awards the house cup now and starts the tally afresh
 const RPC_ADMIN_AWARD_CUP := "admin_award_cup"
+## Admin RPC: {limit?} → {reports: [{from_name, about_name, reason, at}]} newest first
+const RPC_MODERATION_REPORTS := "moderation_reports"
 const MAX_CHAT_LENGTH := 200
 
 

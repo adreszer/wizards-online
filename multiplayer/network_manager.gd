@@ -556,6 +556,16 @@ func _announce_quests(before: Array, now: Array) -> void:
 				GameEvents.notification_requested.emit(tr("QUEST_DONE") % [CharacterProfile.house_name(h + 1), tr(str(q.get("name_key", ""))) % int(q.get("target", 0)), int(q.get("points", 0))], 7.0)
 
 
+## Report, block or unblock a player; staff mute (minutes) or kick; admins ban.
+func send_moderation(action: String, display_name: String, reason: String = "", minutes: int = 10) -> void:
+	send_op(NetworkProtocol.OP_MODERATION, {"action": action, "name": display_name, "reason": reason, "minutes": minutes})
+
+
+## Admin RPC: player reports, newest first.
+func moderation_reports(limit: int = 50, http_key: String = "") -> Dictionary:
+	return await _admin_rpc(NetworkProtocol.RPC_MODERATION_REPORTS, {"limit": limit}, http_key)
+
+
 ## Whether a prefect's guest pass lets us through `house`'s doors right now.
 func has_guest_pass(house: int) -> bool:
 	return float(guest_passes.get(house, 0.0)) > server_time()

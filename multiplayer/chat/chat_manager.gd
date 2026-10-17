@@ -88,4 +88,8 @@ static func result_text(reason: String, payload: Dictionary = {}) -> String:
 			return TranslationServer.translate("CHAT_DM_NO_PLAYER") % str(payload.get("to_name", ""))
 		"mailbox_full":
 			return TranslationServer.translate("CHAT_DM_MAILBOX_FULL") % str(payload.get("to_name", ""))
+		"muted":
+			return TranslationServer.translate("CHAT_MUTED")
+		"blocked":
+			return TranslationServer.translate("CHAT_BLOCKED") % str(payload.get("to_name", ""))
 	return TranslationServer.translate("CHAT_REFUSED") % reason
