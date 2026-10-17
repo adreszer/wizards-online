@@ -92,6 +92,7 @@ func _run() -> void:
 	_test_grades()
 	await _test_books()
 	await _test_prefects()
+	await _test_house_cup()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2536,6 +2537,19 @@ func _test_prefects() -> void:
 	NetworkManager.guest_passes.clear()
 	door.queue_free()
 	t.check(ChatCommands.run("/odejmij 2", null) == tr("DEDUCT_USAGE") and ChatCommands.run("/gosc", null) == tr("GUEST_USAGE"), "prefect commands explain themselves")
+
+
+func _test_house_cup() -> void:
+	t.section("House cup")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var display := castle.get_node_or_null("HouseCupDisplay") as HouseCupDisplay
+	t.check(display != null and not display.visible, "no cup until a house wins one")
+	if display != null:
+		display.show_cup({"winner": 3, "term": "autumn_2026"})
+		t.check(display.visible and display.winner == 3, "the holder's cup and banner stand in the great hall")
+	castle.queue_free()
 
 
 func _test_timetable() -> void:

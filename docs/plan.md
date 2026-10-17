@@ -446,6 +446,12 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: role, door with and without a pass; two clients: the limit, a small deduction, a guest pass
 - [ ] Heads of house (a professor's house-wide stats and house board posts); how prefects are chosen (owner decision)
 
+### Milestone 50 — The house cup
+- [x] At the end of each calendar term the match awards the house cup to the house with the most points (`School.award_cup`: stored in `school/house_cup`, every house brought back to zero through the ledger, so totals still equal their records); `OP_HOUSE_CUP` to everyone and joiners; admin RPC `admin_award_cup` awards it at once
+- [x] `HouseCupDisplay` (great hall, north end): a golden cup on a plinth under a banner in the holder's colour with its name; the holder's members wear brighter house trim for the term; a ceremony notification
+- [x] Tests: display; two clients: award, tally reset, ledger consistency
+- [ ] A staged ceremony (hall decor in the winner's colours, the cup carried in, music cue), real cup and banner models
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

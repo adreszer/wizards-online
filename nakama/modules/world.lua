@@ -348,3 +348,15 @@ nk.register_rpc(function(context, payload)
   until cursor == ""
   return nk.json_encode({ promoted = promoted, kept = kept, dry_run = data.dry_run == true })
 end, P.RPC_ADMIN_ADVANCE_YEARS)
+
+-- RPC "admin_award_cup": {term?} → {winner, totals}: the house cup now (the match also
+-- awards it by itself after each calendar term). Admins or the HTTP key.
+nk.register_rpc(function(context, payload)
+  require_admin(context)
+  local ok, data = pcall(nk.json_decode, payload ~= "" and payload or "{}")
+  data = ok and type(data) == "table" and data or {}
+  local result = nk.match_signal(find_or_create_world(), nk.json_encode({ op = "award_cup", term = data.term }))
+  local decoded = result and select(2, pcall(nk.json_decode, result)) or nil
+  if type(decoded) ~= "table" or not decoded.ok then error({ "match did not answer", 13 }) end
+  return nk.json_encode(decoded)
+end, P.RPC_ADMIN_AWARD_CUP)

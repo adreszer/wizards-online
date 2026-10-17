@@ -62,6 +62,7 @@ local OP_PRACTICAL, OP_PRACTICAL_STATE, OP_PRACTICAL_PROGRESS = P.OP_PRACTICAL, 
 local OP_APPEARANCE, OP_MASTERY = P.OP_APPEARANCE, P.OP_MASTERY
 local OP_HOMEWORK, OP_HOMEWORK_NEW = P.OP_HOMEWORK, P.OP_HOMEWORK_NEW
 local OP_GUEST_PASS, OP_GUEST_PASS_GRANTED = P.OP_GUEST_PASS, P.OP_GUEST_PASS_GRANTED
+local OP_HOUSE_CUP = P.OP_HOUSE_CUP
 -- Mastery: points per validated spell on a world object (practice targets give more),
 -- at most one award per spell per player every MASTERY_GAP seconds.
 local MASTERY_POINTS, MASTERY_PRACTICE_POINTS, MASTERY_GAP = 1, 2, 6
@@ -613,6 +614,29 @@ local function tick_self_study(dispatcher, state, now)
   end
 end
 
+local function send_cup(dispatcher, state, presences, fresh)
+  if not state.cup or not state.cup.winner then return end
+  dispatcher.broadcast_message(OP_HOUSE_CUP, nk.json_encode({ winner = state.cup.winner, term = state.cup.term or "", totals = state.cup.totals,
+    fresh = fresh or nil }), presences, nil, true)
+end
+
+local function award_cup(dispatcher, state, term)
+  state.cup = School.award_cup(state.totals, term)
+  nk.logger_info(string.format("house cup %s: house %d", tostring(term), state.cup.winner))
+  send_house_totals(dispatcher, state, nil)
+  send_cup(dispatcher, state, nil, true)
+end
+
+-- At the end of each calendar term the cup goes to the leading house.
+local function check_term_end(dispatcher, state, now)
+  local day = Timetable.school_day(state.timetable, now)
+  for _, term in ipairs((state.timetable.calendar or {}).terms or {}) do
+    if day > term.d1 and day <= term.d1 + 30 and (state.cup or {}).term ~= term.id then
+      award_cup(dispatcher, state, term.id)
+    end
+  end
+end
+
 -- Timetabled lessons that ended since the last check without anyone opening them
 -- go in the lesson log as "not_held" (the self-study fallback keys off the same slots).
 local function check_ended_slots(state, now)
@@ -697,7 +721,7 @@ function M.match_init(context, params)
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
-                  positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {} }
+                  positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup() }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -742,6 +766,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     dispatcher.broadcast_message(OP_WORLD_SNAPSHOT, nk.json_encode({ objects = state.world.objects, s = nk.time() }), { p }, nil, true)
     send_lessons(dispatcher, state, { p })
     send_house_totals(dispatcher, state, { p })
+    send_cup(dispatcher, state, { p })
     send_wallet(dispatcher, state, p.session_id, Economy.balance(p.user_id))
     send_clock(dispatcher, state, { p })
     send_timetable(dispatcher, state, { p })
@@ -810,6 +835,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     end
     check_ended_slots(state, now)
     tick_self_study(dispatcher, state, now)
+    if tick % (TICK_RATE * 60) == 0 then check_term_end(dispatcher, state, now) end
     local occupied = function(area) return #players_in(state, area) > 0 end
     run_actions(dispatcher, state, Mysteries.tick(state.engine, state.mysteries, nk.time() / 1000, occupied))
   end
@@ -1298,6 +1324,10 @@ function M.match_signal(context, dispatcher, tick, state, data)
     state.self_study = SelfStudy.load()
     send_timetable(dispatcher, state, nil)
     return state, nk.json_encode({ ok = true, slots = #state.timetable.slots })
+  end
+  if ok and type(request) == "table" and request.op == "award_cup" then
+    award_cup(dispatcher, state, type(request.term) == "string" and request.term or "manual")
+    return state, nk.json_encode({ ok = true, winner = state.cup.winner, totals = state.cup.totals })
   end
   if ok and type(request) == "table" and request.op == "grant_coins" then
     local sid = find_sid(state, request.user_id, request.name)

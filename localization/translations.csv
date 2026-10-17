@@ -633,3 +633,5 @@ GUEST_USAGE,"Prefects: /guest name lets a student of another house into your hou
 GUEST_REQUESTED,Guest pass requested.,Wysłano przepustkę.
 DEDUCT_USAGE,"Prefects: /deduct <house 1-4> <points, at most 5> <reason>.","Prefekci: /odejmij <dom 1-4> <punkty, najwyżej 5> <powód>."
 DEDUCT_REQUESTED,Deduction requested.,Wysłano odjęcie punktów.
+HOUSE_CUP_AWARDED,"The house cup goes to %s! The new term's tally starts from zero.","Puchar Domów zdobywa %s! Punktacja nowego semestru zaczyna się od zera."
+HOUSE_CUP_HOLDER,House Cup: %s,Puchar Domów: %s

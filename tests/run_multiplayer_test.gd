@@ -387,6 +387,22 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 		var again: Dictionary = await NetworkManager.homework_grade(answers[0][0], str(answers[0][1].get("user_id", "")), 6, "")
 		t.check(not graded.has("error") and again.has("error"), "and grades it once (%s / %s)" % [str(graded), str(again)])
 
+	t.section("House cup (admin RPC)")
+	var cup_events := [0]
+	var count_cup := func(cup: Dictionary) -> void: if cup.get("fresh", false): cup_events[0] += 1
+	NetworkManager.house_cup_changed.connect(count_cup)
+	var tally_before := NetworkManager.get_house_totals()
+	var cup: Dictionary = await NetworkManager.admin_award_cup("test_term", HTTP_KEY)
+	ok = await _wait_until(func() -> bool: return cup_events[0] >= 1 and NetworkManager.get_house_totals() == PackedInt32Array([0, 0, 0, 0]), 10.0)
+	t.check(cup.get("ok", false) == true and ok and int(NetworkManager.house_cup.get("winner", 0)) == int(cup.get("winner", -1)),
+		"the cup goes to the leader and the new term starts from zero (%s → %s)" % [str(tally_before), str(cup)])
+	var cup_ledger: Dictionary = await NetworkManager.house_points_ledger(500, HTTP_KEY)
+	var cup_sums := [0, 0, 0, 0]
+	for r: Dictionary in cup_ledger.get("records", []):
+		cup_sums[int(r["house"]) - 1] += int(r["delta"])
+	t.check(cup_sums == [0, 0, 0, 0] or (cup_ledger.get("records", []) as Array).size() >= 500, "and the ledger still explains every total (%s)" % str(cup_sums))
+	NetworkManager.house_cup_changed.disconnect(count_cup)
+
 	t.section("Purse (admin RPC)")
 	var granted: Dictionary = await NetworkManager.admin_grant_coins({"user_id": NetworkManager.local_user_id, "amount": 50, "reason": "staff stipend"}, HTTP_KEY)
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 50, 10.0)
@@ -638,7 +654,8 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 30, 10.0)
 	t.check(ok, "the second mystery pays too (%d)" % NetworkManager.get_coins())
 	await _enter_classroom(spawner, Vector3(2, 0, 0))
-	ok = await _wait_until(func() -> bool: return NetworkManager.get_house_totals().size() == 4 and NetworkManager.get_house_totals()[2] >= my_house_points + 5, 20.0)
+	# (The professor awards the house cup meanwhile, which starts every tally from zero.)
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_house_totals().size() == 4 and (NetworkManager.get_house_totals()[2] >= my_house_points + 5 or NetworkManager.house_cup.get("term", "") == "test_term"), 20.0)
 	t.check(ok, "the student's house tally shows the professor's award (%d → %s)" % [my_house_points, str(NetworkManager.get_house_totals())])
 	var hud := world.get_node_or_null("HUD")
 	t.check(hud == null or hud.house_tally_text().contains(str(NetworkManager.get_house_totals()[2])), "the HUD tally shows the totals")

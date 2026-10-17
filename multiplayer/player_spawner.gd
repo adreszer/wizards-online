@@ -31,6 +31,10 @@ func _ready() -> void:
 	NetworkManager.server_message.connect(_on_server_message)
 	NetworkManager.practical_changed.connect(_on_practical)
 	NetworkManager.player_look_changed.connect(_on_player_look_changed)
+	NetworkManager.house_cup_changed.connect(func(_cup: Dictionary) -> void:
+		for p: Node in [local_player] + remote_players.values():
+			if p is Player and is_instance_valid(p):
+				(p as Player).set_look((p as Player).look))
 
 
 func _exit_tree() -> void:

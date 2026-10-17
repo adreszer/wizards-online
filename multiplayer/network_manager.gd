@@ -61,6 +61,8 @@ signal timetable_changed()
 ## features (chat, lessons 2.0…) listen here and send with send_op().
 signal server_message(op_code: int, payload: Dictionary)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
+## The house cup changed hands (or arrived on join): {winner, term, totals, fresh?}.
+signal house_cup_changed(cup: Dictionary)
 ## A remote player's body or look changed (roster entry: char, look {skin, robe}).
 signal player_look_changed(sid: String)
 ## The lesson's question as the local player sees it ({id, question, choices, by, open,
@@ -103,6 +105,8 @@ var quiz: Dictionary = {}
 var quiz_answers: Array = []
 ## The running practical as we see it ({} = none) and, for the professor, everyone's progress.
 var practical: Dictionary = {}
+## The house cup holder {winner, term, totals} ({} = never awarded).
+var house_cup: Dictionary = {}
 ## Guest passes to other houses' rooms: house → until (server time, seconds).
 var guest_passes: Dictionary = {}
 var practical_progress: Dictionary = {}
@@ -416,6 +420,11 @@ func admin_advance_years(request: Dictionary, http_key: String = "") -> Dictiona
 	return await _admin_rpc(NetworkProtocol.RPC_ADMIN_ADVANCE_YEARS, request, http_key)
 
 
+## Admin RPC: award the house cup now (the tally starts again from zero).
+func admin_award_cup(term: String = "", http_key: String = "") -> Dictionary:
+	return await _admin_rpc(NetworkProtocol.RPC_ADMIN_AWARD_CUP, {"term": term} if term != "" else {}, http_key)
+
+
 ## Admin RPC: the lesson log (held lessons with attendance, timetabled ones not held).
 func lesson_log(limit: int = 50, http_key: String = "") -> Dictionary:
 	return await _admin_rpc(NetworkProtocol.RPC_LESSON_LOG, {"limit": limit}, http_key)
@@ -592,6 +601,11 @@ func _on_lesson_message(op_code: int, payload: Dictionary) -> void:
 			if not payload.get("students", []) is Array:
 				practical_progress.students = []
 			practical_progress_changed.emit(practical_progress)
+		NetworkProtocol.OP_HOUSE_CUP:
+			house_cup = payload
+			house_cup_changed.emit(house_cup)
+			if payload.get("fresh", false):
+				GameEvents.notification_requested.emit(tr("HOUSE_CUP_AWARDED") % CharacterProfile.house_name(int(payload.get("winner", 0))), 10.0)
 		NetworkProtocol.OP_GUEST_PASS_GRANTED:
 			guest_passes[int(payload.get("house", 0))] = float(payload.get("until", 0))
 			GameEvents.notification_requested.emit(tr("GUEST_PASS_GRANTED") % [str(payload.get("by", "")), CharacterProfile.house_name(int(payload.get("house", 0)))], 6.0)
@@ -623,6 +637,7 @@ func _teardown() -> void:
 	quiz = {}
 	quiz_answers = []
 	guest_passes = {}
+	house_cup = {}
 	practical = {}
 	practical_progress = {}
 	await world_session.leave()

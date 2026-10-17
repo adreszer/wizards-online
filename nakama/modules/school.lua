@@ -200,6 +200,35 @@ function M.load_clock_offset()
   return 0
 end
 
+-- The house cup: the last award { term, winner, totals, at } (system-owned, public read).
+M.CUP_KEY = "house_cup"
+
+function M.load_cup()
+  local ok, objects = pcall(nk.storage_read, { { collection = M.CLOCK_COLLECTION, key = M.CUP_KEY, user_id = nil } })
+  if ok and objects and objects[1] and type(objects[1].value) == "table" then return objects[1].value end
+  return {}
+end
+
+-- Awards the cup for `term` to the house with the most points (ties: the lower house
+-- number, i.e. none is favoured by luck), records it and starts every house from zero
+-- through the ledger. Returns the cup record.
+function M.award_cup(totals, term)
+  local winner = 1
+  for h = 2, M.HOUSES do
+    if totals[h] > totals[winner] then winner = h end
+  end
+  local cup = { term = term, winner = winner, totals = { totals[1], totals[2], totals[3], totals[4] }, at = nk.time() }
+  pcall(nk.storage_write, {
+    { collection = M.CLOCK_COLLECTION, key = M.CUP_KEY, user_id = nil, value = cup, permission_read = 2, permission_write = 0 },
+  })
+  for h = 1, M.HOUSES do
+    if totals[h] ~= 0 then
+      M.record_points(totals, { house = h, delta = -totals[h], reason = "house cup: new term", by = "", by_name = "", source = "cup", subject = "" })
+    end
+  end
+  return cup
+end
+
 function M.save_clock_offset(offset)
   local ok, err = pcall(nk.storage_write, {
     { collection = M.CLOCK_COLLECTION, key = M.CLOCK_KEY, user_id = nil, value = { offset = offset }, permission_read = 2, permission_write = 0 },

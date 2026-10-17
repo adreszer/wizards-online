@@ -33,6 +33,9 @@ func _ready() -> void:
 	var boards := ClassroomBoards.new()
 	boards.name = "ClassroomBoards"
 	add_child(boards)
+	var cup := HouseCupDisplay.new()
+	cup.name = "HouseCupDisplay"
+	add_child(cup)
 	var meals := FeastMeals.new()
 	meals.name = "FeastMeals"
 	add_child(meals)

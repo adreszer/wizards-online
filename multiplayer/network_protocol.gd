@@ -141,6 +141,8 @@ const OP_HOMEWORK_NEW := 53
 const OP_GUEST_PASS := 54
 ## server → the guest: {house, until, by} a guest pass to that house's doors
 const OP_GUEST_PASS_GRANTED := 55
+## server → all (and joiners): {winner: house, term, totals: [4], fresh?: just awarded} the house cup holder
+const OP_HOUSE_CUP := 56
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"
@@ -181,6 +183,8 @@ const RPC_HOMEWORK_GRADE := "homework_grade"
 ## Admin RPC: {dry_run?, min_subjects? (3)} → {promoted: [{user_id, name, year}], kept: n} moves every student
 ## whose graded subjects all pass (grades.lua) up one year
 const RPC_ADMIN_ADVANCE_YEARS := "admin_advance_years"
+## Admin RPC: {term?} → {winner, totals} awards the house cup now and starts the tally afresh
+const RPC_ADMIN_AWARD_CUP := "admin_award_cup"
 const MAX_CHAT_LENGTH := 200
 
 

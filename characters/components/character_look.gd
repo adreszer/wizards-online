@@ -40,7 +40,11 @@ static func apply(visual: Node, look: Dictionary, house: int) -> void:
 			if mat == null:
 				continue
 			mat.set_shader_parameter("house_amount", 1.0 if house > 0 else 0.0)
-			mat.set_shader_parameter("house_color", CharacterProfile.house_color(house))
+			# The cup holders' trim shines brighter for the term (their reward).
+			var color := CharacterProfile.house_color(house)
+			if house > 0 and int(NetworkManager.house_cup.get("winner", 0)) == house:
+				color = color.lightened(0.35)
+			mat.set_shader_parameter("house_color", color)
 			mat.set_shader_parameter("skin_tint", SKIN_TONES[clean.skin])
 			mat.set_shader_parameter("robe_color", ROBE_COLORS[clean.robe])
 			mat.set_shader_parameter("robe_amount", 0.0 if clean.robe == 0 else 0.85)
