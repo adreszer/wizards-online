@@ -406,6 +406,7 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Anyone seated at a feast bench during a meal eats (the held "eat" arm gesture, synced like any gesture)
 - [x] Sitting became its own state in `Gestures` (`seated`): arm gestures (raise a hand, notes, eat, wave, point, clap, shrug, cheer) play on top of sitting; before, raising a hand while seated left the body stuck on the bench
 - [x] Tests: meal hours, bare and laid tables, eating while seated, raising a hand while seated; `tools/capture_meal.tscn`
+- [x] During a meal the great hall plays the feast music (`MusicDirector.event_track = &"feast"`, cleared when the meal ends or the player leaves the hall)
 - [ ] Real food and tableware models (asset-drop workflow); feasts as ceremonies (Term C5, section 3)
 
 ## Production environment asset pipeline (in validation)

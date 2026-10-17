@@ -13,6 +13,8 @@ const MEALS := [[7.0, 8.5, "MEAL_BREAKFAST"], [12.0, 13.5, "MEAL_LUNCH"], [18.5,
 const TABLE_LENGTH := 5.7
 const TABLE_TOP := 0.79
 const SEAT_PITCH := 0.95
+## Where the feast music plays during meals.
+const FEAST_AREA := &"great_hall"
 ## A seated player this close (metres, flat) to a table's centre line eats.
 const EAT_REACH := 1.2
 
@@ -60,6 +62,19 @@ func update(quiet: bool) -> void:
 	var player := get_tree().get_first_node_in_group(&"local_player") as Player
 	if player != null:
 		_feed(player)
+		_cue_music(player)
+
+
+## In the great hall while a meal is served, the feast music plays (MusicDirector.event_track).
+func _cue_music(player: Player) -> void:
+	var music := get_parent().get_node_or_null("MusicDirector") as MusicDirector
+	if music == null:
+		return
+	var in_hall := player.area_tracker != null and player.area_tracker.current_area_id() == FEAST_AREA
+	if serving != "" and in_hall:
+		music.event_track = &"feast"
+	elif music.event_track == &"feast":
+		music.event_track = &""
 
 
 ## A local player seated at a feast table eats while a meal is served, and stops after.

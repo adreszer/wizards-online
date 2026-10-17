@@ -2372,10 +2372,12 @@ func _test_meals() -> void:
 	meals.update(false)
 	t.check(meals.serving == "MEAL_DINNER" and dishes.all(func(d: Node) -> bool: return (d as Node3D).visible), "dinner appears on the tables")
 	t.check(p.gestures.current == &"eat" and p.gestures.is_sitting(), "and the seated student eats")
+	var music := castle.get_node("MusicDirector") as MusicDirector
+	t.check(p.area_tracker.current_area_id() != FeastMeals.FEAST_AREA or music.event_track == &"feast", "the feast music plays in the great hall during the meal")
 	cycle.time_override = 21.0
 	cycle.refresh()
 	meals.update(false)
-	t.check(p.gestures.current == &"" and p.gestures.is_sitting(), "after dinner the plates go and the student stops eating")
+	t.check(p.gestures.current == &"" and p.gestures.is_sitting() and music.event_track != &"feast", "after dinner the plates go, the student stops eating and the feast music ends")
 	p.gestures.stand()
 	cycle.time_override = NAN
 	castle.queue_free()
