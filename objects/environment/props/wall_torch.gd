@@ -23,6 +23,8 @@ const WORLD_KIND := "wall_torch"
 @export var flicker_speed: float = 9.0
 @export var lit: bool = true
 @export var relight_after: float = 45.0
+## Daylight reaches this torch's room: the Lamplighter puts it out by day.
+@export var daylit: bool = false
 
 @onready var _light: OmniLight3D = $Flame
 @onready var _glow: MeshInstance3D = $Flame/FlameGlow
@@ -30,16 +32,22 @@ const WORLD_KIND := "wall_torch"
 var _phase: float = randf() * TAU
 var _relight_timer: SceneTreeTimer
 var _default_lit: bool = true
+## Lamplighter's part: false while a daylit torch is out for the day.
+var lamp_on: bool = true
+var lamp_stagger: float = 0.0
 
 
 func _ready() -> void:
 	_default_lit = lit
+	if daylit:
+		lamp_stagger = Lamplighter.stagger_for(object_id if object_id != "" else str(name))
+		add_to_group(Lamplighter.GROUP)
 	_receiver.spell_received.connect(_on_spell_received)
 	_apply_lit()
 
 
 func _process(delta: float) -> void:
-	if not lit:
+	if not burning():
 		return
 	_phase += delta * flicker_speed
 	var n := sin(_phase) * 0.5 + sin(_phase * 2.3 + 1.7) * 0.3 + sin(_phase * 5.1 + 0.4) * 0.2
@@ -55,6 +63,19 @@ func set_lit(value: bool) -> void:
 	if not lit and relight_after > 0.0 and not WorldObjectSync.is_synced(self):
 		_relight_timer = get_tree().create_timer(relight_after)
 		_relight_timer.timeout.connect(_on_relight_timeout.bind(_relight_timer))
+
+
+## The Lamplighter lights (true) or snuffs (false) a daylit torch.
+func set_lamp(on: bool) -> void:
+	if lamp_on == on:
+		return
+	lamp_on = on
+	_apply_lit()
+
+
+## Whether the flame shows: lit (spells, the server) and not out for the day.
+func burning() -> bool:
+	return lit and lamp_on
 
 
 func _on_relight_timeout(timer: SceneTreeTimer) -> void:
@@ -79,6 +100,7 @@ func _on_spell_received(effect: SpellEffect) -> void:
 
 
 func _apply_lit() -> void:
-	_light.visible = lit
-	_glow.visible = lit
-	set_process(lit)
+	var on := burning()
+	_light.visible = on
+	_glow.visible = on
+	set_process(on)

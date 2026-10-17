@@ -2007,6 +2007,34 @@ func _test_day_night() -> void:
 		music.update()
 		var playing := music.find_children("*", "AudioStreamPlayer", false, false).filter(func(p: Node) -> bool: return (p as AudioStreamPlayer).playing)
 		t.check(music.current == &"night" and playing.size() == 2, "night switches to the night music, crossfading from the day track")
+
+	# The lamplighter: daylit rooms' candles go out by day and are lit at dusk.
+	t.check(Lamplighter.burns_at(23.0, 0.5) and Lamplighter.burns_at(3.0, 0.5) and not Lamplighter.burns_at(12.0, 0.0)
+		and Lamplighter.burns_at(7.2, 0.5) and not Lamplighter.burns_at(7.6, 0.5) and Lamplighter.burns_at(19.6, 0.5)
+		and not Lamplighter.burns_at(19.2, 0.5), "daylit lights burn from dusk (plus their delay) until after dawn")
+	t.check(Lamplighter.stagger_for("great_hall/torch_1") == Lamplighter.stagger_for("great_hall/torch_1")
+		and Lamplighter.stagger_for("a") <= Lamplighter.STAGGER_HOURS, "each light's delay is fixed and small")
+	var daylit_torches := castle.find_children("*", "WallTorch", true, false).filter(func(n: Node) -> bool: return (n as WallTorch).daylit)
+	var dark_torches := castle.find_children("*", "WallTorch", true, false).filter(func(n: Node) -> bool: return not (n as WallTorch).daylit)
+	var daylit_chandeliers := castle.find_children("*", "Chandelier", true, false).filter(func(n: Node) -> bool: return (n as Chandelier).daylit)
+	t.check(daylit_torches.size() > 0 and dark_torches.size() > 0 and daylit_chandeliers.size() > 0,
+		"rooms with windows have daylit lights, windowless ones keep theirs (%d / %d torches)" % [daylit_torches.size(), dark_torches.size()])
+	if cycle != null and daylit_torches.size() > 0 and dark_torches.size() > 0 and daylit_chandeliers.size() > 0:
+		var torch := daylit_torches[0] as WallTorch
+		var chandelier := daylit_chandeliers[0] as Chandelier
+		var dungeon_torch := dark_torches[0] as WallTorch
+		cycle.time_override = 13.0
+		cycle.refresh()
+		t.check(not torch.burning() and not torch.get_node("Flame").visible and not chandelier.get_node("Candles").visible,
+			"at 13:00 the daylit torch and chandelier are out")
+		t.check(dungeon_torch.burning() and dungeon_torch.get_node("Flame").visible, "a windowless room's torch burns by day")
+		cycle.time_override = 23.0
+		cycle.refresh()
+		t.check(torch.burning() and torch.get_node("Flame").visible and chandelier.get_node("Candles").visible, "at 23:00 they are lit again")
+		torch.set_lit(false)
+		t.check(not torch.burning(), "a lit lamp put out by a spell stays out")
+		torch.set_lit(true)
+		cycle.time_override = NAN
 	castle.queue_free()
 	await get_tree().process_frame
 

@@ -307,7 +307,7 @@ Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B
 - [x] `/time [hh:mm | dawn | day | dusk | night]` (`/czas`): shows or moves the clock (offline locally; online `OP_CHEAT {time}`, admins or `cheats_enabled`, broadcast to everyone with who moved it)
 - [x] `DayNightCycle` (added by `castle.gd`): sky colours and a generated star field, the outdoor light is the sun by day (warm and low at dawn and dusk, white at noon, east → south → west) and the moon by night, swapping at the horizon while it is dark; ambient, fog and the interior fill rise a little by day; window glass glows with daylight and the far-view window glows fade by day; `GameEvents.time_phase_changed` plus dawn/nightfall notifications
 - [x] HUD clock (top right: "14:05 · day"); headless tests for the clock maths, `/time`, and the castle's noon/midnight/dawn lighting
-- [ ] Torches and chandeliers lit at dusk and snuffed at dawn (a curfew pass with the timetable)
+- [x] Torches and chandeliers lit at dusk and snuffed after dawn: `Lamplighter` (`gameplay/world/lamplighter.gd`, driven by `DayNightCycle`), a pure function of the school hour with a per-light delay of up to 45 school minutes so rooms go dark one by one; only lights the generator marks `daylit` (their room has a window: ~500 of ~680), so dungeons, stairwells and windowless rooms burn all day; a torch put out by a spell stays out. Tests: the rule, daylit vs windowless, noon/midnight in the castle
 - [ ] Night-only content keys off `time_phase_changed` / `SchoolClock.is_night`: night flight of the turning stairs, night creatures, stargazing, curfew; the same check on the server for anything it decides
 - [ ] Sun shadows outdoors (off for now; measure the cost on the grounds first)
 

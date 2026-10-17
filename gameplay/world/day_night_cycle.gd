@@ -2,8 +2,8 @@ class_name DayNightCycle
 extends Node
 ## Lights the world from the school clock (NetworkManager.school_hours(), the same
 ## on every client): the sky's colours and stars, the sun or moon over the grounds,
-## the faint daylight that reaches the interiors, ambient light, fog, and the
-## window panes. The level adds it next to its WorldEnvironment (castle.gd).
+## the faint daylight that reaches the interiors, ambient light, fog, the
+## window panes, and (through the Lamplighter) the candles of rooms with windows. The level adds it next to its WorldEnvironment (castle.gd).
 ##
 ## Lights it drives, found by name on the level root:
 ##   Moon  the outdoor light (render layer 11 only: terrain, water, facade). It is
@@ -164,6 +164,8 @@ func apply_hours(h: float) -> void:
 	if sky_light != null:
 		_place_sky_light(sun_direction(h))
 	WallWindow.set_daylight(daylight)
+	if is_inside_tree():
+		Lamplighter.apply(get_tree(), h)
 	for exterior in _exteriors:
 		if is_instance_valid(exterior):
 			exterior.call("set_daylight", daylight)

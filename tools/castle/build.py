@@ -181,6 +181,11 @@ def choose_windows():
                     n += 1
     return n
 
+def windowed_rooms():
+    """Rooms that got at least one window (choose_windows ran): daylight reaches them, so
+    their torches and chandeliers are put out by day (Lamplighter)."""
+    return {u["window"] for u in units.values() if u["window"]}
+
 def run_start(axis, coord, lo, hi, y):
     if axis == "x":
         return (lo, y, coord), 0.0
@@ -435,8 +440,11 @@ def emit_chandeliers():
                     drop = top - floor - CHANDELIER_CANDLE_HEIGHT - 1.7
                     if drop < 0.3:
                         continue    # too low a band to hang candles in
+                    props = {"drop": f"{drop:.3f}"}
+                    if r.id in windowed_rooms():
+                        props["daylit"] = "true"
                     inst(uname(f"Chandelier_{r.id}"), K("chandelier"),
-                         (x, top, z), parent="Lights", props={"drop": f"{drop:.3f}"})
+                         (x, top, z), parent="Lights", props=props)
                     n += 1
     return n
 
@@ -484,8 +492,9 @@ def wall_torch(r, pos, rot):
     layout changes: mysteries should only reference objects placed in content/placements.json."""
     oid = f"{r.id}/torch_{_names['torch:' + r.id] + 1}"
     _names['torch:' + r.id] += 1
+    extra = {"daylit": "true"} if r.id in windowed_rooms() else None
     inst(f"Torch_{node_name(oid)}", K("wall_torch"), pos, parent="Torches",
-         rot_y=math.radians(rot), props=oid_props(oid), groups=["world_objects"])
+         rot_y=math.radians(rot), props=oid_props(oid, extra), groups=["world_objects"])
 
 def emit_zones():
     for r in rooms.values():

@@ -10,9 +10,13 @@ extends Node3D
 ## Length of the iron rod from the ceiling to the chandelier's hook; tall halls use a
 ## longer drop so the candles still hang about 4 m above the floor.
 @export var drop: float = 2.0
+## Daylight reaches this chandelier's room: the Lamplighter puts it out by day.
+@export var daylit: bool = false
 
 @onready var _light: OmniLight3D = $Candles
 var _phase: float = randf() * TAU
+var lamp_on: bool = true
+var lamp_stagger: float = 0.0
 
 
 func _ready() -> void:
@@ -23,6 +27,21 @@ func _ready() -> void:
 	rod.position.y = -drop / 2.0
 	$Model.position.y = -(drop + 0.95)
 	_light.position.y = -(drop + 1.3)   # at candle height
+	if daylit:
+		lamp_stagger = Lamplighter.stagger_for(str(get_path()))
+		add_to_group(Lamplighter.GROUP)
+
+
+## The Lamplighter lights (true) or snuffs (false) the candles of a daylit chandelier.
+func set_lamp(on: bool) -> void:
+	if lamp_on == on:
+		return
+	lamp_on = on
+	_light.visible = on
+	for flame in $Model.get_children():
+		if flame is Flame:
+			flame.visible = on
+	set_process(on)
 
 
 func _process(delta: float) -> void:

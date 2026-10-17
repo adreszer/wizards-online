@@ -23046,26 +23046,32 @@ transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 
 [node name="Torch_great_hall_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.175, 2.600, 20.000)
 object_id = "great_hall/torch_1"
+daylit = true
 
 [node name="Torch_great_hall_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 43.825, 2.600, 20.000)
 object_id = "great_hall/torch_2"
+daylit = true
 
 [node name="Torch_great_hall_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 2.600, 8.175)
 object_id = "great_hall/torch_3"
+daylit = true
 
 [node name="Torch_great_hall_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 20.000, 2.600, 47.825)
 object_id = "great_hall/torch_4"
+daylit = true
 
 [node name="Torch_great_hall_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 36.000, 2.600, 47.825)
 object_id = "great_hall/torch_5"
+daylit = true
 
 [node name="Torch_stair_hall_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -28.000, 2.600, 47.825)
 object_id = "stair_hall/torch_1"
+daylit = true
 
 [node name="Torch_courtyard_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 2.600, -12.000)
@@ -23102,14 +23108,17 @@ object_id = "courtyard/torch_8"
 [node name="Torch_library_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -19.825, 2.600, -60.000)
 object_id = "library/torch_1"
+daylit = true
 
 [node name="Torch_library_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 19.825, 2.600, -60.000)
 object_id = "library/torch_2"
+daylit = true
 
 [node name="Torch_library_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 2.600, -63.825)
 object_id = "library/torch_3"
+daylit = true
 
 [node name="Torch_corridor_w_0_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -19.825, 2.600, -36.000)
@@ -23158,82 +23167,102 @@ object_id = "corridor_w_1/torch_4"
 [node name="Torch_corridor_e_1_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.175, 11.600, -36.000)
 object_id = "corridor_e_1/torch_1"
+daylit = true
 
 [node name="Torch_corridor_e_1_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.175, 11.600, -20.000)
 object_id = "corridor_e_1/torch_2"
+daylit = true
 
 [node name="Torch_corridor_e_1_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.175, 11.600, -12.000)
 object_id = "corridor_e_1/torch_3"
+daylit = true
 
 [node name="Torch_corridor_e_1_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.175, 11.600, -4.000)
 object_id = "corridor_e_1/torch_4"
+daylit = true
 
 [node name="Torch_corridor_e_1_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, 12.175, 11.600, 4.000)
 object_id = "corridor_e_1/torch_5"
+daylit = true
 
 [node name="Torch_corridor_e_1_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 19.825, 11.600, -36.000)
 object_id = "corridor_e_1/torch_6"
+daylit = true
 
 [node name="Torch_corridor_e_1_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 19.825, 11.600, -20.000)
 object_id = "corridor_e_1/torch_7"
+daylit = true
 
 [node name="Torch_corridor_e_1_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, 19.825, 11.600, -4.000)
 object_id = "corridor_e_1/torch_8"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -19.825, 20.600, -36.000)
 object_id = "corridor_w_2/torch_1"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -19.825, 20.600, -20.000)
 object_id = "corridor_w_2/torch_2"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -19.825, 20.600, -4.000)
 object_id = "corridor_w_2/torch_3"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -19.825, 20.600, 12.000)
 object_id = "corridor_w_2/torch_4"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -12.175, 20.600, -36.000)
 object_id = "corridor_w_2/torch_5"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -12.175, 20.600, -28.000)
 object_id = "corridor_w_2/torch_6"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -12.175, 20.600, -20.000)
 object_id = "corridor_w_2/torch_7"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -12.175, 20.600, -12.000)
 object_id = "corridor_w_2/torch_8"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -12.175, 20.600, -4.000)
 object_id = "corridor_w_2/torch_9"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -12.175, 20.600, 4.000)
 object_id = "corridor_w_2/torch_10"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -12.175, 20.600, 12.000)
 object_id = "corridor_w_2/torch_11"
+daylit = true
 
 [node name="Torch_corridor_w_2_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -12.175, 20.600, 20.000)
 object_id = "corridor_w_2/torch_12"
+daylit = true
 
 [node name="Torch_dungeon_corridor_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -19.825, -6.400, -36.000)
@@ -23374,382 +23403,477 @@ object_id = "north_wing_cm1/torch_12"
 [node name="Torch_north_wing_c0_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 2.600, -156.000)
 object_id = "north_wing_c0/torch_1"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 2.600, -140.000)
 object_id = "north_wing_c0/torch_2"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 2.600, -132.000)
 object_id = "north_wing_c0/torch_3"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 2.600, -116.000)
 object_id = "north_wing_c0/torch_4"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 2.600, -108.000)
 object_id = "north_wing_c0/torch_5"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 2.600, -92.000)
 object_id = "north_wing_c0/torch_6"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 2.600, -76.000)
 object_id = "north_wing_c0/torch_7"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 2.600, -156.000)
 object_id = "north_wing_c0/torch_8"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 2.600, -140.000)
 object_id = "north_wing_c0/torch_9"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 2.600, -124.000)
 object_id = "north_wing_c0/torch_10"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 2.600, -108.000)
 object_id = "north_wing_c0/torch_11"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 2.600, -92.000)
 object_id = "north_wing_c0/torch_12"
+daylit = true
 
 [node name="Torch_north_wing_c0_torch_13" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 2.600, -68.000)
 object_id = "north_wing_c0/torch_13"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 11.600, -156.000)
 object_id = "north_wing_c1/torch_1"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 11.600, -140.000)
 object_id = "north_wing_c1/torch_2"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 11.600, -132.000)
 object_id = "north_wing_c1/torch_3"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 11.600, -124.000)
 object_id = "north_wing_c1/torch_4"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 11.600, -116.000)
 object_id = "north_wing_c1/torch_5"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 11.600, -108.000)
 object_id = "north_wing_c1/torch_6"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 11.600, -92.000)
 object_id = "north_wing_c1/torch_7"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 11.600, -76.000)
 object_id = "north_wing_c1/torch_8"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 11.600, -156.000)
 object_id = "north_wing_c1/torch_9"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 11.600, -140.000)
 object_id = "north_wing_c1/torch_10"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 11.600, -124.000)
 object_id = "north_wing_c1/torch_11"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 11.600, -108.000)
 object_id = "north_wing_c1/torch_12"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_13" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 11.600, -92.000)
 object_id = "north_wing_c1/torch_13"
+daylit = true
 
 [node name="Torch_north_wing_c1_torch_14" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 11.600, -68.000)
 object_id = "north_wing_c1/torch_14"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 20.600, -156.000)
 object_id = "north_wing_c2/torch_1"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 20.600, -140.000)
 object_id = "north_wing_c2/torch_2"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 20.600, -132.000)
 object_id = "north_wing_c2/torch_3"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 20.600, -124.000)
 object_id = "north_wing_c2/torch_4"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 20.600, -116.000)
 object_id = "north_wing_c2/torch_5"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 20.600, -108.000)
 object_id = "north_wing_c2/torch_6"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 20.600, -92.000)
 object_id = "north_wing_c2/torch_7"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 20.600, -76.000)
 object_id = "north_wing_c2/torch_8"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 20.600, -156.000)
 object_id = "north_wing_c2/torch_9"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 20.600, -140.000)
 object_id = "north_wing_c2/torch_10"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 20.600, -132.000)
 object_id = "north_wing_c2/torch_11"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 20.600, -116.000)
 object_id = "north_wing_c2/torch_12"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_13" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 20.600, -108.000)
 object_id = "north_wing_c2/torch_13"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_14" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 20.600, -92.000)
 object_id = "north_wing_c2/torch_14"
+daylit = true
 
 [node name="Torch_north_wing_c2_torch_15" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 20.600, -68.000)
 object_id = "north_wing_c2/torch_15"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 29.600, -156.000)
 object_id = "north_wing_c3/torch_1"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 29.600, -140.000)
 object_id = "north_wing_c3/torch_2"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 29.600, -132.000)
 object_id = "north_wing_c3/torch_3"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 29.600, -124.000)
 object_id = "north_wing_c3/torch_4"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 29.600, -116.000)
 object_id = "north_wing_c3/torch_5"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 29.600, -108.000)
 object_id = "north_wing_c3/torch_6"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 29.600, -92.000)
 object_id = "north_wing_c3/torch_7"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -11.825, 29.600, -76.000)
 object_id = "north_wing_c3/torch_8"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 29.600, -156.000)
 object_id = "north_wing_c3/torch_9"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 29.600, -140.000)
 object_id = "north_wing_c3/torch_10"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 29.600, -124.000)
 object_id = "north_wing_c3/torch_11"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 29.600, -108.000)
 object_id = "north_wing_c3/torch_12"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_13" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 29.600, -92.000)
 object_id = "north_wing_c3/torch_13"
+daylit = true
 
 [node name="Torch_north_wing_c3_torch_14" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -4.175, 29.600, -68.000)
 object_id = "north_wing_c3/torch_14"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -84.000, 2.600, -171.825)
 object_id = "archive_wing_c0/torch_1"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -68.000, 2.600, -171.825)
 object_id = "archive_wing_c0/torch_2"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 2.600, -171.825)
 object_id = "archive_wing_c0/torch_3"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 2.600, -171.825)
 object_id = "archive_wing_c0/torch_4"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -92.000, 2.600, -164.175)
 object_id = "archive_wing_c0/torch_5"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -84.000, 2.600, -164.175)
 object_id = "archive_wing_c0/torch_6"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -68.000, 2.600, -164.175)
 object_id = "archive_wing_c0/torch_7"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -60.000, 2.600, -164.175)
 object_id = "archive_wing_c0/torch_8"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -52.000, 2.600, -164.175)
 object_id = "archive_wing_c0/torch_9"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -36.000, 2.600, -164.175)
 object_id = "archive_wing_c0/torch_10"
+daylit = true
 
 [node name="Torch_archive_wing_c0_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -28.000, 2.600, -164.175)
 object_id = "archive_wing_c0/torch_11"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -84.000, 11.600, -171.825)
 object_id = "archive_wing_c1/torch_1"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -68.000, 11.600, -171.825)
 object_id = "archive_wing_c1/torch_2"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 11.600, -171.825)
 object_id = "archive_wing_c1/torch_3"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 11.600, -171.825)
 object_id = "archive_wing_c1/torch_4"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -92.000, 11.600, -164.175)
 object_id = "archive_wing_c1/torch_5"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -84.000, 11.600, -164.175)
 object_id = "archive_wing_c1/torch_6"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -76.000, 11.600, -164.175)
 object_id = "archive_wing_c1/torch_7"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -68.000, 11.600, -164.175)
 object_id = "archive_wing_c1/torch_8"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -60.000, 11.600, -164.175)
 object_id = "archive_wing_c1/torch_9"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -52.000, 11.600, -164.175)
 object_id = "archive_wing_c1/torch_10"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -36.000, 11.600, -164.175)
 object_id = "archive_wing_c1/torch_11"
+daylit = true
 
 [node name="Torch_archive_wing_c1_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -28.000, 11.600, -164.175)
 object_id = "archive_wing_c1/torch_12"
+daylit = true
 
 [node name="Torch_archive_wing_c2_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -84.000, 20.600, -171.825)
 object_id = "archive_wing_c2/torch_1"
+daylit = true
 
 [node name="Torch_archive_wing_c2_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -68.000, 20.600, -171.825)
 object_id = "archive_wing_c2/torch_2"
+daylit = true
 
 [node name="Torch_archive_wing_c2_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -52.000, 20.600, -171.825)
 object_id = "archive_wing_c2/torch_3"
+daylit = true
 
 [node name="Torch_archive_wing_c2_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -36.000, 20.600, -171.825)
 object_id = "archive_wing_c2/torch_4"
+daylit = true
 
 [node name="Torch_archive_wing_c2_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -84.000, 20.600, -164.175)
 object_id = "archive_wing_c2/torch_5"
+daylit = true
 
 [node name="Torch_archive_wing_c2_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -68.000, 20.600, -164.175)
 object_id = "archive_wing_c2/torch_6"
+daylit = true
 
 [node name="Torch_archive_wing_c2_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -52.000, 20.600, -164.175)
 object_id = "archive_wing_c2/torch_7"
+daylit = true
 
 [node name="Torch_archive_wing_c2_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -36.000, 20.600, -164.175)
 object_id = "archive_wing_c2/torch_8"
+daylit = true
 
 [node name="Torch_archive_wing_c2_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -28.000, 20.600, -164.175)
 object_id = "archive_wing_c2/torch_9"
+daylit = true
 
 [node name="Torch_great_archive_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, 1.000000, 0, 1, 0, -1.000000, 0, 0.000000, -99.825, 2.600, -156.000)
 object_id = "great_archive/torch_1"
+daylit = true
 
 [node name="Torch_great_archive_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(0.000000, 0, -1.000000, 0, 1, 0, 1.000000, 0, 0.000000, -52.175, 2.600, -156.000)
 object_id = "great_archive/torch_2"
+daylit = true
 
 [node name="Torch_great_archive_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -92.000, 2.600, -163.825)
 object_id = "great_archive/torch_3"
+daylit = true
 
 [node name="Torch_great_archive_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, 2.600, -163.825)
 object_id = "great_archive/torch_4"
+daylit = true
 
 [node name="Torch_great_archive_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -92.000, 2.600, -140.175)
 object_id = "great_archive/torch_5"
+daylit = true
 
 [node name="Torch_great_archive_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -76.000, 2.600, -140.175)
 object_id = "great_archive/torch_6"
+daylit = true
 
 [node name="Torch_great_archive_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, -60.000, 2.600, -140.175)
 object_id = "great_archive/torch_7"
+daylit = true
 
 [node name="Torch_east_wing_cm1_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 68.000, -6.400, 28.175)
@@ -23822,394 +23946,492 @@ object_id = "east_wing_cm1/torch_17"
 [node name="Torch_east_wing_c0_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 68.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_1"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 76.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_2"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 92.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_3"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 108.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_4"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 124.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_5"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 132.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_6"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 140.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_7"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 148.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_8"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 156.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_9"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 2.600, 28.175)
 object_id = "east_wing_c0/torch_10"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 68.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_11"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 76.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_12"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_13" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 84.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_13"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_14" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 92.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_14"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_15" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 100.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_15"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_16" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 108.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_16"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_17" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 124.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_17"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_18" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 132.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_18"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_19" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 148.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_19"
+daylit = true
 
 [node name="Torch_east_wing_c0_torch_20" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 156.000, 2.600, 35.825)
 object_id = "east_wing_c0/torch_20"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 68.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_1"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 76.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_2"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 92.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_3"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 108.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_4"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 124.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_5"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 132.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_6"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 140.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_7"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 148.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_8"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 156.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_9"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 11.600, 28.175)
 object_id = "east_wing_c1/torch_10"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 68.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_11"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 76.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_12"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_13" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 84.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_13"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_14" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 92.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_14"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_15" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 100.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_15"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_16" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 108.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_16"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_17" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 124.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_17"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_18" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 132.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_18"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_19" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 140.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_19"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_20" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 148.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_20"
+daylit = true
 
 [node name="Torch_east_wing_c1_torch_21" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 156.000, 11.600, 35.825)
 object_id = "east_wing_c1/torch_21"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 68.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_1"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 76.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_2"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 92.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_3"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 108.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_4"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 124.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_5"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 132.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_6"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 140.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_7"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 148.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_8"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 156.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_9"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 20.600, 28.175)
 object_id = "east_wing_c2/torch_10"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 68.000, 20.600, 35.825)
 object_id = "east_wing_c2/torch_11"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 76.000, 20.600, 35.825)
 object_id = "east_wing_c2/torch_12"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_13" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 84.000, 20.600, 35.825)
 object_id = "east_wing_c2/torch_13"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_14" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 92.000, 20.600, 35.825)
 object_id = "east_wing_c2/torch_14"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_15" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 100.000, 20.600, 35.825)
 object_id = "east_wing_c2/torch_15"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_16" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 108.000, 20.600, 35.825)
 object_id = "east_wing_c2/torch_16"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_17" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 124.000, 20.600, 35.825)
 object_id = "east_wing_c2/torch_17"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_18" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 140.000, 20.600, 35.825)
 object_id = "east_wing_c2/torch_18"
+daylit = true
 
 [node name="Torch_east_wing_c2_torch_19" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 156.000, 20.600, 35.825)
 object_id = "east_wing_c2/torch_19"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 68.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_1"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 76.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_2"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 92.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_3"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 108.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_4"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 124.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_5"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 132.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_6"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 140.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_7"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 148.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_8"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 156.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_9"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 29.600, 28.175)
 object_id = "east_wing_c3/torch_10"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 68.000, 29.600, 35.825)
 object_id = "east_wing_c3/torch_11"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 76.000, 29.600, 35.825)
 object_id = "east_wing_c3/torch_12"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_13" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 84.000, 29.600, 35.825)
 object_id = "east_wing_c3/torch_13"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_14" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 92.000, 29.600, 35.825)
 object_id = "east_wing_c3/torch_14"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_15" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 100.000, 29.600, 35.825)
 object_id = "east_wing_c3/torch_15"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_16" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 108.000, 29.600, 35.825)
 object_id = "east_wing_c3/torch_16"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_17" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 124.000, 29.600, 35.825)
 object_id = "east_wing_c3/torch_17"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_18" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 140.000, 29.600, 35.825)
 object_id = "east_wing_c3/torch_18"
+daylit = true
 
 [node name="Torch_east_wing_c3_torch_19" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 156.000, 29.600, 35.825)
 object_id = "east_wing_c3/torch_19"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 68.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_1"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 76.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_2"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 92.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_3"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 108.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_4"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 124.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_5"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 132.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_6"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 140.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_7"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_8" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 148.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_8"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_9" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 156.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_9"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_10" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 38.600, 28.175)
 object_id = "east_wing_c4/torch_10"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_11" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 68.000, 38.600, 35.825)
 object_id = "east_wing_c4/torch_11"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_12" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 76.000, 38.600, 35.825)
 object_id = "east_wing_c4/torch_12"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_13" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 84.000, 38.600, 35.825)
 object_id = "east_wing_c4/torch_13"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_14" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 92.000, 38.600, 35.825)
 object_id = "east_wing_c4/torch_14"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_15" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 100.000, 38.600, 35.825)
 object_id = "east_wing_c4/torch_15"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_16" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 108.000, 38.600, 35.825)
 object_id = "east_wing_c4/torch_16"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_17" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 124.000, 38.600, 35.825)
 object_id = "east_wing_c4/torch_17"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_18" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 140.000, 38.600, 35.825)
 object_id = "east_wing_c4/torch_18"
+daylit = true
 
 [node name="Torch_east_wing_c4_torch_19" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 156.000, 38.600, 35.825)
 object_id = "east_wing_c4/torch_19"
+daylit = true
 
 [node name="Torch_turning_stairs_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 132.000, -6.400, 27.825)
@@ -24222,182 +24444,227 @@ object_id = "turning_stairs/torch_2"
 [node name="Torch_duelling_hall_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 132.000, 2.600, 36.175)
 object_id = "duelling_hall/torch_1"
+daylit = true
 
 [node name="Torch_duelling_hall_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 148.000, 2.600, 36.175)
 object_id = "duelling_hall/torch_2"
+daylit = true
 
 [node name="Torch_duelling_hall_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 132.000, 2.600, 51.825)
 object_id = "duelling_hall/torch_3"
+daylit = true
 
 [node name="Torch_unfinished_wing_c0_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 12.000, 2.600, -171.825)
 object_id = "unfinished_wing_c0/torch_1"
+daylit = true
 
 [node name="Torch_unfinished_wing_c0_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 2.600, -171.825)
 object_id = "unfinished_wing_c0/torch_2"
+daylit = true
 
 [node name="Torch_unfinished_wing_c0_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 44.000, 2.600, -171.825)
 object_id = "unfinished_wing_c0/torch_3"
+daylit = true
 
 [node name="Torch_unfinished_wing_c0_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 4.000, 2.600, -164.175)
 object_id = "unfinished_wing_c0/torch_4"
+daylit = true
 
 [node name="Torch_unfinished_wing_c0_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 12.000, 2.600, -164.175)
 object_id = "unfinished_wing_c0/torch_5"
+daylit = true
 
 [node name="Torch_unfinished_wing_c0_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 28.000, 2.600, -164.175)
 object_id = "unfinished_wing_c0/torch_6"
+daylit = true
 
 [node name="Torch_unfinished_wing_c0_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 44.000, 2.600, -164.175)
 object_id = "unfinished_wing_c0/torch_7"
+daylit = true
 
 [node name="Torch_unfinished_wing_c1_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 12.000, 11.600, -171.825)
 object_id = "unfinished_wing_c1/torch_1"
+daylit = true
 
 [node name="Torch_unfinished_wing_c1_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 11.600, -171.825)
 object_id = "unfinished_wing_c1/torch_2"
+daylit = true
 
 [node name="Torch_unfinished_wing_c1_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 44.000, 11.600, -171.825)
 object_id = "unfinished_wing_c1/torch_3"
+daylit = true
 
 [node name="Torch_unfinished_wing_c1_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 4.000, 11.600, -164.175)
 object_id = "unfinished_wing_c1/torch_4"
+daylit = true
 
 [node name="Torch_unfinished_wing_c1_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 12.000, 11.600, -164.175)
 object_id = "unfinished_wing_c1/torch_5"
+daylit = true
 
 [node name="Torch_unfinished_wing_c1_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 28.000, 11.600, -164.175)
 object_id = "unfinished_wing_c1/torch_6"
+daylit = true
 
 [node name="Torch_unfinished_wing_c1_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 44.000, 11.600, -164.175)
 object_id = "unfinished_wing_c1/torch_7"
+daylit = true
 
 [node name="Torch_unfinished_wing_c2_torch_1" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 12.000, 20.600, -171.825)
 object_id = "unfinished_wing_c2/torch_1"
+daylit = true
 
 [node name="Torch_unfinished_wing_c2_torch_2" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 20.600, -171.825)
 object_id = "unfinished_wing_c2/torch_2"
+daylit = true
 
 [node name="Torch_unfinished_wing_c2_torch_3" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 44.000, 20.600, -171.825)
 object_id = "unfinished_wing_c2/torch_3"
+daylit = true
 
 [node name="Torch_unfinished_wing_c2_torch_4" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 4.000, 20.600, -164.175)
 object_id = "unfinished_wing_c2/torch_4"
+daylit = true
 
 [node name="Torch_unfinished_wing_c2_torch_5" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 12.000, 20.600, -164.175)
 object_id = "unfinished_wing_c2/torch_5"
+daylit = true
 
 [node name="Torch_unfinished_wing_c2_torch_6" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 28.000, 20.600, -164.175)
 object_id = "unfinished_wing_c2/torch_6"
+daylit = true
 
 [node name="Torch_unfinished_wing_c2_torch_7" parent="Torches" groups=["world_objects"] instance=ExtResource("20")]
 transform = Transform3D(-1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, -1.000000, 44.000, 20.600, -164.175)
 object_id = "unfinished_wing_c2/torch_7"
+daylit = true
 
 [node name="Chandelier_entrance_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 17.000, 30.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_entrance_hall_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 17.000, 42.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_entrance_hall_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 6.000, 17.000, 30.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_entrance_hall_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 6.000, 17.000, 42.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 17.333, 17.000, 14.667)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_hall_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 17.333, 17.000, 28.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_hall_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 17.333, 17.000, 41.333)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_hall_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 17.000, 14.667)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_hall_5" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 17.000, 28.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_hall_6" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 17.000, 41.333)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_hall_7" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.667, 17.000, 14.667)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_hall_8" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.667, 17.000, 28.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_hall_9" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.667, 17.000, 41.333)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_stair_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 26.000, 30.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_stair_hall_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 8.000, 30.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_stair_hall_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 26.000, 42.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_stair_hall_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 17.000, 42.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_stair_hall_5" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 26.000, 30.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_stair_hall_6" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 8.000, 30.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_stair_hall_7" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 26.000, 42.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_stair_hall_8" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 17.000, 42.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_north_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 8.000, -34.000)
@@ -24418,58 +24685,72 @@ drop = 2.000
 [node name="Chandelier_library" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -13.333, 17.000, -58.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_library_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -13.333, 17.000, -46.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_library_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 17.000, -58.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_library_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 0.000, 17.000, -46.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_library_5" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 13.333, 17.000, -58.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_library_6" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 13.333, 17.000, -46.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_kitchens" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 8.000, 30.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_kitchens_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 8.000, 42.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_house4_common" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 8.000, 16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_house4_dorm" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 68.000, 8.000, 16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_shapeshaping" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 8.000, 16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_shapeshaping_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 8.000, 16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_sigilcraft" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 8.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_sigilcraft_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 8.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_chronicles" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 8.000, -16.000)
@@ -24482,174 +24763,217 @@ drop = 2.000
 [node name="Chandelier_class_glyphs" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 8.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_glyphs_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 8.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_herblore" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 8.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_herblore_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.000, 8.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_skyriding" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 8.000, -16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_skyriding_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.000, 8.000, -16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_beastlore" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 8.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_beastlore_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.000, 8.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_numeromancy" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 17.000, 16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_numeromancy_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 17.000, 16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_warding" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 17.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_warding_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 17.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_staff_room" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 17.000, -16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_staff_room_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 17.000, -16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_hospital_wing" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 17.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_hospital_wing_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 17.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_stargazing" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 17.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_stargazing_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.000, 17.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_song_room" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 17.000, -16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_song_room_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.000, 17.000, -16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_records_room" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 26.000, 17.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_records_room_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 38.000, 17.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_hall_1" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 17.000, -34.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_hall_1_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 17.000, -22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_hall_1_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 6.000, 17.000, -34.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_hall_1_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 6.000, 17.000, -22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_gallery" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 26.000, 30.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_gallery_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -6.000, 26.000, 42.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_gallery_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 6.000, 26.000, 30.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_gallery_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 6.000, 26.000, 42.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_roost" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 26.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_study_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 26.000, 16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_study_hall_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 26.000, 16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_trophy_room" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 26.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_trophy_room_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 26.000, 0.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_head_study" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 26.000, -16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_head_study_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 26.000, -16.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_map_room" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, 26.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_map_room_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -26.000, 26.000, -32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_ne_0" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 8.000, -48.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_ne_1" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 17.000, -48.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_ne_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 26.000, -48.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_ne_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 28.000, 35.000, -48.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_nw_0" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 8.000, -48.000)
@@ -24662,26 +24986,32 @@ drop = 2.000
 [node name="Chandelier_tower_nw_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 26.000, -48.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_nw_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 35.000, -48.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_sw_0" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 8.000, 32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_sw_1" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 17.000, 32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_sw_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 26.000, 32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_tower_sw_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 35.000, 32.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_class_elixirs" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -38.000, -1.000, 6.000)
@@ -24762,18 +25092,22 @@ drop = 2.000
 [node name="Chandelier_portrait_gallery" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 26.000, -138.667)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_portrait_gallery_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 26.000, -128.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_portrait_gallery_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 26.000, -117.333)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_bathing_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 17.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_old_cells" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, -1.000, -136.000)
@@ -24786,22 +25120,27 @@ drop = 2.000
 [node name="Chandelier_scriptorium" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 8.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_scriptorium_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 8.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_globe_room" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 35.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_globe_room_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 35.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_reading_room" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 17.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_wine_cellar" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, -1.000, -88.000)
@@ -24866,178 +25205,222 @@ drop = 2.000
 [node name="Chandelier_north_wing_r10" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 8.000, -72.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r10_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 8.000, -72.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r11" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 8.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r11_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 8.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r12" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 8.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r12_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 8.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r13" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 8.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r14" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 8.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r15" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 8.000, -120.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r16" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 8.000, -136.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r17" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 8.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r18" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 17.000, -72.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r18_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 17.000, -72.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r19" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 17.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r19_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 17.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r20" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 17.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r20_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 17.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r21" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 17.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r21_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 17.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r22" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 17.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r23" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 17.000, -120.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r24" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 17.000, -136.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r25" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 26.000, -72.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r25_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 26.000, -72.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r26" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 26.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r26_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 26.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r27" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 26.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r27_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 26.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r28" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 26.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r28_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 26.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r29" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 26.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r30" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 26.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r31" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 26.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r32" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 35.000, -72.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r32_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 35.000, -72.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r33" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 35.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r33_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 35.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r34" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -30.000, 35.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r34_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -18.000, 35.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r35" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 35.000, -88.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r36" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 35.000, -104.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r37" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 35.000, -120.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r38" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 35.000, -136.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_north_wing_r39" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 35.000, -152.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_clock_tower_0" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 8.000, -168.000)
@@ -25054,190 +25437,237 @@ drop = 2.000
 [node name="Chandelier_clock_tower_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 35.000, -168.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_clock_tower_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 44.000, -168.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_clock_tower_5" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -12.000, 53.000, -168.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_great_archive" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -94.000, 17.000, -158.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_archive_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -94.000, 17.000, -146.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_archive_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -82.000, 17.000, -158.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_archive_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -82.000, 17.000, -146.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_archive_5" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -70.000, 17.000, -158.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_archive_6" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -70.000, 17.000, -146.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_archive_7" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -58.000, 17.000, -158.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_great_archive_8" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -58.000, 17.000, -146.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_restricted_stacks" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -92.000, 26.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_bindery" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 8.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r1" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 8.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r1_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 8.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 8.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r2_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 8.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, 8.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r3_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, 8.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -76.000, 8.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r4_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -76.000, 8.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r5" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -92.000, 8.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r5_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -92.000, 8.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r6" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 17.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r7" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 17.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r7_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 17.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r8" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 17.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r8_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 17.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r9" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, 17.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r9_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, 17.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r10" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -76.000, 17.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r10_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -76.000, 17.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r11" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -92.000, 17.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r11_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -92.000, 17.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r12" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 26.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r13" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, 26.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r14" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -76.000, 26.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r15" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 26.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r15_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -28.000, 26.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r16" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 26.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r16_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -44.000, 26.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r17" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, 26.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r17_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -60.000, 26.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r18" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -76.000, 26.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r18_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -76.000, 26.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r19" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -92.000, 26.000, -190.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_archive_wing_r19_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, -92.000, 26.000, -178.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_turning_stairs" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 130.000, 44.000, -5.333)
@@ -25330,18 +25760,22 @@ drop = 2.000
 [node name="Chandelier_duelling_hall" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 129.333, 17.000, 44.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_duelling_hall_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 140.000, 17.000, 44.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_duelling_hall_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 150.667, 17.000, 44.000)
 drop = 11.000
+daylit = true
 
 [node name="Chandelier_office_herblore" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 17.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_office_sigilcraft" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 148.000, 26.000, 44.000)
@@ -25354,22 +25788,27 @@ drop = 2.000
 [node name="Chandelier_office_chronicles" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 35.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_office_chronicles_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 35.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_staff_library" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 17.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_office_shapeshaping" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 26.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_office_shapeshaping_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 26.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_office_elixirs" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, -1.000, 44.000)
@@ -25378,14 +25817,17 @@ drop = 2.000
 [node name="Chandelier_office_warding" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 132.000, 35.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_office_stargazing" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 35.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_faculty_lounge" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 26.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r1" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, -1.000, 10.000)
@@ -25422,18 +25864,22 @@ drop = 2.000
 [node name="Chandelier_east_wing_r6" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 8.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r6_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 8.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r7" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 8.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r7_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 8.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r8" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 8.000, 10.000)
@@ -25446,26 +25892,32 @@ drop = 2.000
 [node name="Chandelier_east_wing_r9" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 8.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r10" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 8.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r11" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 17.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r11_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 17.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r12" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 17.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r12_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 17.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r13" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 17.000, 10.000)
@@ -25478,42 +25930,52 @@ drop = 2.000
 [node name="Chandelier_east_wing_r14" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 26.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r14_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 26.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r15" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 26.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r15_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 26.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r16" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 26.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r17" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 132.000, 26.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r18" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 35.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r18_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 35.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r19" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 35.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r19_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 35.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r20" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 148.000, 35.000, 44.000)
@@ -25522,38 +25984,47 @@ drop = 2.000
 [node name="Chandelier_east_wing_r21" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 35.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r22" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 44.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r22_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 84.000, 44.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r23" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 44.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r23_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 100.000, 44.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r24" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 44.000, 10.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r24_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 44.000, 22.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r25" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 44.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r26" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 132.000, 44.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_east_wing_r27" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 148.000, 44.000, 44.000)
@@ -25562,46 +26033,57 @@ drop = 2.000
 [node name="Chandelier_east_wing_r28" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 164.000, 44.000, 44.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dawn_tower_0" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 152.000, 8.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dawn_tower_1" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 152.000, 17.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dawn_tower_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 152.000, 26.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dawn_tower_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 152.000, 35.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dawn_tower_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 152.000, 44.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dusk_tower_0" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 184.000, 8.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dusk_tower_1" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 184.000, 17.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dusk_tower_2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 184.000, 26.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dusk_tower_3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 184.000, 35.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_dusk_tower_4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 184.000, 44.000, 60.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_sky_bridge" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 168.000, 35.000, 60.000)
@@ -25610,86 +26092,107 @@ drop = 2.000
 [node name="Chandelier_unfinished_wing_r1" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 8.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r2" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 8.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r3" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 8.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r4" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 8.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r5" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 8.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r6" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 8.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r7" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 8.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r8" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 17.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r9" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 17.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r10" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 17.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r11" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 17.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r12" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 17.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r13" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 17.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r14" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 17.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r15" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 4.000, 26.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r16" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 26.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r17" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 26.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r18" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 26.000, -180.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r19" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 20.000, 26.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r20" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 36.000, 26.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_unfinished_wing_r21" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 52.000, 26.000, -156.000)
 drop = 2.000
+daylit = true
 
 [node name="Chandelier_hidden_east_wing_r8" parent="Lights" instance=ExtResource("21")]
 transform = Transform3D(1.000000, 0, 0.000000, 0, 1, 0, -0.000000, 0, 1.000000, 116.000, 8.000, 0.000)
