@@ -17,7 +17,7 @@ local M = {}
 M.COLLECTION, M.KEY = "records", "transcript"
 M.LOG_COLLECTION = "lesson_log"
 M.RECENT_MAX = 30
-M.SUBJECT_FIELDS = { "attended", "self_study", "quiz_right", "quiz_total", "practicals" }
+M.SUBJECT_FIELDS = { "attended", "self_study", "quiz_right", "quiz_total", "practicals", "homework_count", "homework_points" }
 
 local function blank_subject()
   local s = {}
@@ -103,6 +103,15 @@ function M.practical_done(uid, subject)
   local rec = M.load(uid)
   local s = M.subject(rec, subject)
   s.practicals = s.practicals + 1
+  return M.save(uid, rec)
+end
+
+-- A graded homework answer (grade 1–6).
+function M.homework_graded(uid, subject, grade)
+  local rec = M.load(uid)
+  local s = M.subject(rec, subject)
+  s.homework_count = s.homework_count + 1
+  s.homework_points = s.homework_points + grade
   return M.save(uid, rec)
 end
 

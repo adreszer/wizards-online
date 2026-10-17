@@ -321,6 +321,9 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return NetworkManager.practical_progress.get("students", []).any(func(s: Dictionary) -> bool: return s.get("done", false)), 40.0)
 	t.check(ok, "the professor sees the student finish the practical (%s)" % str(NetworkManager.practical_progress))
 	NetworkManager.stop_practical()
+	NetworkManager.send_homework("Describe two uses of the first sigil.", 3)
+	ok = await _wait_until(func() -> bool: return tool_results.any(func(r: Array) -> bool: return r[1] == "homework" and r[0]), 10.0)
+	t.check(ok, "the professor sets homework for the lesson")
 	# House points: an award with a reason lands in the ledger and the tally.
 	var totals_before := NetworkManager.get_house_totals()
 	t.check(totals_before.size() == 4, "the house points tally arrived on join (%s)" % str(totals_before))
@@ -369,6 +372,20 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return object_events.any(func(e: Array) -> bool: return e[0] == SWITCH), 30.0)
 	var switch_node: Node = _world_object(SWITCH)
 	t.check(ok and switch_node is MagicSwitch and switch_node.is_on == (NetworkManager.get_world_object_states().get(SWITCH, false) == true), "the student's switch change reaches the professor's castle")
+
+	t.section("Homework (professor)")
+	var inbox: Dictionary = await NetworkManager.homework_inbox()
+	var answers: Array = []
+	for hw: Dictionary in inbox.get("homework", []):
+		if str(hw.get("text", "")) == "Describe two uses of the first sigil.":
+			for a: Dictionary in hw.get("answers", []):
+				if not a.has("grade"):
+					answers.append([str(hw.id), a])
+	t.check(not answers.is_empty() and answers[0][1].get("text", "") == "To lift and to push.", "the professor reads the handed-in answer (%d)" % answers.size())
+	if not answers.is_empty():
+		var graded: Dictionary = await NetworkManager.homework_grade(answers[0][0], str(answers[0][1].get("user_id", "")), 5, "Well put.")
+		var again: Dictionary = await NetworkManager.homework_grade(answers[0][0], str(answers[0][1].get("user_id", "")), 6, "")
+		t.check(not graded.has("error") and again.has("error"), "and grades it once (%s / %s)" % [str(graded), str(again)])
 
 	t.section("Purse (admin RPC)")
 	var granted: Dictionary = await NetworkManager.admin_grant_coins({"user_id": NetworkManager.local_user_id, "amount": 50, "reason": "staff stipend"}, HTTP_KEY)
@@ -543,6 +560,12 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 		await _wait(0.5)
 	ok = await _wait_until(func() -> bool: return practical_views.any(func(v: Dictionary) -> bool: return v.get("done", false) and v.get("granted", false)) and _known_spells().has("uplift"), 10.0)
 	t.check(ok, "two hits on the practice target finish it and teach the spell (%s)" % str(practical_views))
+	ok = await _wait_until(func() -> bool: return notifications.any(func(n: String) -> bool: return n.contains("Describe two uses of the first sigil.")), 20.0)
+	t.check(ok, "the student is told about the new homework")
+	var my_hw: Dictionary = await NetworkManager.homework_list()
+	var hw_list: Array = my_hw.get("homework", [])
+	var handed: Dictionary = await NetworkManager.homework_submit(str(hw_list[0].get("id", "")) if not hw_list.is_empty() else "", "To lift and to push.")
+	t.check(not hw_list.is_empty() and not handed.has("error"), "the student hands the homework in (%s)" % str(handed))
 	t.check(player.spell_caster.try_cast(), "student casts the granted spell")
 	await _wait(0.6)
 	player.spell_caster.try_cast()
@@ -658,6 +681,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("attended", 0)) >= 1, "the student reads their own school record")
 	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("quiz_right", 0)) >= 2, "with the marked quiz answers in it")
 	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("practicals", 0)) >= 1, "and the finished practical")
+	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("homework_count", 0)) >= 1, "and the graded homework")
 	var other_record: Dictionary = await NetworkManager.school_record("someone-else")
 	t.check(other_record.has("error"), "but not another student's")
 	cheat_results.clear()   # the brooms section counts its own cheat answers

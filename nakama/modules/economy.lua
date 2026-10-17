@@ -20,7 +20,7 @@ local M = {}
 
 M.CURRENCY = "coins"
 M.DAILY_COLLECTION, M.DAILY_KEY = "economy", "daily"
-M.EARNED_SOURCES = { lesson = true, mystery = true }
+M.EARNED_SOURCES = { lesson = true, mystery = true, homework = true }
 M.SOURCES = { lesson = true, mystery = true, admin = true, shop = true }
 M.MAX_LEDGER = 100
 

@@ -528,6 +528,29 @@ func stop_practical() -> void:
 	send_op(NetworkProtocol.OP_PRACTICAL, {"action": "stop"})
 
 
+## Professor running a lesson: homework for everyone who attended, due in `days`.
+func send_homework(text: String, days: int = 7) -> void:
+	send_op(NetworkProtocol.OP_HOMEWORK, {"text": text, "days": days})
+
+
+## Your homework, each with your answer and grade: {homework: [...]} or {error}.
+func homework_list() -> Dictionary:
+	return await _session_rpc(NetworkProtocol.RPC_HOMEWORK_LIST, {})
+
+
+func homework_submit(id: String, text: String) -> Dictionary:
+	return await _session_rpc(NetworkProtocol.RPC_HOMEWORK_SUBMIT, {"id": id, "text": text})
+
+
+## Staff: the homework you set, with every answer handed in.
+func homework_inbox() -> Dictionary:
+	return await _session_rpc(NetworkProtocol.RPC_HOMEWORK_INBOX, {})
+
+
+func homework_grade(id: String, user_id: String, grade: int, comment: String) -> Dictionary:
+	return await _session_rpc(NetworkProtocol.RPC_HOMEWORK_GRADE, {"id": id, "user_id": user_id, "grade": grade, "comment": comment})
+
+
 ## The board text of the open lesson in `area` ("" without one).
 func board_text(area: String) -> String:
 	return str(get_lessons().get(area, {}).get("board", ""))
@@ -552,6 +575,9 @@ func _on_lesson_message(op_code: int, payload: Dictionary) -> void:
 			if not payload.get("students", []) is Array:
 				practical_progress.students = []
 			practical_progress_changed.emit(practical_progress)
+		NetworkProtocol.OP_HOMEWORK_NEW:
+			var def := SubjectRegistry.load_definition(str(payload.get("subject", "")))
+			GameEvents.notification_requested.emit(tr("HOMEWORK_NEW") % [tr(def.display_name) if def != null else "?", str(payload.get("text", ""))], 8.0)
 		NetworkProtocol.OP_LESSON_TOOL_RESULT:
 			lesson_tool_result_received.emit(payload.get("ok", false) == true, str(payload.get("tool", "")), str(payload.get("reason", "")))
 

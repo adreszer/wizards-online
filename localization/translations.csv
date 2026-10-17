@@ -577,3 +577,26 @@ JOURNAL_RECORD_OFFLINE,The school record is kept in the online school.,Dziennik 
 JOURNAL_RECORD_LINE,"lessons %d · self-study %d · answers %d of %d right · practicals %d","lekcje %d · nauka własna %d · dobre odpowiedzi %d z %d · ćwiczenia %d"
 JOURNAL_NO_DISCOVERIES,Nothing discovered yet. The castle keeps its secrets.,Jeszcze nic nie odkryto. Zamek strzeże swoich tajemnic.
 JOURNAL_DISCOVERIES,"Mysteries solved: %d · hidden rooms found: %d","Rozwiązane tajemnice: %d · odnalezione ukryte komnaty: %d"
+JOURNAL_TAB_HOMEWORK,Homework,Prace domowe
+HOMEWORK_NEW,New homework (%s): %s,Nowa praca domowa (%s): %s
+HOMEWORK_NONE,No homework. Enjoy it while it lasts.,Brak prac domowych. Korzystaj póki możesz.
+HOMEWORK_DUE,due %s,termin: %s
+HOMEWORK_TODO,To do: write your answer below.,Do zrobienia: wpisz odpowiedź poniżej.
+HOMEWORK_MISSED,Not handed in.,Nie oddano.
+HOMEWORK_HANDED,Handed in; waiting for the grade.,Oddane; czeka na ocenę.
+HOMEWORK_GRADED,Grade %d · %s,Ocena %d · %s
+HOMEWORK_ANSWER_PLACEHOLDER,Your answer…,Twoja odpowiedź…
+HOMEWORK_HAND_IN,Hand in,Oddaj
+HOMEWORK_HANDED_IN,Homework handed in.,Praca domowa oddana.
+HOMEWORK_REFUSED,Not handed in (%s).,Nie oddano (%s).
+JOURNAL_HOMEWORK_LINE,"homework %d, average %.1f","prace domowe: %d, średnia %.1f"
+HOMEWORK_TASK_PLACEHOLDER,"The task (e.g. describe two uses of the Uplift charm)","Zadanie (np. opisz dwa zastosowania zaklęcia Uniesienia)"
+HOMEWORK_DAYS,Days,Dni
+HOMEWORK_SET,Set homework,Zadaj pracę domową
+HOMEWORK_SET_DONE,Homework set for everyone who attended.,Zadano pracę domową wszystkim obecnym.
+HOMEWORK_LOAD,Load handed-in answers,Wczytaj oddane prace
+HOMEWORK_LOADED,Answers: %d,Prace: %d
+HOMEWORK_GRADE,Grade,Ocena
+HOMEWORK_COMMENT_PLACEHOLDER,A comment for the student,Komentarz dla ucznia
+HOMEWORK_GRADE_BUTTON,Grade,Oceń
+HOMEWORK_GRADED_DONE,Graded.,Oceniono.

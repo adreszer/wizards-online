@@ -2457,6 +2457,11 @@ func _test_journal() -> void:
 	var rec := Journal.record_bbcode({"subjects": {"sigilcraft": {"attended": 3, "self_study": 1, "quiz_right": 4, "quiz_total": 5, "practicals": 2}}})
 	t.check(rec.contains(tr("SUBJECT_SIGILCRAFT_NAME")) and rec.contains(tr("JOURNAL_RECORD_LINE") % [3, 1, 4, 5, 2]), "the record lists each subject (%s)" % rec.replace("\n", " | "))
 	t.check(Journal.record_bbcode({}) == tr("JOURNAL_RECORD_EMPTY"), "an empty record says so")
+	var hw := Journal.homework_bbcode([
+		{"id": "a", "subject": "sigilcraft", "by_name": "Vexley", "text": "Two uses", "due": 2000.0},
+		{"id": "b", "subject": "sigilcraft", "by_name": "Vexley", "text": "Three uses", "due": 2000.0, "answer": {"text": "x", "grade": 5, "comment": "good"}}], 1000.0)
+	t.check(hw.contains(tr("HOMEWORK_TODO")) and hw.contains(tr("HOMEWORK_GRADED") % [5, "good"]), "homework shows what to do and the grades (%s)" % hw.replace("\n", " | "))
+	t.check(Journal.homework_bbcode([], 0.0) == tr("HOMEWORK_NONE"), "no homework says so")
 	t.check(Journal.discoveries_bbcode(["loft", "map:loft", "founders_tale"]) == tr("JOURNAL_DISCOVERIES") % [2, 1], "discoveries and hidden rooms are counted")
 	var caster := SpellCaster.new()
 	caster.learn_spell(ARCANE_PULSE)

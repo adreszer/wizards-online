@@ -57,6 +57,14 @@ var _quiz_status: Label
 var _answer_sids: Array[String] = []
 ## The choices of the question we asked last (answers arrive as indices).
 var _asked_choices: Array = []
+## The "Homework" tab.
+var _hw_text: LineEdit
+var _hw_days: SpinBox
+var _hw_answers: ItemList
+var _hw_grade: SpinBox
+var _hw_comment: LineEdit
+## Parallel to the answers list: {id, user_id}.
+var _hw_entries: Array = []
 ## The "Practical" tab.
 var _practical_spell: OptionButton
 var _practical_hits: SpinBox
@@ -173,6 +181,73 @@ func _build_board_tab() -> void:
 	_practical_status.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	practical_tab.add_child(_practical_status)
 	NetworkManager.practical_progress_changed.connect(_on_practical_progress)
+	_build_homework_tab(tabs)
+
+
+## The "Homework" tab: set homework for this lesson's students, read and grade answers.
+func _build_homework_tab(tabs: TabContainer) -> void:
+	var tab := VBoxContainer.new()
+	tab.name = tr("JOURNAL_TAB_HOMEWORK")
+	tabs.add_child(tab)
+	var set_row := HBoxContainer.new()
+	tab.add_child(set_row)
+	_hw_text = LineEdit.new()
+	_hw_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_hw_text.placeholder_text = tr("HOMEWORK_TASK_PLACEHOLDER")
+	set_row.add_child(_hw_text)
+	set_row.add_child(_label(tr("HOMEWORK_DAYS")))
+	_hw_days = SpinBox.new()
+	_hw_days.min_value = 1
+	_hw_days.max_value = 30
+	_hw_days.value = 7
+	set_row.add_child(_hw_days)
+	set_row.add_child(_button(tr("HOMEWORK_SET"), func() -> void:
+		if _hw_text.text.strip_edges() != "":
+			NetworkManager.send_homework(_hw_text.text.strip_edges(), int(_hw_days.value))
+			_show(tr("HOMEWORK_SET_DONE"))))
+	tab.add_child(_button(tr("HOMEWORK_LOAD"), load_homework_answers))
+	_hw_answers = ItemList.new()
+	_hw_answers.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_hw_answers.custom_minimum_size = Vector2(0, 160)
+	tab.add_child(_hw_answers)
+	var grade_row := HBoxContainer.new()
+	tab.add_child(grade_row)
+	grade_row.add_child(_label(tr("HOMEWORK_GRADE")))
+	_hw_grade = SpinBox.new()
+	_hw_grade.min_value = 1
+	_hw_grade.max_value = 6
+	_hw_grade.value = 4
+	grade_row.add_child(_hw_grade)
+	_hw_comment = LineEdit.new()
+	_hw_comment.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_hw_comment.placeholder_text = tr("HOMEWORK_COMMENT_PLACEHOLDER")
+	grade_row.add_child(_hw_comment)
+	grade_row.add_child(_button(tr("HOMEWORK_GRADE_BUTTON"), grade_selected_answer))
+
+
+## Reads the homework you set and lists every answer ("✓ 5" once graded).
+func load_homework_answers() -> void:
+	var answer: Dictionary = await NetworkManager.homework_inbox()
+	_hw_answers.clear()
+	_hw_entries.clear()
+	for hw: Dictionary in answer.get("homework", []):
+		var def := SubjectRegistry.load_definition(str(hw.get("subject", "")))
+		for a: Dictionary in hw.get("answers", []):
+			var mark := "" if not a.has("grade") else "  ✓ %d" % int(a.grade)
+			_hw_answers.add_item("%s · %s: %s%s" % [tr(def.display_name) if def != null else "?", str(a.get("name", "?")), str(a.get("text", "")), mark])
+			_hw_entries.append({"id": str(hw.get("id", "")), "user_id": str(a.get("user_id", ""))})
+	_show(tr("HOMEWORK_LOADED") % _hw_entries.size())
+
+
+func grade_selected_answer() -> void:
+	var sel := _hw_answers.get_selected_items()
+	if sel.is_empty() or sel[0] >= _hw_entries.size():
+		_show(tr("QUIZ_SELECT_ANSWER"))
+		return
+	var e: Dictionary = _hw_entries[sel[0]]
+	var answer: Dictionary = await NetworkManager.homework_grade(e.id, e.user_id, int(_hw_grade.value), _hw_comment.text)
+	_show(tr("HOMEWORK_GRADED_DONE") if not answer.has("error") else tr("LESSON_TOOL_REFUSED") % ["homework", str(answer.error)])
+	load_homework_answers()
 
 
 ## Starts a practical of the chosen spell in this lesson.

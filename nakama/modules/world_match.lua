@@ -40,6 +40,7 @@ local Records = require("records")
 local Chat = require("chat")
 local Quiz = require("quiz")
 local SelfStudy = require("self_study")
+local Homework = require("homework")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -59,6 +60,7 @@ local OP_BOARD, OP_QUIZ, OP_QUIZ_STATE, OP_QUIZ_ANSWER = P.OP_BOARD, P.OP_QUIZ, 
 local OP_QUIZ_ANSWERS, OP_LESSON_TOOL_RESULT = P.OP_QUIZ_ANSWERS, P.OP_LESSON_TOOL_RESULT
 local OP_PRACTICAL, OP_PRACTICAL_STATE, OP_PRACTICAL_PROGRESS = P.OP_PRACTICAL, P.OP_PRACTICAL_STATE, P.OP_PRACTICAL_PROGRESS
 local OP_APPEARANCE, OP_MASTERY = P.OP_APPEARANCE, P.OP_MASTERY
+local OP_HOMEWORK, OP_HOMEWORK_NEW = P.OP_HOMEWORK, P.OP_HOMEWORK_NEW
 -- Mastery: points per validated spell on a world object (practice targets give more),
 -- at most one award per spell per player every MASTERY_GAP seconds.
 local MASTERY_POINTS, MASTERY_PRACTICE_POINTS, MASTERY_GAP = 1, 2, 6
@@ -1113,6 +1115,25 @@ function M.match_loop(context, dispatcher, tick, state, messages)
             listeners_of(state, sid, mode), nil, true)
         end
       end
+    elseif message.op_code == OP_HOMEWORK then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local lesson = own_lesson(state, sid)
+      local reason
+      if not lesson then
+        reason = "no_lesson"
+      else
+        local hw, why = Homework.set(lesson, state.areas[sid] or "", message.sender.user_id, state.names[sid] or "", payload.text, payload.days, now)
+        reason = why
+        if hw then
+          local notice = nk.json_encode({ subject = hw.subject, text = hw.text, due = hw.due, by = hw.by_name })
+          for uid, _ in pairs(hw.students) do
+            local other = sid_of_user(state, uid)
+            if other then dispatcher.broadcast_message(OP_HOMEWORK_NEW, notice, { state.presences[other] }, nil, true) end
+          end
+        end
+      end
+      dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = "homework", reason = reason or "" }), { message.sender }, nil, true)
     elseif message.op_code == OP_APPEARANCE then
       local ok, payload = pcall(nk.json_decode, message.data)
       local profile = state.profiles[sid]

@@ -349,7 +349,7 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: Polish/English amounts, change lines, offline `/coins`, economy rules shipped; two clients against Nakama: purse on join and reset, a first solve pays and notifies, two solves, no going below zero, cheat through the server, own ledger (no pay for a too-short lesson), no reading another purse, admin grants by id and name, refusals (overdraft, no reason), ledger order and reasons. Lesson pay checked by hand with `lesson_coin_minutes` 0 (server log "10 coins paid")
 - [ ] Owner: the currency's name (and whether it should have denominations)
 - [ ] Spending: shops in the village (`Economy.spend`, stock, prices, purchases into the inventory), cosmetics and decoration only
-- [ ] More ways to earn: homework graded by professors, events, house-cup bonuses; a professor tool to reward a student in a lesson
+- [~] More ways to earn: homework graded by professors (done, Milestone 46); events, house-cup bonuses, a professor tool to reward a student in a lesson still open
 
 ### Milestone 38 — Audio (list: docs/audio-list.md)
 - [x] The full sound and music list with generation prompts, sources (generate vs library), takes and a credit budget: `docs/audio-list.md`; music style set by the owner (magical symphony orchestra, celesta lead)
@@ -422,6 +422,11 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] `Journal` (J): year and house, tabs for the week's timetable, the spellbook (mastery rank, points to the next rank, the spell's rune), the school record per subject (attendance, self-study, quiz answers, practicals; `school_record` RPC) and discoveries (mysteries solved, hidden rooms found)
 - [x] Tests: header, record, discoveries, spellbook text; two clients: an admin sets a year
 - [ ] Owner: how a character advances a year (exams vs time served), final year names; homework and grades in the journal (Term B7–B8)
+
+### Milestone 46 — Homework
+- [x] `nakama/modules/homework.lua`: the professor running a lesson sets homework (`OP_HOMEWORK {text, days}`) for everyone who attended (online attendees are told, `OP_HOMEWORK_NEW`); students hand in a written answer before the due date (RPC `homework_submit`, replaceable until graded); the professor who set it grades each answer once, 1–6 with a comment (RPCs `homework_inbox`, `homework_grade`); grades go into the record (`homework_count`, `homework_points`) and a passing grade (2+) earns `coins_per_homework`
+- [x] Journal "Homework" tab (tasks, due dates, your answer and grade, hand-in row); professor panel "Homework" tab (set, load answers, grade with a comment); homework average in the record
+- [x] Tests: journal text; two clients: set, notified, handed in, read, graded once, in the record
 
 ## Production environment asset pipeline (in validation)
 

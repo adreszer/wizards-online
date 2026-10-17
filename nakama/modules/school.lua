@@ -48,6 +48,8 @@ M.DEFAULT_RULES = {
   self_study_grace_minutes = 5,
   self_study_spells = {},
   coins_per_self_study = 5,
+  -- Homework (homework.lua): a passing grade pays this much (earned, daily cap applies).
+  coins_per_homework = 10,
 }
 M.HOUSES = 4
 M.POINTS_COLLECTION, M.TOTALS_KEY = "house_points", "totals"

@@ -131,6 +131,11 @@ const OP_PRACTICAL_PROGRESS := 49
 const OP_APPEARANCE := 50
 ## server → one player: {spell, points} a spell's mastery points changed (SpellMastery reads levels)
 const OP_MASTERY := 51
+## client (professor running the lesson) → server: {text, days} homework for everyone who
+## attended (answered by OP_LESSON_TOOL_RESULT, tool "homework")
+const OP_HOMEWORK := 52
+## server → each attendee online: {subject, text, due, by} new homework was set
+const OP_HOMEWORK_NEW := 53
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"
@@ -160,6 +165,14 @@ const RPC_SCHOOL_RECORD := "school_record"
 ## Admin RPC: {limit?} → {entries: [{kind: "lesson" | "self_study" | "not_held", subject, area,
 ## slot, by_name, opened_at, closed_at, why, attended: {uid: name}, points}]} newest first
 const RPC_LESSON_LOG := "lesson_log"
+## RPC: {} → {homework: [{id, subject, by_name, text, set_at, due, answer?: {text, at, grade?, comment?}}]} your homework
+const RPC_HOMEWORK_LIST := "homework_list"
+## RPC: {id, text} → {ok} hand in (or replace) an answer before it is due and graded
+const RPC_HOMEWORK_SUBMIT := "homework_submit"
+## Staff RPC: {} → {homework: [{id, subject, text, due, answers: [{user_id, name, text, grade?, comment?}]}]} what you set
+const RPC_HOMEWORK_INBOX := "homework_inbox"
+## Staff RPC: {id, user_id, grade: 1–6, comment} → {ok} grade one answer (into the record; a pass pays coins)
+const RPC_HOMEWORK_GRADE := "homework_grade"
 const MAX_CHAT_LENGTH := 200
 
 

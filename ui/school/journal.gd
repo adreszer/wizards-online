@@ -13,6 +13,12 @@ var _root: PanelContainer
 var _header: Label
 var _tabs: TabContainer
 var _pages: Dictionary = {}
+## Your homework list from the server, and the hand-in row.
+var homework: Array = []
+var _hw_pick: OptionButton
+var _hw_text: LineEdit
+var _hand_in_row: HBoxContainer
+var _open_ids: Array[String] = []
 
 
 func _ready() -> void:
@@ -48,7 +54,7 @@ func _build() -> void:
 	_tabs = TabContainer.new()
 	_tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(_tabs)
-	for key in ["JOURNAL_TAB_TIMETABLE", "JOURNAL_TAB_SPELLS", "JOURNAL_TAB_RECORD", "JOURNAL_TAB_DISCOVERIES"]:
+	for key in ["JOURNAL_TAB_TIMETABLE", "JOURNAL_TAB_SPELLS", "JOURNAL_TAB_RECORD", "JOURNAL_TAB_HOMEWORK", "JOURNAL_TAB_DISCOVERIES"]:
 		var page := RichTextLabel.new()
 		page.name = tr(key)
 		page.bbcode_enabled = true
@@ -56,6 +62,22 @@ func _build() -> void:
 		page.add_theme_color_override("default_color", Color(0.93, 0.9, 0.82))
 		_tabs.add_child(page)
 		_pages[key] = page
+	# Handing homework in: pick an open assignment, write, send.
+	var hand_in := HBoxContainer.new()
+	_hw_pick = OptionButton.new()
+	_hw_pick.custom_minimum_size = Vector2(220, 0)
+	hand_in.add_child(_hw_pick)
+	_hw_text = LineEdit.new()
+	_hw_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_hw_text.placeholder_text = "HOMEWORK_ANSWER_PLACEHOLDER"
+	_hw_text.max_length = 600
+	hand_in.add_child(_hw_text)
+	var send := Button.new()
+	send.text = "HOMEWORK_HAND_IN"
+	send.pressed.connect(_hand_in)
+	hand_in.add_child(send)
+	box.add_child(hand_in)
+	_hand_in_row = hand_in
 	var foot := Label.new()
 	foot.text = "JOURNAL_FOOTER"
 	foot.add_theme_font_size_override("font_size", 13)
@@ -85,6 +107,8 @@ func open() -> void:
 	if NetworkManager.is_online():
 		var answer: Dictionary = await NetworkManager.school_record()
 		record = answer.get("record", {}) if answer.get("record", {}) is Dictionary else {}
+		var hw: Dictionary = await NetworkManager.homework_list()
+		homework = hw.get("homework", []) if hw.get("homework", []) is Array else []
 		if is_open:
 			refresh()
 
@@ -104,6 +128,48 @@ func refresh() -> void:
 	(_pages["JOURNAL_TAB_SPELLS"] as RichTextLabel).text = spells_bbcode(_player.spell_caster if _player != null else null)
 	(_pages["JOURNAL_TAB_RECORD"] as RichTextLabel).text = record_bbcode(record) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	(_pages["JOURNAL_TAB_DISCOVERIES"] as RichTextLabel).text = discoveries_bbcode(profile.get("discoveries", []))
+	var now := NetworkManager.server_time()
+	(_pages["JOURNAL_TAB_HOMEWORK"] as RichTextLabel).text = homework_bbcode(homework, now) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
+	_hw_pick.clear()
+	_open_ids.clear()
+	for h: Dictionary in homework:
+		var answer: Variant = h.get("answer")
+		if float(h.get("due", 0)) > now and not (answer is Dictionary and answer.has("grade")):
+			var def := SubjectRegistry.load_definition(str(h.get("subject", "")))
+			_hw_pick.add_item(tr(def.display_name) if def != null else "?")
+			_open_ids.append(str(h.get("id", "")))
+	_hand_in_row.visible = not _open_ids.is_empty()
+
+
+func _hand_in() -> void:
+	if _hw_pick.selected < 0 or _hw_pick.selected >= _open_ids.size() or _hw_text.text.strip_edges() == "":
+		return
+	var answer: Dictionary = await NetworkManager.homework_submit(_open_ids[_hw_pick.selected], _hw_text.text.strip_edges())
+	GameEvents.notification_requested.emit(tr("HOMEWORK_HANDED_IN") if not answer.has("error") else tr("HOMEWORK_REFUSED") % str(answer.error), 4.0)
+	if not answer.has("error"):
+		_hw_text.text = ""
+		var hw: Dictionary = await NetworkManager.homework_list()
+		homework = hw.get("homework", []) if hw.get("homework", []) is Array else []
+		if is_open:
+			refresh()
+
+
+## Each assignment: subject, the task, due date, your answer and grade.
+static func homework_bbcode(list: Array, now: float) -> String:
+	if list.is_empty():
+		return TranslationServer.translate("HOMEWORK_NONE")
+	var out := PackedStringArray()
+	for h: Dictionary in list:
+		var def := SubjectRegistry.load_definition(str(h.get("subject", "")))
+		var due := Time.get_datetime_dict_from_unix_time(int(h.get("due", 0)))
+		var head := "[b]%s[/b] (%s) — %s" % [TranslationServer.translate(def.display_name) if def != null else "?", str(h.get("by_name", "")),
+			TranslationServer.translate("HOMEWORK_DUE") % "%d.%02d" % [due.day, due.month]]
+		var answer: Variant = h.get("answer")
+		var state := TranslationServer.translate("HOMEWORK_TODO") if float(h.get("due", 0)) > now else TranslationServer.translate("HOMEWORK_MISSED")
+		if answer is Dictionary:
+			state = TranslationServer.translate("HOMEWORK_HANDED") if not answer.has("grade") else TranslationServer.translate("HOMEWORK_GRADED") % [int(answer.grade), str(answer.get("comment", ""))]
+		out.append("%s\n   %s\n   [i]%s[/i]" % [head, str(h.get("text", "")).replace("[", "[lb]"), state])
+	return "\n".join(out)
 
 
 ## "Second Circle · Phoenara" (year and house).
@@ -148,7 +214,8 @@ static func record_bbcode(rec: Dictionary) -> String:
 		var def := SubjectRegistry.load_definition(id)
 		out.append("[b]%s[/b]\n   %s" % [TranslationServer.translate(def.display_name) if def != null else id,
 			TranslationServer.translate("JOURNAL_RECORD_LINE") % [int(s.get("attended", 0)), int(s.get("self_study", 0)),
-				int(s.get("quiz_right", 0)), int(s.get("quiz_total", 0)), int(s.get("practicals", 0))]])
+				int(s.get("quiz_right", 0)), int(s.get("quiz_total", 0)), int(s.get("practicals", 0))]
+			+ (("\n   " + TranslationServer.translate("JOURNAL_HOMEWORK_LINE") % [int(s.homework_count), float(s.homework_points) / float(s.homework_count)]) if int(s.get("homework_count", 0)) > 0 else "")])
 	return "\n".join(out)
 
 

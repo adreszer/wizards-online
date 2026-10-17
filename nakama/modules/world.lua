@@ -8,6 +8,8 @@ local P = require("generated.protocol")
 local School = require("school")
 local Economy = require("economy")
 local Records = require("records")
+local Homework = require("homework")
+local Timetable = require("timetable")
 
 local WORLD_LABEL = "world"
 
@@ -259,3 +261,51 @@ local function rpc_lesson_log(context, payload)
   return nk.json_encode({ entries = Records.list_log(math.max(1, math.min(500, math.floor(limit)))) })
 end
 nk.register_rpc(rpc_lesson_log, P.RPC_LESSON_LOG)
+
+local function homework_caller(context)
+  if not context.user_id or context.user_id == "" then error({ "needs a player session", 3 }) end
+  local is_admin = Profile.env_admins(context.env)[context.user_id] or Profile.load(context.user_id).role == "admin"
+  return context.user_id, is_admin
+end
+
+-- RPC "homework_list": {} → {homework}: the caller's assignments with their answers.
+nk.register_rpc(function(context, payload)
+  local uid = homework_caller(context)
+  return nk.json_encode({ homework = Homework.for_student(uid, 50) })
+end, P.RPC_HOMEWORK_LIST)
+
+-- RPC "homework_submit": {id, text} → {ok}.
+nk.register_rpc(function(context, payload)
+  local uid = homework_caller(context)
+  local ok, data = pcall(nk.json_decode, payload or "")
+  data = ok and type(data) == "table" and data or {}
+  local done, why = Homework.submit(uid, data.id, data.text, nk.time() / 1000)
+  if not done then error({ why or "failed", 3 }) end
+  return nk.json_encode({ ok = true })
+end, P.RPC_HOMEWORK_SUBMIT)
+
+-- RPC "homework_inbox": {} → {homework}: what the calling professor set, with answers.
+nk.register_rpc(function(context, payload)
+  require_staff(context)
+  local uid, is_admin = homework_caller(context)
+  return nk.json_encode({ homework = Homework.inbox(uid, is_admin, 50) })
+end, P.RPC_HOMEWORK_INBOX)
+
+-- RPC "homework_grade": {id, user_id, grade, comment} → {ok}: grades an answer, records it
+-- and pays a passing one.
+nk.register_rpc(function(context, payload)
+  require_staff(context)
+  local by, is_admin = homework_caller(context)
+  local ok, data = pcall(nk.json_decode, payload or "")
+  data = ok and type(data) == "table" and data or {}
+  local now = nk.time() / 1000
+  local hw, answer = Homework.grade(by, is_admin, data.id, data.user_id, data.grade, data.comment, now)
+  if not hw then error({ answer or "failed", 3 }) end
+  Records.homework_graded(data.user_id, hw.subject, answer.grade)
+  if answer.grade >= Homework.PASS_GRADE then
+    local rules = School.load_rules()
+    Economy.earn(data.user_id, rules.coins_per_homework, { source = "homework", subject = hw.subject, reason = "homework" }, rules,
+      Timetable.school_day(Timetable.load(), now))
+  end
+  return nk.json_encode({ ok = true, grade = answer.grade })
+end, P.RPC_HOMEWORK_GRADE)
