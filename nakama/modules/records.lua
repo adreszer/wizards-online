@@ -4,7 +4,7 @@
 --
 -- Storage:
 --   records/transcript   per user, owner-readable, written only here:
---     { v = 1, subjects = { [subject] = { attended, self_study, quiz_right, quiz_total } },
+--     { v = 1, subjects = { [subject] = { attended, self_study, quiz_right, quiz_total, practicals } },
 --       recent = { { subject, at, slot, by, kind } } }   (newest first, RECENT_MAX)
 --   lesson_log/<uuid>    system-owned, one per lesson (held or not):
 --     { kind = "lesson" | "self_study" | "not_held", subject, area, slot, t0,
@@ -17,7 +17,7 @@ local M = {}
 M.COLLECTION, M.KEY = "records", "transcript"
 M.LOG_COLLECTION = "lesson_log"
 M.RECENT_MAX = 30
-M.SUBJECT_FIELDS = { "attended", "self_study", "quiz_right", "quiz_total" }
+M.SUBJECT_FIELDS = { "attended", "self_study", "quiz_right", "quiz_total", "practicals" }
 
 local function blank_subject()
   local s = {}
@@ -95,6 +95,14 @@ function M.quiz_result(uid, subject, right, total)
   local s = M.subject(rec, subject)
   s.quiz_right = s.quiz_right + right
   s.quiz_total = s.quiz_total + total
+  return M.save(uid, rec)
+end
+
+-- A practical task finished (the practice target hit enough times).
+function M.practical_done(uid, subject)
+  local rec = M.load(uid)
+  local s = M.subject(rec, subject)
+  s.practicals = s.practicals + 1
   return M.save(uid, rec)
 end
 

@@ -29,9 +29,11 @@ func _ready() -> void:
 	NetworkManager.disconnected.connect(_on_disconnected)
 	NetworkManager.chat_line_received.connect(_on_chat_line)
 	NetworkManager.server_message.connect(_on_server_message)
+	NetworkManager.practical_changed.connect(_on_practical)
 
 
 func _exit_tree() -> void:
+	NetworkManager.practical_changed.disconnect(_on_practical)
 	NetworkManager.chat_line_received.disconnect(_on_chat_line)
 	NetworkManager.server_message.disconnect(_on_server_message)
 	NetworkManager.player_joined.disconnect(_on_player_joined)
@@ -44,6 +46,40 @@ func _exit_tree() -> void:
 	NetworkManager.player_profile_changed.disconnect(_on_player_profile_changed)
 	NetworkManager.spell_granted.disconnect(_on_spell_granted)
 	NetworkManager.disconnected.disconnect(_on_disconnected)
+
+
+## The spell a practical lets the local player cast for practice (not in their spellbook).
+var _practice_spell: StringName = &""
+
+## A practical in our classroom: its spell joins the hotbar for practice while it runs
+## (the server allows the casts), and leaves again unless it was granted.
+func _on_practical(view: Dictionary) -> void:
+	if local_player == null:
+		return
+	var caster: SpellCaster = local_player.spell_caster
+	var spell := StringName(str(view.get("spell", "")))
+	var known_on_server: Array = NetworkManager.get_local_profile().get("spells", {}).get("known", [])
+	if spell == &"":
+		if _practice_spell != &"" and not known_on_server.has(String(_practice_spell)):
+			caster.forget_spell(_practice_spell)
+			GameEvents.notification_requested.emit(tr("PRACTICAL_OVER"), 4.0)
+		_practice_spell = &""
+		return
+	var def := SpellRegistry.load_definition(String(spell))
+	if def == null:
+		return
+	if not caster.knows(spell):
+		caster.learn_spell(def)
+		caster.equip(def)
+		_practice_spell = spell
+		GameEvents.notification_requested.emit(tr("PRACTICAL_STARTED") % [tr(def.display_name), int(view.get("hits", 1))], 7.0)
+	if view.get("done", false):
+		# A granted spell is ours now (its own notification names the professor).
+		if view.get("granted", false):
+			_practice_spell = &""
+		GameEvents.notification_requested.emit(tr("PRACTICAL_DONE"), 6.0)
+	elif int(view.get("progress", 0)) > 0:
+		GameEvents.notification_requested.emit(tr("PRACTICAL_PROGRESS") % [int(view.progress), int(view.get("hits", 1))], 2.0)
 
 
 ## The speaker of a chat line (remote or local) shows it over their head.

@@ -66,6 +66,10 @@ signal chat_message_received(sender_name: String, text: String, is_self: bool)
 signal quiz_changed(view: Dictionary)
 ## Professor: the live answers to the current question [{sid, name, answer, right?}].
 signal quiz_answers_changed(answers: Array)
+## The practical as the local student sees it ({spell, hits, progress, done, granted}); {} = none.
+signal practical_changed(view: Dictionary)
+## Professor: everyone's progress in the running practical {spell, hits, students: [{sid, name, progress, done}]}.
+signal practical_progress_changed(info: Dictionary)
 ## Outcome of a board / quiz / answer request.
 signal lesson_tool_result_received(ok: bool, tool: String, reason: String)
 ## A chat or DM line for the local player: {kind: "chat" | "dm", mode, sid, name, text, self,
@@ -95,6 +99,9 @@ var offline_coins: int = 0
 ## The current question as we see it ({} = none) and, for the professor, its answers.
 var quiz: Dictionary = {}
 var quiz_answers: Array = []
+## The running practical as we see it ({} = none) and, for the professor, everyone's progress.
+var practical: Dictionary = {}
+var practical_progress: Dictionary = {}
 var _reconnect_attempts: int = 0
 var _reconnecting: bool = false
 
@@ -500,6 +507,16 @@ func answer_quiz(answer: Variant) -> void:
 		send_op(NetworkProtocol.OP_QUIZ_ANSWER, {"id": quiz.get("id", 0), "answer": answer})
 
 
+## Professor: start a practical of `spell` (students hit the practice target `hits` times;
+## `grant` teaches the spell to whoever finishes) or stop it.
+func start_practical(spell_id: String, hits: int = 3, grant: bool = false) -> void:
+	send_op(NetworkProtocol.OP_PRACTICAL, {"action": "start", "spell": spell_id, "hits": hits, "grant": grant})
+
+
+func stop_practical() -> void:
+	send_op(NetworkProtocol.OP_PRACTICAL, {"action": "stop"})
+
+
 ## The board text of the open lesson in `area` ("" without one).
 func board_text(area: String) -> String:
 	return str(get_lessons().get(area, {}).get("board", ""))
@@ -516,6 +533,14 @@ func _on_lesson_message(op_code: int, payload: Dictionary) -> void:
 			var list: Variant = payload.get("answers", [])
 			quiz_answers = list if list is Array else []
 			quiz_answers_changed.emit(quiz_answers)
+		NetworkProtocol.OP_PRACTICAL_STATE:
+			practical = payload if str(payload.get("spell", "")) != "" else {}
+			practical_changed.emit(practical)
+		NetworkProtocol.OP_PRACTICAL_PROGRESS:
+			practical_progress = payload
+			if not payload.get("students", []) is Array:
+				practical_progress.students = []
+			practical_progress_changed.emit(practical_progress)
 		NetworkProtocol.OP_LESSON_TOOL_RESULT:
 			lesson_tool_result_received.emit(payload.get("ok", false) == true, str(payload.get("tool", "")), str(payload.get("reason", "")))
 
@@ -540,6 +565,8 @@ func _teardown() -> void:
 	chat_manager.leave()
 	quiz = {}
 	quiz_answers = []
+	practical = {}
+	practical_progress = {}
 	await world_session.leave()
 	state_synchronizer.reset()
 

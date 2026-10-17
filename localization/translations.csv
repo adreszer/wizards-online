@@ -368,7 +368,7 @@ NOTIFY_FLIGHT_CONTROLS,Flying: the broom follows the mouse · W forward · Space
 INVENTORY_RIDING_MARK,(riding),(w locie)
 INVENTORY_CLICK_TO_RIDE,Click to mount it or land (shortcut: B).,"Kliknij, aby wsiąść albo wylądować (skrót: B)."
 CHAT_OFFLINE_COMMANDS_ONLY,Offline there is nobody to talk to; only commands work here (/help).,Offline nie ma z kim rozmawiać; działają tylko komendy (/pomoc).
-CHEAT_HELP,Commands: /broom (/miotla) gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /plan opens the timetable · /coins <amount> changes your purse · /goto <place> takes you there (station, village, castle, an area) · /help this list.,Komendy: /miotla (/broom) daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /plan otwiera plan lekcji · /korony <ilość> zmienia zawartość sakiewki · /idz <miejsce> przenosi na miejsce (stacja, wioska, zamek, obszar) · /pomoc ta lista.
+CHEAT_HELP,"Talk: /w whisper · /s shout · /msg name text · /r reply. Gestures: /wave /bow /raise /clap /point /shrug /cheer /notes /sit /stand (G opens the menu, H raises a hand). Dev: /broom gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /plan opens the timetable · /coins <amount> changes your purse · /goto <place> takes you there (station, village, castle, an area) · /help this list.","Rozmowa: /sz szept · /k krzyk · /pw imię tekst · /odp odpowiedź. Gesty: /machaj /ukłon /ręka /klaszcz /wskaż /wzrusz /wiwat /notuj /usiądź /wstań (G otwiera menu, H zgłasza się). Dla testów: /miotla daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /plan otwiera plan lekcji · /korony <ilość> zmienia zawartość sakiewki · /idz <miejsce> przenosi na miejsce (stacja, wioska, zamek, obszar) · /pomoc ta lista."
 CHEAT_GIVE_USAGE,Usage: /give <item>. Items: %s,Użycie: /daj <przedmiot>. Przedmioty: %s
 CHEAT_UNKNOWN,Unknown command: %s (try /help).,Nieznana komenda: %s (spróbuj /pomoc).
 CHEAT_UNKNOWN_ITEM,"No item called ""%s"". Items: %s",Nie ma przedmiotu „%s”. Przedmioty: %s
@@ -508,3 +508,17 @@ QUIZ_ASKED,Question asked.,Pytanie zadane.
 QUIZ_SELECT_ANSWER,Select an answer in the list first.,Najpierw zaznacz odpowiedź na liście.
 QUIZ_ANSWER_COUNT,Answers: %d,Odpowiedzi: %d
 LESSON_TOOL_REFUSED,Refused (%s: %s).,Odmowa (%s: %s).
+PRACTICAL_STARTED,"Practical: hit the practice target with %s, %d times. The spell is on your hotbar for now.","Ćwiczenie: traf %s w tarczę ćwiczeniową, %d razy. Zaklęcie jest na razie na twoim pasku."
+PRACTICAL_PROGRESS,Practice target: %d of %d,Tarcza ćwiczeniowa: %d z %d
+PRACTICAL_DONE,Practical done!,Ćwiczenie zaliczone!
+PRACTICAL_OVER,The practical is over.,Ćwiczenie zakończone.
+LESSON_TAB_PRACTICAL,Practical,Ćwiczenie
+PRACTICAL_PANEL_INTRO,"Students in the room may cast the chosen spell for practice and must hit the classroom's practice target (the rune disc at the front) as many times as set. Ticked: the spell is theirs once they finish.","Uczniowie w klasie mogą ćwiczyć wybrane zaklęcie i muszą trafić tarczę ćwiczeniową (runiczny krąg z przodu klasy) tyle razy, ile ustawisz. Zaznaczone: po zaliczeniu zaklęcie zostaje z nimi."
+PRACTICAL_HITS,Hits,Trafienia
+PRACTICAL_GRANT,Teach it to those who finish,"Naucz tych, którzy zaliczą"
+PRACTICAL_START,Start the practical,Rozpocznij ćwiczenie
+PRACTICAL_STOP,Stop,Zakończ
+PRACTICAL_PICK_SPELL,Pick a spell of this subject first.,Najpierw wybierz zaklęcie tego przedmiotu.
+PRACTICAL_STARTED_PROFESSOR,Practical started.,Ćwiczenie rozpoczęte.
+PRACTICAL_NONE,No practical running.,Żadne ćwiczenie nie trwa.
+PRACTICAL_RUNNING,"%s, %d hits:","%s, trafienia: %d:"

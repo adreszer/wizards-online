@@ -380,13 +380,15 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: seats per prop and facing, sitting and standing in the castle, gestures time out or stay, chat commands, remote snapshots; two clients: a student's raised hand reaches the professor's panel. `tools/capture_gestures.tscn` renders every gesture and both seats
 - [ ] Authored clips (Mixamo) to replace the procedural poses where they fall short; casting gestures per spell family (roadmap 5.4)
 
-### Milestone 41 — Lessons 2.0: the board and quizzes
+### Milestone 41 — Lessons 2.0: the board, quizzes and practicals
 - [x] The classroom board: the professor writes (`OP_BOARD`, kept on the lesson, sent in `OP_LESSON_STATE` as `board`); `ClassroomBoards` (added by `castle.gd`) puts chalk text on every classroom's wall board (positions recorded by `StaticBatch`); without a lesson the board names the subject and the next lesson in that room
 - [x] Quizzes (`nakama/modules/quiz.lua`): multiple choice with a right answer (marked when the professor closes the question), multiple choice without one, or open questions (marked one by one); answers can change while the question is open; marked answers go into each student's record (`quiz_right` / `quiz_total`); students entering mid-question get it
 - [x] Student `QuizPanel`: takes the keyboard when a question arrives (1–6, a click, or typed text), Esc sets it aside, K brings it back; shows the answer, then the right choice and the result
 - [x] Professor panel split into tabs ("Lesson", "Board & quiz"): board text, write/wipe, question + choices (one per line, `*` marks the right one), ask/close, live answers with right/wrong marking; lesson plans: `# text` lines write the board, `? question | a | *b` lines ask
 - [x] Tests: choice parsing, quiz panel lines, idle/lesson board text, boards in every classroom facing the room; two clients: board text on the student's board, a multiple-choice question answered and marked on close, an open question marked by hand (once), marks in the record
-- [ ] Practice tasks (Term B3), self-study lessons that reuse the quiz
+- [x] Practicals (Term B3): every furnished classroom has a practice target (`PracticeTarget`, a rune disc on a post at the front, placed by the generator as `<room>/practice_target`); the professor starts a practical of one of the subject's spells (`OP_PRACTICAL {spell, hits, grant}`): students in the room may cast it for practice (the server's cast and world-event checks allow it there), each hit on the target counts on the server, the last one finishes the task (`practicals` in the record) and, when `grant` is set, teaches the spell; students see their progress (`OP_PRACTICAL_STATE`, the spell joins their hotbar while it runs), the professor everyone's (`OP_PRACTICAL_PROGRESS`, "Practical" tab)
+- [x] Localization check: every row of `translations.csv` has exactly three cells (the old `/help` line had unquoted commas and was cut short; it now lists chat and gesture commands too)
+- [ ] Self-study lessons that reuse the quiz and the practical
 
 ## Production environment asset pipeline (in validation)
 

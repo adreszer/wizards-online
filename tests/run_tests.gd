@@ -82,6 +82,7 @@ func _run() -> void:
 	await _test_chat()
 	await _test_gestures()
 	await _test_board_and_quiz()
+	await _test_practicals()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2211,6 +2212,41 @@ func _test_board_and_quiz() -> void:
 	castle.queue_free()
 
 
+func _test_practicals() -> void:
+	t.section("Practicals")
+	var ProfessorPanelScript: GDScript = load("res://ui/school/professor_panel.gd")
+	t.check(ProfessorPanelScript.practical_progress_text({"spell": ""}) == tr("PRACTICAL_NONE"), "no practical running")
+	var text: String = ProfessorPanelScript.practical_progress_text({"spell": "uplift", "hits": 3, "students": [{"name": "Ola", "progress": 2}, {"name": "Kuba", "done": true}]})
+	t.check(text.contains(tr("SPELL_UPLIFT_NAME")) and text.contains("Ola 2/3") and text.contains("Kuba ✓"), "the professor sees everyone's progress (%s)" % text.replace("\n", " | "))
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var targets := castle.find_children("*", "PracticeTarget", true, false)
+	var zones := {}
+	for z in get_tree().get_nodes_in_group(AreaZone.GROUP):
+		zones[str((z as AreaZone).area_id)] = z
+	var misplaced: Array[String] = []
+	for target: PracticeTarget in targets:
+		var area := (target.object_id as String).get_slice("/", 0)
+		var zone: AreaZone = zones.get(area)
+		var local := zone.global_transform.affine_inverse() * target.global_position if zone != null else Vector3.INF
+		var to_centre := zone.global_position - target.global_position if zone != null else Vector3.ZERO
+		to_centre.y = 0.0
+		if zone == null or absf(local.x) > zone.size.x / 2.0 or absf(local.z) > zone.size.z / 2.0 or target.global_basis.z.dot(to_centre.normalized()) < 0.2:
+			misplaced.append(target.object_id)
+	t.check(targets.size() >= 12 and misplaced.is_empty(), "every classroom has a practice target inside it, facing the class (%d, %s)" % [targets.size(), str(misplaced)])
+	var p := await _spawn_player(Vector3(0, 1, 0))
+	var spawner := PlayerSpawner.new()
+	add_child(spawner)
+	spawner.local_player = p
+	NetworkManager.practical_changed.emit({"spell": "uplift", "hits": 2, "progress": 0})
+	t.check(p.spell_caster.knows(&"uplift") and p.spell_caster.equipped_spell.id == &"uplift", "a practical puts its spell on the hotbar for practice")
+	NetworkManager.practical_changed.emit({})
+	t.check(not p.spell_caster.knows(&"uplift"), "and takes it away when the practical ends without a grant")
+	spawner.queue_free()
+	castle.queue_free()
+
+
 func _test_timetable() -> void:
 	t.section("Timetable")
 	# 2026-10-12 was a Monday; school time is UTC+2 (summer time) in this payload.
@@ -2407,8 +2443,11 @@ func _test_localization() -> void:
 	t.check(header.size() >= 3 and header[0] == "keys" and header[1] == "en" and header[2] == "pl", "csv header is keys,en,pl")
 	var keys: PackedStringArray = []
 	var missing: PackedStringArray = []
+	var ragged: PackedStringArray = []
 	while not file.eof_reached():
 		var row := file.get_csv_line()
+		if row.size() > 3:
+			ragged.append(row[0])   # an unquoted comma split a cell
 		if row.size() < 3 or row[0].is_empty():
 			continue
 		keys.append(row[0])
@@ -2417,6 +2456,7 @@ func _test_localization() -> void:
 	file.close()
 	t.check(keys.size() > 60, "csv has the expected number of keys (%d)" % keys.size())
 	t.check(missing.is_empty(), "no empty en/pl cell (%s)" % str(missing))
+	t.check(ragged.is_empty(), "every row has exactly three cells: commas inside text are quoted (%s)" % str(ragged))
 	var duplicates: PackedStringArray = []
 	var seen: Dictionary = {}
 	for key in keys:

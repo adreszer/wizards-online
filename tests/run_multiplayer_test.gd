@@ -33,6 +33,7 @@ var timetables_received: int = 0
 ## Direct messages received or echoed: the ChatManager line dictionaries.
 var dm_lines: Array = []
 var tool_results: Array = []
+var practical_views: Array = []
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
@@ -64,6 +65,7 @@ func _ready() -> void:
 	NetworkManager.house_points_result_received.connect(func(ok: bool, house: int, delta: int, reason: String) -> void: points_results.append({"ok": ok, "house": house, "delta": delta, "reason": reason}))
 	NetworkManager.lecture_received.connect(func(by: String, text: String) -> void: lectures.append("%s: %s" % [by, text]))
 	NetworkManager.timetable_changed.connect(func() -> void: timetables_received += 1)
+	NetworkManager.practical_changed.connect(func(view: Dictionary) -> void: practical_views.append(view))
 	NetworkManager.lesson_tool_result_received.connect(func(ok: bool, tool: String, reason: String) -> void: tool_results.append([ok, tool, reason]))
 	NetworkManager.chat_line_received.connect(func(line: Dictionary) -> void:
 		if line.get("kind", "") == "dm":
@@ -250,7 +252,8 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return panel.students_present().size() == 1, 30.0)
 	t.check(ok, "the student shows up in the classroom")
 	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.gestures.current == &"raise_hand", 30.0)
-	t.check(ok and panel.raised_hands_first(panel.students_present())[0] == remote, "the student's raised hand reaches the professor's lesson panel")
+	var queue: Array[Node] = panel.raised_hands_first(panel.students_present())
+	t.check(ok and not queue.is_empty() and queue[0] == remote, "the student's raised hand reaches the professor's lesson panel (%s, %d present)" % [str(remote.gestures.current) if is_instance_valid(remote) else "-", queue.size()])
 	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.house == 3, 10.0)
 	t.check(ok and NetworkManager.get_players().get(remote.peer_id, {}).get("house", 0) == 3, "the roster update carries the student's new house")
 	t.check(casts_seen == 0, "a cast of an unlearned spell was dropped by the server")
@@ -301,6 +304,14 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	NetworkManager.mark_quiz_answer(b_sid, false)
 	ok = await _wait_until(func() -> bool: return tool_results.any(func(r: Array) -> bool: return r[2] == "already_marked"), 10.0)
 	t.check(ok, "an answer is marked once")
+	# A practical: the student practises Uplift on the practice target and earns it.
+	NetworkManager.start_practical("galewind", 2, true)
+	NetworkManager.start_practical("uplift", 2, true)
+	ok = await _wait_until(func() -> bool: return tool_results.any(func(r: Array) -> bool: return r[1] == "practical" and r[2] == "not_in_subject"), 10.0)
+	t.check(ok, "a practical of another subject's spell is refused")
+	ok = await _wait_until(func() -> bool: return NetworkManager.practical_progress.get("students", []).any(func(s: Dictionary) -> bool: return s.get("done", false)), 40.0)
+	t.check(ok, "the professor sees the student finish the practical (%s)" % str(NetworkManager.practical_progress))
+	NetworkManager.stop_practical()
 	# House points: an award with a reason lands in the ledger and the tally.
 	var totals_before := NetworkManager.get_house_totals()
 	t.check(totals_before.size() == 4, "the house points tally arrived on join (%s)" % str(totals_before))
@@ -507,6 +518,15 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	NetworkManager.answer_quiz("lifting a feather")
 	ok = await _wait_until(func() -> bool: return NetworkManager.quiz.get("right", false) == true, 20.0)
 	t.check(ok and QuizPanel.status_text(NetworkManager.quiz) == tr("QUIZ_RIGHT"), "the professor's mark reaches the student")
+	ok = await _wait_until(func() -> bool: return NetworkManager.practical.get("spell", "") == "uplift", 20.0)
+	t.check(ok and player.spell_caster.knows(&"uplift") and not _known_spells().has("uplift"), "a practical lends the student its spell for practice")
+	var target := _world_object(str(CLASSROOM) + "/practice_target") as PracticeTarget
+	var uplift := SpellRegistry.load_definition("uplift")
+	for i in 2:
+		target._on_spell_received(SpellEffect.create(uplift, player, "", target.global_position, Vector3.FORWARD))
+		await _wait(0.5)
+	ok = await _wait_until(func() -> bool: return practical_views.any(func(v: Dictionary) -> bool: return v.get("done", false) and v.get("granted", false)) and _known_spells().has("uplift"), 10.0)
+	t.check(ok, "two hits on the practice target finish it and teach the spell (%s)" % str(practical_views))
 	t.check(player.spell_caster.try_cast(), "student casts the granted spell")
 	await _wait(0.6)
 	player.spell_caster.try_cast()
@@ -604,6 +624,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	var own_record: Dictionary = await NetworkManager.school_record()
 	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("attended", 0)) >= 1, "the student reads their own school record")
 	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("quiz_right", 0)) >= 2, "with the marked quiz answers in it")
+	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("practicals", 0)) >= 1, "and the finished practical")
 	var other_record: Dictionary = await NetworkManager.school_record("someone-else")
 	t.check(other_record.has("error"), "but not another student's")
 	cheat_results.clear()   # the brooms section counts its own cheat answers

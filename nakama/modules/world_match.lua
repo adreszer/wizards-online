@@ -56,6 +56,8 @@ local OP_TIMETABLE, OP_WALLET = P.OP_TIMETABLE, P.OP_WALLET
 local OP_CHAT, OP_CHAT_LINE, OP_DM, OP_DM_LINE, OP_CHAT_RESULT = P.OP_CHAT, P.OP_CHAT_LINE, P.OP_DM, P.OP_DM_LINE, P.OP_CHAT_RESULT
 local OP_BOARD, OP_QUIZ, OP_QUIZ_STATE, OP_QUIZ_ANSWER = P.OP_BOARD, P.OP_QUIZ, P.OP_QUIZ_STATE, P.OP_QUIZ_ANSWER
 local OP_QUIZ_ANSWERS, OP_LESSON_TOOL_RESULT = P.OP_QUIZ_ANSWERS, P.OP_LESSON_TOOL_RESULT
+local OP_PRACTICAL, OP_PRACTICAL_STATE, OP_PRACTICAL_PROGRESS = P.OP_PRACTICAL, P.OP_PRACTICAL_STATE, P.OP_PRACTICAL_PROGRESS
+local MAX_PRACTICAL_HITS = 10
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
 local MAX_AREA_ID_BYTES = 48
@@ -360,6 +362,74 @@ local function send_quiz_answers(dispatcher, state, lesson)
   end
 end
 
+-- Whether `sid` may cast `spell` for practice: a practical of it runs in their room
+-- (the professor who runs it uses their own spellbook).
+local function practising(state, sid, spell)
+  local lesson = state.lessons[state.areas[sid] or ""]
+  return lesson ~= nil and lesson.practical ~= nil and lesson.practical.spell == spell and lesson.by_sid ~= sid
+end
+
+local function knows_or_practises(state, sid, spell)
+  local profile = state.profiles[sid]
+  return (profile and Profile.knows(profile, spell)) or practising(state, sid, spell)
+end
+
+-- The practical as each student in the room sees it ({spell = ""}: none).
+local function send_practical(dispatcher, state, area, only_sid)
+  local lesson = state.lessons[area]
+  local pr = lesson and lesson.practical
+  for _, pl in ipairs(players_in(state, area)) do
+    if (not only_sid or pl.sid == only_sid) and (not lesson or pl.sid ~= lesson.by_sid) then
+      local view = { spell = "" }
+      if pr then
+        local mine = pr.students[pl.sid] or {}
+        view = { spell = pr.spell, hits = pr.hits, progress = mine.progress or 0, done = mine.done == true, granted = mine.granted == true }
+      end
+      dispatcher.broadcast_message(OP_PRACTICAL_STATE, nk.json_encode(view), { state.presences[pl.sid] }, nil, true)
+    end
+  end
+end
+
+-- Everyone's progress, to whoever runs the lesson.
+local function send_practical_progress(dispatcher, state, lesson)
+  local p = state.presences[lesson.by_sid]
+  local pr = lesson.practical
+  if not p then return end
+  local students = {}
+  if pr then
+    for sid, s in pairs(pr.students) do
+      table.insert(students, { sid = sid, name = s.name, progress = s.progress, done = s.done == true })
+    end
+    table.sort(students, function(a, b) return a.name < b.name end)
+  end
+  dispatcher.broadcast_message(OP_PRACTICAL_PROGRESS, nk.json_encode({ spell = pr and pr.spell or "", hits = pr and pr.hits or 0, students = students }), { p }, nil, true)
+end
+
+-- A hit on the room's practice target with the practised spell counts for `sid`; the
+-- last one finishes the task (the record notes it; a granting practical teaches the spell).
+local function count_practice_hit(dispatcher, state, sid, spell)
+  local area = state.areas[sid] or ""
+  local lesson = state.lessons[area]
+  local pr = lesson and lesson.practical
+  if not pr or pr.spell ~= spell or lesson.by_sid == sid then return end
+  local s = pr.students[sid]
+  if not s then
+    s = { name = state.names[sid] or "", progress = 0 }
+    pr.students[sid] = s
+  end
+  if s.done then return end
+  s.progress = s.progress + 1
+  if s.progress >= pr.hits then
+    s.done = true
+    Records.practical_done(state.presences[sid].user_id, lesson.subject)
+    if pr.grant and grant_spell(dispatcher, state, sid, spell, lesson.by_name) then
+      s.granted = true
+    end
+  end
+  send_practical(dispatcher, state, area, sid)
+  send_practical_progress(dispatcher, state, lesson)
+end
+
 -- Marked answers go into the students' records.
 local function record_marks(lesson, marked)
   for _, a in pairs(marked) do
@@ -375,6 +445,7 @@ local function close_lesson(dispatcher, state, area, why)
   end
   state.lessons[area] = nil
   send_quiz(dispatcher, state, area)
+  if lesson.practical then send_practical(dispatcher, state, area) end
   local count, paid = 0, 0
   for _ in pairs(lesson.attendance) do count = count + 1 end
   -- Attendance pays: every student who attended and is still in the room, when the
@@ -666,8 +737,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     elseif message.op_code == OP_SPELL_CAST then
       -- Only spells the character actually knows leave the server.
       local ok, payload = pcall(nk.json_decode, message.data)
-      local profile = state.profiles[sid]
-      if ok and type(payload) == "table" and type(payload.id) == "string" and profile and Profile.knows(profile, payload.id) then
+      if ok and type(payload) == "table" and type(payload.id) == "string" and knows_or_practises(state, sid, payload.id) then
         local rest = others(state, sid)
         if #rest > 0 then
           dispatcher.broadcast_message(OP_SPELL_CAST, message.data, rest, message.sender, true)
@@ -685,6 +755,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
             lesson.attendance[message.sender.user_id] = state.names[sid] or ""
           end
           if lesson and lesson.quiz then send_quiz(dispatcher, state, area, sid) end
+          if lesson and lesson.practical then send_practical(dispatcher, state, area, sid) end
           feed_mysteries(dispatcher, state, sid, { event = "enter", area = area })
           -- A secret area, once walked into, stays on this character's map.
           local profile = state.profiles[sid]
@@ -784,7 +855,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       local ok, payload = pcall(nk.json_decode, message.data)
       local profile = state.profiles[sid]
       if ok and profile then
-        local ctx = { sid = sid, area = state.areas[sid], knows = function(id) return Profile.knows(profile, id) end }
+        local ctx = { sid = sid, area = state.areas[sid], knows = function(id) return knows_or_practises(state, sid, id) end }
         local ev, reason = Objects.validate(state.world, ctx, payload, now)
         if ev then
           local value = Objects.apply(state.world, ev, now)
@@ -793,6 +864,9 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           end
           if ev.obj.kind == "item_rack" and ev.event == "interact" then
             give_item(dispatcher, state, sid, ev.obj.item_id)
+          end
+          if ev.obj.kind == "practice_target" and ev.event == "spell" then
+            count_practice_hit(dispatcher, state, sid, ev.spell)
           end
           feed_mysteries(dispatcher, state, sid, { event = ev.event, object = ev.oid, effect_type = ev.effect_type, state = Objects.state_of(state.world, ev.oid) })
         else
@@ -932,6 +1006,39 @@ function M.match_loop(context, dispatcher, tick, state, messages)
             listeners_of(state, sid, mode), nil, true)
         end
       end
+    elseif message.op_code == OP_PRACTICAL then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local lesson = own_lesson(state, sid)
+      local area = state.areas[sid] or ""
+      local reason
+      if not lesson then
+        reason = "no_lesson"
+      elseif payload.action == "start" then
+        local hits = tonumber(payload.hits) or 3
+        if type(payload.spell) ~= "string" or not Profile.SPELLS[payload.spell] then
+          reason = "unknown_spell"
+        elseif not School.teaches(lesson.subject, payload.spell) then
+          reason = "not_in_subject"
+        elseif hits ~= math.floor(hits) or hits < 1 or hits > MAX_PRACTICAL_HITS then
+          reason = "bad_hits"
+        else
+          lesson.practical = { spell = payload.spell, hits = hits, grant = payload.grant == true, students = {} }
+          send_practical(dispatcher, state, area)
+          send_practical_progress(dispatcher, state, lesson)
+        end
+      elseif payload.action == "stop" then
+        if not lesson.practical then
+          reason = "no_practical"
+        else
+          lesson.practical = nil
+          send_practical(dispatcher, state, area)
+          send_practical_progress(dispatcher, state, lesson)
+        end
+      else
+        reason = "bad_action"
+      end
+      dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = "practical", reason = reason or "" }), { message.sender }, nil, true)
     elseif message.op_code == OP_BOARD or message.op_code == OP_QUIZ or message.op_code == OP_QUIZ_ANSWER then
       local ok, payload = pcall(nk.json_decode, message.data)
       payload = ok and type(payload) == "table" and payload or {}

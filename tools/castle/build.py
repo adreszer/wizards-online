@@ -524,6 +524,9 @@ WALL_BOARD_ACROSS = -2.0                  # wall-mounted board beside the mid-wa
 WALL_BOARD_CENTRE_HEIGHT = 2.0            # centre of the 1.55 m tall board above the floor
 PROFESSOR_DESK_FROM_FRONT = 1.6           # professor's desk, off to one side of the lectern
 PROFESSOR_DESK_ACROSS = 3.5
+PRACTICE_TARGET = "res://objects/school/practice_target.tscn"
+PRACTICE_TARGET_FROM_FRONT = 1.8          # practice target (practicals) this far in from the front wall
+PRACTICE_TARGET_FROM_SIDE = 2.0           # and this far in from the side wall opposite the professor's desk
 TOME_ACROSS = -2.2                        # practice tomes on the other side of the lectern (pitch 2.2 per dx unit)
 
 def classroom_frame(r):
@@ -577,6 +580,13 @@ def emit_furniture():
                 inst(uname(f"Bench_{rid}"), K("student_bench"),
                      classroom_point(r, a + BENCH_BEHIND_DESK, b), parent="Furniture", rot_y=yaw)
                 n += 2
+        # The practice target for practicals: at the front on the far side from the professor's
+        # desk, its rune disc (+Z) turned toward the class.
+        oid = f"{rid}/practice_target"
+        inst(f"PracticeTarget_{node_name(oid)}", PRACTICE_TARGET,
+             classroom_point(r, PRACTICE_TARGET_FROM_FRONT, -(cross / 2 - PRACTICE_TARGET_FROM_SIDE)),
+             parent="Puzzles", rot_y=yaw + math.pi, props=oid_props(oid), groups=["world_objects"])
+        n += 1
     return n
 
 # Wall furniture: props lined along a room's wall (back against it), skipping doors,

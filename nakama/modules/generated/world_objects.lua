@@ -539,6 +539,13 @@ return {
     pos = { 20, 0, -30 },
     start_open = false,
   },
+  ["class_beastlore/practice_target"] = {
+    accepts = { "any" },
+    area = "class_beastlore",
+    areas = { "class_beastlore" },
+    kind = "practice_target",
+    pos = { 42.2, 0, -38 },
+  },
   ["class_chronicles/door_1"] = {
     accepts = { "unlock" },
     area = "class_chronicles",
@@ -547,6 +554,13 @@ return {
     locked = false,
     pos = { -20, 0, -14 },
     start_open = false,
+  },
+  ["class_chronicles/practice_target"] = {
+    accepts = { "any" },
+    area = "class_chronicles",
+    areas = { "class_chronicles" },
+    kind = "practice_target",
+    pos = { -42.2, 0, -22 },
   },
   ["class_chronicles/statue_reader"] = {
     accepts = { "force" },
@@ -565,6 +579,13 @@ return {
     locked = false,
     pos = { -20, -9, 6 },
     start_open = false,
+  },
+  ["class_elixirs/practice_target"] = {
+    accepts = { "any" },
+    area = "class_elixirs",
+    areas = { "class_elixirs" },
+    kind = "practice_target",
+    pos = { -42.2, -9, 2 },
   },
   ["class_elixirs/tome_wellspring"] = {
     accepts = {},
@@ -591,6 +612,13 @@ return {
     pos = { -20, 0, -30 },
     start_open = false,
   },
+  ["class_glyphs/practice_target"] = {
+    accepts = { "any" },
+    area = "class_glyphs",
+    areas = { "class_glyphs" },
+    kind = "practice_target",
+    pos = { -42.2, 0, -38 },
+  },
   ["class_glyphs/tome_unbolt"] = {
     accepts = {},
     area = "class_glyphs",
@@ -606,6 +634,13 @@ return {
     locked = false,
     pos = { 20, 0, 2 },
     start_open = false,
+  },
+  ["class_herblore/practice_target"] = {
+    accepts = { "any" },
+    area = "class_herblore",
+    areas = { "class_herblore" },
+    kind = "practice_target",
+    pos = { 42.2, 0, -6 },
   },
   ["class_herblore/tome_quicksprout"] = {
     accepts = {},
@@ -632,6 +667,13 @@ return {
     pos = { -20, 9, 18 },
     start_open = false,
   },
+  ["class_numeromancy/practice_target"] = {
+    accepts = { "any" },
+    area = "class_numeromancy",
+    areas = { "class_numeromancy" },
+    kind = "practice_target",
+    pos = { -42.2, 9, 10 },
+  },
   ["class_shapeshaping/door_1"] = {
     accepts = { "unlock" },
     area = "class_shapeshaping",
@@ -649,6 +691,13 @@ return {
     locked = false,
     pos = { -20, 0, 18 },
     start_open = false,
+  },
+  ["class_shapeshaping/practice_target"] = {
+    accepts = { "any" },
+    area = "class_shapeshaping",
+    areas = { "class_shapeshaping" },
+    kind = "practice_target",
+    pos = { -42.2, 0, 10 },
   },
   ["class_shapeshaping/tome_mendweave"] = {
     accepts = {},
@@ -688,6 +737,13 @@ return {
     pos = { -42.5, 0, -6.5 },
     toggleable = true,
   },
+  ["class_sigilcraft/practice_target"] = {
+    accepts = { "any" },
+    area = "class_sigilcraft",
+    areas = { "class_sigilcraft" },
+    kind = "practice_target",
+    pos = { -42.2, 0, -6 },
+  },
   ["class_sigilcraft/tome_arcane_pulse"] = {
     accepts = {},
     area = "class_sigilcraft",
@@ -719,6 +775,13 @@ return {
     pos = { 20, 0, -14 },
     start_open = false,
   },
+  ["class_skyriding/practice_target"] = {
+    accepts = { "any" },
+    area = "class_skyriding",
+    areas = { "class_skyriding" },
+    kind = "practice_target",
+    pos = { 42.2, 0, -22 },
+  },
   ["class_skyriding/tome_galewind"] = {
     accepts = {},
     area = "class_skyriding",
@@ -735,6 +798,13 @@ return {
     pos = { 20, 9, 2 },
     start_open = false,
   },
+  ["class_stargazing/practice_target"] = {
+    accepts = { "any" },
+    area = "class_stargazing",
+    areas = { "class_stargazing" },
+    kind = "practice_target",
+    pos = { 42.2, 9, -6 },
+  },
   ["class_stargazing/tome_duskveil"] = {
     accepts = {},
     area = "class_stargazing",
@@ -750,6 +820,13 @@ return {
     locked = false,
     pos = { -20, 9, 2 },
     start_open = false,
+  },
+  ["class_warding/practice_target"] = {
+    accepts = { "any" },
+    area = "class_warding",
+    areas = { "class_warding" },
+    kind = "practice_target",
+    pos = { -42.2, 9, -6 },
   },
   ["class_warding/tome_frostbind"] = {
     accepts = {},
@@ -4854,6 +4931,13 @@ return {
     pos = { -52, 18, 30 },
     start_open = false,
   },
+  ["tower_sw_2/practice_target"] = {
+    accepts = { "any" },
+    area = "tower_sw_2",
+    areas = { "tower_sw_2" },
+    kind = "practice_target",
+    pos = { -37.8, 18, 26 },
+  },
   ["tower_sw_3/door_1"] = {
     accepts = { "unlock" },
     area = "tower_sw_3",
@@ -4862,6 +4946,13 @@ return {
     locked = false,
     pos = { -52, 27, 30 },
     start_open = false,
+  },
+  ["tower_sw_3/practice_target"] = {
+    accepts = { "any" },
+    area = "tower_sw_3",
+    areas = { "tower_sw_3" },
+    kind = "practice_target",
+    pos = { -37.8, 27, 26 },
   },
   ["tower_sw_4/fragment_a"] = {
     accepts = {},

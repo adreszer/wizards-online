@@ -57,6 +57,11 @@ var _quiz_status: Label
 var _answer_sids: Array[String] = []
 ## The choices of the question we asked last (answers arrive as indices).
 var _asked_choices: Array = []
+## The "Practical" tab.
+var _practical_spell: OptionButton
+var _practical_hits: SpinBox
+var _practical_grant: CheckBox
+var _practical_status: Label
 
 
 func _ready() -> void:
@@ -138,6 +143,62 @@ func _build_board_tab() -> void:
 	_quiz_answers.custom_minimum_size = Vector2(0, 110)
 	_quiz_answers.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	board_tab.add_child(_quiz_answers)
+	var practical_tab := VBoxContainer.new()
+	practical_tab.name = tr("LESSON_TAB_PRACTICAL")
+	tabs.add_child(practical_tab)
+	var intro := _label(tr("PRACTICAL_PANEL_INTRO"))
+	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	practical_tab.add_child(intro)
+	var practical_row := HBoxContainer.new()
+	practical_tab.add_child(practical_row)
+	_practical_spell = OptionButton.new()
+	_practical_spell.custom_minimum_size = Vector2(200, 0)
+	practical_row.add_child(_practical_spell)
+	practical_row.add_child(_label(tr("PRACTICAL_HITS")))
+	_practical_hits = SpinBox.new()
+	_practical_hits.min_value = 1
+	_practical_hits.max_value = 10
+	_practical_hits.value = 3
+	practical_row.add_child(_practical_hits)
+	_practical_grant = CheckBox.new()
+	_practical_grant.text = tr("PRACTICAL_GRANT")
+	_practical_grant.button_pressed = true
+	practical_row.add_child(_practical_grant)
+	var practical_buttons := HBoxContainer.new()
+	practical_tab.add_child(practical_buttons)
+	practical_buttons.add_child(_button(tr("PRACTICAL_START"), start_practical))
+	practical_buttons.add_child(_button(tr("PRACTICAL_STOP"), func() -> void: NetworkManager.stop_practical()))
+	_practical_status = _label("")
+	_practical_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_practical_status.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	practical_tab.add_child(_practical_status)
+	NetworkManager.practical_progress_changed.connect(_on_practical_progress)
+
+
+## Starts a practical of the chosen spell in this lesson.
+func start_practical() -> void:
+	if _practical_spell.selected < 0 or _practical_spell.selected >= _spell_ids.size():
+		_show(tr("PRACTICAL_PICK_SPELL"))
+		return
+	NetworkManager.start_practical(_spell_ids[_practical_spell.selected], int(_practical_hits.value), _practical_grant.button_pressed)
+	_show(tr("PRACTICAL_STARTED_PROFESSOR"))
+
+
+func _on_practical_progress(info: Dictionary) -> void:
+	_practical_status.text = practical_progress_text(info)
+
+
+## "Uplift, 3 hits: Ola 2/3 · Kuba ✓" (or that none runs).
+static func practical_progress_text(info: Dictionary) -> String:
+	var spell := str(info.get("spell", ""))
+	if spell == "":
+		return TranslationServer.translate("PRACTICAL_NONE")
+	var def := SpellRegistry.load_definition(spell)
+	var parts := PackedStringArray()
+	for s: Dictionary in info.get("students", []):
+		parts.append("%s %s" % [str(s.get("name", "?")), "✓" if s.get("done", false) else "%d/%d" % [int(s.get("progress", 0)), int(info.get("hits", 1))]])
+	var head := TranslationServer.translate("PRACTICAL_RUNNING") % [TranslationServer.translate(def.display_name) if def != null else spell, int(info.get("hits", 1))]
+	return head + ("\n" + " · ".join(parts) if not parts.is_empty() else "")
 
 
 func _label(text: String) -> Label:
@@ -370,6 +431,10 @@ func _list_spells(subject: String) -> void:
 			_spells.add_item(tr(spell.display_name))
 	if _spell_ids.has(keep):
 		_spells.select(_spell_ids.find(keep))
+	if _practical_spell != null:
+		_practical_spell.clear()
+		for i in _spells.item_count:
+			_practical_spell.add_item(_spells.get_item_text(i), i)
 
 
 func refresh() -> void:

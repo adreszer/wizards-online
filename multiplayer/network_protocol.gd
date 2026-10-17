@@ -116,6 +116,15 @@ const OP_QUIZ_ANSWER := 44
 const OP_QUIZ_ANSWERS := 45
 ## server → sender: {ok, tool: "board" | "quiz" | "answer", reason} outcome of a lesson tool request
 const OP_LESSON_TOOL_RESULT := 46
+## client (professor running the lesson) → server: {action: "start", spell, hits: 1–10, grant: bool}
+## | {action: "stop"} a practical: students in the room may cast `spell` for practice and
+## must hit the room's practice target `hits` times; `grant` teaches the spell to whoever finishes
+const OP_PRACTICAL := 47
+## server → each student in the classroom: {spell, hits, progress, done, granted?} their task;
+## {spell: ""} = no practical
+const OP_PRACTICAL_STATE := 48
+## server → the professor: {spell, hits, students: [{sid, name, progress, done}]}
+const OP_PRACTICAL_PROGRESS := 49
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"
