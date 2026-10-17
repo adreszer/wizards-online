@@ -1340,10 +1340,24 @@ func _test_castle() -> void:
 	t.check(castle.get_node_or_null("StartPoint") != null, "castle has a StartPoint")
 	var shell: CastleExterior = castle.get_node_or_null("Exterior")
 	var shell_ok := shell != null
-	for part in ["Roofs", "Stone", "Hlod", "HlodWindows"]:
+	for part in ["Roofs", "Stone"]:
 		var mi: MeshInstance3D = shell.get_node_or_null(part) if shell != null else null
 		shell_ok = shell_ok and mi != null and mi.mesh != null and mi.mesh.get_surface_count() > 0
+	# The far view's visibility range counts from each chunk's AABB centre, so a chunk must be
+	# small enough never to show while the camera is inside one of its rooms (one castle-wide
+	# mesh filled the doorways near the castle's edges with walls one could walk through).
+	var far_chunks := 0
+	var widest := 0.0
+	for part in ["Hlod", "HlodWindows"]:
+		var group: Node = shell.get_node_or_null(part) if shell != null else null
+		shell_ok = shell_ok and group != null and group.get_child_count() > 0
+		for mi: MeshInstance3D in (group.get_children() if group != null else []):
+			far_chunks += 1
+			widest = maxf(widest, mi.get_aabb().size.length() / 2.0)
+			shell_ok = shell_ok and mi.mesh.get_surface_count() > 0
 	t.check(shell_ok, "the castle has its exterior shell (roofs, stone, far view)")
+	t.check(shell != null and widest < shell.detail_range - 20.0,
+		"the far view is chunked so it never shows from inside the castle (%d chunks, widest %.0f m from its centre)" % [far_chunks, widest])
 	await get_tree().process_frame
 	var ranged := 0
 	for w in castle.get_node("Walls").find_children("*", "GeometryInstance3D", true, false) + castle.get_node("StaticBatch").get_children():

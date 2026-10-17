@@ -21,6 +21,8 @@ const DAY_GLOW := Color(0.2, 0.22, 0.26)
 @export var data_path: String = "res://levels/castle/exterior.json"
 ## Interior detail is drawn up to this distance (m); the HLOD from a little before it.
 @export var detail_range: float = 170.0
+## Side (m) of the far view's chunks, each holding the boxes and window glows centred in it.
+@export var hlod_cell: float = 32.0
 ## Interior lights fade out from this distance (m) over 30 m.
 @export var light_fade_begin: float = 90.0
 ## Interior lights stop casting shadows beyond this distance (m): near lights keep the
@@ -106,14 +108,14 @@ func _surface() -> SurfaceTool:
 	return st
 
 
-func _commit(st: SurfaceTool, material: Material, node_name: String) -> MeshInstance3D:
+func _commit(st: SurfaceTool, material: Material, node_name: String, parent: Node = self) -> MeshInstance3D:
 	st.generate_normals()
 	var mi := MeshInstance3D.new()
 	mi.name = node_name
 	mi.mesh = st.commit()
 	mi.material_override = material
 	mi.layers = 1 | OUTDOOR_LAYER
-	add_child(mi)
+	parent.add_child(mi)
 	return mi
 
 
@@ -279,12 +281,16 @@ func _facade(st: SurfaceTool, q: Array) -> void:
 
 # --- far view -----------------------------------------------------------------------------
 
+## The far view is split into chunks of [member hlod_cell] m: a visibility range is
+## measured from the camera to a mesh's AABB centre, so one castle-wide mesh appeared
+## wherever the camera was far from the castle's middle, its room boxes filling the
+## doorways near the castle's edges with walls one could walk through.
 func _build_hlod() -> void:
-	var boxes := _surface()
+	var boxes: Dictionary = {}   # Vector2i cell -> SurfaceTool
 	for h: Array in data.get("hlod", []):
-		_box(boxes, Vector3((h[0] + h[1]) / 2.0, (h[4] + h[5]) / 2.0, (h[2] + h[3]) / 2.0),
-			Vector3(h[1] - h[0] - 0.1, h[5] - h[4], h[3] - h[2] - 0.1))
-	var glows := _surface()
+		var centre := Vector3((h[0] + h[1]) / 2.0, (h[4] + h[5]) / 2.0, (h[2] + h[3]) / 2.0)
+		_box(_hlod_surface(boxes, centre), centre, Vector3(h[1] - h[0] - 0.1, h[5] - h[4], h[3] - h[2] - 0.1))
+	var glows: Dictionary = {}
 	for w: Array in data.get("windows", []):
 		if w.size() > 5 and not w[5]:
 			continue
@@ -292,14 +298,25 @@ func _build_hlod() -> void:
 		var m: float = w[2]
 		var y: float = w[3]
 		if w[0] == "z":
-			_quad(glows, Vector3(c, y - 1.3, m - 0.8), Vector3(c, y - 1.3, m + 0.8), Vector3(c, y + 1.3, m + 0.8), Vector3(c, y + 1.3, m - 0.8))
+			_quad(_hlod_surface(glows, Vector3(c, y, m)), Vector3(c, y - 1.3, m - 0.8), Vector3(c, y - 1.3, m + 0.8), Vector3(c, y + 1.3, m + 0.8), Vector3(c, y + 1.3, m - 0.8))
 		else:
-			_quad(glows, Vector3(m - 0.8, y - 1.3, c), Vector3(m + 0.8, y - 1.3, c), Vector3(m + 0.8, y + 1.3, c), Vector3(m - 0.8, y + 1.3, c))
+			_quad(_hlod_surface(glows, Vector3(m, y, c)), Vector3(m - 0.8, y - 1.3, c), Vector3(m + 0.8, y - 1.3, c), Vector3(m + 0.8, y + 1.3, c), Vector3(m - 0.8, y + 1.3, c))
 	for pair in [[boxes, _stone, "Hlod"], [glows, _glow, "HlodWindows"]]:
-		var mi := _commit(pair[0], pair[1], pair[2])
-		mi.visibility_range_begin = detail_range - 10.0
-		mi.visibility_range_begin_margin = 10.0
-		mi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+		var group := Node3D.new()
+		group.name = pair[2]
+		add_child(group)
+		for cell: Vector2i in pair[0]:
+			var mi := _commit(pair[0][cell], pair[1], "%s_%d_%d" % [pair[2], cell.x, cell.y], group)
+			mi.visibility_range_begin = detail_range - 10.0
+			mi.visibility_range_begin_margin = 10.0
+			mi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+
+
+func _hlod_surface(cells: Dictionary, at: Vector3) -> SurfaceTool:
+	var cell := Vector2i(floori(at.x / hlod_cell), floori(at.z / hlod_cell))
+	if not cells.has(cell):
+		cells[cell] = _surface()
+	return cells[cell]
 
 
 func _apply_detail_ranges() -> void:
