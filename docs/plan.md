@@ -319,9 +319,10 @@ Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B
 - [x] `NoticeBoard` (placement kind `notice_board`, on the wall board model) in the entrance hall and every common room: the coming lessons, the running one marked; interact (or `/plan`) opens `TimetablePanel`, the week grouped by day; HUD line "Now: … (until …)" / "Next: … · …"
 - [x] Generator: placed wall items (`WALL_SPAN_KINDS`) keep the dressing (hearths, banners) off their wall span
 - [x] Tests: timetable model, board/HUD/panel text, bells, `timetable.json` validity, board placement; two clients: occurrences land on their slot's weekday and hour in school time, reload resends; `tools/capture_timetable.tscn` for screenshots
-- [ ] Attendance per slot stored for grades (today it is only logged); "absent" when a timetabled lesson has no professor (self-study fallback)
+- [x] School records (`nakama/modules/records.lua`): a closed lesson adds itself to every attendee's record (`records/transcript`, owner-readable: per subject attended / self-study / quiz counters, the last 30 lessons) and writes a `lesson_log` entry (subject, room, slot, professor, times, attendance, points); a timetabled lesson nobody opened is logged as `not_held` when its slot ends. RPCs `school_record` (your own; staff and admins any student's) and `lesson_log` (admins)
+- [ ] Self-study fallback when a timetabled lesson has no professor
 - [ ] In-game timetable editing for admins (today: edit the JSON, then reload)
-- [ ] Terms and holidays (`calendar.json`): weeks without lessons, exam weeks
+- [x] Terms and holidays: `nakama/content/calendar.json` (terms, breaks, exam weeks with dates and translated name keys); lessons and self-study happen only on term days outside breaks, exam days are flagged; OP_TIMETABLE carries `cal` {term, week, brk, exam, next_term}, shown on the notice boards and the week panel ("Autumn term, week 7 · exam week", "Holidays: …")
 
 ### Milestone 36 — The village and the railway station
 Outside the estate's outer gatehouse (whose gate now stands open), at the foot of the southern mountains: an original village modelled on the reference school's nearby village (placeholder names until the owner picks them), and the station where new players will later start the game. Design: docs/castle-generation.md, "Village (as built in Milestone 36)".

@@ -361,6 +361,20 @@ func save_lesson_plan(id: String, title: String, lines: PackedStringArray) -> Di
 	return await _session_rpc(NetworkProtocol.RPC_LESSON_PLAN_SAVE, request)
 
 
+## A student's school record (attendance and quizzes per subject, recent lessons):
+## your own, or (staff) anyone's by user id. {user_id, record} or {error}.
+func school_record(user_id: String = "", http_key: String = "") -> Dictionary:
+	var request := {}
+	if not user_id.is_empty():
+		request["user_id"] = user_id
+	return await _admin_rpc(NetworkProtocol.RPC_SCHOOL_RECORD, request, http_key)
+
+
+## Admin RPC: the lesson log (held lessons with attendance, timetabled ones not held).
+func lesson_log(limit: int = 50, http_key: String = "") -> Dictionary:
+	return await _admin_rpc(NetworkProtocol.RPC_LESSON_LOG, {"limit": limit}, http_key)
+
+
 ## Admin RPC: recent house points records, newest first.
 func house_points_ledger(limit: int = 50, http_key: String = "") -> Dictionary:
 	return await _admin_rpc(NetworkProtocol.RPC_HOUSE_POINTS_LEDGER, {"limit": limit}, http_key)

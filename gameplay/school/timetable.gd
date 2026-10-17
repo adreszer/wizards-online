@@ -20,10 +20,14 @@ var entries: Array[Dictionary] = []
 var tz_minutes := 0
 ## True once the server has sent one (online).
 var received := false
+## Today in the school calendar (nakama/content/calendar.json): {term?: name key,
+## week?: n, brk?: name key, exam: bool, next_term?: name key, next_day?: day number}.
+var calendar: Dictionary = {}
 
 
 func apply(payload: Dictionary) -> void:
 	tz_minutes = int(payload.get("tz", 0))
+	calendar = payload.get("cal", {}) if payload.get("cal", {}) is Dictionary else {}
 	entries.clear()
 	var raw: Variant = payload.get("slots", [])
 	# An empty Lua table encodes as {}, so anything but an array is "no slots".
@@ -37,13 +41,14 @@ func apply(payload: Dictionary) -> void:
 			if t1 <= t0:
 				continue
 			entries.append({"id": str(d.get("id", "")), "kind": str(d.get("k", KIND_LESSON)), "subject": str(d.get("s", "")),
-				"area": str(d.get("a", "")), "professor": str(d.get("p", "")), "t0": t0, "t1": t1})
+				"area": str(d.get("a", "")), "professor": str(d.get("p", "")), "t0": t0, "t1": t1, "exam": d.get("x", false) == true})
 	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.t0 < b.t0)
 	received = true
 
 
 func clear() -> void:
 	entries.clear()
+	calendar = {}
 	tz_minutes = 0
 	received = false
 
@@ -122,6 +127,26 @@ func status_line(now: float) -> String:
 	if school_time(next.t0).day != school_time(now).day:
 		when = TranslationServer.translate(day_key(next.t0)) + " " + when
 	return TranslationServer.translate("HUD_LESSON_NEXT") % [Timetable.title_of(next), when]
+
+
+## Where the school year stands today: "Autumn term, week 7 · exam week",
+## "Holidays: …, no lessons" or "Between terms; … starts Mon 7 Jan"; "" without a calendar.
+func calendar_line() -> String:
+	if not received:
+		return ""
+	var tl := func(key: String) -> String: return TranslationServer.translate(key)
+	if calendar.has("brk"):
+		return tl.call("CALENDAR_HOLIDAY") % tl.call(str(calendar.brk))
+	if calendar.has("term"):
+		var line: String = tl.call("CALENDAR_TERM_WEEK") % [tl.call(str(calendar.term)), int(calendar.get("week", 1))]
+		if calendar.get("exam", false) == true:
+			line += " · " + tl.call("CALENDAR_EXAMS")
+		return line
+	if calendar.has("next_term"):
+		var day := int(calendar.get("next_day", 0))
+		var date := Time.get_date_dict_from_unix_time(day * 86400)
+		return tl.call("CALENDAR_BETWEEN_TERMS") % [tl.call(str(calendar.next_term)), "%d.%02d.%d" % [date.day, date.month, date.year]]
+	return ""
 
 
 ## The entry's title: its subject's name, or "Self-study".

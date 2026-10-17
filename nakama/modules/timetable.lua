@@ -1,5 +1,7 @@
 -- The school timetable in real time (nakama/content/timetable.json). Slots are
--- weekly ("mon 18:00, 45 min, Charms") in the school's own time zone; the match
+-- weekly ("mon 18:00, 45 min, Charms") in the school's own time zone, and happen
+-- only on school days of nakama/content/calendar.json (terms minus breaks; exam
+-- weeks are flagged); the match
 -- turns them into concrete start/end times (seconds since the epoch) for the
 -- next days and sends those as OP_TIMETABLE, so clients need no time zone rules
 -- and every client rings the same bell at the same moment.
@@ -11,6 +13,8 @@ local AREAS = require("world_areas")
 local M = {}
 
 M.PATH = "../content/timetable.json"
+-- Terms, breaks and exam weeks (optional: without it every week is a school week).
+M.CALENDAR_PATH = "../content/calendar.json"
 M.DAYS = { mon = 0, tue = 1, wed = 2, thu = 3, fri = 4, sat = 5, sun = 6 }
 M.KINDS = { lesson = true, study = true }
 -- Professors' slots may open a few minutes early.
@@ -102,9 +106,87 @@ function M.sanitize_slot(raw)
   }
 end
 
+-- "2026-09-01" → day number, or nil.
+function M.parse_date(text)
+  if type(text) ~= "string" then return nil end
+  local y, m, d = text:match("^(%d%d%d%d)-(%d%d)-(%d%d)$")
+  y, m, d = tonumber(y), tonumber(m), tonumber(d)
+  if not y or m < 1 or m > 12 or d < 1 or d > 31 then return nil end
+  return M.days_from_civil(y, m, d)
+end
+
+-- A list of {name_key?, start, end} ranges from the calendar file; bad ones logged.
+local function parse_ranges(raw, what, need_key)
+  local out = {}
+  for i, r in ipairs(type(raw) == "table" and raw or {}) do
+    local d0 = type(r) == "table" and M.parse_date(r.start) or nil
+    local d1 = type(r) == "table" and M.parse_date(r["end"]) or nil
+    local key = type(r) == "table" and type(r.name_key) == "string" and r.name_key or ""
+    if not d0 or not d1 or d1 < d0 or (need_key and key == "") then
+      nk.logger_error(string.format("calendar: %s %d left out (dates or name_key)", what, i))
+    else
+      table.insert(out, { id = type(r.id) == "string" and r.id or key, key = key, d0 = d0, d1 = d1 })
+    end
+  end
+  return out
+end
+
+-- Reads nakama/content/calendar.json: { terms, breaks, exams } as day ranges.
+function M.load_calendar()
+  local cal = { terms = {}, breaks = {}, exams = {} }
+  local ok, text = pcall(nk.file_read, M.CALENDAR_PATH)
+  if not ok then return cal end
+  local ok2, data = pcall(nk.json_decode, text)
+  if not ok2 or type(data) ~= "table" then
+    nk.logger_error("calendar: " .. M.CALENDAR_PATH .. " is not valid JSON")
+    return cal
+  end
+  cal.terms = parse_ranges(data.terms, "term", true)
+  cal.breaks = parse_ranges(data.breaks, "break", true)
+  cal.exams = parse_ranges(data.exam_weeks, "exam week", false)
+  return cal
+end
+
+local function range_at(list, day)
+  for _, r in ipairs(list) do
+    if day >= r.d0 and day <= r.d1 then return r end
+  end
+  return nil
+end
+
+-- What school day number `day` is: { school = lessons happen, term?, brk?, exam }.
+-- Without terms in the calendar every day outside a break is a school day.
+function M.day_info(tt, day)
+  local cal = tt.calendar or { terms = {}, breaks = {}, exams = {} }
+  local term = range_at(cal.terms, day)
+  local brk = range_at(cal.breaks, day)
+  local in_term = term ~= nil or #cal.terms == 0
+  return { school = in_term and brk == nil, term = term, brk = brk, exam = range_at(cal.exams, day) ~= nil and in_term and brk == nil }
+end
+
+-- The calendar part of OP_TIMETABLE for `day`: the term's name key and week, the
+-- break's, whether it is an exam day, and the next term when between terms.
+function M.calendar_payload(tt, day)
+  local info = M.day_info(tt, day)
+  local out = { exam = info.exam }
+  if info.term then
+    out.term = info.term.key
+    out.week = math.floor((day - info.term.d0) / 7) + 1
+  end
+  if info.brk then out.brk = info.brk.key end
+  if not info.term and tt.calendar and #tt.calendar.terms > 0 then
+    local next_term
+    for _, t in ipairs(tt.calendar.terms) do
+      if t.d0 > day and (not next_term or t.d0 < next_term.d0) then next_term = t end
+    end
+    if next_term then out.next_term, out.next_day = next_term.key, next_term.d0 end
+  end
+  return out
+end
+
 -- Reads and validates the timetable; bad slots are logged and left out.
 function M.load()
-  local tt = { utc_offset_minutes = 60, dst = "", days_ahead = 7, slots = {} }
+  local tt = { utc_offset_minutes = 60, dst = "", days_ahead = 7, slots = {}, calendar = M.load_calendar() }
   local ok, text = pcall(nk.file_read, M.PATH)
   if not ok then
     nk.logger_warn("timetable: cannot read " .. M.PATH .. ", no lessons scheduled")
@@ -141,14 +223,15 @@ function M.occurrences(tt, now)
   local today = math.floor((now + M.offset_at(tt, now)) / 86400)
   for d = today - 1, today + tt.days_ahead do
     local wd = M.weekday(d)
-    for _, slot in ipairs(tt.slots) do
+    local info = M.day_info(tt, d)
+    for _, slot in ipairs(info.school and tt.slots or {}) do
       if slot.day == wd then
         local local_start = d * 86400 + slot.start
         local t0 = local_start - M.offset_at(tt, local_start - tt.utc_offset_minutes * 60)
         local t1 = t0 + slot.seconds
         if t1 > now then
           table.insert(out, { id = slot.id, kind = slot.kind, subject = slot.subject, area = slot.area,
-                              professor = slot.professor, t0 = t0, t1 = t1 })
+                              professor = slot.professor, t0 = t0, t1 = t1, exam = info.exam })
         end
       end
     end
@@ -179,9 +262,10 @@ end
 function M.payload(tt, now)
   local list = {}
   for _, o in ipairs(M.occurrences(tt, now)) do
-    table.insert(list, { id = o.id, k = o.kind, s = o.subject, a = o.area, p = o.professor, t0 = o.t0, t1 = o.t1 })
+    table.insert(list, { id = o.id, k = o.kind, s = o.subject, a = o.area, p = o.professor, t0 = o.t0, t1 = o.t1, x = o.exam or nil })
   end
-  return nk.json_encode({ tz = math.floor(M.offset_at(tt, now) / 60), slots = list })
+  return nk.json_encode({ tz = math.floor(M.offset_at(tt, now) / 60), slots = list,
+                          cal = M.calendar_payload(tt, M.school_day(tt, now)) })
 end
 
 return M

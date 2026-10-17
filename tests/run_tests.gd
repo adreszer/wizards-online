@@ -2067,6 +2067,31 @@ func _test_timetable() -> void:
 		and tt.status_line(charms + 60.0) == tr("HUD_LESSON_NOW") % [tr("SUBJECT_SIGILCRAFT_NAME"), "18:45"], "the HUD shows the running or next lesson")
 	t.check(TimetablePanel.week_bbcode(tt, charms - 600.0, get_tree()).contains(tr("DAY_SUN_LONG")), "the week panel groups by day")
 
+	# The school calendar (terms, breaks, exam weeks) rides along with the timetable.
+	t.check(tt.calendar_line() == "", "no calendar, no calendar line")
+	var cal_tt := Timetable.new()
+	cal_tt.apply({"tz": 60, "slots": [{"id": "exam", "k": "lesson", "s": "sigilcraft", "a": "class_sigilcraft", "t0": charms, "t1": charms + 60.0, "x": true}],
+		"cal": {"term": "TERM_AUTUMN", "week": 15, "exam": true}})
+	t.check(cal_tt.calendar_line() == tr("CALENDAR_TERM_WEEK") % [tr("TERM_AUTUMN"), 15] + " · " + tr("CALENDAR_EXAMS") and cal_tt.entries[0].exam,
+		"a term week with exams (%s)" % cal_tt.calendar_line())
+	t.check(TimetablePanel.week_bbcode(cal_tt, charms - 600.0, get_tree()).contains(tr("TIMETABLE_EXAM"))
+		and NoticeBoard.board_text(cal_tt, charms - 600.0, 5).contains(tr("TERM_AUTUMN")), "the panel marks exams and the board names the term")
+	cal_tt.apply({"tz": 60, "slots": [], "cal": {"brk": "BREAK_WINTER", "exam": false}})
+	t.check(cal_tt.calendar_line() == tr("CALENDAR_HOLIDAY") % tr("BREAK_WINTER"), "a break says there are no lessons")
+	cal_tt.apply({"tz": 60, "slots": [], "cal": {"next_term": "TERM_SPRING", "next_day": 20825, "exam": false}})
+	t.check(cal_tt.calendar_line().contains(tr("TERM_SPRING")) and cal_tt.calendar_line().contains("7.01.2027"), "between terms it names the next (%s)" % cal_tt.calendar_line())
+	var cal_data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/calendar.json"))
+	var cal_ok := cal_data is Dictionary and (cal_data.get("terms", []) as Array).size() > 0
+	if cal_ok:
+		for list_name: String in ["terms", "breaks", "exam_weeks"]:
+			for r: Dictionary in cal_data.get(list_name, []):
+				var d0 := str(r.get("start", ""))
+				var d1 := str(r.get("end", ""))
+				var key := str(r.get("name_key", ""))
+				if d0.length() != 10 or d1.length() != 10 or d1 < d0 or (list_name != "exam_weeks" and tr(key) == key):
+					cal_ok = false
+	t.check(cal_ok, "calendar.json: dates in order, every term and break named by a translated key")
+
 	# The shipped timetable names real subjects and rooms.
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/timetable.json"))
 	var ok := data is Dictionary and (data.get("slots", []) as Array).size() > 0

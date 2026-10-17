@@ -7,6 +7,7 @@ local Profile = require("character_profile")
 local P = require("generated.protocol")
 local School = require("school")
 local Economy = require("economy")
+local Records = require("records")
 
 local WORLD_LABEL = "world"
 local MAX_CHAT_LENGTH = P.MAX_CHAT_LENGTH
@@ -236,3 +237,33 @@ local function rpc_wallet_ledger(context, payload)
   return nk.json_encode({ coins = Economy.balance(uid), entries = Economy.ledger(uid, data.limit) })
 end
 nk.register_rpc(rpc_wallet_ledger, P.RPC_WALLET_LEDGER)
+
+-- RPC "school_record": {user_id?} → {user_id, record}: a student's school record
+-- (attendance and quiz results per subject, recent lessons). Your own; staff may read
+-- any student's (grading), admins and the HTTP key too.
+local function rpc_school_record(context, payload)
+  local ok, data = pcall(nk.json_decode, payload ~= "" and payload or "{}")
+  data = ok and type(data) == "table" and data or {}
+  local uid = context.user_id
+  if type(data.user_id) == "string" and data.user_id ~= "" and data.user_id ~= uid then
+    if uid and uid ~= "" and not Profile.env_admins(context.env)[uid] and not Profile.is_staff(Profile.load(uid).role) then
+      error({ "only staff read other students' records", 7 })
+    end
+    uid = data.user_id
+  end
+  if not uid or uid == "" then
+    error({ "name a user_id", 3 })
+  end
+  return nk.json_encode({ user_id = uid, record = Records.load(uid) })
+end
+nk.register_rpc(rpc_school_record, P.RPC_SCHOOL_RECORD)
+
+-- RPC "lesson_log": {limit?} → {entries}: every lesson held (with attendance) and
+-- every timetabled lesson nobody ran, newest first. Admins or the HTTP key.
+local function rpc_lesson_log(context, payload)
+  require_admin(context)
+  local ok, data = pcall(nk.json_decode, payload ~= "" and payload or "{}")
+  local limit = ok and type(data) == "table" and tonumber(data.limit) or 50
+  return nk.json_encode({ entries = Records.list_log(math.max(1, math.min(500, math.floor(limit)))) })
+end
+nk.register_rpc(rpc_lesson_log, P.RPC_LESSON_LOG)

@@ -65,10 +65,15 @@ static func week_bbcode(tt: Timetable, now: float, tree: SceneTree) -> String:
 	if not tt.received:
 		return TranslationServer.translate("TIMETABLE_OFFLINE")
 	var entries := tt.upcoming(now)
-	if entries.is_empty():
-		return TranslationServer.translate("TIMETABLE_EMPTY")
-	var next := tt.next_after(now)
 	var out := PackedStringArray()
+	var cal := tt.calendar_line()
+	if cal != "":
+		out.append("[i]%s[/i]" % _escape(cal))
+		out.append("")
+	if entries.is_empty():
+		out.append(TranslationServer.translate("TIMETABLE_EMPTY"))
+		return "\n".join(out)
+	var next := tt.next_after(now)
 	var day := -999999
 	for e in entries:
 		var st := tt.school_time(e.t0)
@@ -81,6 +86,8 @@ static func week_bbcode(tt: Timetable, now: float, tree: SceneTree) -> String:
 			_escape(Timetable.room_name(tree, str(e.area)))]
 		if str(e.professor) != "":
 			line += "   · " + _escape(TranslationServer.translate("TIMETABLE_PROFESSOR") % str(e.professor))
+		if e.get("exam", false):
+			line += "   [color=#e08a6a](%s)[/color]" % TranslationServer.translate("TIMETABLE_EXAM")
 		if e.t0 <= now:
 			line = "[color=#9fe07a]%s  %s[/color]" % [TranslationServer.translate("TIMETABLE_NOW"), line]
 		elif not next.is_empty() and e.id == next.id and e.t0 == next.t0:

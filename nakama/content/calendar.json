@@ -1,0 +1,20 @@
+{
+  "_comment": "The school year in real dates (school time). Lessons and self-study happen only on days inside a term and outside a break; exam weeks are flagged (exams run in them). name_key values are client translation keys (localization/translations.csv). Edit and restart Nakama or call admin_reload_timetable. Without terms every day is a school day.",
+  "terms": [
+    { "id": "autumn_2026", "name_key": "TERM_AUTUMN", "start": "2026-09-01", "end": "2026-12-18" },
+    { "id": "spring_2027", "name_key": "TERM_SPRING", "start": "2027-01-07", "end": "2027-03-26" },
+    { "id": "summer_2027", "name_key": "TERM_SUMMER", "start": "2027-04-12", "end": "2027-06-25" },
+    { "id": "autumn_2027", "name_key": "TERM_AUTUMN", "start": "2027-09-01", "end": "2027-12-17" }
+  ],
+  "breaks": [
+    { "name_key": "BREAK_AUTUMN", "start": "2026-10-31", "end": "2026-11-02" },
+    { "name_key": "BREAK_WINTER", "start": "2027-02-15", "end": "2027-02-21" },
+    { "name_key": "BREAK_MAY", "start": "2027-05-01", "end": "2027-05-03" }
+  ],
+  "exam_weeks": [
+    { "start": "2026-12-14", "end": "2026-12-18" },
+    { "start": "2027-03-22", "end": "2027-03-26" },
+    { "start": "2027-06-21", "end": "2027-06-25" },
+    { "start": "2027-12-13", "end": "2027-12-17" }
+  ]
+}

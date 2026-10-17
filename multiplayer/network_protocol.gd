@@ -106,6 +106,12 @@ const RPC_LESSON_PLAN_LIST := "lesson_plan_list"
 const RPC_ADMIN_GRANT_COINS := "admin_grant_coins"
 ## RPC: {limit?, user_id? (admins)} → {coins, entries: [{delta, source, reason, by_name, subject, area, at}]} newest first
 const RPC_WALLET_LEDGER := "wallet_ledger"
+## RPC: {user_id? (staff, admins)} → {user_id, record: {subjects: {id: {attended, self_study,
+## quiz_right, quiz_total}}, recent: [{subject, at, slot, by, kind}]}} (see records.lua)
+const RPC_SCHOOL_RECORD := "school_record"
+## Admin RPC: {limit?} → {entries: [{kind: "lesson" | "self_study" | "not_held", subject, area,
+## slot, by_name, opened_at, closed_at, why, attended: {uid: name}, points}]} newest first
+const RPC_LESSON_LOG := "lesson_log"
 const MAX_CHAT_LENGTH := 200
 
 

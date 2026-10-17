@@ -45,6 +45,9 @@ static func board_text(timetable: Timetable, now: float, lines: int) -> String:
 	if not timetable.received:
 		out.append(TranslationServer.translate("TIMETABLE_OFFLINE"))
 		return "\n".join(out)
+	var cal := timetable.calendar_line()
+	if cal != "":
+		out.insert(1, cal)
 	var coming := timetable.upcoming(now, lines)
 	if coming.is_empty():
 		out.append(TranslationServer.translate("TIMETABLE_EMPTY"))

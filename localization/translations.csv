@@ -438,3 +438,14 @@ DAY_THU_LONG,Thursday,Czwartek
 DAY_FRI_LONG,Friday,Piątek
 DAY_SAT_LONG,Saturday,Sobota
 DAY_SUN_LONG,Sunday,Niedziela
+TERM_AUTUMN,Autumn term,Semestr jesienny
+TERM_SPRING,Spring term,Semestr wiosenny
+TERM_SUMMER,Summer term,Semestr letni
+BREAK_AUTUMN,All Saints' break,Przerwa świąteczna (Wszystkich Świętych)
+BREAK_WINTER,Winter holidays,Ferie zimowe
+BREAK_MAY,May holidays,Majówka
+CALENDAR_TERM_WEEK,"%s, week %d","%s, tydzień %d"
+CALENDAR_EXAMS,exam week,tydzień egzaminów
+CALENDAR_HOLIDAY,"Holidays: %s, no lessons","Wolne: %s, bez lekcji"
+CALENDAR_BETWEEN_TERMS,"Between terms; %s starts %s","Przerwa między semestrami; %s od %s"
+TIMETABLE_EXAM,exam,egzamin

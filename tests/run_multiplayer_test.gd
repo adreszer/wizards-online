@@ -310,6 +310,15 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	NetworkManager.send_lesson("close")
 	ok = await _wait_until(func() -> bool: return not NetworkManager.get_lessons().has(str(CLASSROOM)), 10.0)
 	t.check(ok, "the professor ends the lesson")
+	var b_uid := str(NetworkManager.get_players().get(b_sid, {}).get("uid", ""))
+	var b_record: Dictionary = await NetworkManager.school_record(b_uid)
+	var attended := int(b_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("attended", 0))
+	t.check(attended >= 1 and b_record.get("record", {}).get("recent", [{}])[0].get("by", "") == "ClientA",
+		"the student's record has the lesson, readable by the professor (%s)" % str(b_record).left(200))
+	var log_answer: Dictionary = await NetworkManager.lesson_log(5, HTTP_KEY)
+	var last: Dictionary = (log_answer.get("entries", [{}]) as Array)[0]
+	t.check(last.get("kind", "") == "lesson" and last.get("subject", "") == "sigilcraft" and last.get("attended", {}).has(b_uid),
+		"the lesson log names the lesson and who came (%s)" % str(last).left(200))
 	ok = await _wait_until(func() -> bool: return object_events.any(func(e: Array) -> bool: return e[0] == SWITCH), 30.0)
 	var switch_node: Node = _world_object(SWITCH)
 	t.check(ok and switch_node is MagicSwitch and switch_node.is_on == (NetworkManager.get_world_object_states().get(SWITCH, false) == true), "the student's switch change reaches the professor's castle")
@@ -360,7 +369,10 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 ## and start time in school time (nakama/content/timetable.json).
 func _check_timetable() -> void:
 	var tt := NetworkManager.timetable
-	t.check(tt.received and timetables_received >= 1 and tt.entries.size() >= 10, "the join brings the timetable (%d entries)" % tt.entries.size())
+	# Breaks and the summer have no lessons (calendar.json), so only a term week must be full.
+	var in_term := tt.calendar.has("term") and not tt.calendar.has("brk")
+	t.check(tt.received and timetables_received >= 1 and (tt.entries.size() >= 5 or not in_term), "the join brings the timetable (%d entries, %s)" % [tt.entries.size(), tt.calendar_line()])
+	t.check(tt.calendar.has("term") or tt.calendar.has("brk") or tt.calendar.has("next_term"), "and where the school year stands (%s)" % str(tt.calendar))
 	t.check(tt.tz_minutes == 60 or tt.tz_minutes == 120, "school time is Warsaw time (UTC+%d min)" % tt.tz_minutes)
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/timetable.json"))
 	var slots := {}
@@ -373,7 +385,7 @@ func _check_timetable() -> void:
 		var st := tt.school_time(e.t0)
 		if slot.is_empty() or days[st.weekday] != slot.day or tt.clock_text(e.t0) != str(slot.start).pad_zeros(5) or e.t1 - e.t0 != float(slot.minutes) * 60.0:
 			wrong.append("%s@%s %s" % [e.id, tt.day_key(e.t0), tt.clock_text(e.t0)])
-	t.check(wrong.is_empty() and tt.entries[0].t1 > NetworkManager.server_time(), "every occurrence lands on its slot's day and hour %s" % str(wrong))
+	t.check(wrong.is_empty() and (tt.entries.is_empty() or tt.entries[0].t1 > NetworkManager.server_time()), "every occurrence lands on its slot's day and hour %s" % str(wrong))
 
 
 # --- Actor (client B) ------------------------------------------------------------------
@@ -520,6 +532,10 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 		"the student's own ledger: two mysteries, no pay for a lesson shorter than the rules' minimum (%s)" % str(sources))
 	var theirs: Dictionary = await NetworkManager.wallet_ledger(5, "someone-else")
 	t.check(theirs.has("error"), "a student cannot read someone else's purse")
+	var own_record: Dictionary = await NetworkManager.school_record()
+	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("attended", 0)) >= 1, "the student reads their own school record")
+	var other_record: Dictionary = await NetworkManager.school_record("someone-else")
+	t.check(other_record.has("error"), "but not another student's")
 	cheat_results.clear()   # the brooms section counts its own cheat answers
 
 	t.section("Brooms (student)")

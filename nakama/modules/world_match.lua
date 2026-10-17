@@ -36,6 +36,7 @@ local Mysteries = require("mysteries")
 local School = require("school")
 local Timetable = require("timetable")
 local Economy = require("economy")
+local Records = require("records")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -354,6 +355,14 @@ local function close_lesson(dispatcher, state, area, why)
     end
   end
   nk.logger_info(string.format("lesson %s in %s by %s closed (%s), %d attended, %d points, %d coins paid, slot %s", lesson.subject, area, lesson.by_name, why, count, lesson.points, paid, lesson.slot or "-"))
+  -- Records: every student who came gets the lesson in their record; the lesson goes in the log.
+  local kind = lesson.kind or "lesson"
+  for uid, _ in pairs(lesson.attendance) do
+    Records.lesson_attended(uid, { subject = lesson.subject, at = lesson.opened_at, slot = lesson.slot, by = lesson.by_name, kind = kind })
+  end
+  Records.log_lesson({ kind = kind, subject = lesson.subject, area = area, slot = lesson.slot or "", t0 = lesson.slot_t0 or 0,
+                       by = lesson.by_uid or "", by_name = lesson.by_name, opened_at = lesson.opened_at, closed_at = nk.time() / 1000,
+                       why = why, attended = lesson.attendance, points = lesson.points })
   send_lessons(dispatcher, state, nil)
 end
 
@@ -365,6 +374,25 @@ local function own_lesson(state, sid)
     return lesson
   end
   return nil
+end
+
+-- Timetabled lessons that ended since the last check without anyone opening them
+-- go in the lesson log as "not_held" (the self-study fallback keys off the same slots).
+local function check_ended_slots(state, now)
+  local since = state.slots_checked_at or now
+  state.slots_checked_at = now
+  if since >= now then return end
+  for _, o in ipairs(Timetable.occurrences(state.timetable, since)) do
+    if o.t1 <= now and o.kind == "lesson" then
+      local key = o.id .. "@" .. o.t0
+      if not state.held_slots[key] then
+        Records.log_lesson({ kind = "not_held", subject = o.subject, area = o.area, slot = o.id, t0 = o.t0, by = "", by_name = o.professor or "",
+                             opened_at = 0, closed_at = 0, why = "no professor", attended = {}, points = 0 })
+        nk.logger_info(string.format("timetable: %s (%s) was not held", o.id, o.subject))
+      end
+      state.held_slots[key] = nil
+    end
+  end
 end
 
 -- The school clock (day length + offset); `presences` nil = everyone.
@@ -431,7 +459,7 @@ function M.match_init(context, params)
   local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {}, locales = {},
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
-                  clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0 }
+                  clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {} }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -526,6 +554,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     if Timetable.school_day(state.timetable, now) ~= state.timetable_day then
       send_timetable(dispatcher, state, nil)
     end
+    check_ended_slots(state, now)
     local occupied = function(area) return #players_in(state, area) > 0 end
     run_actions(dispatcher, state, Mysteries.tick(state.engine, state.mysteries, nk.time() / 1000, occupied))
   end
@@ -726,8 +755,9 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         else
           -- A lesson opened in its timetable slot (or just before) belongs to that slot.
           local slot = Timetable.current(state.timetable, now, area, subject)
-          state.lessons[area] = { subject = subject, by_sid = sid, by_name = state.names[sid] or "", opened_at = now, attendance = {}, points = 0,
-                                  slot = slot and slot.id or nil }
+          state.lessons[area] = { subject = subject, by_sid = sid, by_uid = message.sender.user_id, by_name = state.names[sid] or "", opened_at = now,
+                                  attendance = {}, points = 0, slot = slot and slot.id or nil, slot_t0 = slot and slot.t0 or nil }
+          if slot then state.held_slots[slot.id .. "@" .. slot.t0] = true end
           for _, pl in ipairs(players_in(state, area)) do
             if pl.sid ~= sid then state.lessons[area].attendance[pl.uid] = state.names[pl.sid] or "" end
           end

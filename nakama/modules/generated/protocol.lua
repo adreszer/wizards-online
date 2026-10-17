@@ -43,7 +43,9 @@ return {
   RPC_ADMIN_SET_PROFILE = "admin_set_profile",
   RPC_HOUSE_POINTS_LEDGER = "house_points_ledger",
   RPC_JOIN_WORLD = "join_world",
+  RPC_LESSON_LOG = "lesson_log",
   RPC_LESSON_PLAN_LIST = "lesson_plan_list",
   RPC_LESSON_PLAN_SAVE = "lesson_plan_save",
+  RPC_SCHOOL_RECORD = "school_record",
   RPC_WALLET_LEDGER = "wallet_ledger",
 }
