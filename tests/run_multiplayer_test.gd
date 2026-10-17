@@ -657,6 +657,8 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	NetworkManager.answer_quiz(1)
 	ok = await _wait_until(func() -> bool: return NetworkManager.quiz.get("answer", -1) == 1.0, 10.0)
 	t.check(ok, "the student answers the quill's question")
+	var dry: Dictionary = await NetworkManager.admin_advance_years({"dry_run": true, "min_subjects": 1}, HTTP_KEY)
+	t.check(dry.get("dry_run", false) == true and dry.has("promoted"), "admins can list who would move up a year (%s)" % str(dry).left(160))
 
 	t.section("Purse (student)")
 	var refusals := cheat_results.size()

@@ -28,6 +28,7 @@ const SIT_ALIASES: Array[String] = ["sit", "usiadz", "usiądź", "siadaj"]
 const SELF_STUDY_ALIASES: Array[String] = ["selfstudy", "samouk", "nauka"]
 const LOOK_ALIASES: Array[String] = ["look", "wyglad", "wygląd", "postac", "postać"]
 const RUNES_ALIASES: Array[String] = ["runes", "runy", "rune"]
+const EXAM_ALIASES: Array[String] = ["exam", "egzamin"]
 const STAND_ALIASES: Array[String] = ["stand", "wstan", "wstań"]
 const GIVE_ALIASES: Array[String] = ["give", "daj"]
 const BROOM_ALIASES: Array[String] = ["broom", "miotla", "miotła"]
@@ -93,6 +94,10 @@ static func run(text: String, player: Node) -> String:
 	if LOOK_ALIASES.has(name):
 		GameEvents.character_creator_requested.emit.call_deferred()
 		return ""
+	if EXAM_ALIASES.has(name):
+		if not NetworkManager.send_op(NetworkProtocol.OP_CHEAT, {"self_study": true, "exam": true}):
+			return _t("SELF_STUDY_ONLINE_ONLY")
+		return _t("SELF_STUDY_REQUESTED")
 	if SELF_STUDY_ALIASES.has(name):
 		if not NetworkManager.send_op(NetworkProtocol.OP_CHEAT, {"self_study": true}):
 			return _t("SELF_STUDY_ONLINE_ONLY")

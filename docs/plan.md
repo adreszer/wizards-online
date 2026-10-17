@@ -428,6 +428,13 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Journal "Homework" tab (tasks, due dates, your answer and grade, hand-in row); professor panel "Homework" tab (set, load answers, grade with a comment); homework average in the record
 - [x] Tests: journal text; two clients: set, notified, handed in, read, graded once, in the record
 
+### Milestone 47 — Grades and exams
+- [x] Subject grades 1–6 (`SchoolGrades`, mirrored by `nakama/modules/grades.lua`) from the record: attendance (self-study counts half), quiz and exam answers, practicals, homework average; parts without data drop out; shown in the journal
+- [x] Exams: on exam days (calendar exam weeks) an unclaimed timetabled lesson runs as an exam (`SelfStudy.exam_plan`: the subject's questions only, 75 s each, no lecture); answers go to `exam_right` / `exam_total`; `/exam` (`/egzamin`) starts one for playtesting
+- [x] Year advancement tool: admin RPC `admin_advance_years {dry_run, min_subjects}` moves every student whose graded subjects all pass up a year (online players live)
+- [x] Tests: grade formula, journal grade; two clients: the advancement dry run
+- [ ] Owner: when years advance (run the RPC after summer exams, or automatically), the exam hall setup (desks in the great hall, proximity chat muted), practical exams
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

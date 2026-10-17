@@ -10,6 +10,7 @@ local Economy = require("economy")
 local Records = require("records")
 local Homework = require("homework")
 local Timetable = require("timetable")
+local Grades = require("grades")
 
 local WORLD_LABEL = "world"
 
@@ -309,3 +310,41 @@ nk.register_rpc(function(context, payload)
   end
   return nk.json_encode({ ok = true, grade = answer.grade })
 end, P.RPC_HOMEWORK_GRADE)
+
+-- RPC "admin_advance_years": {dry_run?, min_subjects?} → {promoted, kept}: every student
+-- (everyone who ever joined, from the chat name index) whose graded subjects all pass
+-- moves up a year (at most the seventh). Online players are updated live. Admins or the
+-- HTTP key. When this runs (end of the school year, after exams) is the owner's call.
+nk.register_rpc(function(context, payload)
+  require_admin(context)
+  local ok, data = pcall(nk.json_decode, payload ~= "" and payload or "{}")
+  data = ok and type(data) == "table" and data or {}
+  local min_subjects = math.max(1, math.floor(tonumber(data.min_subjects) or 3))
+  local promoted, kept, cursor = {}, 0, ""
+  repeat
+    local ok2, objects, next_cursor = pcall(nk.storage_list, nil, "names", 100, cursor)
+    if not ok2 then break end
+    for _, o in ipairs(objects or {}) do
+      local uid = type(o.value) == "table" and o.value.uid
+      if uid then
+        local profile = Profile.load(uid)
+        local passes = Grades.passes(Records.load(uid), min_subjects)
+        if profile.role == "student" and passes and profile.year < Profile.MAX_YEAR then
+          table.insert(promoted, { user_id = uid, name = o.value.name, year = profile.year + 1 })
+          if not data.dry_run then
+            local result = nk.match_signal(find_or_create_world(), nk.json_encode({ op = "set_profile", user_id = uid, year = profile.year + 1 }))
+            local decoded = result and select(2, pcall(nk.json_decode, result)) or nil
+            if type(decoded) ~= "table" or not decoded.ok then
+              profile.year = profile.year + 1
+              Profile.write(uid, profile)
+            end
+          end
+        else
+          kept = kept + 1
+        end
+      end
+    end
+    cursor = next_cursor or ""
+  until cursor == ""
+  return nk.json_encode({ promoted = promoted, kept = kept, dry_run = data.dry_run == true })
+end, P.RPC_ADMIN_ADVANCE_YEARS)

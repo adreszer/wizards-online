@@ -409,6 +409,11 @@ func school_record(user_id: String = "", http_key: String = "") -> Dictionary:
 	return await _admin_rpc(NetworkProtocol.RPC_SCHOOL_RECORD, request, http_key)
 
 
+## Admin RPC: move every passing student up a year ({dry_run} only lists them).
+func admin_advance_years(request: Dictionary, http_key: String = "") -> Dictionary:
+	return await _admin_rpc(NetworkProtocol.RPC_ADMIN_ADVANCE_YEARS, request, http_key)
+
+
 ## Admin RPC: the lesson log (held lessons with attendance, timetabled ones not held).
 func lesson_log(limit: int = 50, http_key: String = "") -> Dictionary:
 	return await _admin_rpc(NetworkProtocol.RPC_LESSON_LOG, {"limit": limit}, http_key)

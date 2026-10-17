@@ -600,3 +600,6 @@ HOMEWORK_GRADE,Grade,Ocena
 HOMEWORK_COMMENT_PLACEHOLDER,A comment for the student,Komentarz dla ucznia
 HOMEWORK_GRADE_BUTTON,Grade,Oceń
 HOMEWORK_GRADED_DONE,Graded.,Oceniono.
+JOURNAL_GRADE,grade %d,ocena %d
+JOURNAL_NO_GRADE,(no grade yet),(jeszcze bez oceny)
+JOURNAL_EXAM_LINE,exam answers %d of %d right,egzamin: dobrze %d z %d

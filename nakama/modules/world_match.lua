@@ -344,7 +344,7 @@ end
 local function lessons_payload(state)
   local out = {}
   for area, lesson in pairs(state.lessons) do
-    out[area] = { subject = lesson.subject, by = lesson.by_name, sid = lesson.by_sid, slot = lesson.slot or "", board = lesson.board or "",
+    out[area] = { subject = lesson.subject, by = lesson.by_name, sid = lesson.by_sid, slot = lesson.slot or "", board = lesson.board or "", exam = lesson.exam or nil,
                   auto = lesson.kind == "self_study" or nil, board_i18n = lesson.board_i18n }
   end
   return nk.json_encode({ lessons = out })
@@ -446,7 +446,7 @@ end
 -- Marked answers go into the students' records.
 local function record_marks(lesson, marked)
   for _, a in pairs(marked) do
-    Records.quiz_result(a.uid, lesson.subject, a.right and 1 or 0, 1)
+    Records.quiz_result(a.uid, lesson.subject, a.right and 1 or 0, 1, lesson.exam == true)
   end
 end
 
@@ -552,11 +552,12 @@ end
 -- An automated (self-study) lesson in occurrence `o`'s room, run from the subject's plan.
 local function open_self_study(dispatcher, state, o, now)
   local lesson = { subject = o.subject, by_sid = nil, by_uid = "", by_name = "", opened_at = now, attendance = {}, points = 0,
-                   slot = o.id, slot_t0 = o.t0, kind = "self_study" }
+                   slot = o.id, slot_t0 = o.t0, kind = "self_study", exam = o.exam == true }
   for _, pl in ipairs(players_in(state, o.area)) do lesson.attendance[pl.uid] = state.names[pl.sid] or "" end
   state.lessons[o.area] = lesson
   state.held_slots[o.id .. "@" .. o.t0] = true
-  SelfStudy.start(lesson, state.self_study.plans[o.subject], now)
+  local plan = state.self_study.plans[o.subject]
+  SelfStudy.start(lesson, o.exam and SelfStudy.exam_plan(plan) or plan, now)
   nk.logger_info(string.format("self-study: %s in %s (slot %s)", o.subject, o.area, o.id))
   send_lessons(dispatcher, state, nil)
 end
@@ -985,7 +986,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         elseif state.lessons[area] then
           reason = "already_open"
         else
-          open_self_study(dispatcher, state, { id = "cheat", t0 = now, subject = subject, area = area }, now)
+          open_self_study(dispatcher, state, { id = "cheat", t0 = now, subject = subject, area = area, exam = payload.exam == true }, now)
         end
       elseif coins ~= nil then
         -- /coins: add to (or take from) your own purse, answered by OP_WALLET.

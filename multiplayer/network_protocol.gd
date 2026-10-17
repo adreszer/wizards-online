@@ -173,6 +173,9 @@ const RPC_HOMEWORK_SUBMIT := "homework_submit"
 const RPC_HOMEWORK_INBOX := "homework_inbox"
 ## Staff RPC: {id, user_id, grade: 1–6, comment} → {ok} grade one answer (into the record; a pass pays coins)
 const RPC_HOMEWORK_GRADE := "homework_grade"
+## Admin RPC: {dry_run?, min_subjects? (3)} → {promoted: [{user_id, name, year}], kept: n} moves every student
+## whose graded subjects all pass (grades.lua) up one year
+const RPC_ADMIN_ADVANCE_YEARS := "admin_advance_years"
 const MAX_CHAT_LENGTH := 200
 
 

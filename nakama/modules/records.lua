@@ -17,7 +17,7 @@ local M = {}
 M.COLLECTION, M.KEY = "records", "transcript"
 M.LOG_COLLECTION = "lesson_log"
 M.RECENT_MAX = 30
-M.SUBJECT_FIELDS = { "attended", "self_study", "quiz_right", "quiz_total", "practicals", "homework_count", "homework_points" }
+M.SUBJECT_FIELDS = { "attended", "self_study", "quiz_right", "quiz_total", "practicals", "homework_count", "homework_points", "exam_right", "exam_total" }
 
 local function blank_subject()
   local s = {}
@@ -89,12 +89,18 @@ function M.lesson_attended(uid, info)
   return M.save(uid, rec)
 end
 
--- Quiz answers marked by the professor (or a self-study lesson): right of total.
-function M.quiz_result(uid, subject, right, total)
+-- Quiz answers marked by the professor (or a self-study lesson): right of total. An
+-- exam's answers count as exam results instead.
+function M.quiz_result(uid, subject, right, total, exam)
   local rec = M.load(uid)
   local s = M.subject(rec, subject)
-  s.quiz_right = s.quiz_right + right
-  s.quiz_total = s.quiz_total + total
+  if exam then
+    s.exam_right = s.exam_right + right
+    s.exam_total = s.exam_total + total
+  else
+    s.quiz_right = s.quiz_right + right
+    s.quiz_total = s.quiz_total + total
+  end
   return M.save(uid, rec)
 end
 

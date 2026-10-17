@@ -212,10 +212,13 @@ static func record_bbcode(rec: Dictionary) -> String:
 	for id: String in subjects:
 		var s: Dictionary = subjects[id]
 		var def := SubjectRegistry.load_definition(id)
-		out.append("[b]%s[/b]\n   %s" % [TranslationServer.translate(def.display_name) if def != null else id,
+		var grade := SchoolGrades.grade(s)
+		var grade_text: String = TranslationServer.translate("JOURNAL_GRADE") % grade if grade > 0 else TranslationServer.translate("JOURNAL_NO_GRADE")
+		out.append("[b]%s[/b]  %s\n   %s" % [TranslationServer.translate(def.display_name) if def != null else id, grade_text,
 			TranslationServer.translate("JOURNAL_RECORD_LINE") % [int(s.get("attended", 0)), int(s.get("self_study", 0)),
 				int(s.get("quiz_right", 0)), int(s.get("quiz_total", 0)), int(s.get("practicals", 0))]
-			+ (("\n   " + TranslationServer.translate("JOURNAL_HOMEWORK_LINE") % [int(s.homework_count), float(s.homework_points) / float(s.homework_count)]) if int(s.get("homework_count", 0)) > 0 else "")])
+			+ (("\n   " + TranslationServer.translate("JOURNAL_HOMEWORK_LINE") % [int(s.homework_count), float(s.homework_points) / float(s.homework_count)]) if int(s.get("homework_count", 0)) > 0 else "")
+			+ (("\n   " + TranslationServer.translate("JOURNAL_EXAM_LINE") % [int(s.exam_right), int(s.exam_total)]) if int(s.get("exam_total", 0)) > 0 else "")])
 	return "\n".join(out)
 
 

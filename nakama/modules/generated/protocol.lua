@@ -55,6 +55,7 @@ return {
   OP_WALLET = 35,
   OP_WORLD_EVENT = 9,
   OP_WORLD_SNAPSHOT = 21,
+  RPC_ADMIN_ADVANCE_YEARS = "admin_advance_years",
   RPC_ADMIN_GRANT_COINS = "admin_grant_coins",
   RPC_ADMIN_RELOAD_TIMETABLE = "admin_reload_timetable",
   RPC_ADMIN_RESET_WORLD = "admin_reset_world",

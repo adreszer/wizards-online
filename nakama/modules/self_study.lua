@@ -104,6 +104,20 @@ function M.load()
   return out
 end
 
+-- An exam from a plan: the board says so, then every question of the plan, each with
+-- more time and no lecture between (the answers count as exam results).
+function M.exam_plan(plan)
+  local steps = { { board = { pl = "Egzamin. Proszę o ciszę.", en = "Exam. Silence, please." } },
+                  { say = { pl = "Egzamin się zaczyna. Odpowiadajcie samodzielnie.", en = "The exam begins. Answer on your own." } } }
+  for _, s in ipairs(plan.steps) do
+    if s.quiz ~= nil then
+      table.insert(steps, { quiz = s.quiz, choices = s.choices, correct = s.correct, seconds = 75 })
+    end
+  end
+  table.insert(steps, { say = { pl = "Koniec egzaminu. Wyniki trafią do dziennika.", en = "The exam is over. The results go into your record." } })
+  return { steps = steps }
+end
+
 -- Starts the plan on an (automated) lesson.
 function M.start(lesson, plan, now)
   lesson.auto = { plan = plan, step = 0, next_at = now }

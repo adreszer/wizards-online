@@ -89,6 +89,7 @@ func _run() -> void:
 	await _test_mastery()
 	_test_runes()
 	_test_journal()
+	_test_grades()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2469,6 +2470,16 @@ func _test_journal() -> void:
 	var spells := Journal.spells_bbcode(caster)
 	t.check(spells.contains(tr(ARCANE_PULSE.display_name)) and spells.contains(tr("MASTERY_ADEPT")) and spells.contains("→"), "the spellbook shows rank and rune (%s)" % spells.replace("\n", " | "))
 	caster.free()
+
+
+func _test_grades() -> void:
+	t.section("Grades")
+	t.check(SchoolGrades.grade({}) == 0, "no lessons, no grade")
+	var good := {"attended": 6, "quiz_right": 9, "quiz_total": 10, "practicals": 2, "homework_count": 2, "homework_points": 11, "exam_right": 5, "exam_total": 5}
+	var poor := {"attended": 1, "quiz_right": 0, "quiz_total": 6, "homework_count": 1, "homework_points": 1}
+	t.check(SchoolGrades.grade(good) >= 5 and SchoolGrades.grade(poor) <= 2, "a strong record grades high, a weak one low (%d, %d)" % [SchoolGrades.grade(good), SchoolGrades.grade(poor)])
+	t.check(SchoolGrades.grade({"attended": 3}) >= 1 and SchoolGrades.grade({"attended": 3}) <= 6, "missing parts are left out, not counted as zero")
+	t.check(Journal.record_bbcode({"subjects": {"sigilcraft": good}}).contains(tr("JOURNAL_GRADE") % SchoolGrades.grade(good)), "the journal shows the grade")
 
 
 func _test_timetable() -> void:
