@@ -260,7 +260,7 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(ok, "the student shows up in the classroom")
 	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.character_id == "apprentice_f" and int(remote.look.get("skin", 0)) == 3, 10.0)
 	t.check(ok, "B's new look reaches A (%s / %s)" % [str(remote.look) if is_instance_valid(remote) else "-", str(NetworkManager.get_players().get(b_sid_for_look(spawner), {}))])
-	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.gestures.current == &"raise_hand", 30.0)
+	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.gestures.current == &"raise_hand" and not panel.raised_hands_first(panel.students_present()).is_empty(), 30.0)
 	var queue: Array[Node] = panel.raised_hands_first(panel.students_present())
 	t.check(ok and not queue.is_empty() and queue[0] == remote, "the student's raised hand reaches the professor's lesson panel (%s, %d present)" % [str(remote.gestures.current) if is_instance_valid(remote) else "-", queue.size()])
 	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.house == 3, 10.0)
