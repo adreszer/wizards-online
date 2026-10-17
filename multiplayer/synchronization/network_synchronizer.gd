@@ -83,8 +83,8 @@ func _tick_local(delta: float) -> void:
 	var gestures: Gestures = player.gestures
 	if gestures.current != &"":
 		snapshot["e"] = String(gestures.current)
-		if gestures.is_sitting():
-			snapshot["h"] = snappedf(gestures.seat_height, 0.01)
+	if gestures.is_sitting():
+		snapshot["h"] = snappedf(gestures.seat_height, 0.01)
 	NetworkManager.send_player_state(snapshot)
 
 

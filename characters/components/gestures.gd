@@ -10,15 +10,20 @@ extends Node
 
 signal changed(gesture: StringName)
 
-## One-shot gestures and how long each plays (seconds).
+## One-shot gestures and how long each plays (seconds). Sitting is its own state
+## (`seated`), not a gesture; "eat" is held while seated at a feast during a meal.
 const ONE_SHOT := {&"wave": 2.4, &"bow": 1.8, &"clap": 2.6, &"point": 2.4, &"shrug": 1.6, &"cheer": 2.4}
 ## Held gestures: they last until cancelled.
-const HELD: Array[StringName] = [&"raise_hand", &"notes", &"sit"]
+const HELD: Array[StringName] = [&"raise_hand", &"notes", &"eat"]
+## Arm gestures that play while seated (on top of sitting).
+const SEATED_OK: Array[StringName] = [&"raise_hand", &"notes", &"eat", &"wave", &"point", &"clap", &"shrug", &"cheer"]
 ## Every gesture id, in the emote menu's order (sit is chosen at a seat, not here).
 const IDS: Array[StringName] = [&"raise_hand", &"wave", &"bow", &"clap", &"point", &"shrug", &"cheer", &"notes"]
 const BLEND_SPEED := 6.0
 
 var current: StringName = &""
+## Sitting on a seat (arm gestures can play on top).
+var seated := false
 ## Sitting: the seat surface above the feet (metres), and the seat (global transform:
 ## origin on the surface, -Z the way the sitter faces).
 var seat_height: float = 0.0
@@ -47,28 +52,30 @@ static func is_gesture(id: StringName) -> bool:
 
 
 func is_sitting() -> bool:
-	return current == &"sit"
+	return seated
 
 
-## Starts gesture `id` (a held one toggles off when it is already showing).
+## Starts gesture `id` (a held one toggles off when it is already showing). Seated,
+## only arm gestures play (on top of sitting); a bow stands up first.
 func play(id: StringName) -> bool:
 	if not is_gesture(id) or id == &"sit":
 		return false
 	if id == current and HELD.has(id):
-		stop()
+		_show(&"")
 		return true
-	if is_sitting() and id != &"raise_hand" and id != &"notes":
+	if seated and not SEATED_OK.has(id):
 		stand()
 	_show(id)
 	_left = float(ONE_SHOT.get(id, 0.0))
 	return true
 
 
+## Ends the gesture; seated with no gesture, stands up.
 func stop() -> void:
-	if is_sitting():
-		stand()
-	elif current != &"":
+	if current != &"":
 		_show(&"")
+	elif seated:
+		stand()
 
 
 ## Sits on `p_seat` (origin on the seat surface, facing its -Z): the body moves to the
@@ -94,12 +101,16 @@ func sit_at(p_seat: Transform3D) -> void:
 	var movement := body.get_node_or_null("Movement")
 	if movement != null:
 		movement.set_physics_process(false)
-	_show(&"sit")
+	seated = true
+	if not SEATED_OK.has(current):
+		current = &""
+	_restart()
 
 
 func stand() -> void:
-	if not is_sitting():
+	if not seated:
 		return
+	seated = false
 	var body := _player as CharacterBody3D
 	# Step off the seat toward where the sitter faced.
 	body.global_position += -seat.basis.z * 0.55 + Vector3.UP * 0.05
@@ -109,21 +120,28 @@ func stand() -> void:
 		if movement != null:
 			movement.set("facing_yaw", body.rotation.y)
 			movement.set_physics_process(true)
-	_show(&"")
+	if current == &"eat":
+		current = &""
+	_restart()
 
 
-## Remote players: the gesture and seat height from their latest snapshot.
+## Remote players: the gesture and seat height (0 = standing) from their latest snapshot.
 func set_remote(id: StringName, height: float) -> void:
+	var clean: StringName = id if is_gesture(id) and id != &"sit" else &""
+	var now_seated := height > 0.0
 	seat_height = height
-	if id != current:
-		current = id if is_gesture(id) else &""
-		if pose != null:
-			pose.elapsed = 0.0
-		changed.emit(current)
+	if clean != current or now_seated != seated:
+		current = clean
+		seated = now_seated
+		_restart()
 
 
 func _show(id: StringName) -> void:
 	current = id
+	_restart()
+
+
+func _restart() -> void:
 	if pose != null:
 		pose.elapsed = 0.0
 	changed.emit(current)
@@ -136,11 +154,13 @@ func _process(delta: float) -> void:
 			_show(&"")
 	if pose == null:
 		return
-	if current != &"":
+	var showing := current != &"" or seated
+	if showing:
 		pose.gesture = current
+		pose.seated = seated
 		pose.seat_world_y = _player.global_position.y + seat_height
-	var target := 1.0 if current != &"" else 0.0
-	pose.influence = move_toward(pose.influence, target, delta * BLEND_SPEED)
+	pose.influence = move_toward(pose.influence, 1.0 if showing else 0.0, delta * BLEND_SPEED)
 	pose.active = pose.influence > 0.0
 	if pose.influence <= 0.0:
 		pose.gesture = &""
+		pose.seated = false

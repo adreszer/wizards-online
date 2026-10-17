@@ -545,3 +545,7 @@ ROBE_BLACK,Black,Czerń
 ROBE_BROWN,Brown,Brąz
 ROBE_NAVY,Navy,Granat
 ROBE_MOSS,Moss,Mech
+MEAL_BREAKFAST,Breakfast,Śniadanie
+MEAL_LUNCH,Lunch,Obiad
+MEAL_DINNER,Dinner,Kolacja
+MEAL_SERVED,%s is served in the great hall.,%s na stołach w wielkiej sali.

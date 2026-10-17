@@ -33,6 +33,9 @@ func _ready() -> void:
 	var boards := ClassroomBoards.new()
 	boards.name = "ClassroomBoards"
 	add_child(boards)
+	var meals := FeastMeals.new()
+	meals.name = "FeastMeals"
+	add_child(meals)
 	for wall in get_tree().get_nodes_in_group("secret_walls"):
 		if wall is SecretWall:
 			(wall as SecretWall).revealed.connect(func() -> void: GameEvents.notification_requested.emit(tr("NOTIFY_SECRET_PASSAGE"), 4.0))

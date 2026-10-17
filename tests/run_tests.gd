@@ -85,6 +85,7 @@ func _run() -> void:
 	await _test_practicals()
 	_test_self_study()
 	await _test_character_look()
+	await _test_meals()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2178,7 +2179,11 @@ func _test_gestures() -> void:
 	var seat_h := p.gestures.seat_height
 	t.check(seat_h > 0.3 and seat_h < 0.8, "the seat height is measured from the floor (%.2f m)" % seat_h)
 	await _wait(0.5)
-	t.check(p.gestures.pose != null and p.gestures.pose.influence > 0.9 and p.gestures.pose.gesture == &"sit", "the sitting pose blends in")
+	t.check(p.gestures.pose != null and p.gestures.pose.influence > 0.9 and p.gestures.pose.seated, "the sitting pose blends in")
+	p.gestures.play(&"raise_hand")
+	t.check(p.gestures.is_sitting() and p.gestures.current == &"raise_hand", "a seated student raises a hand without standing up")
+	p.gestures.play(&"raise_hand")
+	t.check(p.gestures.is_sitting() and p.gestures.current == &"", "and lowers it, still seated")
 	p.gestures.stand()
 	t.check(not p.gestures.is_sitting() and p.collision_mask == Player.LAYER_WORLD and p.movement.is_physics_processing(), "standing up restores collision and movement")
 	castle.queue_free()
@@ -2338,6 +2343,42 @@ func _test_character_look() -> void:
 			and (mats[0] as ShaderMaterial).get_shader_parameter("house_color") == CharacterProfile.house_color(3), "sorting puts the house colour on the trim")
 	var profile := CharacterProfile.sanitize({"appearance": {"body": "apprentice_f", "skin": 1, "set": true}})
 	t.check(profile.appearance.body == "apprentice_f" and profile.appearance.set, "the server profile carries the look")
+
+
+func _test_meals() -> void:
+	t.section("Meals")
+	t.check(FeastMeals.meal_at(7.5) == "MEAL_BREAKFAST" and FeastMeals.meal_at(12.2) == "MEAL_LUNCH" and FeastMeals.meal_at(19.0) == "MEAL_DINNER"
+		and FeastMeals.meal_at(10.0) == "" and FeastMeals.meal_at(23.0) == "", "breakfast, lunch and dinner by the school clock")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var meals := castle.get_node_or_null("FeastMeals") as FeastMeals
+	var cycle := castle.get_node("DayNightCycle") as DayNightCycle
+	t.check(meals != null and meals.tables.size() >= 8, "the feast tables are known (%d)" % (meals.tables.size() if meals else 0))
+	if meals == null or meals.tables.is_empty():
+		castle.queue_free()
+		return
+	cycle.time_override = 15.0
+	cycle.refresh()
+	meals.update(true)
+	var dishes := meals.get_children().filter(func(n: Node) -> bool: return n is MultiMeshInstance3D)
+	t.check(meals.serving == "" and dishes.all(func(d: Node) -> bool: return not (d as Node3D).visible), "between meals the tables are bare")
+	var p := await _spawn_player(Vector3(0, 1, 0), "apprentice_m")
+	p.global_position = meals.tables[0] * Vector3(0.5, 0.05, -1.6)
+	await _wait(0.3)
+	t.check(p.try_sit() and meals.near_table(p.global_position), "a student sits at a feast bench")
+	cycle.time_override = 18.7
+	cycle.refresh()
+	meals.update(false)
+	t.check(meals.serving == "MEAL_DINNER" and dishes.all(func(d: Node) -> bool: return (d as Node3D).visible), "dinner appears on the tables")
+	t.check(p.gestures.current == &"eat" and p.gestures.is_sitting(), "and the seated student eats")
+	cycle.time_override = 21.0
+	cycle.refresh()
+	meals.update(false)
+	t.check(p.gestures.current == &"" and p.gestures.is_sitting(), "after dinner the plates go and the student stops eating")
+	p.gestures.stand()
+	cycle.time_override = NAN
+	castle.queue_free()
 
 
 func _test_timetable() -> void:

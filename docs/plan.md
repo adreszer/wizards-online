@@ -401,6 +401,13 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: clamping, body swap, shader parameters, house trim, profile; two clients: a look is stored and reaches the other player. `tools/capture_looks.tscn` renders every house, tone and robe
 - [ ] Faces and hairstyles need more character models (asset-drop workflow); a crest on the robe (Term C1)
 
+### Milestone 43 — Meals in the great hall
+- [x] `FeastMeals` (added by `castle.gd`): breakfast 7:00–8:30, lunch 12:00–13:30, dinner 18:30–20:00 on the school clock (no server traffic, every client agrees); plates, food, goblets, platters, roasts, bread and fruit appear on every feast table (MultiMeshes over the positions `StaticBatch` records), "Dinner is served" notification
+- [x] Anyone seated at a feast bench during a meal eats (the held "eat" arm gesture, synced like any gesture)
+- [x] Sitting became its own state in `Gestures` (`seated`): arm gestures (raise a hand, notes, eat, wave, point, clap, shrug, cheer) play on top of sitting; before, raising a hand while seated left the body stuck on the bench
+- [x] Tests: meal hours, bare and laid tables, eating while seated, raising a hand while seated; `tools/capture_meal.tscn`
+- [ ] Real food and tableware models (asset-drop workflow); feasts as ceremonies (Term C5, section 3)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
