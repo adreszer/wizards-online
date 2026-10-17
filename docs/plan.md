@@ -361,7 +361,9 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Grounds music: by day on open terrain (zone kind `grounds`: estate, lake, forest edge, village, station…) the `grounds` track, walled courtyards keep the castle track, night is the night track everywhere; the switch waits until the player has been in or out for 3 s and crossfades over 4 s; every track resumes where it was left
 - [x] Lesson music: inside a classroom where a lesson runs (`NetworkManager.get_lessons()`, self-study included), at any hour, the `lesson` track, after the same 3 s delay; back to the clock's track when the lesson ends
 - [x] Feast, duel and mystery tracks processed and preloaded; `MusicDirector.event_track` lets those features cue their track over the clock and the area (starts from the top, 4 s crossfade) and clear it again
-- [ ] Set `event_track` from the feast schedule, duelling club and mystery discovery once those exist; music volume slider in settings; stingers (sorting, house cup)
+- [x] Flying music: while the local player rides a broom (`PlayerMovement.is_flying`), at any hour, the `flying` track after the same 3 s delay (a short hop changes nothing); a lesson still wins
+- [x] One-shot tracks: `sorting` (ceremony, 1:59) and `house_cup` (fanfare, 0:29) play once as an `event_track`, trailing silence trimmed, and clear themselves when they end so the clock's music returns; the whole music list is now in the game
+- [ ] Set `event_track` from the feast schedule, duelling club, mystery discovery, sorting ceremony and house cup award once those exist; music volume slider in settings
 - [ ] Sound effects, ambiences per area, footsteps per surface, reverb per area (the rest of the list)
 
 ### Milestone 39 — Proximity chat, direct messages, speech bubbles

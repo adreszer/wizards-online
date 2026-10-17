@@ -2004,7 +2004,7 @@ func _test_day_night() -> void:
 	if music != null and cycle != null:
 		for track: StringName in MusicDirector.TRACKS:
 			var stream := MusicDirector.TRACKS[track] as AudioStream
-			t.check(stream != null and stream.get_length() > MusicDirector.LOOP_FADE * 4.0, "%s music is long enough to loop (%.0f s)" % [track, stream.get_length()])
+			t.check(stream != null and stream.get_length() > MusicDirector.LOOP_FADE * 4.0, "%s music is long enough to %s (%.0f s)" % [track, "play out" if MusicDirector.ONE_SHOT.has(track) else "loop", stream.get_length()])
 		cycle.time_override = 12.0
 		cycle.refresh()
 		music.update()
@@ -2065,6 +2065,38 @@ func _test_day_night() -> void:
 		music.event_track = &""
 		music.update(0.25)
 		t.check(music.current == &"night", "clearing the event goes back to the clock's music")
+		# On a broom: the flying music at any hour, after the same delay.
+		t.check(MusicDirector.track_for(SchoolClock.Phase.DAY, true, false, true) == &"flying"
+			and MusicDirector.track_for(SchoolClock.Phase.NIGHT, false, false, true) == &"flying", "a broom plays the flying music at any hour")
+		var saved_movement := music.movement
+		var rider := PlayerMovement.new()
+		music.movement = rider
+		rider.is_flying = true
+		music.update(1.0)
+		t.check(music.current == &"night", "a short hop on the broom does not change the music")
+		music.update(MusicDirector.OUTDOOR_DELAY)
+		t.check(music.current == &"flying" and music.flying, "staying on the broom plays the flying music")
+		rider.is_flying = false
+		music.update(MusicDirector.OUTDOOR_DELAY)
+		t.check(music.current == &"night" and not music.flying, "landing goes back to the clock's music")
+		music.movement = saved_movement
+		rider.free()
+		# One-shot tracks (ceremony, fanfare) play once and hand back to the clock.
+		t.check(MusicDirector.ONE_SHOT.has(&"sorting") and MusicDirector.ONE_SHOT.has(&"house_cup"), "the sorting and house cup music play once")
+		music.event_track = &"house_cup"
+		music.update(0.25)
+		var cup_player: AudioStreamPlayer = null
+		for child in music.find_children("*", "AudioStreamPlayer", false, false):
+			if (child as AudioStreamPlayer).stream == MusicDirector.TRACKS[&"house_cup"]:
+				cup_player = child
+		t.check(music.current == &"house_cup" and cup_player != null, "the house cup fanfare plays")
+		if cup_player != null:
+			cup_player.seek(cup_player.stream.get_length() - 0.1)
+			await _wait(0.05)
+		music.update(0.25)
+		t.check(music.event_track.is_empty(), "the fanfare clears itself when it ends, it does not loop")
+		music.update(0.25)
+		t.check(music.current == &"night", "after the fanfare the clock's music returns")
 		music.lessons_override = null
 		room.free()
 		music.tracker = saved_tracker

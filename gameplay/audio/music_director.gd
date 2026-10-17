@@ -4,13 +4,15 @@ extends Node
 ## by day the castle track indoors and the grounds track out on open terrain
 ## (zone kind `grounds`: estate, lake, village…; walled courtyards count as the
 ## castle), the night track everywhere from dusk, and the lesson track inside a
-## classroom while a lesson runs there (any hour). A change crossfades to the other
+## classroom while a lesson runs there (any hour), the flying track while the
+## local player rides a broom (any hour). A change crossfades to the other
 ## track, which resumes where it was left, and each track loops by crossfading its
 ## own end into its start, so the files need no exact loop points. Plays on the
 ## Music bus (default_bus_layout.tres), not positional. Added by castle.gd next
 ## to the DayNightCycle it listens to.
 ## Feasts, duels and mysteries set `event_track`, which wins over the clock and the
-## area until they clear it.
+## area until they clear it. ONE_SHOT tracks (the sorting ceremony, the house cup
+## fanfare) play once and clear `event_track` themselves when they end.
 ## With `fixed_track` set it plays only that track: the game root uses one for
 ## the main theme behind the menu (core/game.gd), stopped when the world loads.
 
@@ -23,7 +25,12 @@ const TRACKS := {
 	&"feast": preload("res://assets/audio/music/music_feast.mp3"),
 	&"duel": preload("res://assets/audio/music/music_duel.mp3"),
 	&"mystery": preload("res://assets/audio/music/music_mystery.mp3"),
+	&"flying": preload("res://assets/audio/music/music_flying.mp3"),
+	&"sorting": preload("res://assets/audio/music/music_sorting.mp3"),
+	&"house_cup": preload("res://assets/audio/music/music_house_cup.mp3"),
 }
+## Tracks with a real ending: they play once instead of looping.
+const ONE_SHOT: Array[StringName] = [&"sorting", &"house_cup"]
 ## Seconds of overlap when a track loops back to its start.
 const LOOP_FADE := 6.0
 ## Tracks that end on their own (a fade to silence) and need only this much overlap.
@@ -33,7 +40,7 @@ const SWITCH_FADE := 8.0
 ## Seconds of overlap when the area or an event changes the track (castle, grounds,
 ## lesson, feast…); the day/night switch uses SWITCH_FADE.
 const AREA_FADE := 4.0
-## Seconds the player must stay in or out (of the grounds, of a lesson) before the
+## Seconds the player must stay in or out (of the grounds, of a lesson, on a broom) before the
 ## music follows (doorways, gaps between zones).
 const OUTDOOR_DELAY := 3.0
 ## Area kinds that play the grounds music by day.
@@ -57,12 +64,16 @@ var lessons_override: Variant = null
 var cycle: DayNightCycle
 ## The local player's area, set when the local player spawns.
 var tracker: AreaTracker
+## The local player's movement (is_flying), set when the local player spawns.
+var movement: PlayerMovement
 ## The track playing now (&"day", &"night", &"grounds"…), empty before the first update.
 var current: StringName = &""
 ## Whether the music treats the player as outdoors (follows the area after OUTDOOR_DELAY).
 var outdoors := false
 ## Whether the music treats the player as inside a running lesson.
 var in_lesson := false
+## Whether the music treats the player as flying.
+var flying := false
 
 var _players: Array[AudioStreamPlayer] = []
 var _active := 0
@@ -81,8 +92,12 @@ func _ready() -> void:
 		p.volume_db = -80.0
 		add_child(p)
 		_players.append(p)
-	GameEvents.local_player_spawned.connect(func(player: Node) -> void: tracker = player.get("area_tracker"))
-	GameEvents.local_player_removed.connect(func(_p: Node) -> void: tracker = null)
+	GameEvents.local_player_spawned.connect(func(player: Node) -> void:
+		tracker = player.get("area_tracker")
+		movement = player.get("movement"))
+	GameEvents.local_player_removed.connect(func(_p: Node) -> void:
+		tracker = null
+		movement = null)
 	update()
 
 
@@ -94,10 +109,12 @@ func _process(delta: float) -> void:
 	update(interval)
 
 
-## The track for a phase of the school day, indoors or out, in a lesson or not.
-static func track_for(phase: SchoolClock.Phase, outside := false, lesson := false) -> StringName:
+## The track for a phase of the school day, indoors or out, in a lesson, on a broom.
+static func track_for(phase: SchoolClock.Phase, outside := false, lesson := false, on_broom := false) -> StringName:
 	if lesson:
 		return &"lesson"
+	if on_broom:
+		return &"flying"
 	if phase == SchoolClock.Phase.DAWN or phase == SchoolClock.Phase.DAY:
 		return &"grounds" if outside else &"day"
 	return &"night"
@@ -110,7 +127,7 @@ func update(dt := 0.0) -> void:
 	if want.is_empty():
 		_follow_area(dt)
 		var phase := cycle.phase if cycle != null else SchoolClock.phase_of(NetworkManager.school_hours())
-		want = event_track if not event_track.is_empty() else track_for(phase, outdoors, in_lesson)
+		want = event_track if not event_track.is_empty() else track_for(phase, outdoors, in_lesson, flying)
 	if want != current:
 		var fade := AREA_FADE
 		if current.is_empty():
@@ -120,6 +137,11 @@ func update(dt := 0.0) -> void:
 		_play(want, fade, fixed_track.is_empty() and want != event_track)
 		return
 	var p := _players[_active]
+	if ONE_SHOT.has(current):
+		if not p.playing or p.get_playback_position() >= p.stream.get_length() - 0.25:
+			if event_track == current:
+				event_track = &""
+		return
 	var overlap := float(LOOP_FADE_BY_TRACK.get(current, LOOP_FADE))
 	if p.playing and p.stream != null and p.get_playback_position() >= p.stream.get_length() - overlap:
 		_play(current, overlap)
@@ -131,13 +153,15 @@ func _follow_area(dt: float) -> void:
 	if tracker != null and tracker.current_zone != null:
 		var lessons: Dictionary = lessons_override if lessons_override != null else NetworkManager.get_lessons()
 		lesson_here = lessons.has(str(tracker.current_area_id()))
-	if out_here == outdoors and lesson_here == in_lesson:
+	var flying_here := movement != null and movement.is_flying
+	if out_here == outdoors and lesson_here == in_lesson and flying_here == flying:
 		_outdoor_for = 0.0
 		return
 	_outdoor_for += dt
 	if _outdoor_for >= OUTDOOR_DELAY or current.is_empty():
 		outdoors = out_here
 		in_lesson = lesson_here
+		flying = flying_here
 		_outdoor_for = 0.0
 
 
