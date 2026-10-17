@@ -4,9 +4,11 @@ extends StaticBody3D
 ## Newel stair for a square stair turret: wedge steps wind around a central
 ## column and reach out to the turret's walls (no gaps to fall through in the
 ## corners). Origin is the column's foot at floor level. Each turn climbs
-## [member rise_per_turn] (one storey) in [member steps_per_turn] steps, so
-## every storey's doorway sits at the same angle: the last step of each turn
-## ends at [member start_angle_degrees], level with that storey's floor.
+## [member rise_per_turn] (one storey) over [member steps_per_turn] sectors, so
+## every storey's doorway sits at the same angle: the last [member landing_steps]
+## sectors of each turn are one level landing in front of that storey's doorway
+## (no doorway opens straight onto a step), and the first step up starts at
+## [member start_angle_degrees].
 ## Angles are measured in the XZ plane from +X toward +Z. Children are generated
 ## and never saved; tools/castle (circulation.py) computes the same geometry.
 
@@ -21,6 +23,11 @@ extends StaticBody3D
 @export var steps_per_turn: int = 25:
 	set(value):
 		steps_per_turn = maxi(4, value)
+		_rebuild()
+## Sectors of each turn spent on the level landing before the doorway (0: none).
+@export var landing_steps: int = 0:
+	set(value):
+		landing_steps = maxi(0, value)
 		_rebuild()
 ## Half the inner width of the square turret: steps reach out to this square.
 @export var half_size: float = 3.8:
@@ -67,14 +74,25 @@ func step_count() -> int:
 	return int(round(turns * steps_per_turn))
 
 
+func rising_steps() -> int:
+	return maxi(1, steps_per_turn - landing_steps)
+
+
 func riser() -> float:
-	return rise_per_turn / steps_per_turn
+	return rise_per_turn / rising_steps()
 
 
-## Height of the tread under angle `angle` (radians, same convention as the steps) on the
-## n-th turn counted from the bottom; used by tests to walk the stair.
+## Top of sector `step_index` counted from the first step up (landings included); used by
+## tests to walk the stair.
 func tread_height_at(step_index: int) -> float:
-	return (step_index + 1) * riser()
+	var turn := floori(float(step_index) / steps_per_turn)
+	var k := step_index % steps_per_turn
+	return turn * rise_per_turn + minf(k + 1, rising_steps()) * riser()
+
+
+## The angle (radians) in the middle of the doorway landings.
+func landing_angle() -> float:
+	return deg_to_rad(start_angle_degrees) - landing_steps * TAU / steps_per_turn / 2.0
 
 
 func _ray_to_square(angle: float) -> Vector2:
@@ -108,28 +126,22 @@ func _rebuild() -> void:
 			remove_child(child)
 			child.queue_free()
 	var n := step_count()
-	var h := riser()
 	var da := TAU / steps_per_turn
 	var a_start := deg_to_rad(start_angle_degrees)
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for i in range(n):
+		var k := i % steps_per_turn
+		if k > rising_steps():
+			continue   # drawn as one piece with the landing's first sector
 		var a0 := a_start + i * da
-		var outline := _step_outline(a0, a0 + da)
-		var top := (i + 1) * h
-		var bottom := maxf(0.0, top - slab_thickness)
-		var points := PackedVector3Array()
-		for p in outline:
-			points.append(Vector3(p.x, top, p.y))
-		for p in outline:
-			points.append(Vector3(p.x, bottom, p.y))
-		_add_prism(st, outline, top, bottom)
-		var shape := CollisionShape3D.new()
-		var convex := ConvexPolygonShape3D.new()
-		convex.points = points
-		shape.shape = convex
-		shape.set_meta("stair_generated", true)
-		add_child(shape)
+		var a1 := a0 + da * (landing_steps if k == rising_steps() else 1)
+		var outline := _step_outline(a0, a1)
+		if k == rising_steps() and landing_steps * da > PI / 2.0:
+			# A landing wider than a quarter turn: split so each outline stays convex.
+			_add_tread(st, _step_outline(a0, (a0 + a1) / 2.0), tread_height_at(i))
+			outline = _step_outline((a0 + a1) / 2.0, a1)
+		_add_tread(st, outline, tread_height_at(i))
 	st.generate_normals()
 	var mesh := MeshInstance3D.new()
 	mesh.mesh = st.commit()
@@ -159,6 +171,22 @@ func _rebuild() -> void:
 	if lanterns:
 		for k in range(int(ceil(turns))):
 			_add_lantern(k * rise_per_turn + rise_per_turn * 0.55, a_start + PI + k * 0.0)
+
+
+func _add_tread(st: SurfaceTool, outline: PackedVector2Array, top: float) -> void:
+	var bottom := maxf(0.0, top - slab_thickness)
+	var points := PackedVector3Array()
+	for p in outline:
+		points.append(Vector3(p.x, top, p.y))
+	for p in outline:
+		points.append(Vector3(p.x, bottom, p.y))
+	_add_prism(st, outline, top, bottom)
+	var shape := CollisionShape3D.new()
+	var convex := ConvexPolygonShape3D.new()
+	convex.points = points
+	shape.shape = convex
+	shape.set_meta("stair_generated", true)
+	add_child(shape)
 
 
 func _add_lantern(height: float, angle: float) -> void:

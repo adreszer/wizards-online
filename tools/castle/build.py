@@ -296,7 +296,8 @@ def emit_stairs():
         if st.get("kind") == "spiral":
             inst(uname(f"Spiral_{st['lo']}"), K("spiral_staircase"), (st["x"], st["y0"], st["z"]), parent="Stairs",
                  props={"turns": f"{st['turns']:.3f}", "rise_per_turn": f"{st['rise_per_turn']:.3f}",
-                        "steps_per_turn": str(st["steps_per_turn"]), "half_size": f"{st['half']:.3f}",
+                        "steps_per_turn": str(st["steps_per_turn"]), "landing_steps": str(st["landing_steps"]),
+                        "half_size": f"{st['half']:.3f}",
                         "start_angle_degrees": f"{st['start_angle']:.3f}"})
             continue
         inst(uname(f"Stairs_{st['lo']}"), K("staircase"), (st["x"], st["y0"], st["z"]),

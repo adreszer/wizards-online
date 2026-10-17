@@ -93,6 +93,7 @@ The current stairs break rule S1: tower flights start 0.2 m from the south wall,
 - **S7 Fall protection.** Every walkable edge with a drop over 1.2 m gets a railing or parapet. The only exceptions are volumes tagged `jump_route` or `drop_ok` (set pieces, section 4). Open sides of flights get balustrades.
 - **S8 Where stairs may be.** Flights only in stair halls, corridors, towers, halls and house landings. Never in classrooms, the library reading floor, the great hall floor or dormitories.
 - **S9 Two ways up.** Every public storey is reachable from the entrance by at least **two independent stair routes**, so one closed or shifting stair never cuts off part of the school.
+- **S10 A level landing at every doorway.** No doorway opens straight onto a step. The 2.5 m in front of a doorway (both sides) is never on a straight flight's treads, unless the flight passes far above or below. In a stair turret, each turn of the spiral ends with a level landing of 60 degrees, centred on the doorway and wider than it seen from the newel (30 sectors per turn, 5 of them landing, risers 0.36 m), so you step out of the door onto flat stone and the first step up or down is past the landing.
 
 ### 3.3 Circulation and rooms
 
@@ -202,7 +203,7 @@ Each milestone ships green (`tools/check.sh`), is pushed, and leaves the game pl
 - **Done when:** the castle scene regenerates byte-identical and the preview renders all storeys.
 
 ### Milestone 25 — Stairs and circulation rules (fixes the castle as it is)
-- Rules S1–S9, C1–C10 and A1/A3 implemented, and the current castle **fixed** to pass them:
+- Rules S1–S10, C1–C10 and A1/A3 implemented, and the current castle **fixed** to pass them:
   - Grand staircase: the first flight starts 4 m clear of the south wall (run 11.5 m, tread 0.46 m) with the landings re-cut.
   - Towers: the new `SpiralStaircase` module replaces the straight flights.
   - Doors and windows are moved off walls behind flights.

@@ -7,7 +7,8 @@ derive(plan) fills, for every straight flight:
   hole / pad  the cut in the floor above (and the room's ceiling) and the slab that
               carries the player from the top step to the hole's far edge
   open_sides  local z signs (+1 / -1) of the flight's sides that are not against a wall
-and for every spiral (stair turret): its centre, half size, turns and start angle.
+and for every spiral (stair turret): its centre, half size, turns, start angle and the
+level landing in front of its doorways (rule S10).
 
 It also collects plan.railings (balustrades on open flight sides, parapets on landing
 and hole edges: rule S7), plan.pads (extra walkable slabs) and plan.keepout (rects where
@@ -26,7 +27,9 @@ FLOOR_THICK = 0.5       # bottom of a floor slab below its top (upper storeys)
 LANDING_THICK = 1.0
 RAIL_HEIGHT = 1.0
 RAIL_T = 0.25
-SPIRAL_STEPS = 25       # per storey
+SPIRAL_STEPS = 30       # sectors per storey: a level landing in front of the doorway, then the steps
+SPIRAL_LANDING = 5      # sectors of that landing (60 degrees: wider than a doorway seen from the newel)
+SPIRAL_WALK_LINE = 2.3  # where S4 measures a spiral's treads (m from the centre)
 SPIRAL_COLUMN = 0.5
 
 
@@ -252,7 +255,10 @@ def derive_spiral(plan, st):
     dx, dz = (off + 2 - cx, coord - cz) if axis == "x" else (coord - cx, off + 2 - cz)
     door_angle = math.atan2(dz, dx)
     da = 2 * math.pi / SPIRAL_STEPS
-    st["start_angle"] = math.degrees(door_angle + da / 2)
+    # Every turn starts with a level landing centred on the doorway; the first step up is
+    # past it (rule S10: no doorway opens straight onto a step).
+    st["landing_steps"] = SPIRAL_LANDING
+    st["start_angle"] = math.degrees(door_angle + SPIRAL_LANDING * da / 2)
     st["door_angle"] = math.degrees(door_angle)
     st["door_storeys"] = sorted(k[3] for k, _v in doors)
     st["footprint"] = R.rect
@@ -262,8 +268,16 @@ def derive_spiral(plan, st):
     plan.keepout.append((R.rect, R.y, R.ceiling_y))
 
 
+def spiral_riser(st):
+    return st["rise_per_turn"] / (st["steps_per_turn"] - st.get("landing_steps", 0))
+
+
 def spiral_tread(st, angle_deg, turn_floor):
-    """Tread top under the angle on the turn that starts at storey offset turn_floor."""
+    """Tread top under the angle on the turn that starts at storey offset turn_floor (the
+    landing sectors before start_angle stay level with the storey)."""
     rel = (math.radians(angle_deg) - math.radians(st["start_angle"])) % (2 * math.pi)
     i = int(rel / (2 * math.pi / st["steps_per_turn"]))
-    return st["y0"] + turn_floor * STOREY + (i + 1) * STOREY / st["steps_per_turn"]
+    rising = st["steps_per_turn"] - st.get("landing_steps", 0)
+    if i >= rising:
+        return st["y0"] + (turn_floor + 1) * STOREY
+    return st["y0"] + turn_floor * STOREY + (i + 1) * spiral_riser(st)

@@ -45,6 +45,15 @@ class CastleGeneratorTest(unittest.TestCase):
         data["rooms"].append({"id": "island", "rect": [200, 216, 200, 216], "kind": "room"})
         self.assertIn("C1", {v.rule for v in rules.validate(main.plan_from_data(data))})
 
+    def test_doorway_onto_a_spiral_step_is_refused(self):
+        old = circulation.SPIRAL_LANDING, circulation.SPIRAL_STEPS
+        circulation.SPIRAL_LANDING, circulation.SPIRAL_STEPS = 0, 25
+        try:
+            ids = {v.rule for v in rules.validate(self.plan())}
+        finally:
+            circulation.SPIRAL_LANDING, circulation.SPIRAL_STEPS = old
+        self.assertIn("S10", ids)
+
     def test_off_grid_room_is_a_plan_error(self):
         data = copy.deepcopy(self.data)
         data["rooms"].append({"id": "odd", "rect": [1, 9, 0, 8]})

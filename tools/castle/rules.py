@@ -325,6 +325,14 @@ def tread_comfort(plan):
             yield stair_name(st), f"riser {st['rise'] / n:.2f} m"
         if st["run"] / n < _c.MIN_TREAD - 1e-6:
             yield stair_name(st), f"tread {st['run'] / n:.2f} m (run {st['run']} m for {n} steps; use a switchback or a spiral)"
+    for st in plan.stairs:
+        if st.get("kind") != "spiral":
+            continue
+        if _c.spiral_riser(st) > _c.MAX_RISER + 1e-6:
+            yield st["lo"], f"spiral riser {_c.spiral_riser(st):.2f} m"
+        tread = 2 * _math.pi * _c.SPIRAL_WALK_LINE / st["steps_per_turn"]
+        if tread < _c.MIN_TREAD - 1e-6:
+            yield st["lo"], f"spiral tread {tread:.2f} m on the walking line"
 
 
 @rule("S5", "towers and small rooms climb by spiral stairs in a stair turret")
@@ -424,6 +432,41 @@ def two_routes(plan):
         for r in _main_rooms(plan):
             if r.storey != 0 and r.id not in seen and not waived(plan, "S9", r.id):
                 yield r.id, f"cut off when the flight {a[0]}@{a[1]}->{b[0]}@{b[1]} is closed"
+
+
+DOOR_STEP_CLEAR = 2.5
+
+
+@rule("S10", "no doorway opens straight onto a step: a level landing in front of every doorway")
+def doors_clear_of_steps(plan):
+    for (axis, coord, off, s), (a, b, _n) in plan.door_rooms.items():
+        floor = s * _STOREY
+        for sign in (-1, 1):
+            d0, d1 = sorted((coord, coord + sign * DOOR_STEP_CLEAR))
+            thr = (off, off + 4, d0, d1) if axis == "x" else (d0, d1, off, off + 4)
+            for st in flights(plan):
+                if not _rect_overlap(thr, st["footprint"]):
+                    continue
+                for k in range(41):
+                    lx = st["run"] * k / 40
+                    if not _rect_overlap(_c.flight_rect(st, max(0, lx - 0.2), min(st["run"], lx + 0.2)), thr):
+                        continue
+                    h = st["y0"] + _c.tread_height(st, lx)
+                    if floor - 3.5 < h < floor + _c.HEADROOM and abs(h - floor) > 0.05:
+                        yield f"{a}/{b}", f"doorway on storey {s} at {off} opens onto the flight {stair_name(st)}"
+                        break
+        for st in plan.stairs:
+            if st.get("kind") != "spiral" or st["lo"] not in (a, b):
+                continue
+            # The doorway's jambs, seen from the newel, must fall inside the landing.
+            half = _math.radians(st["landing_steps"] * 360.0 / st["steps_per_turn"] / 2)
+            mid = _math.radians(st["start_angle"]) - half
+            for e in (off, off + 4):
+                dx, dz = (e - st["x"], coord - st["z"]) if axis == "x" else (coord - st["x"], e - st["z"])
+                rel = (_math.atan2(dz, dx) - mid + _math.pi) % (2 * _math.pi) - _math.pi
+                if abs(rel) > half + 1e-6:
+                    yield st["lo"], f"doorway on storey {s} reaches past the spiral's landing ({_math.degrees(abs(rel)):.0f} > {_math.degrees(half):.0f} deg)"
+                    break
 
 
 # --------------------------------------------------------------------------- circulation and rooms

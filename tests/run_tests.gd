@@ -1504,7 +1504,9 @@ func _test_castle() -> void:
 	t.check(spiral != null, "the southwest tower has a spiral stair turret")
 	if spiral != null:
 		var centre := spiral.global_position
-		var door_angle := deg_to_rad(spiral.start_angle_degrees) - TAU / spiral.steps_per_turn
+		var door_angle := spiral.landing_angle()
+		t.check(spiral.landing_steps > 0 and spiral.riser() <= 0.36 + 1e-4,
+			"the turret's spiral has a level landing at its doorways (%d sectors, riser %.2f)" % [spiral.landing_steps, spiral.riser()])
 		await _spawn_player(centre + Vector3(cos(door_angle), 0, sin(door_angle)) * 2.3 + Vector3(0, 0.3, 0))
 		for i in range(int(14.0 * Engine.physics_ticks_per_second)):
 			var rel := player.global_position - centre
