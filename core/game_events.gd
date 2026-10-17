@@ -54,3 +54,6 @@ signal school_bell_rang(event: String, entry: Dictionary)
 
 ## Something asked for the character creator (first join, /look).
 signal character_creator_requested()
+
+## Someone opened a book: its title key and page keys (BookPanel shows it).
+signal book_requested(title_key: String, page_keys: PackedStringArray)

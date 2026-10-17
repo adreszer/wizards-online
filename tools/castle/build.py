@@ -813,6 +813,7 @@ KINDS = {
     "house_tally": ("res://objects/school/house_tally.tscn", "Props", False),
     "item_rack": ("res://objects/interactables/broom_rack.tscn", "Props", True),
     "notice_board": ("res://objects/school/notice_board.tscn", "Props", False),
+    "lore_book": ("res://objects/interactables/lore_book.tscn", "Props", True),
 }
 PLAQUE_HEIGHT = 1.6
 NOTICE_BOARD_HEIGHT = 1.9   # centre of the 1.55 m board (its origin) above the floor
@@ -929,6 +930,8 @@ def emit_placements(path):
                 props["spell"] = f'ExtResource("{spell_ext}")'
             if e["kind"] == "plaque":
                 props["text"] = f'"{e["text"]}"'
+            if e["kind"] == "lore_book":
+                props["book"] = f'"{e["book"]}"'
             for prop, value in e.get("set", {}).items():
                 props[prop] = godot_literal(value)
             if world:

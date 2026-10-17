@@ -435,6 +435,12 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: grade formula, journal grade; two clients: the advancement dry run
 - [ ] Owner: when years advance (run the RPC after summer exams, or automatically), the exam hall setup (desks in the great hall, proximity chat muted), practical exams
 
+### Milestone 48 — Library books
+- [x] `LoreBook` (placement kind `lore_book`, field `book`): a book open on a reading stand; interact opens `BookPanel` (parchment, page turning with the buttons, A/D or the arrows); reading is reported to the server so mysteries can use it
+- [x] Six original books in the library (founding, the four houses, moving charms, the castle's walls, the greenhouse herbal, the sky over the tower) in Polish and English; several answer self-study questions or hint at secrets
+- [x] Tests: books placed and titled with pages, opening and turning
+- [ ] Sealed stacks behind a permission slip a professor grants (needs professors to grant items)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

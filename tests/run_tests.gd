@@ -90,6 +90,7 @@ func _run() -> void:
 	_test_runes()
 	_test_journal()
 	_test_grades()
+	await _test_books()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2494,6 +2495,27 @@ func _test_grades() -> void:
 	t.check(SchoolGrades.grade(good) >= 5 and SchoolGrades.grade(poor) <= 2, "a strong record grades high, a weak one low (%d, %d)" % [SchoolGrades.grade(good), SchoolGrades.grade(poor)])
 	t.check(SchoolGrades.grade({"attended": 3}) >= 1 and SchoolGrades.grade({"attended": 3}) <= 6, "missing parts are left out, not counted as zero")
 	t.check(Journal.record_bbcode({"subjects": {"sigilcraft": good}}).contains(tr("JOURNAL_GRADE") % SchoolGrades.grade(good)), "the journal shows the grade")
+
+
+func _test_books() -> void:
+	t.section("Library books")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var books := castle.find_children("*", "LoreBook", true, false)
+	t.check(books.size() >= 6 and books.all(func(b: Node) -> bool: return (b as LoreBook).page_keys().size() >= 2 and tr("BOOK_%s_TITLE" % (b as LoreBook).book) != "BOOK_%s_TITLE" % (b as LoreBook).book),
+		"the library holds readable books, each titled with two or more pages (%d)" % books.size())
+	var panel := BookPanel.new()
+	add_child(panel)
+	var book := books[0] as LoreBook
+	book._on_interacted(null)
+	t.check(panel.is_open and panel.pages.size() == book.page_keys().size() and GameSession.ui_input_captured, "reading a book opens it")
+	panel.turn(1)
+	t.check(panel.page == 1, "pages turn")
+	panel.close()
+	t.check(not GameSession.ui_input_captured, "and it closes")
+	panel.queue_free()
+	castle.queue_free()
 
 
 func _test_timetable() -> void:
