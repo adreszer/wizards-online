@@ -452,6 +452,11 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: display; two clients: award, tally reset, ledger consistency
 - [ ] A staged ceremony (hall decor in the winner's colours, the cup carried in, music cue), real cup and banner models
 
+### Milestone 51 — House quests
+- [x] `nakama/modules/house_quests.lua` + `nakama/content/house_quests.json`: each school week two quests rotate in (attend lessons, finish practicals, right answers, first mystery solves); every member's actions count for their house (lesson close, practical finish, marked answers, discoveries); reaching a target awards the quest's points once per week through the ledger (source `quest`); progress stored in `school/house_quests`, sent as `OP_HOUSE_QUESTS`
+- [x] Journal "House" tab: this week's quests with every house's progress (ours first) and the tally; a notification when a house completes one
+- [x] Tests: the house page; two clients: quests arrive with progress
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

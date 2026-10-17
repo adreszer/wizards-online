@@ -1,0 +1,10 @@
+{
+  "_comment": "Weekly house quests: each school week (Monday to Sunday, school time) the quests whose index matches the week rotate in; a house that reaches a target gets `points` once that week. counter: lessons (attended lessons, self-study counts), practicals (finished), quiz_right (right quiz or exam answers), mysteries (first solves). name_key is a client translation key with %d for the target.",
+  "per_week": 2,
+  "quests": [
+    { "id": "lessons_10", "counter": "lessons", "target": 10, "points": 15, "name_key": "QUEST_LESSONS" },
+    { "id": "practicals_5", "counter": "practicals", "target": 5, "points": 15, "name_key": "QUEST_PRACTICALS" },
+    { "id": "quiz_20", "counter": "quiz_right", "target": 20, "points": 15, "name_key": "QUEST_QUIZ" },
+    { "id": "mysteries_3", "counter": "mysteries", "target": 3, "points": 20, "name_key": "QUEST_MYSTERIES" }
+  ]
+}

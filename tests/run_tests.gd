@@ -2480,6 +2480,10 @@ func _test_journal() -> void:
 		{"id": "b", "subject": "sigilcraft", "by_name": "Vexley", "text": "Three uses", "due": 2000.0, "answer": {"text": "x", "grade": 5, "comment": "good"}}], 1000.0)
 	t.check(hw.contains(tr("HOMEWORK_TODO")) and hw.contains(tr("HOMEWORK_GRADED") % [5, "good"]), "homework shows what to do and the grades (%s)" % hw.replace("\n", " | "))
 	t.check(Journal.homework_bbcode([], 0.0) == tr("HOMEWORK_NONE"), "no homework says so")
+	var house := Journal.house_bbcode({"quests": [{"id": "p", "name_key": "QUEST_PRACTICALS", "target": 5, "points": 15, "progress": [1, 2, 5, 0], "done": [false, false, true, false]}]},
+		PackedInt32Array([10, 20, 30, 40]), 3)
+	t.check(house.contains(tr("QUEST_PRACTICALS") % 5) and house.contains("5 / 5  ✓") and house.find(tr("HOUSE_3_NAME")) < house.find(tr("HOUSE_1_NAME")),
+		"the house page lists this week's quests, our house first (%s)" % house.replace("\n", " | "))
 	t.check(Journal.discoveries_bbcode(["loft", "map:loft", "founders_tale"]) == tr("JOURNAL_DISCOVERIES") % [2, 1], "discoveries and hidden rooms are counted")
 	var caster := SpellCaster.new()
 	caster.learn_spell(ARCANE_PULSE)

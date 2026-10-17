@@ -41,6 +41,7 @@ local Chat = require("chat")
 local Quiz = require("quiz")
 local SelfStudy = require("self_study")
 local Homework = require("homework")
+local Quests = require("house_quests")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -62,7 +63,7 @@ local OP_PRACTICAL, OP_PRACTICAL_STATE, OP_PRACTICAL_PROGRESS = P.OP_PRACTICAL, 
 local OP_APPEARANCE, OP_MASTERY = P.OP_APPEARANCE, P.OP_MASTERY
 local OP_HOMEWORK, OP_HOMEWORK_NEW = P.OP_HOMEWORK, P.OP_HOMEWORK_NEW
 local OP_GUEST_PASS, OP_GUEST_PASS_GRANTED = P.OP_GUEST_PASS, P.OP_GUEST_PASS_GRANTED
-local OP_HOUSE_CUP = P.OP_HOUSE_CUP
+local OP_HOUSE_CUP, OP_HOUSE_QUESTS = P.OP_HOUSE_CUP, P.OP_HOUSE_QUESTS
 -- Mastery: points per validated spell on a world object (practice targets give more),
 -- at most one award per spell per player every MASTERY_GAP seconds.
 local MASTERY_POINTS, MASTERY_PRACTICE_POINTS, MASTERY_GAP = 1, 2, 6
@@ -357,6 +358,25 @@ local function send_lessons(dispatcher, state, presences)
   dispatcher.broadcast_message(OP_LESSON_STATE, lessons_payload(state), presences, nil, true)
 end
 
+-- House quests: the school week, progress sent to everyone, completions award points.
+local function quest_week(state, now)
+  return math.floor(Timetable.school_day(state.timetable, now) / 7)
+end
+
+local function send_quests(dispatcher, state, presences)
+  dispatcher.broadcast_message(OP_HOUSE_QUESTS, nk.json_encode(Quests.payload(state.quests, state.quest_defs)), presences, nil, true)
+end
+
+local function count_quest(dispatcher, state, house, counter, n)
+  if not house or house < 1 then return end
+  Quests.roll(state.quests, quest_week(state, nk.time() / 1000))
+  for _, q in ipairs(Quests.count(state.quests, state.quest_defs, house, counter, n)) do
+    award_house_points(dispatcher, state, house, q.points, "house quest: " .. q.id, nil, "quest")
+  end
+  Quests.save_state(state.quests)
+  send_quests(dispatcher, state, nil)
+end
+
 -- The lesson's question as each player in the room sees it ({id = 0}: none).
 local function send_quiz(dispatcher, state, area, only_sid)
   local lesson = state.lessons[area]
@@ -438,6 +458,7 @@ local function count_practice_hit(dispatcher, state, sid, spell)
   if s.progress >= pr.hits then
     s.done = true
     Records.practical_done(state.presences[sid].user_id, lesson.subject)
+    count_quest(dispatcher, state, state.profiles[sid] and state.profiles[sid].house, "practicals", 1)
     if pr.grant and grant_spell(dispatcher, state, sid, spell, lesson.by_name) then
       s.granted = true
     end
@@ -447,9 +468,13 @@ local function count_practice_hit(dispatcher, state, sid, spell)
 end
 
 -- Marked answers go into the students' records.
-local function record_marks(lesson, marked)
+local function record_marks(lesson, marked, dispatcher, state)
   for _, a in pairs(marked) do
     Records.quiz_result(a.uid, lesson.subject, a.right and 1 or 0, 1, lesson.exam == true)
+    if a.right and dispatcher then
+      local sid = sid_of_user(state, a.uid)
+      count_quest(dispatcher, state, sid and state.profiles[sid] and state.profiles[sid].house, "quiz_right", 1)
+    end
   end
 end
 
@@ -457,7 +482,7 @@ local function close_lesson(dispatcher, state, area, why)
   local lesson = state.lessons[area]
   if not lesson then return end
   if lesson.quiz and lesson.quiz.open then
-    record_marks(lesson, Quiz.close(lesson.quiz))
+    record_marks(lesson, Quiz.close(lesson.quiz), dispatcher, state)
   end
   state.lessons[area] = nil
   send_quiz(dispatcher, state, area)
@@ -480,9 +505,14 @@ local function close_lesson(dispatcher, state, area, why)
   nk.logger_info(string.format("lesson %s in %s by %s closed (%s), %d attended, %d points, %d coins paid, slot %s", lesson.subject, area, lesson.by_name, why, count, lesson.points, paid, lesson.slot or "-"))
   -- Records: every student who came gets the lesson in their record; the lesson goes in the log.
   local kind = lesson.kind or "lesson"
+  local per_house = {}
   for uid, _ in pairs(lesson.attendance) do
     Records.lesson_attended(uid, { subject = lesson.subject, at = lesson.opened_at, slot = lesson.slot, by = lesson.by_name, kind = kind })
+    local other = sid_of_user(state, uid)
+    local h = other and state.profiles[other] and state.profiles[other].house or 0
+    if h > 0 then per_house[h] = (per_house[h] or 0) + 1 end
   end
+  for h, n in pairs(per_house) do count_quest(dispatcher, state, h, "lessons", n) end
   Records.log_lesson({ kind = kind, subject = lesson.subject, area = area, slot = lesson.slot or "", t0 = lesson.slot_t0 or 0,
                        by = lesson.by_uid or "", by_name = lesson.by_name, opened_at = lesson.opened_at, closed_at = nk.time() / 1000,
                        why = why, attended = lesson.attendance, points = lesson.points })
@@ -584,7 +614,7 @@ local function run_self_study(dispatcher, state, area, lesson, now)
       send_quiz(dispatcher, state, area)
     elseif kind == "close_quiz" then
       if lesson.quiz and lesson.quiz.open then
-        record_marks(lesson, Quiz.close(lesson.quiz))
+        record_marks(lesson, Quiz.close(lesson.quiz), dispatcher, state)
         send_quiz(dispatcher, state, area)
       end
     elseif kind == "practical" then
@@ -689,6 +719,7 @@ local function run_actions(dispatcher, state, actions)
       if profile and Profile.discover(profile, a[3]) then
         Profile.write(state.presences[a[2]].user_id, profile)
         send_profile(dispatcher, state, a[2])
+        count_quest(dispatcher, state, profile.house, "mysteries", 1)
         -- A first solve pays (once per character: the discovery is the receipt).
         pay(dispatcher, state, a[2], a[5] or state.rules.coins_per_mystery, { source = "mystery", reason = a[4] or a[3] }, a[4] or a[3])
       end
@@ -721,7 +752,8 @@ function M.match_init(context, params)
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
-                  positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup() }
+                  positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup(),
+                  quests = Quests.load_state(), quest_defs = Quests.load_defs() }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -767,6 +799,8 @@ function M.match_join(context, dispatcher, tick, state, presences)
     send_lessons(dispatcher, state, { p })
     send_house_totals(dispatcher, state, { p })
     send_cup(dispatcher, state, { p })
+    if Quests.roll(state.quests, quest_week(state, nk.time() / 1000)) then Quests.save_state(state.quests) end
+    send_quests(dispatcher, state, { p })
     send_wallet(dispatcher, state, p.session_id, Economy.balance(p.user_id))
     send_clock(dispatcher, state, { p })
     send_timetable(dispatcher, state, { p })
@@ -1262,7 +1296,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           lesson.board = School.clean_text(payload.text, state.rules.max_board_bytes)
           send_lessons(dispatcher, state, nil)
         elseif payload.action == "ask" then
-          if lesson.quiz and lesson.quiz.open then record_marks(lesson, Quiz.close(lesson.quiz)) end
+          if lesson.quiz and lesson.quiz.open then record_marks(lesson, Quiz.close(lesson.quiz), dispatcher, state) end
           state.quiz_seq = (state.quiz_seq or 0) + 1
           local quiz, why = Quiz.new_question(state.quiz_seq, payload)
           reason = why
@@ -1275,7 +1309,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           if not lesson.quiz or not lesson.quiz.open then
             reason = "no_question"
           else
-            record_marks(lesson, Quiz.close(lesson.quiz))
+            record_marks(lesson, Quiz.close(lesson.quiz), dispatcher, state)
             send_quiz(dispatcher, state, area)
             send_quiz_answers(dispatcher, state, lesson)
           end
@@ -1288,7 +1322,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           end
           reason = why
           if entry then
-            record_marks(lesson, { entry })
+            record_marks(lesson, { entry }, dispatcher, state)
             send_quiz(dispatcher, state, area, payload.sid)
             send_quiz_answers(dispatcher, state, lesson)
           end

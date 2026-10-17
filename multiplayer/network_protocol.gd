@@ -143,6 +143,9 @@ const OP_GUEST_PASS := 54
 const OP_GUEST_PASS_GRANTED := 55
 ## server → all (and joiners): {winner: house, term, totals: [4], fresh?: just awarded} the house cup holder
 const OP_HOUSE_CUP := 56
+## server → all (and joiners), when progress changes: {week, quests: [{id, name_key, target, points,
+## progress: [4], done: [4]}]} this week's house quests
+const OP_HOUSE_QUESTS := 57
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"

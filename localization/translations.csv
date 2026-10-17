@@ -635,3 +635,11 @@ DEDUCT_USAGE,"Prefects: /deduct <house 1-4> <points, at most 5> <reason>.","Pref
 DEDUCT_REQUESTED,Deduction requested.,Wysłano odjęcie punktów.
 HOUSE_CUP_AWARDED,"The house cup goes to %s! The new term's tally starts from zero.","Puchar Domów zdobywa %s! Punktacja nowego semestru zaczyna się od zera."
 HOUSE_CUP_HOLDER,House Cup: %s,Puchar Domów: %s
+JOURNAL_TAB_HOUSE,House,Dom
+QUEST_LESSONS,Attend %d lessons together,Wspólnie przyjdźcie na %d lekcji
+QUEST_PRACTICALS,Finish %d practicals,Zaliczcie %d ćwiczeń
+QUEST_QUIZ,Give %d right answers in lessons,Udzielcie %d dobrych odpowiedzi na lekcjach
+QUEST_MYSTERIES,Solve %d mysteries,Rozwiążcie %d tajemnice
+QUEST_NONE,No house quests this week.,W tym tygodniu domy nie mają zadań.
+QUEST_DONE,"%s completed a house quest: %s (+%d points)!","%s wypełnia zadanie domu: %s (+%d punktów)!"
+QUEST_TALLY,"House points: %d · %d · %d · %d","Punkty domów: %d · %d · %d · %d"

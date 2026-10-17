@@ -54,7 +54,7 @@ func _build() -> void:
 	_tabs = TabContainer.new()
 	_tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(_tabs)
-	for key in ["JOURNAL_TAB_TIMETABLE", "JOURNAL_TAB_SPELLS", "JOURNAL_TAB_RECORD", "JOURNAL_TAB_HOMEWORK", "JOURNAL_TAB_DISCOVERIES"]:
+	for key in ["JOURNAL_TAB_TIMETABLE", "JOURNAL_TAB_SPELLS", "JOURNAL_TAB_RECORD", "JOURNAL_TAB_HOMEWORK", "JOURNAL_TAB_HOUSE", "JOURNAL_TAB_DISCOVERIES"]:
 		var page := RichTextLabel.new()
 		page.name = tr(key)
 		page.bbcode_enabled = true
@@ -128,6 +128,7 @@ func refresh() -> void:
 	(_pages["JOURNAL_TAB_SPELLS"] as RichTextLabel).text = spells_bbcode(_player.spell_caster if _player != null else null)
 	(_pages["JOURNAL_TAB_RECORD"] as RichTextLabel).text = record_bbcode(record) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	(_pages["JOURNAL_TAB_DISCOVERIES"] as RichTextLabel).text = discoveries_bbcode(profile.get("discoveries", []))
+	(_pages["JOURNAL_TAB_HOUSE"] as RichTextLabel).text = house_bbcode(NetworkManager.house_quests, NetworkManager.get_house_totals(), _player.house if _player != null else 0) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	var now := NetworkManager.server_time()
 	(_pages["JOURNAL_TAB_HOMEWORK"] as RichTextLabel).text = homework_bbcode(homework, now) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	_hw_pick.clear()
@@ -152,6 +153,29 @@ func _hand_in() -> void:
 		homework = hw.get("homework", []) if hw.get("homework", []) is Array else []
 		if is_open:
 			refresh()
+
+
+## The house page: this week's quests with every house's progress (ours first), and the tally.
+static func house_bbcode(quests: Dictionary, totals: PackedInt32Array, house: int) -> String:
+	var out := PackedStringArray()
+	var list: Array = quests.get("quests", []) if quests.get("quests", []) is Array else []
+	if list.is_empty():
+		out.append(TranslationServer.translate("QUEST_NONE"))
+	for q: Dictionary in list:
+		out.append("[b]%s[/b]  (+%d)" % [TranslationServer.translate(str(q.get("name_key", ""))) % int(q.get("target", 0)), int(q.get("points", 0))])
+		var order: Array = [house] if house > 0 else []
+		for h in range(1, 5):
+			if h != house:
+				order.append(h)
+		for h: int in order:
+			var progress := int((q.get("progress", []) as Array)[h - 1]) if (q.get("progress", []) as Array).size() >= h else 0
+			var done: bool = (q.get("done", []) as Array).size() >= h and q.done[h - 1] == true
+			var line := "   %s: %d / %d%s" % [CharacterProfile.house_name(h), mini(progress, int(q.get("target", 0))), int(q.get("target", 0)), "  ✓" if done else ""]
+			out.append("[b]%s[/b]" % line if h == house else line)
+	if totals.size() == 4:
+		out.append("")
+		out.append(TranslationServer.translate("QUEST_TALLY") % [totals[0], totals[1], totals[2], totals[3]])
+	return "\n".join(out)
 
 
 ## Each assignment: subject, the task, due date, your answer and grade.

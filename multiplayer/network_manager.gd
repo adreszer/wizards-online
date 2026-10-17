@@ -105,6 +105,8 @@ var quiz: Dictionary = {}
 var quiz_answers: Array = []
 ## The running practical as we see it ({} = none) and, for the professor, everyone's progress.
 var practical: Dictionary = {}
+## This week's house quests {week, quests: [{id, name_key, target, points, progress, done}]}.
+var house_quests: Dictionary = {}
 ## The house cup holder {winner, term, totals} ({} = never awarded).
 var house_cup: Dictionary = {}
 ## Guest passes to other houses' rooms: house → until (server time, seconds).
@@ -544,6 +546,16 @@ func stop_practical() -> void:
 	send_op(NetworkProtocol.OP_PRACTICAL, {"action": "stop"})
 
 
+## A house that just finished a quest is announced to everyone.
+func _announce_quests(before: Array, now: Array) -> void:
+	for q: Dictionary in now:
+		var old: Array = before.filter(func(b: Dictionary) -> bool: return b.get("id", "") == q.get("id", ""))
+		for h in 4:
+			var was: bool = not old.is_empty() and (old[0].get("done", []) as Array).size() > h and old[0].done[h] == true
+			if not was and (q.get("done", []) as Array).size() > h and q.done[h] == true and not before.is_empty():
+				GameEvents.notification_requested.emit(tr("QUEST_DONE") % [CharacterProfile.house_name(h + 1), tr(str(q.get("name_key", ""))) % int(q.get("target", 0)), int(q.get("points", 0))], 7.0)
+
+
 ## Whether a prefect's guest pass lets us through `house`'s doors right now.
 func has_guest_pass(house: int) -> bool:
 	return float(guest_passes.get(house, 0.0)) > server_time()
@@ -601,6 +613,10 @@ func _on_lesson_message(op_code: int, payload: Dictionary) -> void:
 			if not payload.get("students", []) is Array:
 				practical_progress.students = []
 			practical_progress_changed.emit(practical_progress)
+		NetworkProtocol.OP_HOUSE_QUESTS:
+			var before: Array = house_quests.get("quests", [])
+			house_quests = payload
+			_announce_quests(before, payload.get("quests", []) if payload.get("quests", []) is Array else [])
 		NetworkProtocol.OP_HOUSE_CUP:
 			house_cup = payload
 			house_cup_changed.emit(house_cup)
@@ -638,6 +654,7 @@ func _teardown() -> void:
 	quiz_answers = []
 	guest_passes = {}
 	house_cup = {}
+	house_quests = {}
 	practical = {}
 	practical_progress = {}
 	await world_session.leave()

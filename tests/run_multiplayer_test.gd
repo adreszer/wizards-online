@@ -701,6 +701,8 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("quiz_right", 0)) >= 2, "with the marked quiz answers in it")
 	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("practicals", 0)) >= 1, "and the finished practical")
 	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("homework_count", 0)) >= 1, "and the graded homework")
+	var quests: Array = NetworkManager.house_quests.get("quests", [])
+	t.check(quests.size() == 2 and (quests[0].get("progress", []) as Array).size() == 4, "this week's two house quests arrive with every house's progress (%s)" % str(NetworkManager.house_quests).left(200))
 	var other_record: Dictionary = await NetworkManager.school_record("someone-else")
 	t.check(other_record.has("error"), "but not another student's")
 	cheat_results.clear()   # the brooms section counts its own cheat answers
