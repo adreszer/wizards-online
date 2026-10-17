@@ -9,6 +9,8 @@ const ROLE_PROFESSOR := "professor"
 const ROLE_ADMIN := "admin"
 const ROLES: Array[String] = [ROLE_STUDENT, ROLE_PROFESSOR, ROLE_ADMIN]
 const MAX_HOUSE := 4
+## School years (placeholder names: First Circle … Seventh Circle, YEAR_n).
+const MAX_YEAR := 7
 ## Houses (index 0 = unsorted): 1 Drakoryn (dragon), 2 Grypheon (griffin),
 ## 3 Phoenara (phoenix), 4 Hipporys (hippocampus). Names live in the CSV as
 ## HOUSE_<n>_NAME / HOUSE_<n>_ANIMAL; colours: dragon green, griffin gold,
@@ -42,6 +44,7 @@ static func sanitize(raw: Dictionary) -> Dictionary:
 		"discoveries": _strings(raw.get("discoveries", [])),
 		"appearance": CharacterLook.sanitize(raw.get("appearance", {})),
 		"mastery": _mastery(raw.get("mastery", {})),
+		"year": clampi(int(raw.get("year", 1)), 1, MAX_YEAR),
 	}
 
 

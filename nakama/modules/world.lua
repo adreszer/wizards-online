@@ -62,7 +62,10 @@ local function rpc_admin_set_profile(context, payload)
   if data.house ~= nil and (type(data.house) ~= "number" or data.house < 0 or data.house > Profile.MAX_HOUSE) then
     error({ "house must be 0.." .. Profile.MAX_HOUSE, 3 })
   end
-  local request = { op = "set_profile", user_id = data.user_id, name = data.name, role = data.role, house = data.house, forget_spells = data.forget_spells == true, forget_mysteries = data.forget_mysteries == true, reset_inventory = data.reset_inventory == true, reset_purse = data.reset_purse == true }
+  if data.year ~= nil and (type(data.year) ~= "number" or data.year < 1 or data.year > Profile.MAX_YEAR) then
+    error({ "year must be 1.." .. Profile.MAX_YEAR, 3 })
+  end
+  local request = { op = "set_profile", user_id = data.user_id, name = data.name, role = data.role, house = data.house, year = data.year, forget_spells = data.forget_spells == true, forget_mysteries = data.forget_mysteries == true, reset_inventory = data.reset_inventory == true, reset_purse = data.reset_purse == true }
   local match_id = find_or_create_world()
   local result = nk.match_signal(match_id, nk.json_encode(request))
   local decoded = result and select(2, pcall(nk.json_decode, result)) or nil
@@ -77,6 +80,7 @@ local function rpc_admin_set_profile(context, payload)
     local profile = Profile.load(data.user_id)
     if data.role then profile.role = data.role end
     if data.house then profile.house = data.house end
+    if data.year then profile.year = math.floor(data.year) end
     if data.forget_spells == true then profile.spells = Profile.sanitize_spells(nil) end
     if data.forget_mysteries == true then
       profile.discoveries = {}

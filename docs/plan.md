@@ -417,6 +417,12 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: ranks, cooldown, profile; two clients: real use earns points
 - [x] Casting gestures (Term B5): optional rune tracing (`RuneTracer`, `/runes` / `/runy`, saved in the settings): hold Cast, trace the spell's rune (strokes U/D/L/R, one rune per spell), release; a clean rune casts 30 % stronger with a flash, any other trace or a click casts normally
 
+### Milestone 45 — Years and the school journal
+- [x] School year on the server profile (`year` 1–7; placeholder names First … Seventh Circle, `YEAR_n`); admins set it with `admin_set_profile {year}`
+- [x] `Journal` (J): year and house, tabs for the week's timetable, the spellbook (mastery rank, points to the next rank, the spell's rune), the school record per subject (attendance, self-study, quiz answers, practicals; `school_record` RPC) and discoveries (mysteries solved, hidden rooms found)
+- [x] Tests: header, record, discoveries, spellbook text; two clients: an admin sets a year
+- [ ] Owner: how a character advances a year (exams vs time served), final year names; homework and grades in the journal (Term B7–B8)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

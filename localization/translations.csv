@@ -557,3 +557,23 @@ MASTERY_LEVEL_UP,"%s: new mastery rank: %s (shorter cooldown, a stronger glow)."
 RUNE_CLEAN,A clean rune!,Czysta runa!
 RUNES_ON,"Rune casting on: hold Cast, trace the spell's rune with the mouse, release. A clean rune casts stronger; a click still casts.","Rzucanie runami włączone: przytrzymaj rzut, narysuj myszą runę zaklęcia, puść. Czysta runa daje mocniejszy czar; zwykłe kliknięcie też działa."
 RUNES_OFF,Rune casting off: Cast casts on click.,Rzucanie runami wyłączone: czar na kliknięcie.
+YEAR_1,First Circle,Pierwszy Krąg
+YEAR_2,Second Circle,Drugi Krąg
+YEAR_3,Third Circle,Trzeci Krąg
+YEAR_4,Fourth Circle,Czwarty Krąg
+YEAR_5,Fifth Circle,Piąty Krąg
+YEAR_6,Sixth Circle,Szósty Krąg
+YEAR_7,Seventh Circle,Siódmy Krąg
+JOURNAL_TAB_TIMETABLE,Timetable,Plan lekcji
+JOURNAL_TAB_SPELLS,Spellbook,Księga zaklęć
+JOURNAL_TAB_RECORD,School record,Dziennik ocen
+JOURNAL_TAB_DISCOVERIES,Discoveries,Odkrycia
+JOURNAL_FOOTER,J or Esc closes the journal.,J lub Esc zamyka dziennik.
+JOURNAL_NO_SPELLS,No spells yet: they are taught in lessons.,Brak zaklęć: uczy się ich na lekcjach.
+JOURNAL_MASTERY_NEXT,(%d to the next rank),(do następnego stopnia: %d)
+JOURNAL_RUNE,rune: %s,runa: %s
+JOURNAL_RECORD_EMPTY,No lessons recorded yet.,Nie zapisano jeszcze żadnych lekcji.
+JOURNAL_RECORD_OFFLINE,The school record is kept in the online school.,Dziennik prowadzi szkoła online.
+JOURNAL_RECORD_LINE,"lessons %d · self-study %d · answers %d of %d right · practicals %d","lekcje %d · nauka własna %d · dobre odpowiedzi %d z %d · ćwiczenia %d"
+JOURNAL_NO_DISCOVERIES,Nothing discovered yet. The castle keeps its secrets.,Jeszcze nic nie odkryto. Zamek strzeże swoich tajemnic.
+JOURNAL_DISCOVERIES,"Mysteries solved: %d · hidden rooms found: %d","Rozwiązane tajemnice: %d · odnalezione ukryte komnaty: %d"

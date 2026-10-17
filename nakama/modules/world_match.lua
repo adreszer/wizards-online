@@ -209,7 +209,7 @@ local function send_profile(dispatcher, state, sid)
   local p = state.presences[sid]
   if profile and p then
     dispatcher.broadcast_message(OP_PROFILE, nk.json_encode({ house = profile.house, role = profile.role, spells = profile.spells, discoveries = profile.discoveries,
-      appearance = profile.appearance, mastery = profile.mastery }), { p }, nil, true)
+      appearance = profile.appearance, mastery = profile.mastery, year = profile.year }), { p }, nil, true)
   end
 end
 
@@ -1285,6 +1285,9 @@ function M.match_signal(context, dispatcher, tick, state, data)
   local profile = state.profiles[sid]
   if type(request.role) == "string" and Profile.ROLES[request.role] then
     profile.role = request.role
+  end
+  if type(request.year) == "number" and request.year >= 1 and request.year <= Profile.MAX_YEAR then
+    profile.year = math.floor(request.year)
   end
   if type(request.house) == "number" and request.house >= 0 and request.house <= Profile.MAX_HOUSE then
     profile.house = math.floor(request.house)

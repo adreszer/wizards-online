@@ -16,6 +16,7 @@ local M = {}
 M.COLLECTION, M.KEY = "character", "profile"
 M.ROLES = { student = true, professor = true, admin = true }
 M.MAX_HOUSE = 4
+M.MAX_YEAR = 7
 M.QUICK_SLOTS = 10
 M.SPELLS = {}
 for _, id in ipairs(SPELLS.ids) do
@@ -197,7 +198,10 @@ function M.sanitize(raw)
     profile.discoveries = M.sanitize_discoveries(raw.discoveries)
     profile.appearance = M.sanitize_appearance(raw.appearance)
     profile.mastery = M.sanitize_mastery(raw.mastery)
+    local year = math.floor(tonumber(raw.year) or 1)
+    profile.year = (year >= 1 and year <= M.MAX_YEAR) and year or 1
   else
+    profile.year = 1
     profile.mastery = {}
     profile.spells = M.sanitize_spells(nil)
     profile.appearance = M.sanitize_appearance(nil)

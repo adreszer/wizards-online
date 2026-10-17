@@ -88,6 +88,7 @@ func _run() -> void:
 	await _test_meals()
 	await _test_mastery()
 	_test_runes()
+	_test_journal()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2448,6 +2449,21 @@ func _test_runes() -> void:
 	var before := GameSession.trace_casting
 	t.check(ChatCommands.run("/runy", null) == (tr("RUNES_OFF") if before else tr("RUNES_ON")), "/runes toggles tracing")
 	GameSession.set_trace_casting(before)
+
+
+func _test_journal() -> void:
+	t.section("Journal")
+	t.check(Journal.header_text({"year": 2}, 3) == tr("YEAR_2") + " · " + tr("HOUSE_3_NAME") and Journal.header_text({}, 0) == tr("YEAR_1"), "the journal names the year and house")
+	var rec := Journal.record_bbcode({"subjects": {"sigilcraft": {"attended": 3, "self_study": 1, "quiz_right": 4, "quiz_total": 5, "practicals": 2}}})
+	t.check(rec.contains(tr("SUBJECT_SIGILCRAFT_NAME")) and rec.contains(tr("JOURNAL_RECORD_LINE") % [3, 1, 4, 5, 2]), "the record lists each subject (%s)" % rec.replace("\n", " | "))
+	t.check(Journal.record_bbcode({}) == tr("JOURNAL_RECORD_EMPTY"), "an empty record says so")
+	t.check(Journal.discoveries_bbcode(["loft", "map:loft", "founders_tale"]) == tr("JOURNAL_DISCOVERIES") % [2, 1], "discoveries and hidden rooms are counted")
+	var caster := SpellCaster.new()
+	caster.learn_spell(ARCANE_PULSE)
+	caster.mastery = {"arcane_pulse": 25}
+	var spells := Journal.spells_bbcode(caster)
+	t.check(spells.contains(tr(ARCANE_PULSE.display_name)) and spells.contains(tr("MASTERY_ADEPT")) and spells.contains("→"), "the spellbook shows rank and rune (%s)" % spells.replace("\n", " | "))
+	caster.free()
 
 
 func _test_timetable() -> void:

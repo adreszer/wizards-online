@@ -21,6 +21,9 @@ func _ready() -> void:
 	var quiz := QuizPanel.new()
 	quiz.name = "QuizPanel"
 	add_child(quiz)
+	var journal := Journal.new()
+	journal.name = "Journal"
+	add_child(journal)
 	var creator := CharacterCreator.new()
 	creator.name = "CharacterCreator"
 	add_child(creator)
