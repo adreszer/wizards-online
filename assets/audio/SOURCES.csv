@@ -1,3 +1,4 @@
 file,source,tool_or_pack,licence,prompt_or_note,generated_on,take,processing
 assets/audio/music/music_castle_day.mp3,generated,ElevenLabs Music (Creator plan),ElevenLabs paid-plan commercial licence,"docs/audio-list.md music_castle_day prompt (2:00)",2026-10-16,,loudness-matched to -18 LUFS; original in music/source/
 assets/audio/music/music_castle_night.mp3,generated,ElevenLabs Music (Creator plan),ElevenLabs paid-plan commercial licence,"docs/audio-list.md music_castle_night prompt (2:00)",2026-10-16,,loudness-matched to -18 LUFS; original in music/source/
+assets/audio/music/music_main_theme.mp3,generated,ElevenLabs Music (Creator plan),ElevenLabs paid-plan commercial licence,"docs/audio-list.md music_main_theme prompt (2:00)",2026-10-17,,trimmed leading/trailing silence; loudness-matched to -18 LUFS; original (WAV) kept as music/source/music_main_theme.flac

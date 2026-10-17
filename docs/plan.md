@@ -356,7 +356,8 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] `Music` audio bus (`default_bus_layout.tres`)
 - [x] `MusicDirector` (added by `castle.gd`, reads the `DayNightCycle` phase): day track from dawn, night track from dusk, 8 s crossfade on a phase change, each track loops by crossfading its last 6 s into its start, 3 s fade-in at level start
 - [x] First two tracks: `music_castle_day`, `music_castle_night` (ElevenLabs Music, loudness-matched to −18 LUFS; originals in `assets/audio/music/source/`, ignored by Godot); provenance in `assets/audio/SOURCES.csv`
-- [x] Tests: track per phase, Music bus, castle wiring, tracks long enough to loop, day → night switch crossfades
+- [x] Main theme behind the menu: a second `MusicDirector` on the game root (`core/game.gd`, `fixed_track = main_theme`), fades out over 2 s when the world loads and starts again on return to the menu; the theme ends on its own, so it restarts with only 0.5 s overlap
+- [x] Tests: track per phase, Music bus, castle wiring, tracks long enough to loop, day → night switch crossfades, menu theme plays, stops and restarts
 - [ ] Music volume slider in settings; area-specific music (grounds, lessons, feast, duel) and stingers
 - [ ] Sound effects, ambiences per area, footsteps per surface, reverb per area (the rest of the list)
 

@@ -6,13 +6,21 @@ extends Node
 @export var menu_scene: PackedScene
 
 var _current: Node
+## The main theme behind the menu; the world plays its own music.
+var menu_music: MusicDirector
 
 
 func _ready() -> void:
+	menu_music = MusicDirector.new()
+	menu_music.name = "MenuMusic"
+	menu_music.fixed_track = &"main_theme"
+	add_child(menu_music)
 	_show_menu()
 
 
 func _show_menu() -> void:
+	if menu_music.current.is_empty():
+		menu_music.start()
 	_swap(menu_scene.instantiate())
 	_current.start_requested.connect(_on_start_requested)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -20,6 +28,7 @@ func _show_menu() -> void:
 
 func _on_start_requested() -> void:
 	GameSession.reset_collectibles()
+	menu_music.stop()
 	_swap(world_scene.instantiate())
 	_current.return_to_menu_requested.connect(_on_return_to_menu)
 

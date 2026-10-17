@@ -2036,6 +2036,22 @@ func _test_day_night() -> void:
 		torch.set_lit(true)
 		cycle.time_override = NAN
 	castle.queue_free()
+
+	# The main theme plays behind the menu, whatever the time, and stops for the world.
+	var game := (load("res://core/game.tscn") as PackedScene).instantiate()
+	add_child(game)
+	await get_tree().process_frame
+	var menu_music := game.get_node_or_null("MenuMusic") as MusicDirector
+	t.check(menu_music != null and menu_music.current == &"main_theme", "the menu plays the main theme")
+	if menu_music != null:
+		menu_music.stop(0.1)
+		t.check(menu_music.current.is_empty() and not menu_music.is_processing(), "leaving the menu stops the main theme")
+		menu_music.start()
+		t.check(menu_music.current == &"main_theme", "back at the menu it starts again")
+		menu_music.stop(0.05)
+		await _wait(0.2)
+	game.queue_free()
+	await get_tree().process_frame
 	await get_tree().process_frame
 
 
