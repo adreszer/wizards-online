@@ -84,6 +84,7 @@ func _run() -> void:
 	await _test_board_and_quiz()
 	await _test_practicals()
 	_test_self_study()
+	await _test_character_look()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2285,6 +2286,33 @@ func _test_self_study() -> void:
 	TranslationServer.set_locale("en")
 	t.check(ClassroomBoards.board_text_for("class_sigilcraft", lessons, Timetable.new(), 0.0) == "Charms", "a self-study board shows in the player's language")
 	TranslationServer.set_locale(previous)
+
+
+func _test_character_look() -> void:
+	t.section("Character look")
+	var clean := CharacterLook.sanitize({"body": "nobody", "skin": 99, "robe": -3})
+	t.check(clean.body == CharacterRegistry.DEFAULT and clean.skin == CharacterLook.SKIN_TONES.size() - 1 and clean.robe == 0 and not clean.set, "looks are clamped to what exists")
+	var p := await _spawn_player(Vector3(0, 1, 0), "apprentice_m")
+	p.set_look({"body": "apprentice_f", "skin": 2, "robe": 3, "set": true})
+	await get_tree().process_frame
+	t.check(p.character_id == "apprentice_f" and p.visual.scene_file_path.ends_with("apprentice_f.tscn"), "a look's body swaps the visual")
+	t.check(p.gestures.pose != null and p.gestures.pose.get_skeleton() != null, "gestures follow the new body")
+	var mats: Array = []
+	for node in p.visual.find_children("*", "MeshInstance3D", true, false):
+		var mi := node as MeshInstance3D
+		if mi.mesh == null:
+			continue
+		for s in mi.mesh.get_surface_count():
+			if mi.get_surface_override_material(s) is ShaderMaterial:
+				mats.append(mi.get_surface_override_material(s))
+	t.check(not mats.is_empty() and (mats[0] as ShaderMaterial).get_shader_parameter("skin_tint") == CharacterLook.SKIN_TONES[2]
+		and (mats[0] as ShaderMaterial).get_shader_parameter("house_amount") == 0.0, "skin and robe go to the look shader; unsorted keeps the violet trim")
+	if not mats.is_empty():
+		p.set_profile("student", 3)
+		t.check((mats[0] as ShaderMaterial).get_shader_parameter("house_amount") == 1.0
+			and (mats[0] as ShaderMaterial).get_shader_parameter("house_color") == CharacterProfile.house_color(3), "sorting puts the house colour on the trim")
+	var profile := CharacterProfile.sanitize({"appearance": {"body": "apprentice_f", "skin": 1, "set": true}})
+	t.check(profile.appearance.body == "apprentice_f" and profile.appearance.set, "the server profile carries the look")
 
 
 func _test_timetable() -> void:

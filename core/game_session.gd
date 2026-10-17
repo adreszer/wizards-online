@@ -18,6 +18,8 @@ var display_name: String = ""
 var language: String = Localization.AUTO
 ## Body used for the local player (see CharacterRegistry). Sent as join metadata online.
 var character_id: String = CharacterRegistry.DEFAULT
+## The chosen look offline (CharacterLook: body, skin, robe, set).
+var look: Dictionary = {"body": CharacterRegistry.DEFAULT, "skin": 0, "robe": 0, "set": false}
 var nakama_host: String = ProjectSettings.get_setting("game/network/host", "127.0.0.1")
 var nakama_port: int = int(ProjectSettings.get_setting("game/network/port", 7350))
 
@@ -82,6 +84,15 @@ func set_display_name(raw: String) -> void:
 
 func set_character(id: String) -> void:
 	character_id = CharacterRegistry.sanitize(id)
+	look["body"] = character_id
+	_save_settings()
+
+
+## The offline look (and the menu's body pick); online the profile's wins.
+func set_look(p_look: Dictionary) -> void:
+	look = CharacterLook.sanitize(p_look)
+	look["set"] = true
+	character_id = str(look.body)
 	_save_settings()
 
 
@@ -133,6 +144,8 @@ func _load_settings() -> void:
 	display_name = str(cfg.get_value("player", "display_name", display_name))
 	language = str(cfg.get_value("player", "language", language))
 	character_id = CharacterRegistry.sanitize(str(cfg.get_value("player", "character", character_id)))
+	look = CharacterLook.sanitize(cfg.get_value("player", "look", {}))
+	look["body"] = character_id
 	nakama_host = str(cfg.get_value("network", "host", nakama_host))
 	nakama_port = int(cfg.get_value("network", "port", nakama_port))
 
@@ -142,6 +155,7 @@ func _save_settings() -> void:
 	cfg.set_value("player", "display_name", display_name)
 	cfg.set_value("player", "language", language)
 	cfg.set_value("player", "character", character_id)
+	cfg.set_value("player", "look", look)
 	cfg.set_value("network", "host", nakama_host)
 	cfg.set_value("network", "port", nakama_port)
 	cfg.save(SETTINGS_PATH)

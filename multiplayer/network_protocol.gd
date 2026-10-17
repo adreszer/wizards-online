@@ -126,6 +126,9 @@ const OP_PRACTICAL := 47
 const OP_PRACTICAL_STATE := 48
 ## server → the professor: {spell, hits, students: [{sid, name, progress, done}]}
 const OP_PRACTICAL_PROGRESS := 49
+## client → server: {body, skin, robe} the character's look (character creator); stored in the
+## profile (`appearance`), sent back in OP_PROFILE and to everyone else in OP_ROSTER_UPDATE {sid, char, look}
+const OP_APPEARANCE := 50
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"

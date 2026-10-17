@@ -61,6 +61,8 @@ signal timetable_changed()
 ## features (chat, lessons 2.0…) listen here and send with send_op().
 signal server_message(op_code: int, payload: Dictionary)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
+## A remote player's body or look changed (roster entry: char, look {skin, robe}).
+signal player_look_changed(sid: String)
 ## The lesson's question as the local player sees it ({id, question, choices, by, open,
 ## answer?, right?, correct?}); {} = no question (left the room, lesson over).
 signal quiz_changed(view: Dictionary)
@@ -133,6 +135,7 @@ func _ready() -> void:
 	state_synchronizer.clock_received.connect(func(payload: Dictionary) -> void:
 		school_clock.apply(payload)
 		school_clock_changed.emit(str(payload.get("by", ""))))
+	state_synchronizer.player_look_changed.connect(player_look_changed.emit)
 	state_synchronizer.timetable_received.connect(func(payload: Dictionary) -> void:
 		timetable.apply(payload)
 		timetable_changed.emit())
@@ -479,6 +482,14 @@ func send_dm(to_name: String, text: String) -> bool:
 		system_message.emit(tr("CHAT_OFFLINE"))
 		return false
 	return chat_manager.send_dm(to_name, text)
+
+
+## The character creator's choice: online stored in the profile (everyone sees it),
+## offline in the local settings.
+func save_look(look: Dictionary) -> void:
+	var clean := CharacterLook.sanitize(look)
+	GameSession.set_look(clean)
+	send_op(NetworkProtocol.OP_APPEARANCE, {"body": clean.body, "skin": clean.skin, "robe": clean.robe})
 
 
 ## Professor running the lesson: what the classroom board shows ("" wipes it).

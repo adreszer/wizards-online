@@ -177,6 +177,10 @@ func _world_object(oid: String) -> Node:
 	return null
 
 
+func b_sid_for_look(spawner: PlayerSpawner) -> String:
+	return spawner.remote_players.keys()[0] if not spawner.remote_players.is_empty() else ""
+
+
 func _known_spells() -> Array:
 	return NetworkManager.get_local_profile().get("spells", {}).get("known", [])
 
@@ -251,6 +255,8 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(panel.can_open(), "lesson tools are available to a professor")
 	ok = await _wait_until(func() -> bool: return panel.students_present().size() == 1, 30.0)
 	t.check(ok, "the student shows up in the classroom")
+	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.character_id == "apprentice_f" and int(remote.look.get("skin", 0)) == 3, 10.0)
+	t.check(ok, "B's new look reaches A (%s / %s)" % [str(remote.look) if is_instance_valid(remote) else "-", str(NetworkManager.get_players().get(b_sid_for_look(spawner), {}))])
 	ok = await _wait_until(func() -> bool: return is_instance_valid(remote) and remote.gestures.current == &"raise_hand", 30.0)
 	var queue: Array[Node] = panel.raised_hands_first(panel.students_present())
 	t.check(ok and not queue.is_empty() and queue[0] == remote, "the student's raised hand reaches the professor's lesson panel (%s, %d present)" % [str(remote.gestures.current) if is_instance_valid(remote) else "-", queue.size()])
@@ -468,6 +474,13 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(ok, "chat message from A received: %s" % str(chat_lines))
 	t.check(chat_lines.any(func(l: String) -> bool: return l == "[ClientB] hello from B"), "own chat message echoed with own name")
 	await _wait(1.0)
+
+	t.section("Look (student)")
+	NetworkManager.save_look({"body": "apprentice_f", "skin": 3, "robe": 2})
+	var looked := await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("appearance", {}).get("set", false) == true, 10.0)
+	t.check(looked and NetworkManager.get_local_profile().appearance.body == "apprentice_f" and int(NetworkManager.get_local_profile().appearance.skin) == 3,
+		"the creator's choice is stored in the profile (%s)" % str(NetworkManager.get_local_profile().get("appearance", {})))
+	t.check(player.character_id == "apprentice_f", "and the body changes")
 
 	t.section("Sorting (student)")
 	var answers_for_3: Array = []

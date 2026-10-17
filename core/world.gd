@@ -21,9 +21,15 @@ func _ready() -> void:
 	var quiz := QuizPanel.new()
 	quiz.name = "QuizPanel"
 	add_child(quiz)
+	var creator := CharacterCreator.new()
+	creator.name = "CharacterCreator"
+	add_child(creator)
 	var player: Node = _spawner.spawn_local(GameSession.display_name, NetworkManager.local_user_id)
 	GameEvents.level_completed.connect(_on_level_completed)
 	_show_satchel_hint(player)
+	# Offline, a first game opens the character creator (online the profile decides).
+	if not NetworkManager.is_online() and not GameSession.look.get("set", false):
+		GameEvents.character_creator_requested.emit.call_deferred()
 	_show_sorting_hint(player)
 	# Playtest shortcut: `-- --all-spells` fills the hotbar without touring the tomes.
 	if OS.get_cmdline_user_args().has("--all-spells"):

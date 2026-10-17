@@ -58,6 +58,7 @@ local OP_CHAT, OP_CHAT_LINE, OP_DM, OP_DM_LINE, OP_CHAT_RESULT = P.OP_CHAT, P.OP
 local OP_BOARD, OP_QUIZ, OP_QUIZ_STATE, OP_QUIZ_ANSWER = P.OP_BOARD, P.OP_QUIZ, P.OP_QUIZ_STATE, P.OP_QUIZ_ANSWER
 local OP_QUIZ_ANSWERS, OP_LESSON_TOOL_RESULT = P.OP_QUIZ_ANSWERS, P.OP_LESSON_TOOL_RESULT
 local OP_PRACTICAL, OP_PRACTICAL_STATE, OP_PRACTICAL_PROGRESS = P.OP_PRACTICAL, P.OP_PRACTICAL_STATE, P.OP_PRACTICAL_PROGRESS
+local OP_APPEARANCE = P.OP_APPEARANCE
 local MAX_PRACTICAL_HITS = 10
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
@@ -194,15 +195,18 @@ local function entry_for(state, sid)
   local p = state.presences[sid]
   local inv = state.inventories[sid]
   local profile = state.profiles[sid]
+  local look = profile and profile.appearance or {}
   return { sid = sid, uid = p.user_id, name = state.names[sid] or p.username, char = state.chars[sid] or "apprentice_m",
-           held = inv and inv.held or "", role = profile and profile.role or "student", house = profile and profile.house or 0 }
+           held = inv and inv.held or "", role = profile and profile.role or "student", house = profile and profile.house or 0,
+           look = { skin = look.skin or 0, robe = look.robe or 0 } }
 end
 
 local function send_profile(dispatcher, state, sid)
   local profile = state.profiles[sid]
   local p = state.presences[sid]
   if profile and p then
-    dispatcher.broadcast_message(OP_PROFILE, nk.json_encode({ house = profile.house, role = profile.role, spells = profile.spells, discoveries = profile.discoveries }), { p }, nil, true)
+    dispatcher.broadcast_message(OP_PROFILE, nk.json_encode({ house = profile.house, role = profile.role, spells = profile.spells, discoveries = profile.discoveries,
+      appearance = profile.appearance }), { p }, nil, true)
   end
 end
 
@@ -709,6 +713,12 @@ function M.match_join(context, dispatcher, tick, state, presences)
       Profile.write(p.user_id, profile)
     end
     state.profiles[p.session_id] = profile
+    -- The stored look decides the body once chosen; before that the menu's pick does.
+    if profile.appearance.set then
+      state.chars[p.session_id] = profile.appearance.body
+    else
+      profile.appearance.body = state.chars[p.session_id] or profile.appearance.body
+    end
     state.areas[p.session_id] = ""
     state.progress[p.user_id] = load_progress(p.user_id)
     Chat.remember_name(p.user_id, state.names[p.session_id])
@@ -1087,6 +1097,21 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         else
           dispatcher.broadcast_message(OP_CHAT_LINE, nk.json_encode({ sid = sid, name = state.names[sid] or "", text = text, mode = mode }),
             listeners_of(state, sid, mode), nil, true)
+        end
+      end
+    elseif message.op_code == OP_APPEARANCE then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      local profile = state.profiles[sid]
+      if ok and type(payload) == "table" and profile then
+        payload.set = true
+        profile.appearance = Profile.sanitize_appearance(payload)
+        state.chars[sid] = profile.appearance.body
+        Profile.write(message.sender.user_id, profile)
+        send_profile(dispatcher, state, sid)
+        local rest = others(state, sid)
+        if #rest > 0 then
+          dispatcher.broadcast_message(OP_ROSTER_UPDATE, nk.json_encode({ sid = sid, role = profile.role, house = profile.house, char = profile.appearance.body,
+            look = { skin = profile.appearance.skin, robe = profile.appearance.robe } }), rest, nil, true)
         end
       end
     elseif message.op_code == OP_PRACTICAL then

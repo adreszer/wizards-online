@@ -30,9 +30,11 @@ func _ready() -> void:
 	NetworkManager.chat_line_received.connect(_on_chat_line)
 	NetworkManager.server_message.connect(_on_server_message)
 	NetworkManager.practical_changed.connect(_on_practical)
+	NetworkManager.player_look_changed.connect(_on_player_look_changed)
 
 
 func _exit_tree() -> void:
+	NetworkManager.player_look_changed.disconnect(_on_player_look_changed)
 	NetworkManager.practical_changed.disconnect(_on_practical)
 	NetworkManager.chat_line_received.disconnect(_on_chat_line)
 	NetworkManager.server_message.disconnect(_on_server_message)
@@ -46,6 +48,22 @@ func _exit_tree() -> void:
 	NetworkManager.player_profile_changed.disconnect(_on_player_profile_changed)
 	NetworkManager.spell_granted.disconnect(_on_spell_granted)
 	NetworkManager.disconnected.disconnect(_on_disconnected)
+
+
+## The creator opens once per session for a character without a chosen look.
+var _creator_offered := false
+
+
+func _apply_remote_look(player: Node, entry: Dictionary) -> void:
+	var look: Dictionary = entry.get("look", {}).duplicate() if entry.get("look", {}) is Dictionary else {}
+	look["body"] = str(entry.get("char", player.character_id))
+	player.set_look(look)
+
+
+func _on_player_look_changed(sid: String) -> void:
+	var player: Node = remote_players.get(sid)
+	if player != null:
+		_apply_remote_look(player, NetworkManager.get_players().get(sid, {}))
 
 
 ## The spell a practical lets the local player cast for practice (not in their spellbook).
@@ -111,6 +129,7 @@ func spawn_local(display_name: String, peer_id: String) -> Node:
 		player.global_transform = spawn_point.global_transform
 		player.respawn_handler.set_checkpoint(spawn_point.global_transform)
 	local_player = player
+	player.set_look(GameSession.look)
 	_apply_local_inventory()
 	_apply_local_profile()
 	local_player_spawned.emit(player)
@@ -138,6 +157,7 @@ func _on_player_joined(sid: String, display_name: String) -> void:
 		player.global_transform = spawn_point.global_transform
 	remote_players[sid] = player
 	var entry: Dictionary = NetworkManager.get_players().get(sid, {})
+	_apply_remote_look(player, entry)
 	var held := str(entry.get("held", ""))
 	if not held.is_empty():
 		player.set_remote_held_item(held)
@@ -210,7 +230,12 @@ func _apply_local_profile() -> void:
 	if profile.is_empty():
 		return
 	local_player.set_profile(str(profile.get("role", "")), int(profile.get("house", 0)))
+	var look: Dictionary = profile.get("appearance", {})
+	local_player.set_look(look)
 	local_player.synchronizer.apply_server_spellbook(profile.get("spells", {}))
+	if not look.get("set", false) and not _creator_offered:
+		_creator_offered = true
+		GameEvents.character_creator_requested.emit.call_deferred()
 
 
 func _on_player_profile_changed(sid: String, role: String, house: int) -> void:

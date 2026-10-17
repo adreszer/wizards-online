@@ -47,6 +47,8 @@ const RENDER_LAYER_CHARACTER := 1 << 1
 @export var teleport_distance: float = 2.0
 
 var cast_origin: Node3D
+## The chosen look (CharacterLook: body, skin, robe); the body swaps the visual.
+var look: Dictionary = CharacterLook.sanitize({})
 ## Server-decided role (CharacterProfile.ROLE_*); students by default.
 var role: String = CharacterProfile.ROLE_STUDENT
 var house: int = 0
@@ -110,6 +112,29 @@ func _apply_character() -> void:
 	old.queue_free()
 	visual = new_visual
 	animation_controller = new_visual.get_node("AnimationController") as AnimationController
+
+
+## Applies a look: a different body rebuilds the visual (gestures, held item and the
+## broom pose follow it), then skin, robe and the house trim are set on its materials.
+func set_look(p_look: Dictionary) -> void:
+	look = CharacterLook.sanitize(p_look)
+	if str(look.body) != character_id and CharacterRegistry.is_valid(str(look.body)):
+		character_id = str(look.body)
+		_apply_character()
+		_set_render_layer(visual)
+		cast_origin = visual.find_child("CastOrigin", true, false) as Node3D
+		off_hand = _find_off_hand()
+		held_item_mount.setup(off_hand)
+		broom_rider.setup(self, movement, inventory, visual)
+		_visual_base = visual.transform
+		if gestures != null:
+			gestures.setup(self, visual)
+		if is_local:
+			spell_caster.setup(self, peer_id, camera_rig, cast_origin)
+			movement.state_changed.connect(animation_controller.set_movement_state)
+		else:
+			synchronizer.movement_state_received.connect(animation_controller.set_movement_state_name)
+	CharacterLook.apply(visual, look, house)
 
 
 func _set_render_layer(node: Node) -> void:
@@ -196,6 +221,8 @@ func set_profile(p_role: String, p_house: int) -> void:
 	house = CharacterProfile.sanitize_house(p_house)
 	nameplate.set_role(role)
 	nameplate.set_house(house)
+	if house != previous_house:
+		CharacterLook.apply(visual, look, house)
 	if is_local and house != previous_house:
 		GameEvents.house_changed.emit(house)
 

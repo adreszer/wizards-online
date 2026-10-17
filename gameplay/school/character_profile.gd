@@ -40,6 +40,7 @@ static func sanitize(raw: Dictionary) -> Dictionary:
 			"equipped": SpellRegistry.sanitize(str(spells.get("equipped", ""))),
 		},
 		"discoveries": _strings(raw.get("discoveries", [])),
+		"appearance": CharacterLook.sanitize(raw.get("appearance", {})),
 	}
 
 

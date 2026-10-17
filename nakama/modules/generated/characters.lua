@@ -2,4 +2,6 @@
 return {
   default = "apprentice_m",
   ids = { "apprentice_f", "apprentice_m", "placeholder" },
+  robes = 5,
+  skin_tones = 5,
 }

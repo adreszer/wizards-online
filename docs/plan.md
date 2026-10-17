@@ -391,6 +391,14 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Self-study lessons (`nakama/modules/self_study.lua`, plans in `nakama/content/self_study.json`, one per subject, every text in Polish and English): a timetabled lesson nobody opened within `self_study_grace_minutes` runs as self-study, hosted by the Lecture Quill (placeholder): lecture lines, board text, multiple-choice questions closed and marked on a timer, a practical on the practice target; it teaches a spell only when `self_study_spells` lists it (**owner decision**, empty by default); attendance counts as `self_study` in the record and pays `coins_per_self_study`; a professor who opens a lesson takes the room over; `/selfstudy` (`/nauka`; admins or dev cheats) starts one at once; `admin_reset_world` closes running ones
 - [ ] Owner: which spells self-study may teach (`school_rules.json` `self_study_spells`), the host's final name
 
+### Milestone 42 — Player character v1: looks and house colours
+- [x] `character_look.gdshader` over the Meshy characters' baked atlas: parts told apart by colour, the violet trim takes the house colour once sorted, skin is tinted toward the chosen tone, the charcoal cloth toward the chosen robe colour (values in linear space); normal, roughness and metallic maps kept
+- [x] `CharacterLook`: body (apprentice_m / apprentice_f), five skin tones, five robe colours (charcoal, black, brown, navy, moss); `Player.set_look()` swaps the body at runtime (gestures, broom pose, held item and wand follow) and sets the shader; sorting updates the trim live
+- [x] Stored on the server: `appearance` {body, skin, robe, set} in the profile (`OP_APPEARANCE`), the body decides the join character once chosen, roster entries and `OP_ROSTER_UPDATE` carry `char` and `look` so everyone sees it; offline in the settings
+- [x] `CharacterCreator` (live preview with its own camera): opens on the first join of a character without a chosen look (offline: the first game), and with `/look` (`/wyglad`)
+- [x] Tests: clamping, body swap, shader parameters, house trim, profile; two clients: a look is stored and reaches the other player. `tools/capture_looks.tscn` renders every house, tone and robe
+- [ ] Faces and hairstyles need more character models (asset-drop workflow); a crest on the robe (Term C1)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

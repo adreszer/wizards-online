@@ -2,13 +2,14 @@
 -- Storage: collection "character", key "profile", one object per user:
 --   { v = 1, house = 0..4, role = "student"|"professor"|"admin",
 --     spells = { known = {ids}, slots = {ids or ""}, equipped = id },
---     discoveries = {mystery discovery ids} }
+--     discoveries = {mystery discovery ids}, appearance = { body, skin, robe, set } }
 -- Spell ids and the sorting questionnaire come from generated modules
 -- (tools/export_server_content.gd), so the client's lists are the only source.
 
 local nk = require("nakama")
 local SPELLS = require("generated.spells")
 local SORTING = require("generated.sorting")
+local CHARACTERS = require("generated.characters")
 
 local M = {}
 
@@ -149,6 +150,21 @@ function M.discover(profile, id)
   return true
 end
 
+-- The character's look: body (a character id), skin tone and robe colour (indices into
+-- CharacterLook's lists), and whether the player chose it (the creator opens until then).
+function M.sanitize_appearance(raw)
+  local out = { body = CHARACTERS.default, skin = 0, robe = 0, set = false }
+  if type(raw) ~= "table" then return out end
+  for _, id in ipairs(CHARACTERS.ids) do
+    if raw.body == id then out.body = id end
+  end
+  local skin, robe = math.floor(tonumber(raw.skin) or 0), math.floor(tonumber(raw.robe) or 0)
+  if skin >= 0 and skin < (CHARACTERS.skin_tones or 1) then out.skin = skin end
+  if robe >= 0 and robe < (CHARACTERS.robes or 1) then out.robe = robe end
+  out.set = raw.set == true
+  return out
+end
+
 function M.sanitize(raw)
   local profile = { v = 1, house = 0, role = "student", spells = nil, discoveries = {} }
   if type(raw) == "table" then
@@ -161,8 +177,10 @@ function M.sanitize(raw)
     end
     profile.spells = M.sanitize_spells(raw.spells)
     profile.discoveries = M.sanitize_discoveries(raw.discoveries)
+    profile.appearance = M.sanitize_appearance(raw.appearance)
   else
     profile.spells = M.sanitize_spells(nil)
+    profile.appearance = M.sanitize_appearance(nil)
   end
   return profile
 end

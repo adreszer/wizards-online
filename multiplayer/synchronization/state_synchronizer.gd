@@ -29,6 +29,8 @@ signal cheat_result_received(ok: bool, item_id: String, reason: String)
 signal wallet_changed(coins: int, delta: int, source: String, detail: String)
 signal clock_received(payload: Dictionary)
 signal timetable_received(payload: Dictionary)
+## A remote player's body or look changed (the roster entry holds them: char, look).
+signal player_look_changed(sid: String)
 
 @export var ping_interval: float = 2.0
 
@@ -78,6 +80,7 @@ func bind(p_session: WorldSession) -> void:
 	session.wallet_received.connect(_on_wallet)
 	session.clock_received.connect(clock_received.emit)
 	session.timetable_received.connect(timetable_received.emit)
+	session.message_received.connect(func(op: int, payload: Dictionary) -> void: _remember_look.call_deferred(op, payload))
 
 
 func reset() -> void:
@@ -260,6 +263,30 @@ func _on_roster_update(sid: String, role: String, house: int) -> void:
 	players[sid]["role"] = CharacterProfile.sanitize_role(role)
 	players[sid]["house"] = CharacterProfile.sanitize_house(house)
 	player_profile_changed.emit(sid, players[sid]["role"], players[sid]["house"])
+
+
+## Roster messages carry each player's body and look; kept on the roster entry (after
+## the entry itself exists, hence deferred) and announced when they change.
+func _remember_look(op: int, payload: Dictionary) -> void:
+	var entries: Array = []
+	if op == NetworkProtocol.OP_ROSTER:
+		entries = payload.get("players", []) if payload.get("players", []) is Array else []
+	elif op == NetworkProtocol.OP_PLAYER_JOINED or op == NetworkProtocol.OP_ROSTER_UPDATE:
+		entries = [payload]
+	for e: Variant in entries:
+		if not e is Dictionary or not players.has(str(e.get("sid", ""))):
+			continue
+		var entry: Dictionary = players[str(e.get("sid", ""))]
+		var look: Variant = e.get("look", {})
+		var changed := false
+		if e.has("char") and str(e.char) != str(entry.get("char", "")):
+			entry["char"] = str(e.char)
+			changed = true
+		if e.has("look") and look is Dictionary and look != entry.get("look", {}):
+			entry["look"] = look
+			changed = true
+		if changed:
+			player_look_changed.emit(str(e.get("sid", "")))
 
 
 func _on_pong(sent_ms: int) -> void:

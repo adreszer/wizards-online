@@ -104,7 +104,7 @@ static func _subjects() -> Dictionary:
 static func _characters() -> Dictionary:
 	var ids: Array = CharacterRegistry.CHARACTERS.keys()
 	ids.sort()
-	return {"ids": ids, "default": CharacterRegistry.DEFAULT}
+	return {"ids": ids, "default": CharacterRegistry.DEFAULT, "skin_tones": CharacterLook.SKIN_TONES.size(), "robes": CharacterLook.ROBE_COLORS.size()}
 
 
 static func _protocol() -> Dictionary:

@@ -2,6 +2,7 @@
 return {
   CHAT_ROOM = "world",
   MAX_CHAT_LENGTH = 200,
+  OP_APPEARANCE = 50,
   OP_AREA = 4,
   OP_BOARD = 41,
   OP_CHAT = 36,

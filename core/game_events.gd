@@ -51,3 +51,6 @@ signal timetable_requested()
 ## The school bell rang for a timetable entry: event "warn" (5 minutes before),
 ## "start" or "end"; entry as in Timetable.entries.
 signal school_bell_rang(event: String, entry: Dictionary)
+
+## Something asked for the character creator (first join, /look).
+signal character_creator_requested()

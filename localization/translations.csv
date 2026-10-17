@@ -527,3 +527,21 @@ SELF_STUDY_REQUESTED,Asking the Lecture Quill to start this room's self-study…
 SELF_STUDY_ONLINE_ONLY,Self-study lessons run in the online school.,Lekcje nauki własnej odbywają się w szkole online.
 SELF_STUDY_NO_PLAN,This room has no self-study plan.,Ta sala nie ma planu nauki własnej.
 SELF_STUDY_ALREADY_OPEN,A lesson is already running here.,Tu już trwa lekcja.
+CREATOR_TITLE,Your character,Twoja postać
+CREATOR_INTRO,"Choose how you look. Your house colours appear on the trim once you are sorted. You can change this later with /look.","Wybierz, jak wyglądasz. Barwy domu pojawią się na wykończeniach po przydziale. Później zmienisz to komendą /wyglad."
+CREATOR_BODY,Body,Sylwetka
+CREATOR_SKIN,Skin tone,Odcień skóry
+CREATOR_ROBE,Robe colour,Kolor szaty
+CREATOR_DONE,Done,Gotowe
+CREATOR_CANCEL,Cancel,Anuluj
+CREATOR_SAVED,Your look is saved.,Wygląd zapisany.
+SKIN_1,Tone 1,Odcień 1
+SKIN_2,Tone 2,Odcień 2
+SKIN_3,Tone 3,Odcień 3
+SKIN_4,Tone 4,Odcień 4
+SKIN_5,Tone 5,Odcień 5
+ROBE_CHARCOAL,Charcoal,Grafit
+ROBE_BLACK,Black,Czerń
+ROBE_BROWN,Brown,Brąz
+ROBE_NAVY,Navy,Granat
+ROBE_MOSS,Moss,Mech
