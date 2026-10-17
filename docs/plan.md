@@ -475,6 +475,12 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: curfew hours, route, sight; the route's rooms exist
 - [ ] Detention tasks (Term D5), noise and darkness as stealth, a lantern familiar, curfew-only secrets
 
+### Milestone 55 — Rumours and talking portraits
+- [x] Rumours: the match keeps the last eight anonymous rumours from real events (a house solved a mystery, finished a house quest, won the cup) and sends them as `OP_RUMOURS`; notice boards show the latest under "They say:"
+- [x] `TalkingPortraits` (added by `castle.gd`; portrait positions recorded by `StaticBatch`): walking up to a portrait makes it greet the student by name and house and pass on a rumour, or old castle gossip when there is no news; each portrait then keeps quiet for 90 s
+- [x] Tests: portraits found, lines, a portrait speaking when approached
+- [ ] Portraits as messengers between each other, hints tied to mysteries, real portrait art
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

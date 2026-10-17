@@ -69,7 +69,8 @@ local OP_GUEST_PASS, OP_GUEST_PASS_GRANTED = P.OP_GUEST_PASS, P.OP_GUEST_PASS_GR
 local OP_HOUSE_CUP, OP_HOUSE_QUESTS = P.OP_HOUSE_CUP, P.OP_HOUSE_QUESTS
 local OP_MODERATION = P.OP_MODERATION
 local OP_DUEL, OP_DUEL_HIT, OP_DUEL_STATE = P.OP_DUEL, P.OP_DUEL_HIT, P.OP_DUEL_STATE
-local OP_CAUGHT = P.OP_CAUGHT
+local OP_CAUGHT, OP_RUMOURS = P.OP_CAUGHT, P.OP_RUMOURS
+local MAX_RUMOURS = 8
 -- Mastery: points per validated spell on a world object (practice targets give more),
 -- at most one award per spell per player every MASTERY_GAP seconds.
 local MASTERY_POINTS, MASTERY_PRACTICE_POINTS, MASTERY_GAP = 1, 2, 6
@@ -364,6 +365,14 @@ local function send_lessons(dispatcher, state, presences)
   dispatcher.broadcast_message(OP_LESSON_STATE, lessons_payload(state), presences, nil, true)
 end
 
+-- Rumours: anonymous news of real events (a house solved a mystery, finished a quest,
+-- won the cup) for notice boards and portraits.
+local function add_rumour(dispatcher, state, key, house)
+  table.insert(state.rumours, 1, { k = key, house = house or 0, at = nk.time() / 1000 })
+  while #state.rumours > MAX_RUMOURS do table.remove(state.rumours) end
+  dispatcher.broadcast_message(OP_RUMOURS, nk.json_encode({ rumours = state.rumours }), nil, nil, true)
+end
+
 -- House quests: the school week, progress sent to everyone, completions award points.
 local function quest_week(state, now)
   return math.floor(Timetable.school_day(state.timetable, now) / 7)
@@ -378,6 +387,7 @@ local function count_quest(dispatcher, state, house, counter, n)
   Quests.roll(state.quests, quest_week(state, nk.time() / 1000))
   for _, q in ipairs(Quests.count(state.quests, state.quest_defs, house, counter, n)) do
     award_house_points(dispatcher, state, house, q.points, "house quest: " .. q.id, nil, "quest")
+    add_rumour(dispatcher, state, "RUMOUR_QUEST", house)
   end
   Quests.save_state(state.quests)
   send_quests(dispatcher, state, nil)
@@ -667,6 +677,7 @@ local function award_cup(dispatcher, state, term)
   nk.logger_info(string.format("house cup %s: house %d", tostring(term), state.cup.winner))
   send_house_totals(dispatcher, state, nil)
   send_cup(dispatcher, state, nil, true)
+  add_rumour(dispatcher, state, "RUMOUR_CUP", state.cup.winner)
 end
 
 -- At the end of each calendar term the cup goes to the leading house.
@@ -781,6 +792,7 @@ local function run_actions(dispatcher, state, actions)
         Profile.write(state.presences[a[2]].user_id, profile)
         send_profile(dispatcher, state, a[2])
         count_quest(dispatcher, state, profile.house, "mysteries", 1)
+        add_rumour(dispatcher, state, "RUMOUR_SOLVED", profile.house)
         -- A first solve pays (once per character: the discovery is the receipt).
         pay(dispatcher, state, a[2], a[5] or state.rules.coins_per_mystery, { source = "mystery", reason = a[4] or a[3] }, a[4] or a[3])
       end
@@ -814,7 +826,7 @@ function M.match_init(context, params)
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
                   positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup(),
-                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0, caught_night = {} }
+                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0, caught_night = {}, rumours = {} }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -867,6 +879,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     send_cup(dispatcher, state, { p })
     if Quests.roll(state.quests, quest_week(state, nk.time() / 1000)) then Quests.save_state(state.quests) end
     send_quests(dispatcher, state, { p })
+    if #state.rumours > 0 then dispatcher.broadcast_message(OP_RUMOURS, nk.json_encode({ rumours = state.rumours }), { p }, nil, true) end
     send_wallet(dispatcher, state, p.session_id, Economy.balance(p.user_id))
     send_clock(dispatcher, state, { p })
     send_timetable(dispatcher, state, { p })

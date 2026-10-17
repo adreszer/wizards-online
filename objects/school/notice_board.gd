@@ -48,6 +48,8 @@ static func board_text(timetable: Timetable, now: float, lines: int) -> String:
 	var cal := timetable.calendar_line()
 	if cal != "":
 		out.insert(1, cal)
+	if not NetworkManager.rumours.is_empty():
+		out.append(TranslationServer.translate("RUMOUR_HEADER") + " " + NetworkManager.rumour_text(NetworkManager.rumours[0]))
 	var coming := timetable.upcoming(now, lines)
 	if coming.is_empty():
 		out.append(TranslationServer.translate("TIMETABLE_EMPTY"))

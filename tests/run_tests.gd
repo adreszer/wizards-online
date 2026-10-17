@@ -94,6 +94,7 @@ func _run() -> void:
 	await _test_prefects()
 	await _test_house_cup()
 	_test_warden()
+	await _test_portraits()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2573,6 +2574,24 @@ func _test_warden() -> void:
 		if line.strip_edges().begins_with("[\""):
 			areas[line.strip_edges().get_slice("\"", 1)] = true
 	t.check(NightWarden.ROUTE.all(func(a: String) -> bool: return areas.has(a)), "every room on his route exists")
+
+
+func _test_portraits() -> void:
+	t.section("Talking portraits and rumours")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var tp := castle.get_node_or_null("TalkingPortraits") as TalkingPortraits
+	t.check(tp != null and tp.portraits.size() >= 20, "the castle's portraits can talk (%d)" % (tp.portraits.size() if tp else 0))
+	var line := TalkingPortraits.line_for("Ola", 3, [{"k": "RUMOUR_SOLVED", "house": 2}], 0)
+	t.check(line.contains("Ola") and line.contains(tr("HOUSE_3_NAME")) and line.contains(tr("HOUSE_2_NAME")), "a portrait greets by name and house and passes on a rumour (%s)" % line)
+	t.check(TalkingPortraits.line_for("Ola", 0, [], 1).contains(tr("RUMOUR_IDLE_2")), "without news, old gossip")
+	if tp != null and not tp.portraits.is_empty():
+		var p := await _spawn_player(Vector3(0, 1, 0))
+		p.global_position = tp.portraits[0].origin + tp.portraits[0].basis.z * 1.2 - Vector3.UP * 1.5
+		await _wait(1.2)
+		t.check(tp._bubble.visible and tp._bubble.text.contains(p.display_name), "walking up to one makes it speak")
+	castle.queue_free()
 
 
 func _test_timetable() -> void:

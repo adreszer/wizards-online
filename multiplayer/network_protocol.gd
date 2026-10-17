@@ -159,6 +159,8 @@ const OP_DUEL_HIT := 60
 const OP_DUEL_STATE := 61
 ## client → server: {area} the night warden saw the local student out after curfew (server checks)
 const OP_CAUGHT := 62
+## server → all (and joiners): {rumours: [{k: translation key, house, at}]} anonymous rumours from real events, newest first
+const OP_RUMOURS := 63
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"

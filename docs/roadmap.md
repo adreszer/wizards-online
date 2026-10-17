@@ -119,7 +119,7 @@ Goal: attending a lesson is fun, and progress over weeks is visible.
 ### Term D: "The castle is alive" (secrets and residents)
 
 1. **Moving and shifting castle** (M ★★★). Some staircases rotate on a schedule, some corridors swap at night, a door that only appears on certain days. Server-owned state, so everyone sees the same castle. The generator's stair and door data make this cheap to author.
-2. **Talking portraits** (M ★★★). Painted NPCs on walls who greet you by name, comment on your house, hint at mysteries, gossip about other players' achievements ("a Phoenara student found the loft yesterday…"), and act as messengers between portraits.
+2. **Talking portraits** (M ★★★). *Built (Milestone 55): greetings by name and house, rumours from real events; messengers and mystery hints still open.* Painted NPCs on walls who greet you by name, comment on your house, hint at mysteries, gossip about other players' achievements ("a Phoenara student found the loft yesterday…"), and act as messengers between portraits.
 3. **The *Echoes*** (M ★★). Translucent memories of former students and staff, each tied to a part of the castle, with a short questline and lore. Original replacement for the classic ghost residents.
 4. **Curfew and the night warden** (M ★★★). *Built (Milestone 54): a warden on a shared-time patrol, caught students cost their house points once a night; detention tasks and richer stealth still open.* After curfew students outside their common room risk being caught by an NPC warden with a lantern familiar that patrols corridors (stealth: light, noise, line of sight). Caught → small point loss and a detention task. Some mysteries can only be done after curfew, which creates the best kind of risk.
 5. **Detention tasks** (S–M ★★). Minigames assigned by professors, prefects or the warden: polish trophies, re-shelve the library, sort ingredients, scrub cauldrons. Sometimes detention leads to a secret (the trophy room has a hidden switch).
@@ -127,7 +127,7 @@ Goal: attending a lesson is fun, and progress over weeks is visible.
 7. **Mystery chains per year** (L ★★★). Each school year has a story mystery spread across the castle, solved over a term (clues in books, portraits, Echoes, lessons). First-years cannot reach some parts; later years can. This is the long-term content engine; the mystery step engine already supports it.
 8. **The *Unfinished Wing*** (L ★★★). A sealed part of the castle that the whole server opens room by room through community goals (points earned, mysteries solved). New content gets released as "the next room has opened", and every player shares the moment.
 9. **Seasons and holidays** (M ★★). The grounds change over the year (autumn leaves, snow, spring blossom); holiday decorations in the great hall; a winter ball event; end-of-year farewell.
-10. **Rumour board** (S ★). A notice board where anonymous rumours appear (authored by the owner or generated from server events): "Someone heard knocking behind the third bookshelf." Directs players toward secrets without spoiling them.
+10. ~~**Rumour board**~~ (built: Milestone 55, rumours from server events on the notice boards and in portraits). (S ★). A notice board where anonymous rumours appear (authored by the owner or generated from server events): "Someone heard knocking behind the third bookshelf." Directs players toward secrets without spoiling them.
 
 ### Term E: "My people are here" (social)
 

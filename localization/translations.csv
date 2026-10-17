@@ -656,3 +656,13 @@ DUEL_BANNER_SCORE,"%s %d : %d %s · first to %d","%s %d : %d %s · do %d trafie�
 DUEL_USAGE,"Duels happen in the duelling hall or the Defence classroom: /duel name, then the other player types /accept.","Pojedynki odbywają się w sali pojedynków albo w klasie obrony: /pojedynek imię, druga osoba wpisuje /przyjmij."
 WARDEN_NAME,The Night Warden,Nocny Strażnik
 WARDEN_CAUGHT,"The warden's lantern finds you. Out of bed after curfew: your house loses points.","Latarnia strażnika cię wyłapuje. Poza łóżkiem po ciszy nocnej: twój dom traci punkty."
+PORTRAIT_GREET,"Ah, %s.","A, %s."
+PORTRAIT_GREET_HOUSE,"Ah, %s of %s.","A, %s z domu %s."
+RUMOUR_HEADER,They say:,Mówi się:
+RUMOUR_SOLVED,"They say someone from %s solved one of the castle's mysteries…","Mówią, że ktoś z domu %s rozwiązał jedną z tajemnic zamku…"
+RUMOUR_QUEST,"They say %s finished this week's house quest.","Mówią, że %s wypełnił tygodniowe zadanie domu."
+RUMOUR_CUP,"They say %s still celebrates the house cup.","Mówią, że %s wciąż świętuje zdobycie pucharu."
+RUMOUR_IDLE_1,"Someone heard knocking behind a bookshelf in the library.","Ktoś słyszał pukanie za regałem w bibliotece."
+RUMOUR_IDLE_2,"The turning stairs never stop at the same landing twice in a row, you know.","Ruchome schody nigdy nie stają dwa razy z rzędu przy tym samym podeście, wiesz?"
+RUMOUR_IDLE_3,"Mind the warden after ten. His lantern sees further than he does.","Uważaj na strażnika po dziesiątej. Jego latarnia widzi dalej niż on."
+RUMOUR_IDLE_4,"The founders' cracked cauldron is still somewhere in the castle.","Pęknięty kociołek założycieli wciąż jest gdzieś w zamku."

@@ -105,6 +105,8 @@ var quiz: Dictionary = {}
 var quiz_answers: Array = []
 ## The running practical as we see it ({} = none) and, for the professor, everyone's progress.
 var practical: Dictionary = {}
+## Rumours from real events, newest first [{k, house, at}].
+var rumours: Array = []
 ## This week's house quests {week, quests: [{id, name_key, target, points, progress, done}]}.
 var house_quests: Dictionary = {}
 ## The house cup holder {winner, term, totals} ({} = never awarded).
@@ -566,6 +568,12 @@ func moderation_reports(limit: int = 50, http_key: String = "") -> Dictionary:
 	return await _admin_rpc(NetworkProtocol.RPC_MODERATION_REPORTS, {"limit": limit}, http_key)
 
 
+## A rumour as a sentence ("They say a Phoenara student solved a mystery…"); offline lore.
+static func rumour_text(r: Dictionary) -> String:
+	return TranslationServer.translate(str(r.get("k", "RUMOUR_IDLE_1"))) % CharacterProfile.house_name(int(r.get("house", 0))) if int(r.get("house", 0)) > 0 \
+		else TranslationServer.translate(str(r.get("k", "RUMOUR_IDLE_1")))
+
+
 ## Whether a prefect's guest pass lets us through `house`'s doors right now.
 func has_guest_pass(house: int) -> bool:
 	return float(guest_passes.get(house, 0.0)) > server_time()
@@ -623,6 +631,8 @@ func _on_lesson_message(op_code: int, payload: Dictionary) -> void:
 			if not payload.get("students", []) is Array:
 				practical_progress.students = []
 			practical_progress_changed.emit(practical_progress)
+		NetworkProtocol.OP_RUMOURS:
+			rumours = payload.get("rumours", []) if payload.get("rumours", []) is Array else []
 		NetworkProtocol.OP_HOUSE_QUESTS:
 			var before: Array = house_quests.get("quests", [])
 			house_quests = payload
@@ -665,6 +675,7 @@ func _teardown() -> void:
 	guest_passes = {}
 	house_cup = {}
 	house_quests = {}
+	rumours = []
 	practical = {}
 	practical_progress = {}
 	await world_session.leave()
