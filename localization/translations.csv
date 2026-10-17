@@ -647,3 +647,10 @@ CHAT_MUTED,You are muted for now.,Masz teraz wyciszony czat.
 CHAT_BLOCKED,%s does not take your messages.,%s nie przyjmuje twoich wiadomości.
 MODERATION_USAGE,"/report name reason · /block name · /unblock name · staff: /mute name [minutes], /kick name · admins: /ban name reason","/zglos_gracza imię powód · /blokuj imię · /odblokuj imię · kadra: /wycisz imię [minuty], /wyrzuc imię · administratorzy: /ban imię powód"
 MODERATION_SENT,Sent.,Wysłano.
+DUEL_CHALLENGED,"%s challenges you to a duel! /accept (/przyjmij) or /decline (/odrzuc).","%s wyzywa cię na pojedynek! /przyjmij albo /odrzuc."
+DUEL_EXPIRED,The duel did not happen.,Pojedynek się nie odbył.
+DUEL_WON_BY,%s wins the duel!,%s wygrywa pojedynek!
+DUEL_BANNER_CHALLENGE,%s challenges %s,%s wyzywa: %s
+DUEL_BANNER_COUNTDOWN,"%s and %s bow… the duel begins","%s i %s kłaniają się… pojedynek się zaczyna"
+DUEL_BANNER_SCORE,"%s %d : %d %s · first to %d","%s %d : %d %s · do %d trafień"
+DUEL_USAGE,"Duels happen in the duelling hall or the Defence classroom: /duel name, then the other player types /accept.","Pojedynki odbywają się w sali pojedynków albo w klasie obrony: /pojedynek imię, druga osoba wpisuje /przyjmij."

@@ -54,6 +54,9 @@ M.DEFAULT_RULES = {
   -- house's rooms lasts.
   max_prefect_points = 5,
   guest_pass_minutes = 10,
+  -- Duels (duel.lua): only in these areas, first to this many hits.
+  duel_areas = { "duelling_hall", "class_warding" },
+  duel_hits_to_win = 3,
 }
 M.HOUSES = 4
 M.POINTS_COLLECTION, M.TOTALS_KEY = "house_points", "totals"

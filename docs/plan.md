@@ -463,6 +463,12 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: command usage; two clients: filtered swearing, block/unblock, a student refused a ban
 - [ ] Chat logs kept for a limited time, an in-game admin view of reports, age-appropriate defaults (roadmap section 7)
 
+### Milestone 53 — The duelling club
+- [x] `nakama/modules/duel.lua`: challenge by name, accept, countdown (both bow), fight, first to `duel_hits_to_win` (3); only in `duel_areas` (the duelling hall, the Defence classroom); hits are reported by the caster (`OP_DUEL_HIT`, from `GameEvents.spell_hit_player` when a projectile hits a remote player) and validated by the server (fighting, both still in a duelling area, the opponent, a known spell, at most one hit per 0.6 s); leaving the area or the game forfeits; challenges expire after a minute; nothing else changes (no health, no points)
+- [x] `DuelHud`: the banner with names and score for duellists and spectators in the room, the result, the duel music while a fight runs; chat commands `/duel` `/accept` `/decline` `/forfeit` (`/pojedynek` `/przyjmij` `/odrzuc` `/poddaj`)
+- [x] Tests: banner, usage; two clients: refused outside the rooms, unknown names refused, challenge and withdrawal
+- [ ] A professor-run club mode (rule sets, a ladder), a hit reaction and duel meter visuals
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

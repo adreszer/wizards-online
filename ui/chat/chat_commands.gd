@@ -30,6 +30,9 @@ const LOOK_ALIASES: Array[String] = ["look", "wyglad", "wygląd", "postac", "pos
 const RUNES_ALIASES: Array[String] = ["runes", "runy", "rune"]
 const EXAM_ALIASES: Array[String] = ["exam", "egzamin"]
 const GUEST_ALIASES: Array[String] = ["guest", "gosc", "gość"]
+## Duels: /duel name, /accept, /decline, /forfeit (Polish: /pojedynek, /przyjmij, /odrzuc, /poddaj).
+const DUEL_ALIASES := {"duel": "challenge", "pojedynek": "challenge", "accept": "accept", "przyjmij": "accept",
+	"decline": "decline", "odrzuc": "decline", "odrzuć": "decline", "forfeit": "forfeit", "poddaj": "forfeit"}
 ## Moderation: /report name reason, /block name, /unblock name; staff /mute name [minutes], /kick name; admins /ban name reason.
 const MODERATION_ALIASES := {"report": "report", "zglos_gracza": "report", "zgłoś_gracza": "report", "block": "block", "blokuj": "block",
 	"unblock": "unblock", "odblokuj": "unblock", "mute": "mute", "wycisz": "mute", "kick": "kick", "wyrzuc": "kick", "wyrzuć": "kick", "ban": "ban"}
@@ -105,6 +108,13 @@ static func run(text: String, player: Node) -> String:
 		var action: String = MODERATION_ALIASES[name]
 		var minutes := int(parts[2]) if action == "mute" and parts.size() > 2 and parts[2].is_valid_int() else 10
 		NetworkManager.send_moderation(action, parts[1], " ".join(parts.slice(2)) if action in ["report", "ban"] else "", minutes)
+		return _t("MODERATION_SENT")
+	if DUEL_ALIASES.has(name):
+		var duel_action: String = DUEL_ALIASES[name]
+		if duel_action == "challenge" and parts.size() < 2:
+			return _t("DUEL_USAGE")
+		if not NetworkManager.send_op(NetworkProtocol.OP_DUEL, {"action": duel_action, "name": " ".join(parts.slice(1))}):
+			return _t("SELF_STUDY_ONLINE_ONLY")
 		return _t("MODERATION_SENT")
 	if GUEST_ALIASES.has(name):
 		if parts.size() < 2:

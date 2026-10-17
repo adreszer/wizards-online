@@ -57,3 +57,6 @@ signal character_creator_requested()
 
 ## Someone opened a book: its title key and page keys (BookPanel shows it).
 signal book_requested(title_key: String, page_keys: PackedStringArray)
+
+## The local player's spell hit another player (only a duel makes that count).
+signal spell_hit_player(peer_id: String, spell_id: StringName)

@@ -2541,6 +2541,9 @@ func _test_prefects() -> void:
 	NetworkManager.guest_passes.clear()
 	door.queue_free()
 	t.check(ChatCommands.run("/blokuj", null) == tr("MODERATION_USAGE"), "moderation commands explain themselves")
+	t.check(ChatCommands.run("/pojedynek", null) == tr("DUEL_USAGE"), "/duel explains where duels happen")
+	t.check(DuelHud.banner_text({"state": "fighting", "a": "x", "b": "y", "a_name": "Ola", "b_name": "Kuba", "hits": {"x": 2, "y": 1}, "to_win": 3})
+		== tr("DUEL_BANNER_SCORE") % ["Ola", 2, 1, "Kuba", 3], "the duel banner keeps score")
 	t.check(ChatCommands.run("/odejmij 2", null) == tr("DEDUCT_USAGE") and ChatCommands.run("/gosc", null) == tr("GUEST_USAGE"), "prefect commands explain themselves")
 
 

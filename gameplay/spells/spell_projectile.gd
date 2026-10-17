@@ -98,6 +98,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_hit(collider: Node, position: Vector3, _normal: Vector3) -> void:
+	if not cosmetic and collider is Player and not (collider as Player).is_local:
+		GameEvents.spell_hit_player.emit((collider as Player).peer_id, definition.id)
 	if not cosmetic:
 		var receiver := SpellReceiver.find_on(collider)
 		if receiver != null:

@@ -43,6 +43,7 @@ local SelfStudy = require("self_study")
 local Homework = require("homework")
 local Quests = require("house_quests")
 local Moderation = require("moderation")
+local Duel = require("duel")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -66,6 +67,7 @@ local OP_HOMEWORK, OP_HOMEWORK_NEW = P.OP_HOMEWORK, P.OP_HOMEWORK_NEW
 local OP_GUEST_PASS, OP_GUEST_PASS_GRANTED = P.OP_GUEST_PASS, P.OP_GUEST_PASS_GRANTED
 local OP_HOUSE_CUP, OP_HOUSE_QUESTS = P.OP_HOUSE_CUP, P.OP_HOUSE_QUESTS
 local OP_MODERATION = P.OP_MODERATION
+local OP_DUEL, OP_DUEL_HIT, OP_DUEL_STATE = P.OP_DUEL, P.OP_DUEL_HIT, P.OP_DUEL_STATE
 -- Mastery: points per validated spell on a world object (practice targets give more),
 -- at most one award per spell per player every MASTERY_GAP seconds.
 local MASTERY_POINTS, MASTERY_PRACTICE_POINTS, MASTERY_GAP = 1, 2, 6
@@ -675,6 +677,55 @@ local function check_term_end(dispatcher, state, now)
   end
 end
 
+-- Duels: whether `sid` stands in a duelling area.
+local function in_duel_area(state, sid)
+  local area = state.areas[sid] or ""
+  for _, a in ipairs(state.rules.duel_areas or {}) do
+    if a == area then return true end
+  end
+  return false
+end
+
+-- The duel's state to both duellists and everyone in their rooms.
+local function send_duel(dispatcher, state, duel)
+  local payload = nk.json_encode({ id = duel.id, state = duel.state, a = duel.a, b = duel.b, a_name = state.names[duel.a] or "",
+    b_name = state.names[duel.b] or "", hits = duel.hits, winner = duel.winner, forfeit = duel.forfeit, expired = duel.expired,
+    to_win = state.rules.duel_hits_to_win })
+  local seen, list = {}, {}
+  for _, sid in ipairs({ duel.a, duel.b }) do
+    if state.presences[sid] and not seen[sid] then seen[sid] = true; table.insert(list, state.presences[sid]) end
+    for _, pl in ipairs(players_in(state, state.areas[sid] or "")) do
+      if not seen[pl.sid] then seen[pl.sid] = true; table.insert(list, state.presences[pl.sid]) end
+    end
+  end
+  if #list > 0 then dispatcher.broadcast_message(OP_DUEL_STATE, payload, list, nil, true) end
+end
+
+local function end_duel(dispatcher, state, duel)
+  send_duel(dispatcher, state, duel)
+  if duel.winner and not duel.expired then
+    nk.logger_info(string.format("duel: %s beat %s", state.names[duel.winner] or "?", state.names[Duel.opponent(duel, duel.winner)] or "?"))
+  end
+  state.duel_of[duel.a], state.duel_of[duel.b] = nil, nil
+end
+
+local function tick_duels(dispatcher, state, now)
+  local done = {}
+  for sid, duel in pairs(state.duel_of) do
+    if not done[duel] then
+      done[duel] = true
+      if duel.state == "fighting" or duel.state == "countdown" then
+        for _, s in ipairs({ duel.a, duel.b }) do
+          if not state.presences[s] or not in_duel_area(state, s) then Duel.forfeit(duel, s) end
+        end
+      end
+      if Duel.tick(duel, now) or duel.state == "over" then
+        if duel.state == "over" then end_duel(dispatcher, state, duel) else send_duel(dispatcher, state, duel) end
+      end
+    end
+  end
+end
+
 -- Timetabled lessons that ended since the last check without anyone opening them
 -- go in the lesson log as "not_held" (the self-study fallback keys off the same slots).
 local function check_ended_slots(state, now)
@@ -761,7 +812,7 @@ function M.match_init(context, params)
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
                   positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup(),
-                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {} }
+                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0 }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -884,6 +935,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     end
     check_ended_slots(state, now)
     tick_self_study(dispatcher, state, now)
+    tick_duels(dispatcher, state, now)
     if tick % (TICK_RATE * 60) == 0 then check_term_end(dispatcher, state, now) end
     local occupied = function(area) return #players_in(state, area) > 0 end
     run_actions(dispatcher, state, Mysteries.tick(state.engine, state.mysteries, nk.time() / 1000, occupied))
@@ -1237,6 +1289,58 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           { state.presences[target] }, nil, true)
       end
       dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = "guest", reason = reason or "" }), { message.sender }, nil, true)
+    elseif message.op_code == OP_DUEL then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local reason
+      local mine = state.duel_of[sid]
+      if payload.action == "challenge" then
+        local target = type(payload.name) == "string" and find_sid(state, nil, payload.name) or nil
+        if not in_duel_area(state, sid) then
+          reason = "not_in_duel_area"
+        elseif not target or target == sid then
+          reason = "no_such_player"
+        elseif mine or state.duel_of[target] then
+          reason = "busy"
+        else
+          state.duel_seq = state.duel_seq + 1
+          local duel = Duel.new(sid, target, now)
+          duel.id = state.duel_seq
+          state.duel_of[sid], state.duel_of[target] = duel, duel
+          send_duel(dispatcher, state, duel)
+        end
+      elseif payload.action == "accept" then
+        if not mine or mine.b ~= sid or mine.state ~= "challenged" then
+          reason = "no_challenge"
+        elseif not in_duel_area(state, sid) or not in_duel_area(state, mine.a) then
+          reason = "not_in_duel_area"
+        else
+          Duel.accept(mine, now)
+          send_duel(dispatcher, state, mine)
+        end
+      elseif payload.action == "decline" or payload.action == "forfeit" then
+        if not mine then
+          reason = "no_duel"
+        else
+          if mine.state == "challenged" then mine.state = "over"; mine.expired = true else Duel.forfeit(mine, sid) end
+          end_duel(dispatcher, state, mine)
+        end
+      else
+        reason = "bad_action"
+      end
+      dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = "duel", reason = reason or "" }), { message.sender }, nil, true)
+    elseif message.op_code == OP_DUEL_HIT then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local duel = state.duel_of[sid]
+      local profile = state.profiles[sid]
+      if duel and type(payload.sid) == "string" and type(payload.spell) == "string" and profile and Profile.knows(profile, payload.spell)
+          and in_duel_area(state, sid) and in_duel_area(state, payload.sid) then
+        local result = Duel.hit(duel, sid, payload.sid, now, state.rules.duel_hits_to_win)
+        if result then
+          if duel.state == "over" then end_duel(dispatcher, state, duel) else send_duel(dispatcher, state, duel) end
+        end
+      end
     elseif message.op_code == OP_MODERATION then
       local ok, payload = pcall(nk.json_decode, message.data)
       payload = ok and type(payload) == "table" and payload or {}

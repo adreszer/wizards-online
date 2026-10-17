@@ -149,6 +149,14 @@ const OP_HOUSE_QUESTS := 57
 ## client → server: {action: "report" | "block" | "unblock" (anyone) | "mute" | "kick" (staff) | "ban" (admins),
 ## name, minutes?, reason?} (answered by OP_LESSON_TOOL_RESULT, tool "moderation")
 const OP_MODERATION := 58
+## client → server: {action: "challenge", name} | {action: "accept" | "decline" | "forfeit"} a duel (only
+## in a duelling area, school_rules.json duel_areas)
+const OP_DUEL := 59
+## client → server: {sid, spell} the local player's spell hit the opponent (the server validates)
+const OP_DUEL_HIT := 60
+## server → duellists and spectators: {id, state: "challenged" | "countdown" | "fighting" | "over", a, b,
+## a_name, b_name, hits: {sid: n}, winner?, forfeit?, expired?, to_win}
+const OP_DUEL_STATE := 61
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"
