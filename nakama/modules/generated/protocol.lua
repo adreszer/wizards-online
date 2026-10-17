@@ -5,6 +5,7 @@ return {
   OP_APPEARANCE = 50,
   OP_AREA = 4,
   OP_BOARD = 41,
+  OP_CAUGHT = 62,
   OP_CHAT = 36,
   OP_CHAT_LINE = 37,
   OP_CHAT_RESULT = 40,

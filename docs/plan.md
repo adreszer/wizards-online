@@ -469,6 +469,12 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: banner, usage; two clients: refused outside the rooms, unknown names refused, challenge and withdrawal
 - [ ] A professor-run club mode (rule sets, a ladder), a hit reaction and duel meter visuals
 
+### Milestone 54 — Curfew and the night warden
+- [x] `NightWarden` (added by `castle.gd`): from 22:00 to 6:00 school time a lantern-carrying warden paces the ground-floor halls and corridors of `ROUTE`, 45 s per room; his room and position are a pure function of the shared time (exported to the server as `generated/warden.lua`)
+- [x] A student out after curfew in his room who comes into his light (within 9 m, in front of him, in sight) is caught: the client reports `OP_CAUGHT`, the server checks the school clock, the warden's room and the role, deducts `curfew_points` from the house (source `curfew`) once per player per night and logs a detention; staff and prefects pass
+- [x] Tests: curfew hours, route, sight; the route's rooms exist
+- [ ] Detention tasks (Term D5), noise and darkness as stealth, a lantern familiar, curfew-only secrets
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

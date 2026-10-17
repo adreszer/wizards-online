@@ -93,6 +93,7 @@ func _run() -> void:
 	await _test_books()
 	await _test_prefects()
 	await _test_house_cup()
+	_test_warden()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2558,6 +2559,20 @@ func _test_house_cup() -> void:
 		display.show_cup({"winner": 3, "term": "autumn_2026"})
 		t.check(display.visible and display.winner == 3, "the holder's cup and banner stand in the great hall")
 	castle.queue_free()
+
+
+func _test_warden() -> void:
+	t.section("Curfew and the night warden")
+	t.check(NightWarden.is_curfew(23.0) and NightWarden.is_curfew(3.0) and not NightWarden.is_curfew(12.0) and not NightWarden.is_curfew(21.5), "curfew runs from 22:00 to 6:00")
+	t.check(NightWarden.area_at(0.0) == NightWarden.ROUTE[0] and NightWarden.area_at(NightWarden.DWELL * 1.5) == NightWarden.ROUTE[1], "he walks the route room by room")
+	var at := Transform3D(Basis.IDENTITY, Vector3.ZERO)   # facing -Z
+	t.check(NightWarden.sees(at, Vector3(0, 0, -5), null) and not NightWarden.sees(at, Vector3(0, 0, 5), null) and not NightWarden.sees(at, Vector3(0, 0, -20), null),
+		"he sees what is close and in front of him")
+	var areas: Dictionary = {}
+	for line in FileAccess.get_file_as_string("res://nakama/modules/world_areas.lua").split("\n"):
+		if line.strip_edges().begins_with("[\""):
+			areas[line.strip_edges().get_slice("\"", 1)] = true
+	t.check(NightWarden.ROUTE.all(func(a: String) -> bool: return areas.has(a)), "every room on his route exists")
 
 
 func _test_timetable() -> void:

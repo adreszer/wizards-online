@@ -157,6 +157,8 @@ const OP_DUEL_HIT := 60
 ## server → duellists and spectators: {id, state: "challenged" | "countdown" | "fighting" | "over", a, b,
 ## a_name, b_name, hits: {sid: n}, winner?, forfeit?, expired?, to_win}
 const OP_DUEL_STATE := 61
+## client → server: {area} the night warden saw the local student out after curfew (server checks)
+const OP_CAUGHT := 62
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"

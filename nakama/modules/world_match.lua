@@ -44,6 +44,7 @@ local Homework = require("homework")
 local Quests = require("house_quests")
 local Moderation = require("moderation")
 local Duel = require("duel")
+local WARDEN = require("generated.warden")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -68,6 +69,7 @@ local OP_GUEST_PASS, OP_GUEST_PASS_GRANTED = P.OP_GUEST_PASS, P.OP_GUEST_PASS_GR
 local OP_HOUSE_CUP, OP_HOUSE_QUESTS = P.OP_HOUSE_CUP, P.OP_HOUSE_QUESTS
 local OP_MODERATION = P.OP_MODERATION
 local OP_DUEL, OP_DUEL_HIT, OP_DUEL_STATE = P.OP_DUEL, P.OP_DUEL_HIT, P.OP_DUEL_STATE
+local OP_CAUGHT = P.OP_CAUGHT
 -- Mastery: points per validated spell on a world object (practice targets give more),
 -- at most one award per spell per player every MASTERY_GAP seconds.
 local MASTERY_POINTS, MASTERY_PRACTICE_POINTS, MASTERY_GAP = 1, 2, 6
@@ -812,7 +814,7 @@ function M.match_init(context, params)
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
                   positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup(),
-                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0 }
+                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0, caught_night = {} }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -1289,6 +1291,23 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           { state.presences[target] }, nil, true)
       end
       dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = "guest", reason = reason or "" }), { message.sender }, nil, true)
+    elseif message.op_code == OP_CAUGHT then
+      -- Checked: curfew by the school clock, the warden's room by the shared time, a
+      -- student in it outside their own house, once per player per night.
+      local profile = state.profiles[sid]
+      local day = School.day_seconds(state.rules)
+      local hours = ((now + state.clock_offset) / day % 1) * 24
+      local curfew = hours >= WARDEN.curfew_start or hours < WARDEN.curfew_end
+      local warden_area = WARDEN.route[(math.floor(now / WARDEN.dwell) % #WARDEN.route) + 1]
+      local night = math.floor((now + state.clock_offset - WARDEN.curfew_end / 24 * day) / day)
+      local area = state.areas[sid] or ""
+      if profile and profile.role == "student" and curfew and (area == warden_area or area == "") and profile.house > 0
+          and (state.caught_night[sid] or -1) ~= night then
+        state.caught_night[sid] = night
+        award_house_points(dispatcher, state, profile.house, -state.rules.curfew_points, "out after curfew: " .. (state.names[sid] or ""), nil, "curfew")
+        Records.log_lesson({ kind = "detention", subject = "", area = area, slot = "", by = "", by_name = "warden", opened_at = now, closed_at = now,
+                             why = "curfew", attended = { [message.sender.user_id] = state.names[sid] or "" }, points = state.rules.curfew_points })
+      end
     elseif message.op_code == OP_DUEL then
       local ok, payload = pcall(nk.json_decode, message.data)
       payload = ok and type(payload) == "table" and payload or {}

@@ -654,3 +654,5 @@ DUEL_BANNER_CHALLENGE,%s challenges %s,%s wyzywa: %s
 DUEL_BANNER_COUNTDOWN,"%s and %s bow… the duel begins","%s i %s kłaniają się… pojedynek się zaczyna"
 DUEL_BANNER_SCORE,"%s %d : %d %s · first to %d","%s %d : %d %s · do %d trafień"
 DUEL_USAGE,"Duels happen in the duelling hall or the Defence classroom: /duel name, then the other player types /accept.","Pojedynki odbywają się w sali pojedynków albo w klasie obrony: /pojedynek imię, druga osoba wpisuje /przyjmij."
+WARDEN_NAME,The Night Warden,Nocny Strażnik
+WARDEN_CAUGHT,"The warden's lantern finds you. Out of bed after curfew: your house loses points.","Latarnia strażnika cię wyłapuje. Poza łóżkiem po ciszy nocnej: twój dom traci punkty."

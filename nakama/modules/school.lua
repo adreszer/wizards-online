@@ -57,6 +57,8 @@ M.DEFAULT_RULES = {
   -- Duels (duel.lua): only in these areas, first to this many hits.
   duel_areas = { "duelling_hall", "class_warding" },
   duel_hits_to_win = 3,
+  -- Curfew: points a student caught by the night warden costs their house (once a night).
+  curfew_points = 5,
 }
 M.HOUSES = 4
 M.POINTS_COLLECTION, M.TOTALS_KEY = "house_points", "totals"
