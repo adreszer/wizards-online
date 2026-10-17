@@ -60,6 +60,10 @@ static func board_text_for(area: String, lessons: Dictionary, timetable: Timetab
 	var subject: String = TranslationServer.translate(def.display_name) if def != null else ""
 	if lessons.has(area):
 		var written := str(lessons[area].get("board", ""))
+		# Self-study boards come in both languages.
+		var both: Variant = lessons[area].get("board_i18n")
+		if both is Dictionary:
+			written = str(both.get(TranslationServer.get_locale().substr(0, 2), both.get("pl", written)))
 		return written if written != "" else subject
 	var lines := PackedStringArray([subject])
 	for e in timetable.upcoming(now):

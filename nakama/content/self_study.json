@@ -1,0 +1,759 @@
+{
+  "_comment": "Self-study lessons: when a timetabled lesson starts and no professor opens it within school_rules.json self_study_grace_minutes, the host runs the subject's plan in the room. Steps: say / board (text), quiz (text, choices, correct = 0-based index, seconds), practical (spell of the subject, hits, seconds). Every text has pl and en. A practical teaches its spell only when school_rules.json self_study_spells lists it (owner decision; empty = none). Names are placeholders.",
+  "host": {
+    "pl": "Pióro Wykładowe",
+    "en": "the Lecture Quill"
+  },
+  "plans": {
+    "sigilcraft": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Zaklęcia: pchnięcie i uniesienie\n• ruch nadgarstka z łokcia\n• cel przed oczami",
+            "en": "Charms: the push and the lift\n• move the wrist from the elbow\n• keep the target in sight"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Zaklęcie to krótka myśl wypowiedziana ręką. Im krótsza myśl, tym czystszy czar.",
+            "en": "A charm is a short thought spoken with the hand. The shorter the thought, the cleaner the charm."
+          }
+        },
+        {
+          "say": {
+            "pl": "Pchnięcie Arkany odsuwa rzeczy od was. Uniesienie robi coś trudniejszego: każe im zapomnieć o ciężarze.",
+            "en": "Arcane Pulse pushes things away from you. Uplift does something harder: it lets them forget their weight."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Co robi Uniesienie?",
+            "en": "What does Uplift do?"
+          },
+          "choices": [
+            {
+              "pl": "Odpycha przedmiot",
+              "en": "Pushes an object away"
+            },
+            {
+              "pl": "Sprawia, że przedmiot zapomina o ciężarze",
+              "en": "Lets an object forget its weight"
+            },
+            {
+              "pl": "Zapala świecę",
+              "en": "Lights a candle"
+            }
+          ],
+          "correct": 1
+        },
+        {
+          "say": {
+            "pl": "Teraz ćwiczenie. Celujcie w runiczny krąg z przodu klasy, spokojnie, bez machania całą ręką.",
+            "en": "Now the practical. Aim at the rune disc at the front of the room, calmly, without swinging your whole arm."
+          }
+        },
+        {
+          "practical": "uplift",
+          "hits": 3
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "shapeshaping": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Transmutacja: naprawa\n• kształt pamięta, jaki był\n• najpierw obejrzyj pęknięcie",
+            "en": "Transfiguration: mending\n• a shape remembers what it was\n• look at the crack first"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Transmutacja nie tworzy niczego z niczego. Przypomina rzeczy, czym były albo czym mogą się stać.",
+            "en": "Transfiguration makes nothing out of nothing. It reminds things what they were, or what they could become."
+          }
+        },
+        {
+          "say": {
+            "pl": "Splot Naprawy szuka w przedmiocie pamięci całości i prowadzi do niej każdy odłamek.",
+            "en": "Mendweave looks for the memory of the whole inside an object and guides every shard back to it."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Na czym opiera się Splot Naprawy?",
+            "en": "What does Mendweave rely on?"
+          },
+          "choices": [
+            {
+              "pl": "Na pamięci całości w przedmiocie",
+              "en": "The object's memory of being whole"
+            },
+            {
+              "pl": "Na sile uderzenia",
+              "en": "The force of a blow"
+            },
+            {
+              "pl": "Na świetle księżyca",
+              "en": "Moonlight"
+            }
+          ],
+          "correct": 0
+        },
+        {
+          "practical": "mendweave",
+          "hits": 3
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "elixirs": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Eliksiry: woda i ogień pod kociołkiem\n• najpierw woda, potem żar\n• nigdy odwrotnie",
+            "en": "Potions: water and fire under the cauldron\n• water first, then the flame\n• never the other way round"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Każdy eliksir zaczyna się od dwóch rzeczy: czystej wody i równego ognia.",
+            "en": "Every potion begins with two things: clean water and an even flame."
+          }
+        },
+        {
+          "say": {
+            "pl": "Źródło napełnia kociołek wodą, Rozpałka budzi żar. Ich kolejność ma znaczenie, inaczej kociołek pęka.",
+            "en": "Wellspring fills the cauldron, Emberkindle wakes the flame. The order matters, or the cauldron cracks."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Co najpierw, gdy zaczynasz eliksir?",
+            "en": "What comes first when you start a potion?"
+          },
+          "choices": [
+            {
+              "pl": "Ogień",
+              "en": "The flame"
+            },
+            {
+              "pl": "Woda",
+              "en": "The water"
+            },
+            {
+              "pl": "Zioła",
+              "en": "The herbs"
+            }
+          ],
+          "correct": 1
+        },
+        {
+          "practical": "wellspring",
+          "hits": 3
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "warding": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Obrona: zatrzymać, nie zranić\n• lód spowalnia\n• stań bokiem do zagrożenia",
+            "en": "Defence: stop, not harm\n• frost slows\n• stand side-on to the danger"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Pierwsza zasada obrony: zatrzymaj zagrożenie, zanim pomyślisz o czymkolwiek innym.",
+            "en": "The first rule of defence: stop the danger before you think of anything else."
+          }
+        },
+        {
+          "say": {
+            "pl": "Okowy Mrozu nie ranią. Spowalniają, dają wam czas na ucieczkę albo na wezwanie pomocy.",
+            "en": "Frostbind does not wound. It slows, and gives you time to get away or call for help."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Do czego służą Okowy Mrozu?",
+            "en": "What is Frostbind for?"
+          },
+          "choices": [
+            {
+              "pl": "Do zranienia przeciwnika",
+              "en": "Wounding an opponent"
+            },
+            {
+              "pl": "Do spowolnienia zagrożenia",
+              "en": "Slowing a danger down"
+            },
+            {
+              "pl": "Do otwierania drzwi",
+              "en": "Opening doors"
+            }
+          ],
+          "correct": 1
+        },
+        {
+          "practical": "frostbind",
+          "hits": 3
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "herblore": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Zielarstwo: wzrost\n• roślina sama wie, jak rosnąć\n• czar tylko ją pogania",
+            "en": "Herbology: growth\n• a plant knows how to grow\n• the charm only hurries it"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Rośliny w naszych szklarniach są cierpliwe. Szybki Kiełek uczy je odrobiny pośpiechu.",
+            "en": "The plants in our greenhouses are patient. Quicksprout teaches them a little haste."
+          }
+        },
+        {
+          "say": {
+            "pl": "Nie przesadzajcie. Roślina pogoniona zbyt mocno rośnie krzywo i szybko więdnie.",
+            "en": "Do not overdo it. A plant hurried too hard grows crooked and wilts quickly."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Co się dzieje z rośliną poganianą zbyt mocno?",
+            "en": "What happens to a plant hurried too hard?"
+          },
+          "choices": [
+            {
+              "pl": "Rośnie krzywo i więdnie",
+              "en": "It grows crooked and wilts"
+            },
+            {
+              "pl": "Kwitnie dwa razy",
+              "en": "It flowers twice"
+            },
+            {
+              "pl": "Zamienia się w drzewo",
+              "en": "It turns into a tree"
+            }
+          ],
+          "correct": 0
+        },
+        {
+          "practical": "quicksprout",
+          "hits": 3
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "stargazing": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Astronomia: ciemność, która pomaga\n• oczy potrzebują mroku\n• gwiazdy wschodzą na wschodzie",
+            "en": "Astronomy: darkness that helps\n• eyes need the dark\n• stars rise in the east"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Żeby zobaczyć słabe gwiazdy, trzeba najpierw zgasić to, co świeci obok.",
+            "en": "To see faint stars, you must first dim what shines beside them."
+          }
+        },
+        {
+          "say": {
+            "pl": "Zasłona Zmierzchu przygasza światło wokół was. Na wieży to najlepszy przyjaciel astronoma.",
+            "en": "Duskveil dims the light around you. On the tower it is an astronomer's best friend."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Gdzie wschodzą gwiazdy?",
+            "en": "Where do the stars rise?"
+          },
+          "choices": [
+            {
+              "pl": "Na zachodzie",
+              "en": "In the west"
+            },
+            {
+              "pl": "Na wschodzie",
+              "en": "In the east"
+            },
+            {
+              "pl": "Na północy",
+              "en": "In the north"
+            }
+          ],
+          "correct": 1
+        },
+        {
+          "practical": "duskveil",
+          "hits": 3
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "chronicles": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Historia Magii: założenie szkoły\n• cztery domy, cztery herby\n• kamień wyboru w wielkiej sali",
+            "en": "History of Magic: the founding of the school\n• four houses, four crests\n• the Choosing Stone in the great hall"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Szkoła powstała na długo przed waszymi dziadkami. Jej założyciele chcieli, by każdy uczeń miał swój dom.",
+            "en": "The school was founded long before your grandparents. Its founders wanted every student to have a house."
+          }
+        },
+        {
+          "say": {
+            "pl": "Stąd cztery domy: Drakoryn ze smokiem, Grypheon z gryfem, Phoenara z feniksem i Hipporys z hippokampem.",
+            "en": "Hence the four houses: Drakoryn with its dragon, Grypheon with its griffin, Phoenara with its phoenix and Hipporys with its hippocampus."
+          }
+        },
+        {
+          "say": {
+            "pl": "Kronikarze pracowali przy świetle Świetlika, małego czaru, który pozwala czytać w ciemnej bibliotece.",
+            "en": "The chroniclers worked by the light of Glowmote, a small charm that lets you read in a dark library."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Który dom ma w herbie gryfa?",
+            "en": "Which house has a griffin on its crest?"
+          },
+          "choices": [
+            {
+              "pl": "Drakoryn",
+              "en": "Drakoryn"
+            },
+            {
+              "pl": "Grypheon",
+              "en": "Grypheon"
+            },
+            {
+              "pl": "Hipporys",
+              "en": "Hipporys"
+            }
+          ],
+          "correct": 1
+        },
+        {
+          "practical": "glowmote",
+          "hits": 3
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "skyriding": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Latanie: wiatr pod kontrolą\n• lataj tylko na zewnątrz\n• lądowanie zaczyna się wysoko",
+            "en": "Flying: the wind under control\n• fly only outdoors\n• a landing starts high up"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Miotła słucha ciała, a wiatr słucha zaklęć. Dobry lotnik panuje nad jednym i drugim.",
+            "en": "A broom listens to your body and the wind listens to charms. A good flyer commands both."
+          }
+        },
+        {
+          "say": {
+            "pl": "Podmuch odpycha powietrze przed wami. Na boisku przydaje się, gdy trzeba szybko wyhamować.",
+            "en": "Galewind pushes the air ahead of you. On the field it helps when you must slow down fast."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Gdzie wolno latać na miotle?",
+            "en": "Where may you fly a broom?"
+          },
+          "choices": [
+            {
+              "pl": "Tylko na zewnątrz",
+              "en": "Only outdoors"
+            },
+            {
+              "pl": "W każdym korytarzu",
+              "en": "In any corridor"
+            },
+            {
+              "pl": "W bibliotece",
+              "en": "In the library"
+            }
+          ],
+          "correct": 0
+        },
+        {
+          "practical": "galewind",
+          "hits": 3
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "glyphs": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Starożytne Runy: znak otwarcia\n• runa to słowo zamknięte w kształcie\n• rysuj od góry",
+            "en": "Ancient Runes: the opening sign\n• a rune is a word locked in a shape\n• draw from the top"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Runy są starsze niż zaklęcia mówione. Każda to słowo, które ktoś zamknął w kształcie.",
+            "en": "Runes are older than spoken charms. Each is a word someone locked into a shape."
+          }
+        },
+        {
+          "say": {
+            "pl": "Odryglowanie wywodzi się z runy otwarcia. Dlatego działa na zamki, ale nie na ściany.",
+            "en": "Unbolt comes from the rune of opening. That is why it works on locks, but not on walls."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Na co działa Odryglowanie?",
+            "en": "What does Unbolt work on?"
+          },
+          "choices": [
+            {
+              "pl": "Na ściany",
+              "en": "Walls"
+            },
+            {
+              "pl": "Na zamki",
+              "en": "Locks"
+            },
+            {
+              "pl": "Na wodę",
+              "en": "Water"
+            }
+          ],
+          "correct": 1
+        },
+        {
+          "practical": "unbolt",
+          "hits": 3
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "beastlore": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Opieka nad Magicznymi Stworzeniami\n• podchodź powoli\n• nie patrz prosto w oczy nieznanemu stworzeniu",
+            "en": "Care of Magical Creatures\n• approach slowly\n• never stare a strange creature in the eye"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Magiczne stworzenia nie są złe ani dobre. Są ostrożne, tak jak wy byście byli.",
+            "en": "Magical creatures are neither good nor bad. They are wary, as you would be."
+          }
+        },
+        {
+          "say": {
+            "pl": "Podchodźcie powoli, bokiem, z pustymi rękami. Stworzenie musi widzieć, że nic mu nie grozi.",
+            "en": "Approach slowly, side-on, with empty hands. The creature must see that it is in no danger."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Jak podchodzić do nieznanego stworzenia?",
+            "en": "How do you approach a strange creature?"
+          },
+          "choices": [
+            {
+              "pl": "Szybko i prosto",
+              "en": "Quickly and head-on"
+            },
+            {
+              "pl": "Powoli, bokiem, z pustymi rękami",
+              "en": "Slowly, side-on, with empty hands"
+            },
+            {
+              "pl": "Głośno, żeby nas usłyszało",
+              "en": "Loudly, so it hears us"
+            }
+          ],
+          "correct": 1
+        },
+        {
+          "quiz": {
+            "pl": "Czego nie robić przy nieznanym stworzeniu?",
+            "en": "What should you not do near a strange creature?"
+          },
+          "choices": [
+            {
+              "pl": "Patrzeć mu prosto w oczy",
+              "en": "Stare it in the eye"
+            },
+            {
+              "pl": "Stać spokojnie",
+              "en": "Stand still"
+            },
+            {
+              "pl": "Mówić cicho",
+              "en": "Speak softly"
+            }
+          ],
+          "correct": 0
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "farsight": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Wróżbiarstwo: znaki, nie wyroki\n• przyszłość to wiele ścieżek\n• zapisuj, co widzisz",
+            "en": "Divination: signs, not sentences\n• the future is many paths\n• write down what you see"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Wróżbiarstwo nie mówi, co się stanie. Pokazuje, co może się stać, jeśli nic nie zmienimy.",
+            "en": "Divination does not say what will happen. It shows what may happen if nothing changes."
+          }
+        },
+        {
+          "say": {
+            "pl": "Dlatego dobry wróżbita zapisuje znaki dokładnie i ostrożnie z nich wnioskuje.",
+            "en": "That is why a good seer records signs exactly and draws conclusions carefully."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Co pokazuje wróżbiarstwo?",
+            "en": "What does divination show?"
+          },
+          "choices": [
+            {
+              "pl": "Jedną pewną przyszłość",
+              "en": "One certain future"
+            },
+            {
+              "pl": "Możliwe ścieżki",
+              "en": "Possible paths"
+            },
+            {
+              "pl": "Przeszłość",
+              "en": "The past"
+            }
+          ],
+          "correct": 1
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    },
+    "numeromancy": {
+      "steps": [
+        {
+          "board": {
+            "pl": "Numerologia: liczby w zaklęciach\n• trzy to liczba równowagi\n• siedem to liczba pełni",
+            "en": "Arithmancy: numbers in spells\n• three is the number of balance\n• seven is the number of wholeness"
+          }
+        },
+        {
+          "say": {
+            "pl": "Dzień dobry. Profesora dziś nie ma, więc lekcję poprowadzę ja. Usiądźcie, proszę.",
+            "en": "Good day. The professor is away today, so I shall lead the lesson. Please take your seats."
+          }
+        },
+        {
+          "say": {
+            "pl": "Każde zaklęcie ma swój rytm. Numerologia uczy go liczyć.",
+            "en": "Every spell has its rhythm. Arithmancy teaches you to count it."
+          }
+        },
+        {
+          "say": {
+            "pl": "Dlatego ćwiczenia z tarczą robimy zwykle trzy razy: trzy to liczba równowagi.",
+            "en": "That is why practicals at the target usually take three hits: three is the number of balance."
+          }
+        },
+        {
+          "quiz": {
+            "pl": "Która liczba oznacza równowagę?",
+            "en": "Which number stands for balance?"
+          },
+          "choices": [
+            {
+              "pl": "Trzy",
+              "en": "Three"
+            },
+            {
+              "pl": "Pięć",
+              "en": "Five"
+            },
+            {
+              "pl": "Dziewięć",
+              "en": "Nine"
+            }
+          ],
+          "correct": 0
+        },
+        {
+          "quiz": {
+            "pl": "Która liczba oznacza pełnię?",
+            "en": "Which number stands for wholeness?"
+          },
+          "choices": [
+            {
+              "pl": "Dwa",
+              "en": "Two"
+            },
+            {
+              "pl": "Siedem",
+              "en": "Seven"
+            },
+            {
+              "pl": "Dziesięć",
+              "en": "Ten"
+            }
+          ],
+          "correct": 1
+        },
+        {
+          "say": {
+            "pl": "To wszystko na dziś. Zanotujcie, czego się nauczyliście, a profesor sprawdzi to na następnej lekcji.",
+            "en": "That is all for today. Note down what you have learned; the professor will check it next lesson."
+          }
+        }
+      ]
+    }
+  }
+}

@@ -69,7 +69,8 @@ const OP_HOUSE_POINTS_RESULT := 28
 const OP_LECTURE := 29
 ## server → everyone in that classroom: {by, sid, text}
 const OP_LECTURE_TEXT := 30
-## client → server: {give: item id}, {time: hours 0–24} or {coins: ±amount} a cheat (dev / admin): accepted from admins,
+## client → server: {give: item id}, {time: hours 0–24}, {coins: ±amount} or {self_study: true} (start the
+## room's self-study lesson now) a cheat (dev / admin): accepted from admins,
 ## or from anyone while the school rules say cheats_enabled
 const OP_CHEAT := 31
 ## server → sender: {ok, id, reason} outcome of OP_CHEAT (the inventory follows as OP_INVENTORY)

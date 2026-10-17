@@ -522,3 +522,8 @@ PRACTICAL_PICK_SPELL,Pick a spell of this subject first.,Najpierw wybierz zaklę
 PRACTICAL_STARTED_PROFESSOR,Practical started.,Ćwiczenie rozpoczęte.
 PRACTICAL_NONE,No practical running.,Żadne ćwiczenie nie trwa.
 PRACTICAL_RUNNING,"%s, %d hits:","%s, trafienia: %d:"
+SELF_STUDY_HOST,"self-study, the Lecture Quill","nauka własna, Pióro Wykładowe"
+SELF_STUDY_REQUESTED,Asking the Lecture Quill to start this room's self-study…,Pióro Wykładowe ma zacząć naukę własną w tej sali…
+SELF_STUDY_ONLINE_ONLY,Self-study lessons run in the online school.,Lekcje nauki własnej odbywają się w szkole online.
+SELF_STUDY_NO_PLAN,This room has no self-study plan.,Ta sala nie ma planu nauki własnej.
+SELF_STUDY_ALREADY_OPEN,A lesson is already running here.,Tu już trwa lekcja.

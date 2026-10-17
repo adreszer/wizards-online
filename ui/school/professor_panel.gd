@@ -444,7 +444,8 @@ func refresh() -> void:
 	var subject_def := SubjectRegistry.load_definition(subject)
 	if not lesson.is_empty():
 		var running := SubjectRegistry.load_definition(str(lesson.get("subject", "")))
-		_lesson_label.text = tr("LESSON_RUNNING") % [tr(running.display_name) if running != null else "?", str(lesson.get("by", ""))]
+		var by := tr("SELF_STUDY_HOST") if lesson.get("auto", false) else str(lesson.get("by", ""))
+		_lesson_label.text = tr("LESSON_RUNNING") % [tr(running.display_name) if running != null else "?", by]
 	elif subject_def != null:
 		_lesson_label.text = tr("LESSON_READY") % tr(subject_def.display_name)
 	else:

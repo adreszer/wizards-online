@@ -25,6 +25,7 @@ const GESTURE_ALIASES := {"raise": &"raise_hand", "hand": &"raise_hand", "reka":
 	"shrug": &"shrug", "wzrusz": &"shrug", "cheer": &"cheer", "wiwat": &"cheer", "hurra": &"cheer",
 	"notes": &"notes", "notuj": &"notes", "notatki": &"notes"}
 const SIT_ALIASES: Array[String] = ["sit", "usiadz", "usiądź", "siadaj"]
+const SELF_STUDY_ALIASES: Array[String] = ["selfstudy", "samouk", "nauka"]
 const STAND_ALIASES: Array[String] = ["stand", "wstan", "wstań"]
 const GIVE_ALIASES: Array[String] = ["give", "daj"]
 const BROOM_ALIASES: Array[String] = ["broom", "miotla", "miotła"]
@@ -84,6 +85,10 @@ static func run(text: String, player: Node) -> String:
 		return _t("CHEAT_HELP")
 	if GESTURE_ALIASES.has(name) or SIT_ALIASES.has(name) or STAND_ALIASES.has(name):
 		return gesture(name, player)
+	if SELF_STUDY_ALIASES.has(name):
+		if not NetworkManager.send_op(NetworkProtocol.OP_CHEAT, {"self_study": true}):
+			return _t("SELF_STUDY_ONLINE_ONLY")
+		return _t("SELF_STUDY_REQUESTED")
 	if BROOM_ALIASES.has(name):
 		return give("broom", player)
 	if GIVE_ALIASES.has(name):
@@ -223,6 +228,10 @@ static func result_line(ok: bool, definition: ItemDefinition, reason: String = "
 		return _t("CHEAT_NOT_ALLOWED")
 	if reason == "insufficient":
 		return _t("CHEAT_COINS_INSUFFICIENT")
+	if reason == "no_plan":
+		return _t("SELF_STUDY_NO_PLAN")
+	if reason == "already_open":
+		return _t("SELF_STUDY_ALREADY_OPEN")
 	return _t("CHEAT_FAILED") % reason
 
 

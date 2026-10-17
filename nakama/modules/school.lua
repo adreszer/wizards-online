@@ -42,6 +42,12 @@ M.DEFAULT_RULES = {
   dm_cooldown_seconds = 1,
   -- Lessons 2.0: what the classroom board holds.
   max_board_bytes = 800,
+  -- Self-study (self_study.lua): a timetabled lesson nobody opened within this many
+  -- minutes runs as self-study; only spells listed here are taught by it (the owner
+  -- decides; empty = none); attendance pays this much.
+  self_study_grace_minutes = 5,
+  self_study_spells = {},
+  coins_per_self_study = 5,
 }
 M.HOUSES = 4
 M.POINTS_COLLECTION, M.TOTALS_KEY = "house_points", "totals"

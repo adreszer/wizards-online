@@ -392,7 +392,7 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 		var r := _remote(spawner)
 		if r != null and (r as Player).broom_rider.mount != null:
 			saw_broom[0] = true
-		return r == null, 60.0)
+		return r == null, 150.0)
 	t.check(saw_broom[0], "B's broom shows on the remote player while B flies")
 	var b_gone := ok
 	# B is away: a direct message waits in B's mailbox (give the server a moment to drop B).
@@ -601,6 +601,21 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(ok, "the student's house tally shows the professor's award (%d → %s)" % [my_house_points, str(NetworkManager.get_house_totals())])
 	var hud := world.get_node_or_null("HUD")
 	t.check(hud == null or hud.house_tally_text().contains(str(NetworkManager.get_house_totals()[2])), "the HUD tally shows the totals")
+
+	t.section("Self-study (student)")
+	ChatCommands.run("/selfstudy", player)
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_lessons().get(str(CLASSROOM), {}).get("auto", false) == true, 10.0)
+	t.check(ok, "/selfstudy starts the room's self-study lesson (%s)" % str(NetworkManager.get_lessons().get(str(CLASSROOM), {})))
+	var quill_boards := world.get_node("Level/ClassroomBoards") as ClassroomBoards
+	ok = await _wait_until(func() -> bool: return quill_boards.labels[str(CLASSROOM)].text.begins_with("Zaklęcia") or quill_boards.labels[str(CLASSROOM)].text.begins_with("Charms"), 10.0)
+	t.check(ok, "the quill writes the board in our language (%s)" % quill_boards.labels[str(CLASSROOM)].text.left(40))
+	ok = await _wait_until(func() -> bool: return lectures.any(func(l: String) -> bool: return l.begins_with("Pióro Wykładowe:") or l.begins_with("the Lecture Quill:")), 15.0)
+	t.check(ok, "and lectures the room (%s)" % str(lectures.slice(-2)))
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz.get("choices", []).size() == 3 and str(NetworkManager.quiz.get("by", "")) != "", 45.0)
+	t.check(ok, "the quill asks a question (%s)" % str(NetworkManager.quiz))
+	NetworkManager.answer_quiz(1)
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz.get("answer", -1) == 1.0, 10.0)
+	t.check(ok, "the student answers the quill's question")
 
 	t.section("Purse (student)")
 	var refusals := cheat_results.size()

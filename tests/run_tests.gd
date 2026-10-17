@@ -83,6 +83,7 @@ func _run() -> void:
 	await _test_gestures()
 	await _test_board_and_quiz()
 	await _test_practicals()
+	_test_self_study()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2245,6 +2246,45 @@ func _test_practicals() -> void:
 	t.check(not p.spell_caster.knows(&"uplift"), "and takes it away when the practical ends without a grant")
 	spawner.queue_free()
 	castle.queue_free()
+
+
+func _test_self_study() -> void:
+	t.section("Self-study")
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/self_study.json"))
+	var problems: Array[String] = []
+	var text_ok := func(v: Variant) -> bool: return v is Dictionary and str(v.get("pl", "")) != "" and str(v.get("en", "")) != ""
+	if not data is Dictionary or not text_ok.call(data.get("host")):
+		problems.append("host")
+	var plans: Dictionary = data.get("plans", {}) if data is Dictionary else {}
+	for subject: String in plans:
+		var def := SubjectRegistry.load_definition(subject)
+		if def == null:
+			problems.append("unknown subject " + subject)
+			continue
+		for s: Dictionary in plans[subject].get("steps", []):
+			if s.has("say") or s.has("board"):
+				if not text_ok.call(s.get("say", s.get("board"))):
+					problems.append(subject + ": text")
+			elif s.has("quiz"):
+				var choices: Array = s.get("choices", [])
+				if not text_ok.call(s.quiz) or choices.size() < 2 or not choices.all(func(c: Variant) -> bool: return text_ok.call(c)) \
+						or int(s.get("correct", -1)) < 0 or int(s.get("correct", -1)) >= choices.size():
+					problems.append(subject + ": quiz")
+			elif s.has("practical"):
+				if not def.spells().has(str(s.practical)):
+					problems.append(subject + ": practical " + str(s.practical))
+			else:
+				problems.append(subject + ": unknown step")
+	t.check(plans.size() == SubjectRegistry.SUBJECT_IDS.size() and problems.is_empty(),
+		"self_study.json: a valid plan for every subject, every text in pl and en (%d plans, %s)" % [plans.size(), str(problems)])
+	var rules: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/school_rules.json"))
+	t.check(rules is Dictionary and not (rules as Dictionary).has("self_study_spells") or (rules.self_study_spells as Array).all(func(id: Variant) -> bool: return SpellRegistry.load_definition(str(id)) != null),
+		"self_study_spells names only real spells (owner decision: none by default)")
+	var lessons := {"class_sigilcraft": {"board": "Zaklęcia", "board_i18n": {"pl": "Zaklęcia", "en": "Charms"}, "auto": true}}
+	var previous := TranslationServer.get_locale()
+	TranslationServer.set_locale("en")
+	t.check(ClassroomBoards.board_text_for("class_sigilcraft", lessons, Timetable.new(), 0.0) == "Charms", "a self-study board shows in the player's language")
+	TranslationServer.set_locale(previous)
 
 
 func _test_timetable() -> void:

@@ -39,6 +39,7 @@ local Economy = require("economy")
 local Records = require("records")
 local Chat = require("chat")
 local Quiz = require("quiz")
+local SelfStudy = require("self_study")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -334,7 +335,8 @@ end
 local function lessons_payload(state)
   local out = {}
   for area, lesson in pairs(state.lessons) do
-    out[area] = { subject = lesson.subject, by = lesson.by_name, sid = lesson.by_sid, slot = lesson.slot or "", board = lesson.board or "" }
+    out[area] = { subject = lesson.subject, by = lesson.by_name, sid = lesson.by_sid, slot = lesson.slot or "", board = lesson.board or "",
+                  auto = lesson.kind == "self_study" or nil, board_i18n = lesson.board_i18n }
   end
   return nk.json_encode({ lessons = out })
 end
@@ -348,7 +350,9 @@ local function send_quiz(dispatcher, state, area, only_sid)
   local lesson = state.lessons[area]
   for _, pl in ipairs(players_in(state, area)) do
     if not only_sid or pl.sid == only_sid then
-      local view = (lesson and lesson.quiz) and Quiz.view_for(lesson.quiz, pl.sid, lesson.by_name) or { id = 0 }
+      local locale = state.locales[pl.sid]
+      local by = lesson and (lesson.kind == "self_study" and SelfStudy.text(state.self_study.host, locale) or lesson.by_name) or ""
+      local view = (lesson and lesson.quiz) and Quiz.view_for(lesson.quiz, pl.sid, by, locale) or { id = 0 }
       dispatcher.broadcast_message(OP_QUIZ_STATE, nk.json_encode(view), { state.presences[pl.sid] }, nil, true)
     end
   end
@@ -452,10 +456,11 @@ local function close_lesson(dispatcher, state, area, why)
   -- lesson ran long enough (opening and closing at once pays nobody).
   local minutes = (nk.time() / 1000 - lesson.opened_at) / 60
   if minutes >= state.rules.lesson_coin_minutes then
+    local amount = lesson.kind == "self_study" and state.rules.coins_per_self_study or state.rules.coins_per_lesson
     for _, pl in ipairs(players_in(state, area)) do
       local profile = state.profiles[pl.sid]
       if pl.sid ~= lesson.by_sid and lesson.attendance[pl.uid] and profile and not Profile.is_staff(profile.role) then
-        paid = paid + pay(dispatcher, state, pl.sid, state.rules.coins_per_lesson,
+        paid = paid + pay(dispatcher, state, pl.sid, amount,
           { source = "lesson", subject = lesson.subject, area = area, by_name = lesson.by_name }, lesson.subject)
       end
     end
@@ -533,6 +538,67 @@ local function own_lesson(state, sid)
     return lesson
   end
   return nil
+end
+
+-- An automated (self-study) lesson in occurrence `o`'s room, run from the subject's plan.
+local function open_self_study(dispatcher, state, o, now)
+  local lesson = { subject = o.subject, by_sid = nil, by_uid = "", by_name = "", opened_at = now, attendance = {}, points = 0,
+                   slot = o.id, slot_t0 = o.t0, kind = "self_study" }
+  for _, pl in ipairs(players_in(state, o.area)) do lesson.attendance[pl.uid] = state.names[pl.sid] or "" end
+  state.lessons[o.area] = lesson
+  state.held_slots[o.id .. "@" .. o.t0] = true
+  SelfStudy.start(lesson, state.self_study.plans[o.subject], now)
+  nk.logger_info(string.format("self-study: %s in %s (slot %s)", o.subject, o.area, o.id))
+  send_lessons(dispatcher, state, nil)
+end
+
+-- One step of an automated lesson, when it is due.
+local function run_self_study(dispatcher, state, area, lesson, now)
+  for _, a in ipairs(SelfStudy.tick(lesson, now)) do
+    local kind = a[1]
+    if kind == "say" then
+      for _, pl in ipairs(players_in(state, area)) do
+        local locale = state.locales[pl.sid]
+        dispatcher.broadcast_message(OP_LECTURE_TEXT, nk.json_encode({ by = SelfStudy.text(state.self_study.host, locale), sid = "", auto = true,
+          text = SelfStudy.text(a[2], locale) }), { state.presences[pl.sid] }, nil, true)
+      end
+    elseif kind == "board" then
+      lesson.board, lesson.board_i18n = SelfStudy.text(a[2], "pl"), a[2]
+      send_lessons(dispatcher, state, nil)
+    elseif kind == "quiz" then
+      state.quiz_seq = (state.quiz_seq or 0) + 1
+      lesson.quiz = { id = state.quiz_seq, question = a[2].quiz, choices = a[2].choices, correct = math.floor(tonumber(a[2].correct)), answers = {}, open = true }
+      send_quiz(dispatcher, state, area)
+    elseif kind == "close_quiz" then
+      if lesson.quiz and lesson.quiz.open then
+        record_marks(lesson, Quiz.close(lesson.quiz))
+        send_quiz(dispatcher, state, area)
+      end
+    elseif kind == "practical" then
+      lesson.practical = { spell = a[2], hits = a[3], grant = SelfStudy.may_teach(state.rules, a[2]), students = {} }
+      send_practical(dispatcher, state, area)
+    elseif kind == "stop_practical" then
+      lesson.practical = nil
+      send_practical(dispatcher, state, area)
+    elseif kind == "end" then
+      close_lesson(dispatcher, state, area, "self-study done")
+    end
+  end
+end
+
+-- Timetabled lessons nobody opened within the grace period run as self-study (when
+-- the subject has a plan); running ones take their next step.
+local function tick_self_study(dispatcher, state, now)
+  local grace = state.rules.self_study_grace_minutes * 60
+  for _, o in ipairs(Timetable.occurrences(state.timetable, now)) do
+    if o.subject ~= "" and state.self_study.plans[o.subject] and now >= o.t0 + grace and now < o.t1 - 60
+        and not state.lessons[o.area] and not state.held_slots[o.id .. "@" .. o.t0] then
+      open_self_study(dispatcher, state, o, now)
+    end
+  end
+  for area, lesson in pairs(state.lessons) do
+    if lesson.kind == "self_study" then run_self_study(dispatcher, state, area, lesson, now) end
+  end
 end
 
 -- Timetabled lessons that ended since the last check without anyone opening them
@@ -619,7 +685,7 @@ function M.match_init(context, params)
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
-                  positions = {}, chat_at = {} }
+                  positions = {}, chat_at = {}, self_study = SelfStudy.load() }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -723,6 +789,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       send_timetable(dispatcher, state, nil)
     end
     check_ended_slots(state, now)
+    tick_self_study(dispatcher, state, now)
     local occupied = function(area) return #players_in(state, area) > 0 end
     run_actions(dispatcher, state, Mysteries.tick(state.engine, state.mysteries, nk.time() / 1000, occupied))
   end
@@ -879,9 +946,21 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       local id = ok and type(payload) == "table" and type(payload.give) == "string" and payload.give or ""
       local hours = ok and type(payload) == "table" and type(payload.time) == "number" and payload.time or nil
       local coins = ok and type(payload) == "table" and type(payload.coins) == "number" and payload.coins or nil
+      local self_study = ok and type(payload) == "table" and payload.self_study == true
       local reason
       if not profile or not (state.rules.cheats_enabled or profile.role == "admin") then
         reason = "not_allowed"
+      elseif self_study then
+        -- /selfstudy: start the room's self-study lesson now (playtesting the plans).
+        local area = state.areas[sid] or ""
+        local subject = School.subject_for_area(area)
+        if not subject or not state.self_study.plans[subject] then
+          reason = "no_plan"
+        elseif state.lessons[area] then
+          reason = "already_open"
+        else
+          open_self_study(dispatcher, state, { id = "cheat", t0 = now, subject = subject, area = area }, now)
+        end
       elseif coins ~= nil then
         -- /coins: add to (or take from) your own purse, answered by OP_WALLET.
         if coins ~= math.floor(coins) or coins == 0 or math.abs(coins) > state.rules.max_coin_grant then
@@ -908,7 +987,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         reason = give_item(dispatcher, state, sid, id)
         nk.logger_info(string.format("cheat: %s gave themselves %s (%s)", state.names[sid] or sid, id, tostring(reason or "ok")))
       end
-      if (hours == nil and coins == nil) or reason ~= nil then
+      if (hours == nil and coins == nil and not self_study) or reason ~= nil then
         dispatcher.broadcast_message(OP_CHEAT_RESULT, nk.json_encode({ ok = reason == nil, id = ITEMS[id] and id or "", reason = reason or "" }), { message.sender }, nil, true)
       end
     elseif message.op_code == OP_LESSON then
@@ -921,6 +1000,10 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         reason = "not_staff"
       elseif action == "open" then
         local subject = School.subject_for_area(area)
+        -- A professor who arrives takes over from the self-study quill.
+        if subject and state.lessons[area] and state.lessons[area].kind == "self_study" then
+          close_lesson(dispatcher, state, area, "professor arrived")
+        end
         if not subject then
           reason = "not_in_classroom"
         elseif state.lessons[area] then
@@ -1120,12 +1203,13 @@ end
 -- Signals come from world.lua's admin RPCs:
 --   { op = "set_profile", user_id | name, role?, house?, forget_spells?, forget_mysteries?, reset_inventory?, reset_purse? }
 --   { op = "grant_coins", user_id | name, amount, reason, by_name }
---   { op = "reset_world" }  every object to its default, world/house mysteries unsolved
+--   { op = "reset_world" }  every object to its default, world/house mysteries unsolved, self-study lessons closed
 -- Answers { ok, sid, user_id, role, house } or { ok = false, reason }.
 function M.match_signal(context, dispatcher, tick, state, data)
   local ok, request = pcall(nk.json_decode, data or "")
   if ok and type(request) == "table" and request.op == "reload_timetable" then
     state.timetable = Timetable.load()
+    state.self_study = SelfStudy.load()
     send_timetable(dispatcher, state, nil)
     return state, nk.json_encode({ ok = true, slots = #state.timetable.slots })
   end
@@ -1146,6 +1230,9 @@ function M.match_signal(context, dispatcher, tick, state, data)
     state.world = Objects.new_world()
     state.world.driven = driven
     state.mysteries = Mysteries.new_state()
+    for area, lesson in pairs(state.lessons) do
+      if lesson.kind == "self_study" then close_lesson(dispatcher, state, area, "world reset") end
+    end
     dispatcher.broadcast_message(OP_WORLD_SNAPSHOT, nk.json_encode({ objects = state.world.objects }), nil, nil, true)
     return state, nk.json_encode({ ok = true })
   end

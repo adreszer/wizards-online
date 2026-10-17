@@ -82,11 +82,20 @@ function M.answers_list(quiz)
   return out
 end
 
+-- `v` (plain text, or {pl, en} from a self-study plan) in `locale`.
+local function loc(v, locale)
+  if type(v) == "table" then return v[locale] or v.pl or "" end
+  return v
+end
+
 -- What one student sees: the question, the choices, their own answer, and once
--- closed the correct choice and whether they were right.
-function M.view_for(quiz, sid, by_name)
+-- closed the correct choice and whether they were right. Self-study questions carry
+-- both languages; `locale` picks one.
+function M.view_for(quiz, sid, by_name, locale)
   local mine = quiz.answers[sid]
-  local view = { id = quiz.id, question = quiz.question, choices = quiz.choices, by = by_name, open = quiz.open }
+  local choices = {}
+  for i, c in ipairs(quiz.choices) do choices[i] = loc(c, locale) end
+  local view = { id = quiz.id, question = loc(quiz.question, locale), choices = choices, by = by_name, open = quiz.open }
   if mine then
     view.answer = mine.answer
     if mine.right ~= nil then view.right = mine.right end

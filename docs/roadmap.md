@@ -64,7 +64,7 @@ Today offline is "the castle without a server". It should become a real mode wit
 | Feature | Description | Size | Impact |
 |---|---|---|---|
 | **Live lessons 2.0** | Board writing, quizzes, practice tasks, attendance, grades (section 4, Term B). | M–L | ★★★ |
-| **Self-study lessons** | When no professor is online, an automated lesson runs from an approved lesson plan at scheduled times. It can teach only spells marked "self-study" by the owner, so human-led lessons keep the best spells. *Owner decision needed.* | M | ★★★ |
+| **Self-study lessons** | *Built (Milestone 41): the Lecture Quill runs a subject's plan when a timetabled lesson goes unclaimed; teaches only spells in `self_study_spells` (owner decision, empty by default).* When no professor is online, an automated lesson runs from an approved lesson plan at scheduled times. It can teach only spells marked "self-study" by the owner, so human-led lessons keep the best spells. | M | ★★★ |
 | **Server timetable and bells** | Real-time schedule (e.g. weekly lessons at fixed hours, Polish time) shown on notice boards and in the journal; bells and announcements before each lesson. | M | ★★★ |
 | **Feasts and ceremonies** | Scheduled great hall events: start-of-term feast, sorting ceremony with an audience, house cup ceremony. Admin speaks to the whole hall. | M | ★★★ |
 | **Community mysteries** | Server-wide puzzles that need many players or all four houses (each house holds a piece). Weekly rotating mystery. | M | ★★ |
