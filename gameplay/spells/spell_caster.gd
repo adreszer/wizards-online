@@ -244,8 +244,9 @@ func _process(delta: float) -> void:
 		_update_aim()
 
 
-## Local cast. Returns true when a projectile was launched.
-func try_cast() -> bool:
+## Local cast (`power` scales its strength: a clean traced rune). Returns true when a
+## projectile was launched.
+func try_cast(power: float = 1.0) -> bool:
 	if equipped_spell == null:
 		cast_failed.emit("no_spell")
 		return false
@@ -259,7 +260,7 @@ func try_cast() -> bool:
 		direction = aim["direction"]
 	direction = direction.normalized()
 	var level := mastery_level(equipped_spell)
-	_spawn_projectile(equipped_spell, origin, direction, false, level)
+	_spawn_projectile(equipped_spell, origin, direction, false, level, power)
 	_cooldowns[String(equipped_spell.id)] = equipped_spell.cooldown * SpellMastery.cooldown_factor(level)
 	_global_cooldown = GLOBAL_COOLDOWN
 	cooldown_started.emit(equipped_spell.cooldown * SpellMastery.cooldown_factor(level))
@@ -349,7 +350,7 @@ func _has_line_of_sight(from: Vector3, to: Vector3, expected: Node) -> bool:
 	return result["collider"] == expected
 
 
-func _spawn_projectile(definition: SpellDefinition, origin: Vector3, direction: Vector3, cosmetic: bool, level: int = 0) -> void:
+func _spawn_projectile(definition: SpellDefinition, origin: Vector3, direction: Vector3, cosmetic: bool, level: int = 0, power: float = 1.0) -> void:
 	var scene := definition.projectile_scene
 	if scene == null:
 		push_warning("SpellDefinition %s has no projectile scene" % definition.id)
@@ -357,6 +358,7 @@ func _spawn_projectile(definition: SpellDefinition, origin: Vector3, direction: 
 	var projectile := scene.instantiate() as SpellProjectile
 	projectile.configure(definition, direction, get_parent(), caster_id, cosmetic)
 	projectile.exclude_rids = exclude_rids
+	projectile.power = power
 	var parent := _projectile_parent if _projectile_parent != null else get_tree().current_scene
 	if parent == null:
 		parent = get_tree().root

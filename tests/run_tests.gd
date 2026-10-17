@@ -87,6 +87,7 @@ func _run() -> void:
 	await _test_character_look()
 	await _test_meals()
 	await _test_mastery()
+	_test_runes()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2431,6 +2432,22 @@ func _test_mastery() -> void:
 	var master := p.spell_caster.get_cooldown_remaining(ARCANE_PULSE)
 	t.check(master < novice and is_equal_approx(p.spell_caster.mastery_level(ARCANE_PULSE), 3), "a master casts with a shorter cooldown (%.2f vs %.2f)" % [master, novice])
 	t.check(CharacterProfile.sanitize({"mastery": {"arcane_pulse": 12, "bogus": 5}}).mastery == {"arcane_pulse": 12}, "the profile keeps mastery of real spells only")
+
+
+func _test_runes() -> void:
+	t.section("Rune tracing")
+	t.check(RuneTracer.strokes_of([Vector2(60, 0)]) == "R" and RuneTracer.strokes_of([Vector2(0, -50), Vector2(0, -50), Vector2(50, 5)]) == "UR",
+		"mouse paths become strokes, repeats collapsed")
+	t.check(RuneTracer.matches("glowmote", "UR") and not RuneTracer.matches("glowmote", "RU") and not RuneTracer.matches("glowmote", ""), "a trace matches only its spell's rune")
+	var seen := {}
+	var ok := true
+	for id: String in RuneTracer.RUNES:
+		ok = ok and SpellRegistry.load_definition(id) != null and not seen.has(RuneTracer.RUNES[id])
+		seen[RuneTracer.RUNES[id]] = true
+	t.check(ok and RuneTracer.RUNES.size() == SpellRegistry.all().size(), "every spell has its own rune")
+	var before := GameSession.trace_casting
+	t.check(ChatCommands.run("/runy", null) == (tr("RUNES_OFF") if before else tr("RUNES_ON")), "/runes toggles tracing")
+	GameSession.set_trace_casting(before)
 
 
 func _test_timetable() -> void:

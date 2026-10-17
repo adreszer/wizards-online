@@ -415,7 +415,7 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Mastery points per spell in the server profile (`mastery`): +1 for a validated spell on a world object, +2 on a practice target, at most one award per spell every 6 s; `OP_MASTERY {spell, points}` on each change, the whole map in `OP_PROFILE`
 - [x] `SpellMastery`: ranks novice / adept / skilled / master at 0 / 20 / 60 / 150 points; each rank shortens the spell's cooldown by 10 % and makes its cast 15 % bigger (remote casts carry the rank, `l`); a rank-up notification. Polish only: nothing stronger against other players
 - [x] Tests: ranks, cooldown, profile; two clients: real use earns points
-- [ ] Casting gestures (Term B5)
+- [x] Casting gestures (Term B5): optional rune tracing (`RuneTracer`, `/runes` / `/runy`, saved in the settings): hold Cast, trace the spell's rune (strokes U/D/L/R, one rune per spell), release; a clean rune casts 30 % stronger with a flash, any other trace or a click casts normally
 
 ## Production environment asset pipeline (in validation)
 

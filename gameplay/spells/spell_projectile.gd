@@ -28,6 +28,8 @@ var caster: Node
 var caster_id: String = ""
 var cosmetic: bool = false
 var exclude_rids: Array[RID] = []
+## Strength multiplier (a clean traced rune casts stronger, RuneTracer).
+var power: float = 1.0
 
 var _travelled: float = 0.0
 var _finished: bool = false
@@ -100,6 +102,7 @@ func _on_hit(collider: Node, position: Vector3, _normal: Vector3) -> void:
 		var receiver := SpellReceiver.find_on(collider)
 		if receiver != null:
 			var effect := SpellEffect.create(definition, caster, caster_id, position, direction)
+			effect.strength *= power
 			receiver.receive(effect)
 	hit.emit(collider, position)
 	# Leave the burst scene just short of the surface so it is not buried in it.

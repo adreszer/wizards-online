@@ -18,6 +18,8 @@ var display_name: String = ""
 var language: String = Localization.AUTO
 ## Body used for the local player (see CharacterRegistry). Sent as join metadata online.
 var character_id: String = CharacterRegistry.DEFAULT
+## Casting by tracing runes (RuneTracer); off = cast on click.
+var trace_casting: bool = false
 ## The chosen look offline (CharacterLook: body, skin, robe, set).
 var look: Dictionary = {"body": CharacterRegistry.DEFAULT, "skin": 0, "robe": 0, "set": false}
 var nakama_host: String = ProjectSettings.get_setting("game/network/host", "127.0.0.1")
@@ -96,6 +98,11 @@ func set_look(p_look: Dictionary) -> void:
 	_save_settings()
 
 
+func set_trace_casting(on: bool) -> void:
+	trace_casting = on
+	_save_settings()
+
+
 ## Switches the game language now and persists the choice.
 func set_language(setting: String) -> void:
 	language = setting if (setting == Localization.AUTO or Localization.SUPPORTED.has(setting)) else Localization.AUTO
@@ -145,6 +152,7 @@ func _load_settings() -> void:
 	language = str(cfg.get_value("player", "language", language))
 	character_id = CharacterRegistry.sanitize(str(cfg.get_value("player", "character", character_id)))
 	look = CharacterLook.sanitize(cfg.get_value("player", "look", {}))
+	trace_casting = cfg.get_value("player", "trace_casting", false) == true
 	look["body"] = character_id
 	nakama_host = str(cfg.get_value("network", "host", nakama_host))
 	nakama_port = int(cfg.get_value("network", "port", nakama_port))
@@ -156,6 +164,7 @@ func _save_settings() -> void:
 	cfg.set_value("player", "language", language)
 	cfg.set_value("player", "character", character_id)
 	cfg.set_value("player", "look", look)
+	cfg.set_value("player", "trace_casting", trace_casting)
 	cfg.set_value("network", "host", nakama_host)
 	cfg.set_value("network", "port", nakama_port)
 	cfg.save(SETTINGS_PATH)

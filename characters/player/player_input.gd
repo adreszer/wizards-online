@@ -44,7 +44,8 @@ func _process(_delta: float) -> void:
 	# "just pressed" flags accumulate until consumed so physics never misses them.
 	if Input.is_action_just_pressed("jump"):
 		jump_just_pressed = true
-	if Input.is_action_just_pressed("cast"):
+	# With rune tracing on, RuneTracer casts on release instead.
+	if Input.is_action_just_pressed("cast") and not GameSession.trace_casting:
 		cast_just_pressed = true
 	if Input.is_action_just_pressed("interact"):
 		interact_just_pressed = true

@@ -554,3 +554,6 @@ MASTERY_ADEPT,adept,wprawny
 MASTERY_SKILLED,skilled,biegły
 MASTERY_MASTER,master,mistrzowski
 MASTERY_LEVEL_UP,"%s: new mastery rank: %s (shorter cooldown, a stronger glow).","%s: nowy stopień biegłości: %s (krótsze odnowienie, mocniejszy blask)."
+RUNE_CLEAN,A clean rune!,Czysta runa!
+RUNES_ON,"Rune casting on: hold Cast, trace the spell's rune with the mouse, release. A clean rune casts stronger; a click still casts.","Rzucanie runami włączone: przytrzymaj rzut, narysuj myszą runę zaklęcia, puść. Czysta runa daje mocniejszy czar; zwykłe kliknięcie też działa."
+RUNES_OFF,Rune casting off: Cast casts on click.,Rzucanie runami wyłączone: czar na kliknięcie.

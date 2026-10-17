@@ -167,6 +167,10 @@ func _setup_local() -> void:
 	respawn_handler.respawned.connect(func(_at: Transform3D) -> void: broom_rider.dismount())
 	synchronizer.setup_local(self)
 	camera_rig.activate()
+	var tracer := RuneTracer.new()
+	tracer.name = "RuneTracer"
+	local_root.add_child(tracer)
+	tracer.setup(self)
 	GameEvents.local_player_spawned.emit(self)
 
 
