@@ -2041,6 +2041,31 @@ func _test_day_night() -> void:
 		cycle.refresh()
 		music.update(0.25)
 		t.check(music.current == &"night", "night outdoors plays the night music")
+		# A running lesson in the room: the lesson music, at any hour, after the same delay.
+		t.check(MusicDirector.track_for(SchoolClock.Phase.NIGHT, false, true) == &"lesson", "a lesson plays the lesson music at any hour")
+		var room := AreaZone.new()
+		room.area_id = &"class_test"
+		room.kind = "classroom"
+		music.lessons_override = {"class_test": {"subject": "elixirs"}}
+		fake.current_zone = room
+		music.update(MusicDirector.OUTDOOR_DELAY)
+		music.update(MusicDirector.OUTDOOR_DELAY)
+		t.check(music.current == &"lesson" and music.in_lesson, "inside a running lesson the lesson music plays")
+		music.lessons_override = {}
+		music.update(MusicDirector.OUTDOOR_DELAY)
+		t.check(music.current == &"night" and not music.in_lesson, "when the lesson ends the room goes back to the clock's music")
+		music.lessons_override = {"class_other": {"subject": "elixirs"}}
+		music.update(MusicDirector.OUTDOOR_DELAY)
+		t.check(music.current == &"night", "a lesson in another room changes nothing")
+		# Events (feasts, duels, mysteries) cue their track over everything else.
+		music.event_track = &"feast"
+		music.update(0.25)
+		t.check(music.current == &"feast", "an event track plays at once")
+		music.event_track = &""
+		music.update(0.25)
+		t.check(music.current == &"night", "clearing the event goes back to the clock's music")
+		music.lessons_override = null
+		room.free()
 		music.tracker = saved_tracker
 		fake.free()
 		field.free()

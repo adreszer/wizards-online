@@ -3,11 +3,14 @@ extends Node
 ## Background music that follows the school clock and the local player's area:
 ## by day the castle track indoors and the grounds track out on open terrain
 ## (zone kind `grounds`: estate, lake, village…; walled courtyards count as the
-## castle), the night track everywhere from dusk. A change crossfades to the other
+## castle), the night track everywhere from dusk, and the lesson track inside a
+## classroom while a lesson runs there (any hour). A change crossfades to the other
 ## track, which resumes where it was left, and each track loops by crossfading its
 ## own end into its start, so the files need no exact loop points. Plays on the
 ## Music bus (default_bus_layout.tres), not positional. Added by castle.gd next
 ## to the DayNightCycle it listens to.
+## Feasts, duels and mysteries set `event_track`, which wins over the clock and the
+## area until they clear it.
 ## With `fixed_track` set it plays only that track: the game root uses one for
 ## the main theme behind the menu (core/game.gd), stopped when the world loads.
 
@@ -16,6 +19,10 @@ const TRACKS := {
 	&"night": preload("res://assets/audio/music/music_castle_night.mp3"),
 	&"main_theme": preload("res://assets/audio/music/music_main_theme.mp3"),
 	&"grounds": preload("res://assets/audio/music/music_grounds.mp3"),
+	&"lesson": preload("res://assets/audio/music/music_lesson.mp3"),
+	&"feast": preload("res://assets/audio/music/music_feast.mp3"),
+	&"duel": preload("res://assets/audio/music/music_duel.mp3"),
+	&"mystery": preload("res://assets/audio/music/music_mystery.mp3"),
 }
 ## Seconds of overlap when a track loops back to its start.
 const LOOP_FADE := 6.0
@@ -23,10 +30,11 @@ const LOOP_FADE := 6.0
 const LOOP_FADE_BY_TRACK := {&"main_theme": 0.5}
 ## Seconds of overlap when the time of day switches tracks.
 const SWITCH_FADE := 8.0
-## Seconds of overlap when stepping between the castle and the grounds.
+## Seconds of overlap when the area or an event changes the track (castle, grounds,
+## lesson, feast…); the day/night switch uses SWITCH_FADE.
 const AREA_FADE := 4.0
-## Seconds the player must stay in or out before the music follows (doorways,
-## gaps between zones).
+## Seconds the player must stay in or out (of the grounds, of a lesson) before the
+## music follows (doorways, gaps between zones).
 const OUTDOOR_DELAY := 3.0
 ## Area kinds that play the grounds music by day.
 const OUTDOOR_KINDS: Array[String] = ["grounds"]
@@ -39,6 +47,11 @@ const START_FADE := 3.0
 
 ## Plays only this track, whatever the time of day (empty: follow the clock).
 @export var fixed_track: StringName = &""
+## Plays this track over the clock and the area while set (&"feast", &"duel",
+## &"mystery"…); empty when no event is on. It starts from the top each time.
+var event_track: StringName = &""
+## Open lessons (area id → lesson) to follow instead of NetworkManager's (tests).
+var lessons_override: Variant = null
 
 ## Where the phase comes from; without one the shared school clock is read.
 var cycle: DayNightCycle
@@ -48,6 +61,8 @@ var tracker: AreaTracker
 var current: StringName = &""
 ## Whether the music treats the player as outdoors (follows the area after OUTDOOR_DELAY).
 var outdoors := false
+## Whether the music treats the player as inside a running lesson.
+var in_lesson := false
 
 var _players: Array[AudioStreamPlayer] = []
 var _active := 0
@@ -79,8 +94,10 @@ func _process(delta: float) -> void:
 	update(interval)
 
 
-## The track for a phase of the school day, indoors or out.
-static func track_for(phase: SchoolClock.Phase, outside := false) -> StringName:
+## The track for a phase of the school day, indoors or out, in a lesson or not.
+static func track_for(phase: SchoolClock.Phase, outside := false, lesson := false) -> StringName:
+	if lesson:
+		return &"lesson"
 	if phase == SchoolClock.Phase.DAWN or phase == SchoolClock.Phase.DAY:
 		return &"grounds" if outside else &"day"
 	return &"night"
@@ -93,14 +110,14 @@ func update(dt := 0.0) -> void:
 	if want.is_empty():
 		_follow_area(dt)
 		var phase := cycle.phase if cycle != null else SchoolClock.phase_of(NetworkManager.school_hours())
-		want = track_for(phase, outdoors)
+		want = event_track if not event_track.is_empty() else track_for(phase, outdoors, in_lesson)
 	if want != current:
-		var fade := SWITCH_FADE
+		var fade := AREA_FADE
 		if current.is_empty():
 			fade = START_FADE
-		elif [current, want].all(func(t: StringName) -> bool: return t == &"day" or t == &"grounds"):
-			fade = AREA_FADE
-		_play(want, fade, fixed_track.is_empty())
+		elif [current, want].has(&"night") and ([current, want].has(&"day") or [current, want].has(&"grounds")):
+			fade = SWITCH_FADE
+		_play(want, fade, fixed_track.is_empty() and want != event_track)
 		return
 	var p := _players[_active]
 	var overlap := float(LOOP_FADE_BY_TRACK.get(current, LOOP_FADE))
@@ -109,13 +126,18 @@ func update(dt := 0.0) -> void:
 
 
 func _follow_area(dt: float) -> void:
-	var here := tracker != null and OUTDOOR_KINDS.has(tracker.current_kind())
-	if here == outdoors:
+	var out_here := tracker != null and OUTDOOR_KINDS.has(tracker.current_kind())
+	var lesson_here := false
+	if tracker != null and tracker.current_zone != null:
+		var lessons: Dictionary = lessons_override if lessons_override != null else NetworkManager.get_lessons()
+		lesson_here = lessons.has(str(tracker.current_area_id()))
+	if out_here == outdoors and lesson_here == in_lesson:
 		_outdoor_for = 0.0
 		return
 	_outdoor_for += dt
 	if _outdoor_for >= OUTDOOR_DELAY or current.is_empty():
-		outdoors = here
+		outdoors = out_here
+		in_lesson = lesson_here
 		_outdoor_for = 0.0
 
 

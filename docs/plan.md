@@ -359,7 +359,9 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Main theme behind the menu: a second `MusicDirector` on the game root (`core/game.gd`, `fixed_track = main_theme`), fades out over 2 s when the world loads and starts again on return to the menu; the theme ends on its own, so it restarts with only 0.5 s overlap
 - [x] Tests: track per phase, Music bus, castle wiring, tracks long enough to loop, day → night switch crossfades, menu theme plays, stops and restarts
 - [x] Grounds music: by day on open terrain (zone kind `grounds`: estate, lake, forest edge, village, station…) the `grounds` track, walled courtyards keep the castle track, night is the night track everywhere; the switch waits until the player has been in or out for 3 s and crossfades over 4 s; every track resumes where it was left
-- [ ] Music volume slider in settings; music for lessons, the feast and duels, and stingers
+- [x] Lesson music: inside a classroom where a lesson runs (`NetworkManager.get_lessons()`, self-study included), at any hour, the `lesson` track, after the same 3 s delay; back to the clock's track when the lesson ends
+- [x] Feast, duel and mystery tracks processed and preloaded; `MusicDirector.event_track` lets those features cue their track over the clock and the area (starts from the top, 4 s crossfade) and clear it again
+- [ ] Set `event_track` from the feast schedule, duelling club and mystery discovery once those exist; music volume slider in settings; stingers (sorting, house cup)
 - [ ] Sound effects, ambiences per area, footsteps per surface, reverb per area (the rest of the list)
 
 ### Milestone 39 — Proximity chat, direct messages, speech bubbles
