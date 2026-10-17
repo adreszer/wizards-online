@@ -70,8 +70,10 @@ func _on_submitted(text: String) -> void:
 	if not chat.is_empty():
 		_send_chat(chat)
 	elif ChatCommands.is_command(clean):
-		add_system_line(clean)
-		add_system_line(ChatCommands.run(clean, get_tree().get_first_node_in_group(&"local_player")))
+		var answer := ChatCommands.run(clean, get_tree().get_first_node_in_group(&"local_player"))
+		if answer != "":
+			add_system_line(clean)
+			add_system_line(answer)
 	elif not clean.is_empty():
 		if GameSession.is_online():
 			NetworkManager.send_chat(clean)

@@ -371,6 +371,15 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [ ] Paper birds: DMs drawn as a folded paper bird flying to the recipient (Term E)
 - [ ] Moderation: word filter, report, mute (section 7 of the roadmap)
 
+### Milestone 40 — Gestures and seats
+- [x] `SocialPose` (`characters/components/social_pose.gd`, on the shared `PoseModifier` base that `BroomRidePose` now uses too): procedural gestures over the animation (raise a hand, wave, bow, clap, point, shrug, cheer, take notes) and sitting (hips onto the seat, thighs along it, shins down, hands on the knees); only the bones a gesture needs are written
+- [x] `Gestures` (player component): one-shot vs held gestures, moving cancels note-taking, moving or jumping stands up; synced in the movement snapshot (`e` gesture, `h` seat height) so everyone sees them
+- [x] Seats without nodes: `StaticBatch` records a seat for every batched bench, chair, armchair and sofa (`Seats.BY_SCENE`); interact with nothing in focus (or `/sit`) sits at the nearest free seat within reach; benches work both ways (the sitter faces away from where they came from: the desk, the feast table); the HUD offers "[E] Sit" / "[E] Stand up"
+- [x] Emote menu (G, keys 1–8), raise a hand with H, chat commands `/wave` `/bow` `/raise` `/clap` `/point` `/shrug` `/cheer` `/notes` `/sit` `/stand` with Polish aliases (`/machaj`, `/ukłon`, `/ręka`…)
+- [x] The professor's lesson panel lists raised hands first, in the order the hands went up
+- [x] Tests: seats per prop and facing, sitting and standing in the castle, gestures time out or stay, chat commands, remote snapshots; two clients: a student's raised hand reaches the professor's panel. `tools/capture_gestures.tscn` renders every gesture and both seats
+- [ ] Authored clips (Mixamo) to replace the procedural poses where they fall short; casting gestures per spell family (roadmap 5.4)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

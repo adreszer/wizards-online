@@ -28,6 +28,8 @@ const BATCHABLE := [
 	"res://objects/environment/props/bookshelf_large.tscn",
 	"res://objects/environment/props/feast_table.tscn",
 ]
+## Group of every batch (Seats looks through them).
+const GROUP := &"static_batch"
 ## Containers whose direct batchable instances are folded in on flush.
 const CONTAINERS := ["Pillars", "Furniture"]
 
@@ -44,6 +46,12 @@ var _meshes: Dictionary = {}    # [cell, mesh, material] key -> {mesh, material,
 var _shapes: Dictionary = {}    # cell -> Array of [Shape3D, Transform3D]
 var _flushed := false
 var instance_count := 0
+## Seats of the benches, chairs and sofas taken in ([{t, both}], see Seats).
+var seats: Array[Dictionary] = []
+
+
+func _enter_tree() -> void:
+	add_to_group(GROUP)
 
 
 ## The batch that serves `node` (its castle's), or null when there is none (the editor,
@@ -103,6 +111,8 @@ static func _collect(root: Node3D, node: Node, xform: Transform3D, proto: Dictio
 func add(scene: PackedScene, xform: Transform3D) -> bool:
 	if _flushed or not can_batch(scene):
 		return false
+	if Seats.BY_SCENE.has(scene.resource_path):
+		seats.append_array(Seats.for_instance(scene.resource_path, xform))
 	var proto := prototype(scene)
 	var local := global_transform.affine_inverse() * xform
 	var cell := Vector3i(floori(local.origin.x / cell_size), floori((local.origin.y + 0.5) / storey_height), floori(local.origin.z / cell_size))

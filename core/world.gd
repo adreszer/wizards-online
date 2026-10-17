@@ -15,6 +15,9 @@ func _ready() -> void:
 	_pause_menu.return_to_menu_requested.connect(return_to_menu_requested.emit)
 	_spawner.spawn_point = _level.get_node("StartPoint")
 	_build_map()
+	var emotes := EmoteMenu.new()
+	emotes.name = "EmoteMenu"
+	add_child(emotes)
 	var player: Node = _spawner.spawn_local(GameSession.display_name, NetworkManager.local_user_id)
 	GameEvents.level_completed.connect(_on_level_completed)
 	_show_satchel_hint(player)

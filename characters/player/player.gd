@@ -64,6 +64,8 @@ var _visual_base: Transform3D
 var off_hand: Node3D
 ## What this character last said (chat, lectures), over the nameplate.
 var speech_bubble: SpeechBubble
+## Social gestures and sitting (raise a hand, wave, bow…).
+var gestures: Gestures
 
 
 func _ready() -> void:
@@ -82,6 +84,10 @@ func _ready() -> void:
 	speech_bubble.name = "SpeechBubble"
 	speech_bubble.position = Vector3(0.0, 2.75, 0.0)
 	add_child(speech_bubble)
+	gestures = Gestures.new()
+	gestures.name = "Gestures"
+	add_child(gestures)
+	gestures.setup(self, visual)
 	if is_local:
 		_setup_local()
 	else:
@@ -154,6 +160,27 @@ func _find_off_hand() -> Node3D:
 ## Remote players: the held item id arrives from the server, already validated.
 func set_remote_held_item(item_id: String) -> void:
 	held_item_mount.show_item(ItemRegistry.load_definition(item_id))
+
+
+## Sits on the nearest free bench, chair or sofa within reach; false when there is none.
+func try_sit() -> bool:
+	if not is_local or movement.is_flying or gestures.is_sitting():
+		return false
+	var others: Array[Vector3] = []
+	for other in get_tree().get_nodes_in_group("remote_players"):
+		others.append((other as Node3D).global_position)
+	var seat: Variant = Seats.nearest_free(get_tree(), global_position, others)
+	if seat == null:
+		return false
+	gestures.sit_at(seat)
+	return true
+
+
+## Whether a free seat is within reach (the HUD offers "[E] Sit").
+func seat_nearby() -> bool:
+	if not is_local or movement.is_flying or gestures.is_sitting():
+		return false
+	return Seats.nearest_free(get_tree(), global_position) != null
 
 
 ## Shows a line this character said (mode: say, whisper, shout, lecture) over their head.
@@ -230,8 +257,20 @@ func _physics_process(_delta: float) -> void:
 		spell_caster.cycle(cycle)
 	if player_input.consume_cast():
 		spell_caster.try_cast()
+	if gestures.is_sitting():
+		# Moving or jumping stands up.
+		if player_input.move_axis.length() > 0.3 or player_input.consume_jump():
+			gestures.stand()
+	elif gestures.current == &"notes" and player_input.move_axis.length() > 0.3:
+		gestures.stop()
+	var gesture := player_input.consume_gesture()
+	if gesture != &"":
+		gestures.play(gesture)
 	if player_input.consume_interact():
-		interaction_controller.try_interact()
+		if gestures.is_sitting():
+			gestures.stand()
+		elif not interaction_controller.try_interact():
+			try_sit()
 	if player_input.consume_mount():
 		broom_rider.toggle()
 

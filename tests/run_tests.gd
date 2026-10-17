@@ -80,6 +80,7 @@ func _run() -> void:
 	await _test_day_night()
 	await _test_timetable()
 	await _test_chat()
+	await _test_gestures()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2118,6 +2119,61 @@ func _test_chat() -> void:
 	t.check(p.speech_bubble.visibility_range_end < 10.0 and p.speech_bubble.font_size < SpeechBubble.STYLE.say.size, "a whisper bubble is small and only readable up close")
 	await _wait(10.0)
 	t.check(not p.speech_bubble.visible, "the bubble fades after a few seconds")
+
+
+func _test_gestures() -> void:
+	t.section("Gestures and seats")
+	var bench := "res://objects/environment/props/student_bench.tscn"
+	var at := Transform3D(Basis.IDENTITY, Vector3(10, 0, 10))
+	var seats := Seats.for_instance(bench, at)
+	t.check(seats.size() == 2 and is_equal_approx((seats[0].t as Transform3D).origin.y, 0.54) and seats[0].both, "a bench has two seats, usable both ways")
+	var from_front := Seats.facing_from(seats[0], Vector3(10, 0, 8))   # standing on its -Z side
+	var from_back := Seats.facing_from(seats[0], Vector3(10, 0, 12))
+	t.check((-from_front.basis.z).z > 0.9 and (-from_back.basis.z).z < -0.9, "a bench sitter faces away from the side they came from")
+	var chair := Seats.for_instance("res://objects/environment/placeholders/chair.tscn", at)[0]
+	t.check(not chair.both and (-(chair.t as Transform3D).basis.z).z > 0.9, "a chair faces its front (+Z)")
+
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var all_seats := Seats.all(get_tree())
+	t.check(all_seats.size() > 200, "the castle's benches, chairs and sofas have seats (%d)" % all_seats.size())
+	var p := await _spawn_player(Vector3(0, 1, 0), "apprentice_f")
+	# Stand next to a seat (the first one, wherever it is) and sit.
+	var first: Transform3D = all_seats[0].t
+	p.global_position = first.origin - first.basis.z * -0.9 + Vector3(0, -first.origin.y + 0.05, 0) + Vector3(0, first.origin.y - 0.54, 0)
+	await _wait(0.3)
+	t.check(p.seat_nearby(), "a seat is within reach")
+	t.check(p.try_sit() and p.gestures.is_sitting() and p.collision_mask == 0 and not p.movement.is_physics_processing(),
+		"interacting near a seat sits down (no collision, movement off)")
+	var seat_h := p.gestures.seat_height
+	t.check(seat_h > 0.3 and seat_h < 0.8, "the seat height is measured from the floor (%.2f m)" % seat_h)
+	await _wait(0.5)
+	t.check(p.gestures.pose != null and p.gestures.pose.influence > 0.9 and p.gestures.pose.gesture == &"sit", "the sitting pose blends in")
+	p.gestures.stand()
+	t.check(not p.gestures.is_sitting() and p.collision_mask == Player.LAYER_WORLD and p.movement.is_physics_processing(), "standing up restores collision and movement")
+	castle.queue_free()
+	await get_tree().process_frame
+
+	p = await _spawn_player(Vector3(0, 1, 0))
+	t.check(p.gestures.play(&"wave") and p.gestures.current == &"wave", "a wave plays")
+	await _wait(Gestures.ONE_SHOT[&"wave"] + 0.3)
+	t.check(p.gestures.current == &"", "and ends by itself")
+	p.gestures.play(&"raise_hand")
+	await _wait(3.0)
+	t.check(p.gestures.current == &"raise_hand", "a raised hand stays up")
+	var ProfessorPanelScript: GDScript = load("res://ui/school/professor_panel.gd")
+	t.check(ProfessorPanelScript._hand_raised(p), "the lesson panel sees the raised hand")
+	p.gestures.play(&"raise_hand")
+	t.check(p.gestures.current == &"", "pressing it again lowers the hand")
+	ChatCommands.run("/uklon", p)
+	await _wait(0.1)
+	t.check(p.gestures.current == &"bow", "/ukłon bows (%s)" % p.gestures.current)
+	t.check(ChatCommands.run("/sit", p) == tr("GESTURE_NO_SEAT"), "/sit with no seat nearby says so")
+	p.gestures.set_remote(&"notes", 0.0)
+	t.check(p.gestures.current == &"notes", "a remote snapshot's gesture shows")
+	p.gestures.set_remote(&"teleport", 0.0)
+	t.check(p.gestures.current == &"", "unknown gestures from the network are ignored")
 
 
 func _test_timetable() -> void:

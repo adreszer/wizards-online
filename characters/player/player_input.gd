@@ -21,6 +21,8 @@ var descend_held: bool = false
 var spell_slot_pressed: int = -1
 ## +1 / -1 when the next / previous spell action was pressed, 0 = none.
 var spell_cycle: int = 0
+## A gesture asked for this frame (raise_hand key, the emote menu, /wave…); &"" = none.
+var gesture_requested: StringName = &""
 
 const SLOT_ACTIONS: Array[StringName] = [
 	&"spell_slot_1", &"spell_slot_2", &"spell_slot_3", &"spell_slot_4", &"spell_slot_5",
@@ -51,6 +53,8 @@ func _process(_delta: float) -> void:
 	for i in SLOT_ACTIONS.size():
 		if Input.is_action_just_pressed(SLOT_ACTIONS[i]):
 			spell_slot_pressed = i
+	if Input.is_action_just_pressed("raise_hand"):
+		gesture_requested = &"raise_hand"
 	if Input.is_action_just_pressed("spell_next"):
 		spell_cycle = 1
 	elif Input.is_action_just_pressed("spell_prev"):
@@ -68,6 +72,18 @@ func clear() -> void:
 	descend_held = false
 	spell_slot_pressed = -1
 	spell_cycle = 0
+	gesture_requested = &""
+
+
+## Asks for a gesture from outside the keyboard (emote menu, chat commands).
+func request_gesture(id: StringName) -> void:
+	gesture_requested = id
+
+
+func consume_gesture() -> StringName:
+	var v := gesture_requested
+	gesture_requested = &""
+	return v
 
 
 func consume_jump() -> bool:

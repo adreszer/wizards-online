@@ -75,6 +75,7 @@ func _process(delta: float) -> void:
 	if _clock_timer <= 0.0:
 		_clock_timer = 0.5
 		_refresh_clock()
+		_refresh_seat_prompt()
 	if _notification_timer > 0.0:
 		_notification_timer -= delta
 		if _notification_timer <= 0.0:
@@ -302,6 +303,19 @@ func _refresh_role() -> void:
 		CharacterProfile.ROLE_ADMIN:
 			_role_label.text = tr("HUD_ROLE_ADMIN") + "  " + tr("HUD_LESSON_HINT")
 	_role_label.visible = CharacterProfile.is_staff(role)
+
+
+## With nothing in focus, interacting sits down at a nearby seat (or stands up).
+func _refresh_seat_prompt() -> void:
+	if _focused != null or _player == null or not is_instance_valid(_player):
+		return
+	var text := ""
+	if _player.gestures.is_sitting():
+		text = tr("HUD_PROMPT") % tr("PROMPT_STAND")
+	elif _player.seat_nearby():
+		text = tr("HUD_PROMPT") % tr("PROMPT_SIT")
+	_prompt_label.text = text
+	_prompt_label.visible = text != ""
 
 
 func _on_focus_changed(interactable: Interactable) -> void:

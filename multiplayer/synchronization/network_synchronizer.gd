@@ -79,6 +79,12 @@ func _tick_local(delta: float) -> void:
 	var rider: BroomRider = player.broom_rider
 	if rider.is_riding():
 		snapshot["m"] = rider.mount_id()
+	# A social gesture (and, sitting, the seat's height above the feet).
+	var gestures: Gestures = player.gestures
+	if gestures.current != &"":
+		snapshot["e"] = String(gestures.current)
+		if gestures.is_sitting():
+			snapshot["h"] = snappedf(gestures.seat_height, 0.01)
 	NetworkManager.send_player_state(snapshot)
 
 
@@ -155,6 +161,8 @@ func receive_state(state: Dictionary) -> void:
 	if mount != _remote_mount:
 		_remote_mount = mount
 		mount_received.emit(mount)
+	var gestures: Gestures = player.gestures
+	gestures.set_remote(StringName(str(state.get("e", ""))), clampf(float(state.get("h", 0.0)), 0.0, 1.5))
 
 
 func receive_spell_cast(definition: SpellDefinition, origin: Vector3, direction: Vector3) -> void:

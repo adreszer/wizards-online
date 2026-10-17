@@ -18,6 +18,14 @@ const WHISPER_ALIASES: Array[String] = ["w", "whisper", "szept", "sz"]
 const SHOUT_ALIASES: Array[String] = ["s", "shout", "krzyk", "k"]
 const DM_ALIASES: Array[String] = ["msg", "dm", "pw", "tell", "napisz"]
 const REPLY_ALIASES: Array[String] = ["r", "reply", "odp", "odpowiedz"]
+## Gestures and seats as commands: /wave, /machaj… (any language's word for it).
+const GESTURE_ALIASES := {"raise": &"raise_hand", "hand": &"raise_hand", "reka": &"raise_hand", "ręka": &"raise_hand", "zglos": &"raise_hand", "zgłoś": &"raise_hand",
+	"wave": &"wave", "machaj": &"wave", "pomachaj": &"wave", "bow": &"bow", "uklon": &"bow", "ukłon": &"bow",
+	"clap": &"clap", "klaszcz": &"clap", "brawo": &"clap", "point": &"point", "wskaz": &"point", "wskaż": &"point",
+	"shrug": &"shrug", "wzrusz": &"shrug", "cheer": &"cheer", "wiwat": &"cheer", "hurra": &"cheer",
+	"notes": &"notes", "notuj": &"notes", "notatki": &"notes"}
+const SIT_ALIASES: Array[String] = ["sit", "usiadz", "usiądź", "siadaj"]
+const STAND_ALIASES: Array[String] = ["stand", "wstan", "wstań"]
 const GIVE_ALIASES: Array[String] = ["give", "daj"]
 const BROOM_ALIASES: Array[String] = ["broom", "miotla", "miotła"]
 const HELP_ALIASES: Array[String] = ["help", "pomoc", "?"]
@@ -74,6 +82,8 @@ static func run(text: String, player: Node) -> String:
 	var name := parts[0].to_lower() if parts.size() > 0 else ""
 	if HELP_ALIASES.has(name):
 		return _t("CHEAT_HELP")
+	if GESTURE_ALIASES.has(name) or SIT_ALIASES.has(name) or STAND_ALIASES.has(name):
+		return gesture(name, player)
 	if BROOM_ALIASES.has(name):
 		return give("broom", player)
 	if GIVE_ALIASES.has(name):
@@ -91,6 +101,20 @@ static func run(text: String, player: Node) -> String:
 	if GOTO_ALIASES.has(name):
 		return goto(parts[1] if parts.size() > 1 else "", player)
 	return _t("CHEAT_UNKNOWN") % text
+
+
+## A gesture, sitting down or standing up for the local player.
+static func gesture(name: String, player: Node) -> String:
+	if not player is Player or not (player as Player).is_local:
+		return _t("CHEAT_NO_PLAYER")
+	var p := player as Player
+	if SIT_ALIASES.has(name):
+		return _t("GESTURE_SAT") if p.try_sit() else _t("GESTURE_NO_SEAT")
+	if STAND_ALIASES.has(name):
+		p.gestures.stand()
+		return ""
+	p.player_input.request_gesture(GESTURE_ALIASES[name])
+	return ""
 
 
 ## No argument: says the balance. Otherwise adds (or with a minus, takes) coins: online

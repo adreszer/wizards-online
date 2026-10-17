@@ -45,6 +45,8 @@ var _refresh_timer: float = 0.0
 var _plans: Array = []
 ## Next plan line "Next line" sends.
 var _plan_cursor: int = 0
+## When each student's hand went up (instance id → msec), for the queue order.
+var _raised_at: Dictionary = {}
 
 
 func _ready() -> void:
@@ -163,6 +165,27 @@ func students_present() -> Array[Node]:
 	return out
 
 
+## `students` with raised hands first (earliest first), then the rest as they were.
+func raised_hands_first(students: Array[Node]) -> Array[Node]:
+	var now := Time.get_ticks_msec()
+	for s in students:
+		if _hand_raised(s) and not _raised_at.has(s.get_instance_id()):
+			_raised_at[s.get_instance_id()] = now
+		elif not _hand_raised(s):
+			_raised_at.erase(s.get_instance_id())
+	var raised := students.filter(func(s: Node) -> bool: return _hand_raised(s))
+	raised.sort_custom(func(a: Node, b: Node) -> bool: return _raised_at[a.get_instance_id()] < _raised_at[b.get_instance_id()])
+	var out: Array[Node] = []
+	out.append_array(raised)
+	out.append_array(students.filter(func(s: Node) -> bool: return not _hand_raised(s)))
+	return out
+
+
+static func _hand_raised(student: Node) -> bool:
+	var g: Variant = student.get("gestures")
+	return g is Gestures and (g as Gestures).current == &"raise_hand"
+
+
 ## Subject id taught in the current room ("" outside a subject's classroom).
 func current_subject() -> String:
 	var zone := current_zone()
@@ -233,9 +256,13 @@ func refresh() -> void:
 	var selected_sid := _selected_sid()
 	_students.clear()
 	_student_sids.clear()
-	for student in students_present():
+	# Raised hands first, in the order the students asked.
+	for student in raised_hands_first(students_present()):
 		_student_sids.append(str(student.get("peer_id")))
-		_students.add_item(str(student.get("display_name")))
+		var label := str(student.get("display_name"))
+		if _hand_raised(student):
+			label = "✋ " + label + "  " + tr("LESSON_RAISED_HAND")
+		_students.add_item(label)
 	var keep := _student_sids.find(selected_sid)
 	if keep >= 0:
 		_students.select(keep)

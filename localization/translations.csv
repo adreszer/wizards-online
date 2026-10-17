@@ -462,3 +462,18 @@ CHAT_MODE_USAGE,"Whisper: /w text (only those right next to you), shout: /s text
 CHAT_TOO_SOON,Slow down a little.,Trochę wolniej.
 CHAT_SHOUT_TOO_SOON,You can shout again in %d s.,Znów krzyknąć możesz za %d s.
 CHAT_REFUSED,Message not sent (%s).,Nie wysłano wiadomości (%s).
+PROMPT_SIT,Sit down,Usiądź
+PROMPT_STAND,Stand up,Wstań
+GESTURE_SAT,You sit down. Move or press E to stand up.,Siadasz. Ruch albo E i wstajesz.
+GESTURE_NO_SEAT,There is no free seat within reach.,W pobliżu nie ma wolnego miejsca.
+GESTURE_RAISE_HAND,Raise hand,Zgłoś się
+GESTURE_WAVE,Wave,Pomachaj
+GESTURE_BOW,Bow,Ukłoń się
+GESTURE_CLAP,Clap,Klaszcz
+GESTURE_POINT,Point,Wskaż
+GESTURE_SHRUG,Shrug,Wzrusz ramionami
+GESTURE_CHEER,Cheer,Wiwatuj
+GESTURE_NOTES,Take notes,Notuj
+EMOTE_MENU_TITLE,Gestures,Gesty
+EMOTE_MENU_FOOTER,"1–8 or click · H raises your hand · G or Esc closes","1–8 albo kliknięcie · H zgłasza się · G lub Esc zamyka"
+LESSON_RAISED_HAND,(hand raised),(zgłasza się)
