@@ -477,3 +477,34 @@ GESTURE_NOTES,Take notes,Notuj
 EMOTE_MENU_TITLE,Gestures,Gesty
 EMOTE_MENU_FOOTER,"1–8 or click · H raises your hand · G or Esc closes","1–8 albo kliknięcie · H zgłasza się · G lub Esc zamyka"
 LESSON_RAISED_HAND,(hand raised),(zgłasza się)
+BOARD_NEXT_LESSON,Next lesson: %s %s,Następna lekcja: %s %s
+QUIZ_TITLE,Question from %s,Pytanie od: %s
+QUIZ_TYPE_ANSWER,Your answer…,Twoja odpowiedź…
+QUIZ_SEND,Answer,Odpowiedz
+QUIZ_HINT_CHOICES,"Choose with 1–6 or a click. Esc: later (K brings it back).","Wybierz klawiszem 1–6 albo kliknięciem. Esc: później (K wraca do pytania)."
+QUIZ_HINT_OPEN,"Type your answer and press Enter. Esc: later (K brings it back).","Wpisz odpowiedź i naciśnij Enter. Esc: później (K wraca do pytania)."
+QUIZ_ANSWERED,"Answer sent; you can still change it until the question closes.","Odpowiedź wysłana; możesz ją zmienić, dopóki pytanie jest otwarte."
+QUIZ_RIGHT,Correct!,Dobrze!
+QUIZ_WRONG,Not quite.,Niezupełnie.
+QUIZ_CLOSED_NO_ANSWER,The question is closed; you did not answer.,"Pytanie zamknięte, bez twojej odpowiedzi."
+QUIZ_CLOSED_WAITING_MARK,The question is closed; the professor will mark your answer.,Pytanie zamknięte; profesor oceni twoją odpowiedź.
+LESSON_TAB_LESSON,Lesson,Lekcja
+LESSON_TAB_BOARD,Board & quiz,Tablica i pytania
+BOARD_TITLE,The classroom board,Tablica w klasie
+BOARD_PLACEHOLDER,What the board should show (students see it in the room),"Co ma być na tablicy (uczniowie widzą to w klasie)"
+BOARD_WRITE,Write on the board,Napisz na tablicy
+BOARD_WIPE,Wipe the board,Zetrzyj tablicę
+BOARD_WRITTEN,Written on the board.,Napisano na tablicy.
+BOARD_WIPED,The board is wiped.,Tablica starta.
+QUIZ_PANEL_TITLE,A question for the room,Pytanie do klasy
+QUIZ_QUESTION_PLACEHOLDER,The question,Pytanie
+QUIZ_CHOICES_PLACEHOLDER,"Choices, one per line; * before the right one. None: an open question.","Odpowiedzi, każda w osobnej linii; * przed poprawną. Bez odpowiedzi: pytanie otwarte."
+QUIZ_ASK,Ask,Zadaj
+QUIZ_CLOSE,Close the question,Zamknij pytanie
+QUIZ_MARK_RIGHT,Right ✓,Dobrze ✓
+QUIZ_MARK_WRONG,Wrong ✗,Źle ✗
+QUIZ_NEEDS_QUESTION,Write the question first.,Najpierw wpisz pytanie.
+QUIZ_ASKED,Question asked.,Pytanie zadane.
+QUIZ_SELECT_ANSWER,Select an answer in the list first.,Najpierw zaznacz odpowiedź na liście.
+QUIZ_ANSWER_COUNT,Answers: %d,Odpowiedzi: %d
+LESSON_TOOL_REFUSED,Refused (%s: %s).,Odmowa (%s: %s).

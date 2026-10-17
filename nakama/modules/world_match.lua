@@ -38,6 +38,7 @@ local Timetable = require("timetable")
 local Economy = require("economy")
 local Records = require("records")
 local Chat = require("chat")
+local Quiz = require("quiz")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -53,6 +54,8 @@ local OP_LECTURE, OP_LECTURE_TEXT = P.OP_LECTURE, P.OP_LECTURE_TEXT
 local OP_CHEAT, OP_CHEAT_RESULT, OP_CLOCK = P.OP_CHEAT, P.OP_CHEAT_RESULT, P.OP_CLOCK
 local OP_TIMETABLE, OP_WALLET = P.OP_TIMETABLE, P.OP_WALLET
 local OP_CHAT, OP_CHAT_LINE, OP_DM, OP_DM_LINE, OP_CHAT_RESULT = P.OP_CHAT, P.OP_CHAT_LINE, P.OP_DM, P.OP_DM_LINE, P.OP_CHAT_RESULT
+local OP_BOARD, OP_QUIZ, OP_QUIZ_STATE, OP_QUIZ_ANSWER = P.OP_BOARD, P.OP_QUIZ, P.OP_QUIZ_STATE, P.OP_QUIZ_ANSWER
+local OP_QUIZ_ANSWERS, OP_LESSON_TOOL_RESULT = P.OP_QUIZ_ANSWERS, P.OP_LESSON_TOOL_RESULT
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
 local MAX_AREA_ID_BYTES = 48
@@ -329,7 +332,7 @@ end
 local function lessons_payload(state)
   local out = {}
   for area, lesson in pairs(state.lessons) do
-    out[area] = { subject = lesson.subject, by = lesson.by_name, sid = lesson.by_sid, slot = lesson.slot or "" }
+    out[area] = { subject = lesson.subject, by = lesson.by_name, sid = lesson.by_sid, slot = lesson.slot or "", board = lesson.board or "" }
   end
   return nk.json_encode({ lessons = out })
 end
@@ -338,10 +341,40 @@ local function send_lessons(dispatcher, state, presences)
   dispatcher.broadcast_message(OP_LESSON_STATE, lessons_payload(state), presences, nil, true)
 end
 
+-- The lesson's question as each player in the room sees it ({id = 0}: none).
+local function send_quiz(dispatcher, state, area, only_sid)
+  local lesson = state.lessons[area]
+  for _, pl in ipairs(players_in(state, area)) do
+    if not only_sid or pl.sid == only_sid then
+      local view = (lesson and lesson.quiz) and Quiz.view_for(lesson.quiz, pl.sid, lesson.by_name) or { id = 0 }
+      dispatcher.broadcast_message(OP_QUIZ_STATE, nk.json_encode(view), { state.presences[pl.sid] }, nil, true)
+    end
+  end
+end
+
+-- The live answers, to whoever runs the lesson.
+local function send_quiz_answers(dispatcher, state, lesson)
+  local p = state.presences[lesson.by_sid]
+  if p and lesson.quiz then
+    dispatcher.broadcast_message(OP_QUIZ_ANSWERS, nk.json_encode({ id = lesson.quiz.id, answers = Quiz.answers_list(lesson.quiz) }), { p }, nil, true)
+  end
+end
+
+-- Marked answers go into the students' records.
+local function record_marks(lesson, marked)
+  for _, a in pairs(marked) do
+    Records.quiz_result(a.uid, lesson.subject, a.right and 1 or 0, 1)
+  end
+end
+
 local function close_lesson(dispatcher, state, area, why)
   local lesson = state.lessons[area]
   if not lesson then return end
+  if lesson.quiz and lesson.quiz.open then
+    record_marks(lesson, Quiz.close(lesson.quiz))
+  end
   state.lessons[area] = nil
+  send_quiz(dispatcher, state, area)
   local count, paid = 0, 0
   for _ in pairs(lesson.attendance) do count = count + 1 end
   -- Attendance pays: every student who attended and is still in the room, when the
@@ -651,6 +684,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           if lesson and lesson.by_sid ~= sid then
             lesson.attendance[message.sender.user_id] = state.names[sid] or ""
           end
+          if lesson and lesson.quiz then send_quiz(dispatcher, state, area, sid) end
           feed_mysteries(dispatcher, state, sid, { event = "enter", area = area })
           -- A secret area, once walked into, stays on this character's map.
           local profile = state.profiles[sid]
@@ -898,6 +932,69 @@ function M.match_loop(context, dispatcher, tick, state, messages)
             listeners_of(state, sid, mode), nil, true)
         end
       end
+    elseif message.op_code == OP_BOARD or message.op_code == OP_QUIZ or message.op_code == OP_QUIZ_ANSWER then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local tool = message.op_code == OP_BOARD and "board" or message.op_code == OP_QUIZ and "quiz" or "answer"
+      local reason
+      if message.op_code == OP_QUIZ_ANSWER then
+        local lesson = state.lessons[state.areas[sid] or ""]
+        if not lesson or not lesson.quiz or lesson.quiz.id ~= payload.id then
+          reason = "no_question"
+        elseif lesson.by_sid == sid then
+          reason = "own_question"
+        else
+          local _, why = Quiz.answer(lesson.quiz, sid, message.sender.user_id, state.names[sid] or "", payload.answer)
+          reason = why
+          if not why then
+            send_quiz(dispatcher, state, state.areas[sid], sid)
+            send_quiz_answers(dispatcher, state, lesson)
+          end
+        end
+      else
+        local lesson = own_lesson(state, sid)
+        local area = state.areas[sid] or ""
+        if not lesson then
+          reason = "no_lesson"
+        elseif message.op_code == OP_BOARD then
+          lesson.board = School.clean_text(payload.text, state.rules.max_board_bytes)
+          send_lessons(dispatcher, state, nil)
+        elseif payload.action == "ask" then
+          if lesson.quiz and lesson.quiz.open then record_marks(lesson, Quiz.close(lesson.quiz)) end
+          state.quiz_seq = (state.quiz_seq or 0) + 1
+          local quiz, why = Quiz.new_question(state.quiz_seq, payload)
+          reason = why
+          if quiz then
+            lesson.quiz = quiz
+            send_quiz(dispatcher, state, area)
+            send_quiz_answers(dispatcher, state, lesson)
+          end
+        elseif payload.action == "close" then
+          if not lesson.quiz or not lesson.quiz.open then
+            reason = "no_question"
+          else
+            record_marks(lesson, Quiz.close(lesson.quiz))
+            send_quiz(dispatcher, state, area)
+            send_quiz_answers(dispatcher, state, lesson)
+          end
+        elseif payload.action == "mark" then
+          local entry, why
+          if lesson.quiz then
+            entry, why = Quiz.mark(lesson.quiz, payload.sid, payload.right)
+          else
+            why = "no_question"
+          end
+          reason = why
+          if entry then
+            record_marks(lesson, { entry })
+            send_quiz(dispatcher, state, area, payload.sid)
+            send_quiz_answers(dispatcher, state, lesson)
+          end
+        else
+          reason = "bad_action"
+        end
+      end
+      dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = tool, reason = reason or "" }), { message.sender }, nil, true)
     elseif message.op_code == OP_PING then
       -- Echo the client's send time with the server's clock (ms since the epoch), so
       -- clients can agree on one time for scheduled movers (shifting stairs, clockwork).

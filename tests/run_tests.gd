@@ -81,6 +81,7 @@ func _run() -> void:
 	await _test_timetable()
 	await _test_chat()
 	await _test_gestures()
+	await _test_board_and_quiz()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2174,6 +2175,40 @@ func _test_gestures() -> void:
 	t.check(p.gestures.current == &"notes", "a remote snapshot's gesture shows")
 	p.gestures.set_remote(&"teleport", 0.0)
 	t.check(p.gestures.current == &"", "unknown gestures from the network are ignored")
+
+
+func _test_board_and_quiz() -> void:
+	t.section("Board and quiz")
+	var ProfessorPanelScript: GDScript = load("res://ui/school/professor_panel.gd")
+	var parsed: Dictionary = ProfessorPanelScript.parse_choices("Galewind\n*Uplift\nEmberkindle")
+	t.check(parsed.choices.size() == 3 and parsed.correct == 1 and parsed.choices[1] == "Uplift", "choices one per line, * marks the right one")
+	parsed = ProfessorPanelScript.parse_choices(" a | *b ")
+	t.check(parsed.choices == PackedStringArray(["a", "b"]) and parsed.correct == 1, "or separated by | (a plan line)")
+	t.check(ProfessorPanelScript.parse_choices("").choices.is_empty(), "no choices: an open question")
+	t.check(QuizPanel.status_text({"id": 1, "choices": ["a", "b"], "open": true}) == tr("QUIZ_HINT_CHOICES")
+		and QuizPanel.status_text({"id": 1, "choices": [], "open": true}) == tr("QUIZ_HINT_OPEN"), "the question says how to answer")
+	t.check(QuizPanel.status_text({"id": 1, "open": true, "answer": 1}) == tr("QUIZ_ANSWERED")
+		and QuizPanel.status_text({"id": 1, "open": false, "answer": 1, "right": true}) == tr("QUIZ_RIGHT")
+		and QuizPanel.status_text({"id": 1, "open": false}) == tr("QUIZ_CLOSED_NO_ANSWER"), "and how it went")
+	var tt := Timetable.new()
+	tt.apply({"tz": 0, "slots": [{"id": "x", "k": "lesson", "s": "sigilcraft", "a": "class_sigilcraft", "t0": 2000.0, "t1": 3000.0}]})
+	var idle := ClassroomBoards.board_text_for("class_sigilcraft", {}, tt, 1000.0)
+	t.check(idle.contains(tr("SUBJECT_SIGILCRAFT_NAME")) and idle.contains(tr("BOARD_NEXT_LESSON").get_slice("%", 0).strip_edges()), "an idle board names the subject and the next lesson (%s)" % idle.replace("\n", " | "))
+	t.check(ClassroomBoards.board_text_for("class_sigilcraft", {"class_sigilcraft": {"board": "Sigils, week one"}}, tt, 1000.0) == "Sigils, week one", "during a lesson it shows what the professor wrote")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var boards := castle.get_node_or_null("ClassroomBoards") as ClassroomBoards
+	var classrooms := get_tree().get_nodes_in_group(AreaZone.GROUP).filter(func(z: Node) -> bool: return (z as AreaZone).kind == "classroom")
+	t.check(boards != null and boards.labels.size() >= classrooms.size() - 2 and boards.labels.has("class_sigilcraft"),
+		"every classroom's board can be written on (%d boards, %d classrooms)" % [boards.labels.size() if boards else 0, classrooms.size()])
+	if boards != null and boards.labels.has("class_sigilcraft"):
+		var label: Label3D = boards.labels["class_sigilcraft"]
+		var zone: AreaZone = classrooms.filter(func(z: Node) -> bool: return str((z as AreaZone).area_id) == "class_sigilcraft")[0]
+		var to_room := (zone.global_position - label.global_position)
+		to_room.y = 0.0
+		t.check(label.global_basis.z.dot(to_room.normalized()) > 0.7, "the chalk text faces into the room")
+	castle.queue_free()
 
 
 func _test_timetable() -> void:

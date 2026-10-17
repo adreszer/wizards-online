@@ -32,6 +32,7 @@ var clock_changes: Array[String] = []
 var timetables_received: int = 0
 ## Direct messages received or echoed: the ChatManager line dictionaries.
 var dm_lines: Array = []
+var tool_results: Array = []
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
@@ -63,6 +64,7 @@ func _ready() -> void:
 	NetworkManager.house_points_result_received.connect(func(ok: bool, house: int, delta: int, reason: String) -> void: points_results.append({"ok": ok, "house": house, "delta": delta, "reason": reason}))
 	NetworkManager.lecture_received.connect(func(by: String, text: String) -> void: lectures.append("%s: %s" % [by, text]))
 	NetworkManager.timetable_changed.connect(func() -> void: timetables_received += 1)
+	NetworkManager.lesson_tool_result_received.connect(func(ok: bool, tool: String, reason: String) -> void: tool_results.append([ok, tool, reason]))
 	NetworkManager.chat_line_received.connect(func(line: Dictionary) -> void:
 		if line.get("kind", "") == "dm":
 			dm_lines.append(line))
@@ -281,6 +283,24 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return grant_results.size() >= 6, 10.0)
 	t.check(ok and grant_results[5]["ok"] == false and grant_results[5]["reason"] == "already_known", "teaching the same spell twice is refused")
 	NetworkManager.send_lecture("Today we draw the first sigil.")
+	# Lessons 2.0: the board, a marked multiple-choice question, an open question.
+	NetworkManager.send_board("Sigils, week one")
+	NetworkManager.ask_quiz("Which spell lifts a feather?", PackedStringArray(["Galewind", "Uplift", "Emberkindle"]), 1)
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz_answers.size() == 1, 30.0)
+	t.check(ok and int(NetworkManager.quiz_answers[0].get("answer", -1)) == 1 and NetworkManager.quiz_answers[0].get("name", "") == "ClientB",
+		"the student's answer reaches the professor live (%s)" % str(NetworkManager.quiz_answers))
+	NetworkManager.close_quiz()
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz_answers.size() == 1 and NetworkManager.quiz_answers[0].get("right", null) == true, 10.0)
+	t.check(ok, "closing marks the multiple-choice answers")
+	NetworkManager.ask_quiz("Name one use of a sigil.")
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz_answers.size() == 1 and NetworkManager.quiz_answers[0].get("answer", "") is String, 30.0)
+	t.check(ok and NetworkManager.quiz_answers[0].get("answer", "") == "lifting a feather", "an open answer arrives as text")
+	NetworkManager.mark_quiz_answer(b_sid, true)
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz_answers[0].get("right", null) == true, 10.0)
+	t.check(ok, "the professor marks an open answer by hand")
+	NetworkManager.mark_quiz_answer(b_sid, false)
+	ok = await _wait_until(func() -> bool: return tool_results.any(func(r: Array) -> bool: return r[2] == "already_marked"), 10.0)
+	t.check(ok, "an answer is marked once")
 	# House points: an award with a reason lands in the ledger and the tally.
 	var totals_before := NetworkManager.get_house_totals()
 	t.check(totals_before.size() == 4, "the house points tally arrived on join (%s)" % str(totals_before))
@@ -471,6 +491,22 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(NetworkManager.get_lessons().get(str(CLASSROOM), {}).get("by", "") == "ClientA", "the student sees the professor's open lesson")
 	ok = await _wait_until(func() -> bool: return lectures.has("ClientA: Today we draw the first sigil."), 15.0)
 	t.check(ok, "the professor's lecture reaches the student in the room (%s)" % str(lectures))
+	ok = await _wait_until(func() -> bool: return NetworkManager.board_text(str(CLASSROOM)) == "Sigils, week one", 15.0)
+	var boards := world.get_node("Level/ClassroomBoards") as ClassroomBoards
+	t.check(ok and boards.labels[str(CLASSROOM)].text == "Sigils, week one", "the professor's board text is on the classroom board")
+	var quiz_panel := world.get_node("QuizPanel") as QuizPanel
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz.get("question", "") == "Which spell lifts a feather?", 15.0)
+	t.check(ok and NetworkManager.quiz.get("choices", []).size() == 3 and quiz_panel.is_open, "the question opens the quiz panel for the student")
+	quiz_panel.answer(1)
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz.get("answer", -1) == 1.0 and not quiz_panel.is_open, 10.0)
+	t.check(ok, "the answer is stored and the panel lets go of the keyboard")
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz.get("open", true) == false, 20.0)
+	t.check(ok and NetworkManager.quiz.get("right", false) == true and int(NetworkManager.quiz.get("correct", -1)) == 1, "closed: the right choice and our result (%s)" % str(NetworkManager.quiz))
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz.get("question", "") == "Name one use of a sigil.", 20.0)
+	t.check(ok and quiz_panel.is_open, "an open question asks for typed text")
+	NetworkManager.answer_quiz("lifting a feather")
+	ok = await _wait_until(func() -> bool: return NetworkManager.quiz.get("right", false) == true, 20.0)
+	t.check(ok and QuizPanel.status_text(NetworkManager.quiz) == tr("QUIZ_RIGHT"), "the professor's mark reaches the student")
 	t.check(player.spell_caster.try_cast(), "student casts the granted spell")
 	await _wait(0.6)
 	player.spell_caster.try_cast()
@@ -567,6 +603,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(theirs.has("error"), "a student cannot read someone else's purse")
 	var own_record: Dictionary = await NetworkManager.school_record()
 	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("attended", 0)) >= 1, "the student reads their own school record")
+	t.check(int(own_record.get("record", {}).get("subjects", {}).get("sigilcraft", {}).get("quiz_right", 0)) >= 2, "with the marked quiz answers in it")
 	var other_record: Dictionary = await NetworkManager.school_record("someone-else")
 	t.check(other_record.has("error"), "but not another student's")
 	cheat_results.clear()   # the brooms section counts its own cheat answers

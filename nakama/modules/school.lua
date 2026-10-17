@@ -40,6 +40,8 @@ M.DEFAULT_RULES = {
   chat_cooldown_seconds = 0.5,
   shout_cooldown_seconds = 10,
   dm_cooldown_seconds = 1,
+  -- Lessons 2.0: what the classroom board holds.
+  max_board_bytes = 800,
 }
 M.HOUSES = 4
 M.POINTS_COLLECTION, M.TOTALS_KEY = "house_points", "totals"

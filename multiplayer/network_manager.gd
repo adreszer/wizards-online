@@ -61,6 +61,13 @@ signal timetable_changed()
 ## features (chat, lessons 2.0…) listen here and send with send_op().
 signal server_message(op_code: int, payload: Dictionary)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
+## The lesson's question as the local player sees it ({id, question, choices, by, open,
+## answer?, right?, correct?}); {} = no question (left the room, lesson over).
+signal quiz_changed(view: Dictionary)
+## Professor: the live answers to the current question [{sid, name, answer, right?}].
+signal quiz_answers_changed(answers: Array)
+## Outcome of a board / quiz / answer request.
+signal lesson_tool_result_received(ok: bool, tool: String, reason: String)
 ## A chat or DM line for the local player: {kind: "chat" | "dm", mode, sid, name, text, self,
 ## to_name, mail} (see ChatManager).
 signal chat_line_received(line: Dictionary)
@@ -85,6 +92,9 @@ var school_clock := SchoolClock.new()
 var timetable := Timetable.new()
 ## Offline practice purse (the /coins cheat); never saved, the real one is the server's wallet.
 var offline_coins: int = 0
+## The current question as we see it ({} = none) and, for the professor, its answers.
+var quiz: Dictionary = {}
+var quiz_answers: Array = []
 var _reconnect_attempts: int = 0
 var _reconnecting: bool = false
 
@@ -120,6 +130,7 @@ func _ready() -> void:
 		timetable.apply(payload)
 		timetable_changed.emit())
 	world_session.message_received.connect(server_message.emit)
+	world_session.message_received.connect(_on_lesson_message)
 	chat_manager.bind(world_session)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	chat_manager.line_received.connect(chat_line_received.emit)
@@ -463,6 +474,52 @@ func send_dm(to_name: String, text: String) -> bool:
 	return chat_manager.send_dm(to_name, text)
 
 
+## Professor running the lesson: what the classroom board shows ("" wipes it).
+func send_board(text: String) -> void:
+	send_op(NetworkProtocol.OP_BOARD, {"text": text})
+
+
+## Professor: ask the room a question. No choices = an open question; `correct` is the
+## index of the right choice or -1 when there is none to mark automatically.
+func ask_quiz(question: String, choices: PackedStringArray = PackedStringArray(), correct: int = -1) -> void:
+	send_op(NetworkProtocol.OP_QUIZ, {"action": "ask", "question": question, "choices": Array(choices), "correct": correct})
+
+
+func close_quiz() -> void:
+	send_op(NetworkProtocol.OP_QUIZ, {"action": "close"})
+
+
+## Professor: mark one student's answer right or wrong (open questions).
+func mark_quiz_answer(sid: String, right: bool) -> void:
+	send_op(NetworkProtocol.OP_QUIZ, {"action": "mark", "sid": sid, "right": right})
+
+
+## Student: answer the current question (a choice index, or text for an open one).
+func answer_quiz(answer: Variant) -> void:
+	if not quiz.is_empty():
+		send_op(NetworkProtocol.OP_QUIZ_ANSWER, {"id": quiz.get("id", 0), "answer": answer})
+
+
+## The board text of the open lesson in `area` ("" without one).
+func board_text(area: String) -> String:
+	return str(get_lessons().get(area, {}).get("board", ""))
+
+
+func _on_lesson_message(op_code: int, payload: Dictionary) -> void:
+	match op_code:
+		NetworkProtocol.OP_QUIZ_STATE:
+			quiz = payload if int(payload.get("id", 0)) != 0 else {}
+			if quiz.has("choices") and not quiz.choices is Array:
+				quiz.choices = []   # an empty Lua table arrives as {}
+			quiz_changed.emit(quiz)
+		NetworkProtocol.OP_QUIZ_ANSWERS:
+			var list: Variant = payload.get("answers", [])
+			quiz_answers = list if list is Array else []
+			quiz_answers_changed.emit(quiz_answers)
+		NetworkProtocol.OP_LESSON_TOOL_RESULT:
+			lesson_tool_result_received.emit(payload.get("ok", false) == true, str(payload.get("tool", "")), str(payload.get("reason", "")))
+
+
 func _on_server_text(text: String, seconds: float) -> void:
 	var clean := text.strip_edges()
 	if clean.is_empty():
@@ -481,6 +538,8 @@ func _on_lecture(by_name: String, text: String) -> void:
 
 func _teardown() -> void:
 	chat_manager.leave()
+	quiz = {}
+	quiz_answers = []
 	await world_session.leave()
 	state_synchronizer.reset()
 

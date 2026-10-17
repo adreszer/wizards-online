@@ -47,6 +47,16 @@ var _plans: Array = []
 var _plan_cursor: int = 0
 ## When each student's hand went up (instance id → msec), for the queue order.
 var _raised_at: Dictionary = {}
+## The "Board & quiz" tab (built in code by _build_board_tab).
+var _board_text: TextEdit
+var _quiz_question: LineEdit
+var _quiz_choices: TextEdit
+var _quiz_answers: ItemList
+var _quiz_status: Label
+## Parallel to the answers list: session ids.
+var _answer_sids: Array[String] = []
+## The choices of the question we asked last (answers arrive as indices).
+var _asked_choices: Array = []
 
 
 func _ready() -> void:
@@ -75,6 +85,136 @@ func _ready() -> void:
 	for h in range(1, CharacterProfile.MAX_HOUSE + 1):
 		_house_option.add_item(CharacterProfile.house_name(h), h)
 	_list_spells("")
+	_build_board_tab()
+	NetworkManager.quiz_answers_changed.connect(_on_quiz_answers)
+	NetworkManager.lesson_tool_result_received.connect(_on_tool_result)
+
+
+## Splits the panel into tabs: "Lesson" (everything that was there) and "Board & quiz".
+func _build_board_tab() -> void:
+	var vbox: VBoxContainer = _root.get_node("Panel/VBox")
+	var tabs := TabContainer.new()
+	tabs.name = "Tabs"
+	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(tabs)
+	vbox.move_child(tabs, vbox.get_node("LessonRow").get_index() + 1)
+	var lesson_tab := VBoxContainer.new()
+	lesson_tab.name = tr("LESSON_TAB_LESSON")
+	tabs.add_child(lesson_tab)
+	for name in ["Columns", "Buttons", "PointsRow", "LectureRow", "PlanRow", "PlanText"]:
+		# reparent() keeps the owner, so the %UniqueName lookups still work.
+		vbox.get_node(name).reparent(lesson_tab)
+	var board_tab := VBoxContainer.new()
+	board_tab.name = tr("LESSON_TAB_BOARD")
+	tabs.add_child(board_tab)
+	board_tab.add_child(_label(tr("BOARD_TITLE")))
+	_board_text = TextEdit.new()
+	_board_text.custom_minimum_size = Vector2(0, 90)
+	_board_text.placeholder_text = tr("BOARD_PLACEHOLDER")
+	board_tab.add_child(_board_text)
+	var board_row := HBoxContainer.new()
+	board_tab.add_child(board_row)
+	board_row.add_child(_button(tr("BOARD_WRITE"), func() -> void: write_board(_board_text.text)))
+	board_row.add_child(_button(tr("BOARD_WIPE"), func() -> void:
+		_board_text.text = ""
+		write_board("")))
+	board_tab.add_child(_label(tr("QUIZ_PANEL_TITLE")))
+	_quiz_question = LineEdit.new()
+	_quiz_question.placeholder_text = tr("QUIZ_QUESTION_PLACEHOLDER")
+	board_tab.add_child(_quiz_question)
+	_quiz_choices = TextEdit.new()
+	_quiz_choices.custom_minimum_size = Vector2(0, 80)
+	_quiz_choices.placeholder_text = tr("QUIZ_CHOICES_PLACEHOLDER")
+	board_tab.add_child(_quiz_choices)
+	var quiz_row := HBoxContainer.new()
+	board_tab.add_child(quiz_row)
+	quiz_row.add_child(_button(tr("QUIZ_ASK"), func() -> void: ask_question(_quiz_question.text, _quiz_choices.text)))
+	quiz_row.add_child(_button(tr("QUIZ_CLOSE"), func() -> void: NetworkManager.close_quiz()))
+	quiz_row.add_child(_button(tr("QUIZ_MARK_RIGHT"), func() -> void: _mark_selected(true)))
+	quiz_row.add_child(_button(tr("QUIZ_MARK_WRONG"), func() -> void: _mark_selected(false)))
+	_quiz_status = _label("")
+	board_tab.add_child(_quiz_status)
+	_quiz_answers = ItemList.new()
+	_quiz_answers.custom_minimum_size = Vector2(0, 110)
+	_quiz_answers.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	board_tab.add_child(_quiz_answers)
+
+
+func _label(text: String) -> Label:
+	var l := Label.new()
+	l.text = text
+	return l
+
+
+func _button(text: String, action: Callable) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.pressed.connect(action)
+	return b
+
+
+## Writes `text` on the classroom board (the server keeps it for the lesson).
+func write_board(text: String) -> void:
+	NetworkManager.send_board(text.strip_edges())
+	_show(tr("BOARD_WRITTEN") if text.strip_edges() != "" else tr("BOARD_WIPED"))
+
+
+## Asks a question; `choices_text` has one choice per line, "*" before the right one
+## (none = an open question).
+func ask_question(question: String, choices_text: String) -> void:
+	var parsed := parse_choices(choices_text)
+	if question.strip_edges() == "":
+		_show(tr("QUIZ_NEEDS_QUESTION"))
+		return
+	_asked_choices = Array(parsed.choices)
+	NetworkManager.ask_quiz(question.strip_edges(), parsed.choices, parsed.correct)
+	_show(tr("QUIZ_ASKED"))
+
+
+## {choices: PackedStringArray, correct: index or -1} from lines (or "|"-separated parts)
+## where a leading "*" marks the right choice.
+static func parse_choices(text: String) -> Dictionary:
+	var choices := PackedStringArray()
+	var correct := -1
+	var parts := text.split("\n") if text.contains("\n") else text.split("|")
+	for raw in parts:
+		var line := raw.strip_edges()
+		if line == "":
+			continue
+		if line.begins_with("*"):
+			correct = choices.size()
+			line = line.substr(1).strip_edges()
+		choices.append(line)
+	return {"choices": choices, "correct": correct}
+
+
+func _mark_selected(right: bool) -> void:
+	var selected := _quiz_answers.get_selected_items()
+	if selected.is_empty() or selected[0] >= _answer_sids.size():
+		_show(tr("QUIZ_SELECT_ANSWER"))
+		return
+	NetworkManager.mark_quiz_answer(_answer_sids[selected[0]], right)
+
+
+func _on_quiz_answers(answers: Array) -> void:
+	_quiz_answers.clear()
+	_answer_sids.clear()
+	for a: Dictionary in answers:
+		var answer: Variant = a.get("answer", "")
+		var text := str(answer)
+		if answer is float and _asked_choices.size() > int(answer):
+			text = "%d. %s" % [int(answer) + 1, _asked_choices[int(answer)]]
+		var mark := ""
+		if a.has("right"):
+			mark = "  ✓" if a.right else "  ✗"
+		_quiz_answers.add_item("%s: %s%s" % [str(a.get("name", "?")), text, mark])
+		_answer_sids.append(str(a.get("sid", "")))
+	_quiz_status.text = tr("QUIZ_ANSWER_COUNT") % answers.size()
+
+
+func _on_tool_result(ok: bool, tool: String, reason: String) -> void:
+	if not ok and is_open:
+		_show(tr("LESSON_TOOL_REFUSED") % [tool, reason])
 
 
 func _bind_player(player: Node) -> void:
@@ -131,7 +271,7 @@ func close() -> void:
 	is_open = false
 	_root.visible = false
 	GameSession.ui_input_captured = false
-	if not get_tree().paused:
+	if is_inside_tree() and not get_tree().paused:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
@@ -355,7 +495,15 @@ func send_next_plan_line() -> void:
 		return
 	if _plan_cursor >= lines.size():
 		_plan_cursor = 0
-	send_lecture(lines[_plan_cursor])
+	var line: String = lines[_plan_cursor]
+	# "# text" writes the board, "? question | choice | *right choice" asks the room.
+	if line.begins_with("#"):
+		write_board(line.substr(1).strip_edges())
+	elif line.begins_with("?"):
+		var parts := line.substr(1).split("|", true, 1)
+		ask_question(parts[0], parts[1] if parts.size() > 1 else "")
+	else:
+		send_lecture(line)
 	_plan_cursor += 1
 	_show(tr("PLAN_LINE_SENT") % [_plan_cursor, lines.size()])
 

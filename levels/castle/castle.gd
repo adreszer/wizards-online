@@ -30,6 +30,9 @@ func _ready() -> void:
 	music.name = "MusicDirector"
 	music.cycle = day_night
 	add_child(music)
+	var boards := ClassroomBoards.new()
+	boards.name = "ClassroomBoards"
+	add_child(boards)
 	for wall in get_tree().get_nodes_in_group("secret_walls"):
 		if wall is SecretWall:
 			(wall as SecretWall).revealed.connect(func() -> void: GameEvents.notification_requested.emit(tr("NOTIFY_SECRET_PASSAGE"), 4.0))

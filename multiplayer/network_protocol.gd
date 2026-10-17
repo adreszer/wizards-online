@@ -101,6 +101,21 @@ const OP_DM_LINE := 39
 ## "no_such_player", "mailbox_full", "empty", "bad_mode"); {ok: true, mailed: true, to_name} when
 ## a DM went to an absent player's mailbox
 const OP_CHAT_RESULT := 40
+## client (professor running the lesson) → server: {text} what the classroom board shows
+## ("" wipes it); everyone gets it in OP_LESSON_STATE (lessons[area].board)
+const OP_BOARD := 41
+## client (professor running the lesson) → server: {action: "ask", question, choices: [text]
+## (none = an open question), correct: index or -1} | {action: "close"} | {action: "mark", sid, right}
+const OP_QUIZ := 42
+## server → each player in the classroom: {id, question, choices, by, open, answer?, right?,
+## correct?} the question as that player sees it; {id: 0} = no question any more
+const OP_QUIZ_STATE := 43
+## client (student) → server: {id, answer: choice index | text}
+const OP_QUIZ_ANSWER := 44
+## server → the professor: {id, answers: [{sid, name, answer, right?}]} live, as students answer
+const OP_QUIZ_ANSWERS := 45
+## server → sender: {ok, tool: "board" | "quiz" | "answer", reason} outcome of a lesson tool request
+const OP_LESSON_TOOL_RESULT := 46
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"

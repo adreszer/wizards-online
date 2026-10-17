@@ -48,6 +48,8 @@ var _flushed := false
 var instance_count := 0
 ## Seats of the benches, chairs and sofas taken in ([{t, both}], see Seats).
 var seats: Array[Dictionary] = []
+## Where every wall board hangs (global transforms), for ClassroomBoards' writing.
+var boards: Array[Transform3D] = []
 
 
 func _enter_tree() -> void:
@@ -111,6 +113,8 @@ static func _collect(root: Node3D, node: Node, xform: Transform3D, proto: Dictio
 func add(scene: PackedScene, xform: Transform3D) -> bool:
 	if _flushed or not can_batch(scene):
 		return false
+	if scene.resource_path == ClassroomBoards.WALL_BOARD:
+		boards.append(xform)
 	if Seats.BY_SCENE.has(scene.resource_path):
 		seats.append_array(Seats.for_instance(scene.resource_path, xform))
 	var proto := prototype(scene)
