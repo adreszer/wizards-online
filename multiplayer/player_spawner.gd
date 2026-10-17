@@ -110,6 +110,15 @@ func _on_chat_line(line: Dictionary) -> void:
 
 
 func _on_server_message(op_code: int, payload: Dictionary) -> void:
+	if op_code == NetworkProtocol.OP_MASTERY and local_player != null:
+		var caster := local_player.spell_caster as SpellCaster
+		var id := str(payload.get("spell", ""))
+		var before := int(caster.mastery.get(id, 0))
+		var points := maxi(0, int(payload.get("points", 0)))
+		caster.mastery[id] = points
+		var def := SpellRegistry.load_definition(id)
+		if def != null and SpellMastery.level_of(points) > SpellMastery.level_of(before):
+			GameEvents.notification_requested.emit(tr("MASTERY_LEVEL_UP") % [tr(def.display_name), tr(SpellMastery.level_key(points))], 6.0)
 	if op_code == NetworkProtocol.OP_LECTURE_TEXT:
 		var sid := str(payload.get("sid", ""))
 		var speaker: Node = remote_players.get(sid, local_player if sid == NetworkManager.world_session.self_session_id else null)
@@ -188,7 +197,7 @@ func _on_spell_cast(sid: String, cast: Dictionary) -> void:
 	if definition == null:
 		return
 	player.synchronizer.receive_spell_cast(definition,
-		NetworkProtocol.array_to_vec3(cast.get("o")), NetworkProtocol.array_to_vec3(cast.get("d")))
+		NetworkProtocol.array_to_vec3(cast.get("o")), NetworkProtocol.array_to_vec3(cast.get("d")), clampi(int(cast.get("l", 0)), 0, SpellMastery.THRESHOLDS.size() - 1))
 
 
 func _on_held_item(sid: String, item_id: String) -> void:
@@ -233,6 +242,7 @@ func _apply_local_profile() -> void:
 	var look: Dictionary = profile.get("appearance", {})
 	local_player.set_look(look)
 	local_player.synchronizer.apply_server_spellbook(profile.get("spells", {}))
+	(local_player.spell_caster as SpellCaster).mastery = profile.get("mastery", {}).duplicate()
 	if not look.get("set", false) and not _creator_offered:
 		_creator_offered = true
 		GameEvents.character_creator_requested.emit.call_deferred()

@@ -56,6 +56,14 @@ var _cooldowns: Dictionary = {}
 var _global_cooldown: float = 0.0
 
 
+## Mastery points per spell id (SpellMastery), from the server profile.
+var mastery: Dictionary = {}
+
+
+func mastery_level(definition: SpellDefinition) -> int:
+	return SpellMastery.level_of(int(mastery.get(String(definition.id), 0))) if definition != null else 0
+
+
 func _init() -> void:
 	quick_slots.resize(QUICK_SLOT_COUNT)
 
@@ -250,10 +258,11 @@ func try_cast() -> bool:
 	if direction.length_squared() < 0.0001:
 		direction = aim["direction"]
 	direction = direction.normalized()
-	_spawn_projectile(equipped_spell, origin, direction, false)
-	_cooldowns[String(equipped_spell.id)] = equipped_spell.cooldown
+	var level := mastery_level(equipped_spell)
+	_spawn_projectile(equipped_spell, origin, direction, false, level)
+	_cooldowns[String(equipped_spell.id)] = equipped_spell.cooldown * SpellMastery.cooldown_factor(level)
 	_global_cooldown = GLOBAL_COOLDOWN
-	cooldown_started.emit(equipped_spell.cooldown)
+	cooldown_started.emit(equipped_spell.cooldown * SpellMastery.cooldown_factor(level))
 	last_cast_origin = origin
 	last_cast_direction = direction
 	spell_cast.emit(equipped_spell, origin, direction)
@@ -261,8 +270,8 @@ func try_cast() -> bool:
 
 
 ## Cosmetic replay of another player's cast (never affects local puzzle state).
-func cast_remote(definition: SpellDefinition, origin: Vector3, direction: Vector3) -> void:
-	_spawn_projectile(definition, origin, direction.normalized(), true)
+func cast_remote(definition: SpellDefinition, origin: Vector3, direction: Vector3, level: int = 0) -> void:
+	_spawn_projectile(definition, origin, direction.normalized(), true, level)
 	spell_cast.emit(definition, origin, direction)
 
 
@@ -340,7 +349,7 @@ func _has_line_of_sight(from: Vector3, to: Vector3, expected: Node) -> bool:
 	return result["collider"] == expected
 
 
-func _spawn_projectile(definition: SpellDefinition, origin: Vector3, direction: Vector3, cosmetic: bool) -> void:
+func _spawn_projectile(definition: SpellDefinition, origin: Vector3, direction: Vector3, cosmetic: bool, level: int = 0) -> void:
 	var scene := definition.projectile_scene
 	if scene == null:
 		push_warning("SpellDefinition %s has no projectile scene" % definition.id)
@@ -353,6 +362,8 @@ func _spawn_projectile(definition: SpellDefinition, origin: Vector3, direction: 
 		parent = get_tree().root
 	parent.add_child(projectile)
 	projectile.global_position = origin
+	if level > 0:
+		projectile.scale *= SpellMastery.visual_scale(level)
 	if definition.cast_sound != null:
 		var player := AudioStreamPlayer3D.new()
 		player.stream = definition.cast_sound

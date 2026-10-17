@@ -58,7 +58,10 @@ local OP_CHAT, OP_CHAT_LINE, OP_DM, OP_DM_LINE, OP_CHAT_RESULT = P.OP_CHAT, P.OP
 local OP_BOARD, OP_QUIZ, OP_QUIZ_STATE, OP_QUIZ_ANSWER = P.OP_BOARD, P.OP_QUIZ, P.OP_QUIZ_STATE, P.OP_QUIZ_ANSWER
 local OP_QUIZ_ANSWERS, OP_LESSON_TOOL_RESULT = P.OP_QUIZ_ANSWERS, P.OP_LESSON_TOOL_RESULT
 local OP_PRACTICAL, OP_PRACTICAL_STATE, OP_PRACTICAL_PROGRESS = P.OP_PRACTICAL, P.OP_PRACTICAL_STATE, P.OP_PRACTICAL_PROGRESS
-local OP_APPEARANCE = P.OP_APPEARANCE
+local OP_APPEARANCE, OP_MASTERY = P.OP_APPEARANCE, P.OP_MASTERY
+-- Mastery: points per validated spell on a world object (practice targets give more),
+-- at most one award per spell per player every MASTERY_GAP seconds.
+local MASTERY_POINTS, MASTERY_PRACTICE_POINTS, MASTERY_GAP = 1, 2, 6
 local MAX_PRACTICAL_HITS = 10
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
@@ -206,7 +209,7 @@ local function send_profile(dispatcher, state, sid)
   local p = state.presences[sid]
   if profile and p then
     dispatcher.broadcast_message(OP_PROFILE, nk.json_encode({ house = profile.house, role = profile.role, spells = profile.spells, discoveries = profile.discoveries,
-      appearance = profile.appearance }), { p }, nil, true)
+      appearance = profile.appearance, mastery = profile.mastery }), { p }, nil, true)
   end
 end
 
@@ -689,7 +692,7 @@ function M.match_init(context, params)
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
-                  positions = {}, chat_at = {}, self_study = SelfStudy.load() }
+                  positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {} }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -765,6 +768,7 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.points_at[sid] = nil
       state.positions[sid] = nil
       state.chat_at[sid] = nil
+      state.mastery_at[sid] = nil
       for area, lesson in pairs(state.lessons) do
         if lesson.by_sid == sid then
           close_lesson(dispatcher, state, area, "professor left")
@@ -944,6 +948,16 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           end
           if ev.obj.kind == "practice_target" and ev.event == "spell" then
             count_practice_hit(dispatcher, state, sid, ev.spell)
+          end
+          if ev.event == "spell" and Profile.knows(profile, ev.spell) then
+            local gaps = state.mastery_at[sid] or {}
+            state.mastery_at[sid] = gaps
+            if not gaps[ev.spell] or now - gaps[ev.spell] >= MASTERY_GAP then
+              gaps[ev.spell] = now
+              local points = Profile.add_mastery(profile, ev.spell, ev.obj.kind == "practice_target" and MASTERY_PRACTICE_POINTS or MASTERY_POINTS)
+              Profile.write(message.sender.user_id, profile)
+              dispatcher.broadcast_message(OP_MASTERY, nk.json_encode({ spell = ev.spell, points = points }), { message.sender }, nil, true)
+            end
           end
           feed_mysteries(dispatcher, state, sid, { event = ev.event, object = ev.oid, effect_type = ev.effect_type, state = Objects.state_of(state.world, ev.oid) })
         else

@@ -129,6 +129,8 @@ const OP_PRACTICAL_PROGRESS := 49
 ## client → server: {body, skin, robe} the character's look (character creator); stored in the
 ## profile (`appearance`), sent back in OP_PROFILE and to everyone else in OP_ROSTER_UPDATE {sid, char, look}
 const OP_APPEARANCE := 50
+## server → one player: {spell, points} a spell's mastery points changed (SpellMastery reads levels)
+const OP_MASTERY := 51
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"

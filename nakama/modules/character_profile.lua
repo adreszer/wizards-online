@@ -165,6 +165,24 @@ function M.sanitize_appearance(raw)
   return out
 end
 
+-- Spell id → mastery points (known spell ids, whole numbers ≥ 0).
+function M.sanitize_mastery(raw)
+  local out = {}
+  if type(raw) ~= "table" then return out end
+  for id, v in pairs(raw) do
+    local n = math.floor(tonumber(v) or 0)
+    if type(id) == "string" and M.SPELLS[id] and n > 0 then out[id] = n end
+  end
+  return out
+end
+
+-- Adds mastery points to a spell; returns the new total.
+function M.add_mastery(profile, id, points)
+  profile.mastery = profile.mastery or {}
+  profile.mastery[id] = (profile.mastery[id] or 0) + points
+  return profile.mastery[id]
+end
+
 function M.sanitize(raw)
   local profile = { v = 1, house = 0, role = "student", spells = nil, discoveries = {} }
   if type(raw) == "table" then
@@ -178,7 +196,9 @@ function M.sanitize(raw)
     profile.spells = M.sanitize_spells(raw.spells)
     profile.discoveries = M.sanitize_discoveries(raw.discoveries)
     profile.appearance = M.sanitize_appearance(raw.appearance)
+    profile.mastery = M.sanitize_mastery(raw.mastery)
   else
+    profile.mastery = {}
     profile.spells = M.sanitize_spells(nil)
     profile.appearance = M.sanitize_appearance(nil)
   end

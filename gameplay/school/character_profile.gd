@@ -41,7 +41,18 @@ static func sanitize(raw: Dictionary) -> Dictionary:
 		},
 		"discoveries": _strings(raw.get("discoveries", [])),
 		"appearance": CharacterLook.sanitize(raw.get("appearance", {})),
+		"mastery": _mastery(raw.get("mastery", {})),
 	}
+
+
+## Spell id → mastery points, known spells only.
+static func _mastery(raw: Variant) -> Dictionary:
+	var out := {}
+	if raw is Dictionary:
+		for id: Variant in raw:
+			if SpellRegistry.load_definition(str(id)) != null:
+				out[str(id)] = maxi(0, int(raw[id]))
+	return out
 
 
 ## Translation key of a house's emblem animal; "" for unsorted.

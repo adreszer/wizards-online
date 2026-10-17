@@ -86,6 +86,7 @@ func _run() -> void:
 	_test_self_study()
 	await _test_character_look()
 	await _test_meals()
+	await _test_mastery()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2413,6 +2414,23 @@ func _test_meals() -> void:
 	p.gestures.stand()
 	cycle.time_override = NAN
 	castle.queue_free()
+
+
+func _test_mastery() -> void:
+	t.section("Spell mastery")
+	t.check(SpellMastery.level_of(0) == 0 and SpellMastery.level_of(20) == 1 and SpellMastery.level_of(149) == 2 and SpellMastery.level_of(500) == 3, "points make ranks")
+	t.check(SpellMastery.to_next(10) == 10 and SpellMastery.to_next(1000) == 0, "points to the next rank")
+	var p := await _spawn_player(Vector3(0, 1, 0))
+	p.spell_caster.learn_spell(ARCANE_PULSE)
+	p.spell_caster.equip(ARCANE_PULSE)
+	p.spell_caster.try_cast()
+	var novice := p.spell_caster.get_cooldown_remaining(ARCANE_PULSE)
+	await _wait(1.5)
+	p.spell_caster.mastery = {"arcane_pulse": 200}
+	p.spell_caster.try_cast()
+	var master := p.spell_caster.get_cooldown_remaining(ARCANE_PULSE)
+	t.check(master < novice and is_equal_approx(p.spell_caster.mastery_level(ARCANE_PULSE), 3), "a master casts with a shorter cooldown (%.2f vs %.2f)" % [master, novice])
+	t.check(CharacterProfile.sanitize({"mastery": {"arcane_pulse": 12, "bogus": 5}}).mastery == {"arcane_pulse": 12}, "the profile keeps mastery of real spells only")
 
 
 func _test_timetable() -> void:

@@ -560,6 +560,8 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(switch_node.is_on == before, "online, a hit does not change the switch locally")
 	ok = await _wait_until(func() -> bool: return object_events.any(func(e: Array) -> bool: return e[0] == SWITCH), 10.0)
 	t.check(ok and switch_node.is_on == (not before), "the server flips the switch for everyone (now %s)" % str(switch_node.is_on))
+	ok = await _wait_until(func() -> bool: return int(player.spell_caster.mastery.get("arcane_pulse", 0)) >= 1 and int(player.spell_caster.mastery.get("uplift", 0)) >= 2, 10.0)
+	t.check(ok, "real use earns mastery on the server (%s)" % str(player.spell_caster.mastery))
 	await _wait(1.0)
 	t.check(object_events.size() == 1, "events from the wrong area, for unknown objects or with an unknown spell are dropped (%s)" % str(object_events))
 	t.check(NetworkManager.get_world_object_states().get("undercroft/secret_wall") == hidden_before, "the out-of-reach secret wall did not change")

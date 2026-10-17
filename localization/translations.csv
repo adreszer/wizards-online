@@ -549,3 +549,8 @@ MEAL_BREAKFAST,Breakfast,Śniadanie
 MEAL_LUNCH,Lunch,Obiad
 MEAL_DINNER,Dinner,Kolacja
 MEAL_SERVED,%s is served in the great hall.,%s na stołach w wielkiej sali.
+MASTERY_NOVICE,novice,początkujący
+MASTERY_ADEPT,adept,wprawny
+MASTERY_SKILLED,skilled,biegły
+MASTERY_MASTER,master,mistrzowski
+MASTERY_LEVEL_UP,"%s: new mastery rank: %s (shorter cooldown, a stronger glow).","%s: nowy stopień biegłości: %s (krótsze odnowienie, mocniejszy blask)."

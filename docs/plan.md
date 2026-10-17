@@ -411,6 +411,12 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] During a meal the great hall plays the feast music (`MusicDirector.event_track = &"feast"`, cleared when the meal ends or the player leaves the hall)
 - [ ] Real food and tableware models (asset-drop workflow); feasts as ceremonies (Term C5, section 3)
 
+### Milestone 44 — Spell mastery
+- [x] Mastery points per spell in the server profile (`mastery`): +1 for a validated spell on a world object, +2 on a practice target, at most one award per spell every 6 s; `OP_MASTERY {spell, points}` on each change, the whole map in `OP_PROFILE`
+- [x] `SpellMastery`: ranks novice / adept / skilled / master at 0 / 20 / 60 / 150 points; each rank shortens the spell's cooldown by 10 % and makes its cast 15 % bigger (remote casts carry the rank, `l`); a rank-up notification. Polish only: nothing stronger against other players
+- [x] Tests: ranks, cooldown, profile; two clients: real use earns points
+- [ ] Casting gestures (Term B5)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.
