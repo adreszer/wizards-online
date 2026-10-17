@@ -67,7 +67,7 @@ const OP_HOUSE_TOTALS := 27
 const OP_HOUSE_POINTS_RESULT := 28
 ## client (professor in an open lesson) → server: {text} lecture text for the room
 const OP_LECTURE := 29
-## server → everyone in that classroom: {by, text}
+## server → everyone in that classroom: {by, sid, text}
 const OP_LECTURE_TEXT := 30
 ## client → server: {give: item id}, {time: hours 0–24} or {coins: ±amount} a cheat (dev / admin): accepted from admins,
 ## or from anyone while the school rules say cheats_enabled
@@ -87,6 +87,24 @@ const OP_TIMETABLE := 34
 ## mystery / reason} (the currency, see nakama/modules/economy.lua)
 const OP_WALLET := 35
 
+## client → server: {text, mode: "say" | "whisper" | "shout"} a line of proximity chat;
+## the server sends it only to players who could hear it (see nakama/modules/chat.lua)
+const OP_CHAT := 36
+## server → the speaker and everyone in earshot: {sid, name, text, mode}
+const OP_CHAT_LINE := 37
+## client → server: {to: display name, text} a direct message
+const OP_DM := 38
+## server → recipient and sender: {from, from_name, to_name, text, at, mail?: delivered from
+## the mailbox, self?: the sender's own copy}
+const OP_DM_LINE := 39
+## server → sender: {ok: false, reason, mode?} a refused chat line or DM ("too_soon",
+## "no_such_player", "mailbox_full", "empty", "bad_mode"); {ok: true, mailed: true, to_name} when
+## a DM went to an absent player's mailbox
+const OP_CHAT_RESULT := 40
+## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
+const CHAT_SAY := "say"
+const CHAT_WHISPER := "whisper"
+const CHAT_SHOUT := "shout"
 const CHAT_ROOM := "world"
 ## Server RPC that finds (or creates) the shared world match.
 const RPC_JOIN_WORLD := "join_world"

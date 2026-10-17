@@ -37,6 +37,7 @@ local School = require("school")
 local Timetable = require("timetable")
 local Economy = require("economy")
 local Records = require("records")
+local Chat = require("chat")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -51,6 +52,7 @@ local OP_HOUSE_POINTS, OP_HOUSE_TOTALS, OP_HOUSE_POINTS_RESULT = P.OP_HOUSE_POIN
 local OP_LECTURE, OP_LECTURE_TEXT = P.OP_LECTURE, P.OP_LECTURE_TEXT
 local OP_CHEAT, OP_CHEAT_RESULT, OP_CLOCK = P.OP_CHEAT, P.OP_CHEAT_RESULT, P.OP_CLOCK
 local OP_TIMETABLE, OP_WALLET = P.OP_TIMETABLE, P.OP_WALLET
+local OP_CHAT, OP_CHAT_LINE, OP_DM, OP_DM_LINE, OP_CHAT_RESULT = P.OP_CHAT, P.OP_CHAT_LINE, P.OP_DM, P.OP_DM_LINE, P.OP_CHAT_RESULT
 local PROGRESS_COLLECTION, PROGRESS_KEY = "mysteries", "progress"
 local TEXT_SECONDS = 6
 local MAX_AREA_ID_BYTES = 48
@@ -366,6 +368,59 @@ local function close_lesson(dispatcher, state, area, why)
   send_lessons(dispatcher, state, nil)
 end
 
+-- Everyone who hears `sid` say something in `mode` (the speaker included).
+local function listeners_of(state, sid, mode)
+  local speaker = { pos = state.positions[sid], area = state.areas[sid] or "" }
+  local out = {}
+  for other, p in pairs(state.presences) do
+    if other == sid or Chat.hears(mode, speaker, { pos = state.positions[other], area = state.areas[other] or "" }) then
+      table.insert(out, p)
+    end
+  end
+  return out
+end
+
+local function chat_refused(dispatcher, presence, reason, extra)
+  local payload = { ok = false, reason = reason }
+  for k, v in pairs(extra or {}) do payload[k] = v end
+  dispatcher.broadcast_message(OP_CHAT_RESULT, nk.json_encode(payload), { presence }, nil, true)
+end
+
+-- A direct message from `sid` to the player called `to_name`: delivered at once when
+-- they are online, otherwise left in their mailbox for their next join.
+local function send_dm(dispatcher, state, sid, to_name, text)
+  local from = state.presences[sid]
+  local line = { from = from.user_id, from_name = state.names[sid] or "", text = text, at = nk.time() / 1000 }
+  local target = find_sid(state, nil, to_name)
+  if target == nil and type(to_name) == "string" then
+    -- Display names are matched without regard to case.
+    for other, name in pairs(state.names) do
+      if string.lower(name) == string.lower(to_name) then target = other end
+    end
+  end
+  if target then
+    line.to_name = state.names[target] or to_name
+    dispatcher.broadcast_message(OP_DM_LINE, nk.json_encode(line), { state.presences[target] }, nil, true)
+    line.self = true
+    dispatcher.broadcast_message(OP_DM_LINE, nk.json_encode(line), { from }, nil, true)
+    return
+  end
+  local uid, known_name = Chat.uid_for_name(to_name)
+  if not uid then
+    chat_refused(dispatcher, from, "no_such_player", { to_name = to_name })
+    return
+  end
+  line.to_name = known_name or to_name
+  local why = Chat.post_mail(uid, line)
+  if why then
+    chat_refused(dispatcher, from, why, { to_name = line.to_name })
+    return
+  end
+  dispatcher.broadcast_message(OP_CHAT_RESULT, nk.json_encode({ ok = true, mailed = true, to_name = line.to_name }), { from }, nil, true)
+  line.self = true
+  dispatcher.broadcast_message(OP_DM_LINE, nk.json_encode(line), { from }, nil, true)
+end
+
 -- The open lesson in `sid`'s area that `sid` may run (its opener, or any admin).
 local function own_lesson(state, sid)
   local lesson = state.lessons[state.areas[sid] or ""]
@@ -459,7 +514,8 @@ function M.match_init(context, params)
   local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {}, locales = {},
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
-                  clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {} }
+                  clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
+                  positions = {}, chat_at = {} }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -485,6 +541,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     state.profiles[p.session_id] = profile
     state.areas[p.session_id] = ""
     state.progress[p.user_id] = load_progress(p.user_id)
+    Chat.remember_name(p.user_id, state.names[p.session_id])
   end
   for _, p in ipairs(presences) do
     local roster = {}
@@ -500,6 +557,11 @@ function M.match_join(context, dispatcher, tick, state, presences)
     send_wallet(dispatcher, state, p.session_id, Economy.balance(p.user_id))
     send_clock(dispatcher, state, { p })
     send_timetable(dispatcher, state, { p })
+    -- Direct messages that arrived while the player was away.
+    for _, mail in ipairs(Chat.take_mail(p.user_id)) do
+      mail.mail = true
+      dispatcher.broadcast_message(OP_DM_LINE, nk.json_encode(mail), { p }, nil, true)
+    end
     local rest = others(state, p.session_id)
     if #rest > 0 then
       dispatcher.broadcast_message(OP_PLAYER_JOINED, nk.json_encode(entry_for(state, p.session_id)), rest, nil, true)
@@ -521,6 +583,8 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.areas[sid] = nil
       state.locales[sid] = nil
       state.points_at[sid] = nil
+      state.positions[sid] = nil
+      state.chat_at[sid] = nil
       for area, lesson in pairs(state.lessons) do
         if lesson.by_sid == sid then
           close_lesson(dispatcher, state, area, "professor left")
@@ -561,6 +625,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
   for _, message in ipairs(messages) do
     local sid = message.sender.session_id
     if message.op_code == OP_STATE then
+      state.positions[sid] = Chat.position_of(message.data) or state.positions[sid]
       local rest = others(state, sid)
       if #rest > 0 then
         dispatcher.broadcast_message(OP_STATE, message.data, rest, message.sender, false)
@@ -808,7 +873,30 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         for _, pl in ipairs(players_in(state, state.areas[sid])) do
           table.insert(listeners, state.presences[pl.sid])
         end
-        dispatcher.broadcast_message(OP_LECTURE_TEXT, nk.json_encode({ by = state.names[sid] or "", text = text }), listeners, nil, true)
+        dispatcher.broadcast_message(OP_LECTURE_TEXT, nk.json_encode({ by = state.names[sid] or "", sid = sid, text = text }), listeners, nil, true)
+      end
+    elseif message.op_code == OP_CHAT or message.op_code == OP_DM then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local text = Chat.clean(payload.text)
+      local mode = message.op_code == OP_DM and "dm" or (payload.mode or "say")
+      local last = state.chat_at[sid] or {}
+      state.chat_at[sid] = last
+      local cooldown = mode == "shout" and state.rules.shout_cooldown_seconds or mode == "dm" and state.rules.dm_cooldown_seconds or state.rules.chat_cooldown_seconds
+      if text == "" then
+        chat_refused(dispatcher, message.sender, "empty")
+      elseif mode ~= "dm" and not Chat.MODES[mode] then
+        chat_refused(dispatcher, message.sender, "bad_mode")
+      elseif last[mode] and now - last[mode] < cooldown then
+        chat_refused(dispatcher, message.sender, "too_soon", { mode = mode, wait = math.ceil(cooldown - (now - last[mode])) })
+      else
+        last[mode] = now
+        if mode == "dm" then
+          send_dm(dispatcher, state, sid, type(payload.to) == "string" and payload.to or "", text)
+        else
+          dispatcher.broadcast_message(OP_CHAT_LINE, nk.json_encode({ sid = sid, name = state.names[sid] or "", text = text, mode = mode }),
+            listeners_of(state, sid, mode), nil, true)
+        end
       end
     elseif message.op_code == OP_PING then
       -- Echo the client's send time with the server's clock (ms since the epoch), so

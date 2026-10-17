@@ -35,6 +35,11 @@ M.DEFAULT_RULES = {
   coins_per_mystery = 15,
   max_daily_coins = 100,
   max_coin_grant = 1000,
+  -- Chat (chat.lua): at most one line per chat_cooldown_seconds, one shout per
+  -- shout_cooldown_seconds, one DM per dm_cooldown_seconds.
+  chat_cooldown_seconds = 0.5,
+  shout_cooldown_seconds = 10,
+  dm_cooldown_seconds = 1,
 }
 M.HOUSES = 4
 M.POINTS_COLLECTION, M.TOTALS_KEY = "house_points", "totals"

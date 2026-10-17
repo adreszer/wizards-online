@@ -57,7 +57,13 @@ signal wallet_changed(coins: int, delta: int, source: String, detail: String)
 signal school_clock_changed(by_name: String)
 ## The server sent the timetable (on join, each new school day, after a reload).
 signal timetable_changed()
+## Any message from the world match (op code, decoded payload), movement excepted. Newer
+## features (chat, lessons 2.0…) listen here and send with send_op().
+signal server_message(op_code: int, payload: Dictionary)
 signal chat_message_received(sender_name: String, text: String, is_self: bool)
+## A chat or DM line for the local player: {kind: "chat" | "dm", mode, sid, name, text, self,
+## to_name, mail} (see ChatManager).
+signal chat_line_received(line: Dictionary)
 signal system_message(text: String)
 
 const CONNECT_TIMEOUT_SECONDS := 5
@@ -113,7 +119,11 @@ func _ready() -> void:
 	state_synchronizer.timetable_received.connect(func(payload: Dictionary) -> void:
 		timetable.apply(payload)
 		timetable_changed.emit())
+	world_session.message_received.connect(server_message.emit)
+	chat_manager.bind(world_session)
 	chat_manager.message_received.connect(chat_message_received.emit)
+	chat_manager.line_received.connect(chat_line_received.emit)
+	chat_manager.system_message.connect(system_message.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 	world_session.server_clock_received.connect(func(server_ms: float, sent_ms: int) -> void:
 		clock.add_sample(server_ms, Time.get_ticks_msec() - sent_ms if sent_ms >= 0 else -1))
@@ -211,7 +221,7 @@ func connect_online(display_name: String) -> String:
 	if err.is_empty():
 		err = await world_session.join_world(authentication.client, authentication.session, display_name, GameSession.character_id)
 	if err.is_empty():
-		err = await chat_manager.join(world_session.socket, local_user_id, display_name, state_synchronizer.get_display_name_for_user)
+		chat_manager.join(display_name)
 	if not err.is_empty():
 		await _teardown()
 		_set_status(Status.ERROR, err)
@@ -232,6 +242,14 @@ func disconnect_online(reason: String = "") -> void:
 	await _teardown()
 	_set_status(Status.OFFLINE, reason)
 	disconnected.emit(reason)
+
+
+## Sends one match message (any op from NetworkProtocol) when in the world; false otherwise.
+func send_op(op_code: int, payload: Dictionary) -> bool:
+	if not is_in_world():
+		return false
+	world_session.send(op_code, payload)
+	return true
 
 
 func send_player_state(state: Dictionary) -> void:
@@ -429,11 +447,20 @@ func _admin_rpc(rpc_id: String, request: Dictionary, http_key: String) -> Dictio
 	return NetworkProtocol.decode(rpc.payload)
 
 
-func send_chat(text: String) -> bool:
+## A line of proximity chat ("say", "whisper" or "shout"); the server decides who hears it.
+func send_chat(text: String, mode: String = NetworkProtocol.CHAT_SAY) -> bool:
 	if not is_online():
 		system_message.emit(tr("CHAT_OFFLINE"))
 		return false
-	return chat_manager.send(text)
+	return chat_manager.send(text, mode)
+
+
+## A direct message to the player called `to_name` (waits in their mailbox if they are away).
+func send_dm(to_name: String, text: String) -> bool:
+	if not is_online():
+		system_message.emit(tr("CHAT_OFFLINE"))
+		return false
+	return chat_manager.send_dm(to_name, text)
 
 
 func _on_server_text(text: String, seconds: float) -> void:

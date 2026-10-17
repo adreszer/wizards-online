@@ -30,6 +30,8 @@ var wallets: Array = []
 ## Who moved the school clock, per OP_CLOCK ("" = the join snapshot)
 var clock_changes: Array[String] = []
 var timetables_received: int = 0
+## Direct messages received or echoed: the ChatManager line dictionaries.
+var dm_lines: Array = []
 
 const HTTP_KEY := "defaulthttpkey"
 const CLASSROOM := &"class_sigilcraft"
@@ -61,6 +63,9 @@ func _ready() -> void:
 	NetworkManager.house_points_result_received.connect(func(ok: bool, house: int, delta: int, reason: String) -> void: points_results.append({"ok": ok, "house": house, "delta": delta, "reason": reason}))
 	NetworkManager.lecture_received.connect(func(by: String, text: String) -> void: lectures.append("%s: %s" % [by, text]))
 	NetworkManager.timetable_changed.connect(func() -> void: timetables_received += 1)
+	NetworkManager.chat_line_received.connect(func(line: Dictionary) -> void:
+		if line.get("kind", "") == "dm":
+			dm_lines.append(line))
 	NetworkManager.school_clock_changed.connect(func(by: String) -> void: clock_changes.append(by))
 	NetworkManager.cheat_result_received.connect(func(ok: bool, id: String, reason: String) -> void: cheat_results.append({"ok": ok, "id": id, "reason": reason}))
 	await _run()
@@ -344,6 +349,9 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 	t.check(ok, "the two-player mystery opens the loft for the professor too")
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("loft"), 10.0)
 	t.check(ok, "both players of a cooperative mystery get the discovery")
+	t.check(dm_lines.any(func(l: Dictionary) -> bool: return l.name == "ClientB" and l.text == "psst, professor" and not l.self),
+		"B's direct message reached A across the castle (%s)" % str(dm_lines))
+	t.check(not chat_lines.has("[ClientB] anyone in the library?"), "but B talking in the library was not heard in the gallery")
 
 	# Meanwhile B fetches a broom and flies: the snapshots carry it here.
 	var saw_broom := [false]
@@ -353,6 +361,13 @@ func _run_observer(spawner: PlayerSpawner) -> void:
 			saw_broom[0] = true
 		return r == null, 60.0)
 	t.check(saw_broom[0], "B's broom shows on the remote player while B flies")
+	var b_gone := ok
+	# B is away: a direct message waits in B's mailbox (give the server a moment to drop B).
+	await _wait(0.8)
+	NetworkManager.send_dm("ClientB", "see you at the feast")
+	var mailed := await _wait_until(func() -> bool: return dm_lines.any(func(l: Dictionary) -> bool: return l.self and l.text == "see you at the feast"), 10.0)
+	t.check(mailed and system_lines.has(tr("CHAT_DM_MAILED") % "ClientB"), "a DM to an absent player goes to their mailbox (%s)" % str(system_lines.slice(-3)))
+	ok = b_gone
 	var before := timetables_received
 	var reloaded: Dictionary = await NetworkManager.admin_reload_timetable(HTTP_KEY)
 	var got := await _wait_until(func() -> bool: return timetables_received > before, 10.0)
@@ -407,7 +422,11 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	await _wait(0.4)
 	player.movement.request_jump()
 	await _wait(1.5)
+	# Walk back: chat is heard only near the speaker and in the same room as them.
+	player.movement.set_external_move(Vector3(0, 0, 1), true)
+	await _wait(3.0)
 	player.movement.set_external_move(Vector3.ZERO)
+	await _wait(0.5)
 	# A locally learned spell is not known to the server: the cast is relayed to nobody.
 	player.spell_caster.learn_spell(ARCANE_PULSE)
 	t.check(player.spell_caster.try_cast(), "local cast fires (server will drop it)")
@@ -474,6 +493,13 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(NetworkManager.get_world_object_states().get("undercroft/secret_wall") == hidden_before, "the out-of-reach secret wall did not change")
 
 	t.section("Mysteries (student)")
+	NetworkManager.send_dm("ClientA", "psst, professor")
+	ok = await _wait_until(func() -> bool: return dm_lines.any(func(l: Dictionary) -> bool: return l.self and l.to_name == "ClientA"), 10.0)
+	t.check(ok, "a direct message is echoed to its sender")
+	await _wait(1.1)
+	NetworkManager.send_dm("Nobody Here 42", "hello?")
+	ok = await _wait_until(func() -> bool: return system_lines.has(tr("CHAT_DM_NO_PLAYER") % "Nobody Here 42"), 10.0)
+	t.check(ok, "a DM to a name nobody uses is refused")
 	# Player scope: three plaques in order; the server answers each with a clue.
 	for i in TALE.size():
 		var area: StringName = StringName(TALE[i][0])
@@ -484,6 +510,10 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 		plaque._on_interacted(player)
 		ok = await _wait_until(func() -> bool: return server_texts.size() > texts_before, 10.0)
 		t.check(ok, "reading %s earns a server text (%s)" % [TALE[i][1], str(server_texts.slice(texts_before))])
+		if area == &"library":
+			NetworkManager.send_chat("anyone in the library?")
+			ok = await _wait_until(func() -> bool: return chat_lines.has("[ClientB] anyone in the library?"), 10.0)
+			t.check(ok and player.speech_bubble.visible and player.speech_bubble.text == "anyone in the library?", "the speaker hears themselves and shows a speech bubble")
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("founders_tale"), 10.0)
 	t.check(ok, "solving a mystery records a discovery on the profile")
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 15, 10.0)
@@ -583,6 +613,8 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return _remote(spawner) != null, 20.0)
 	t.check(ok, "sees ClientA again after reconnect")
 	ok = await _wait_until(func() -> bool: return _known_spells().has("glowmote"), 10.0)
+	var mailed := await _wait_until(func() -> bool: return dm_lines.any(func(l: Dictionary) -> bool: return l.get("mail", false) and l.text == "see you at the feast"), 10.0)
+	t.check(mailed and NetworkManager.chat_manager.last_dm_from == "ClientA", "the mailbox delivers on the next join (%s)" % str(dm_lines))
 	var profile := NetworkManager.get_local_profile()
 	t.check(ok and _known_spells().has("arcane_pulse"), "learned spells persist across reconnect (%s)" % str(_known_spells()))
 	t.check(profile.get("spells", {}).get("slots", [])[5] == "glowmote" and player.spell_caster.quick_slots[5] == glow and player.spell_caster.equipped_spell == ARCANE_PULSE, "hotbar layout persists across reconnect")

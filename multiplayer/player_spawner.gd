@@ -27,9 +27,13 @@ func _ready() -> void:
 	NetworkManager.player_profile_changed.connect(_on_player_profile_changed)
 	NetworkManager.spell_granted.connect(_on_spell_granted)
 	NetworkManager.disconnected.connect(_on_disconnected)
+	NetworkManager.chat_line_received.connect(_on_chat_line)
+	NetworkManager.server_message.connect(_on_server_message)
 
 
 func _exit_tree() -> void:
+	NetworkManager.chat_line_received.disconnect(_on_chat_line)
+	NetworkManager.server_message.disconnect(_on_server_message)
 	NetworkManager.player_joined.disconnect(_on_player_joined)
 	NetworkManager.player_left.disconnect(_on_player_left)
 	NetworkManager.player_state_received.disconnect(_on_player_state)
@@ -40,6 +44,23 @@ func _exit_tree() -> void:
 	NetworkManager.player_profile_changed.disconnect(_on_player_profile_changed)
 	NetworkManager.spell_granted.disconnect(_on_spell_granted)
 	NetworkManager.disconnected.disconnect(_on_disconnected)
+
+
+## The speaker of a chat line (remote or local) shows it over their head.
+func _on_chat_line(line: Dictionary) -> void:
+	if line.get("kind", "") != "chat":
+		return
+	var speaker: Node = local_player if line.get("self", false) else remote_players.get(str(line.get("sid", "")))
+	if speaker is Player and is_instance_valid(speaker):
+		(speaker as Player).say(str(line.get("text", "")), str(line.get("mode", "say")))
+
+
+func _on_server_message(op_code: int, payload: Dictionary) -> void:
+	if op_code == NetworkProtocol.OP_LECTURE_TEXT:
+		var sid := str(payload.get("sid", ""))
+		var speaker: Node = remote_players.get(sid, local_player if sid == NetworkManager.world_session.self_session_id else null)
+		if speaker is Player and is_instance_valid(speaker):
+			(speaker as Player).say(NetworkProtocol.sanitize_chat(str(payload.get("text", ""))), "lecture")
 
 
 func spawn_local(display_name: String, peer_id: String) -> Node:

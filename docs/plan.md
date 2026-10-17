@@ -361,6 +361,15 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [ ] Music volume slider in settings; area-specific music (grounds, lessons, feast, duel) and stingers
 - [ ] Sound effects, ambiences per area, footsteps per surface, reverb per area (the rest of the list)
 
+### Milestone 39 — Proximity chat, direct messages, speech bubbles
+- [x] Chat through the world match (`nakama/modules/chat.lua`): say (18 m, same area), whisper (4 m, same area), shout (45 m, through walls), positions from the players' own movement snapshots; rate limits per mode in `school_rules.json`; Nakama's chat channels closed
+- [x] Direct messages by display name (`OP_DM`), delivered at once or left in the recipient's mailbox (`mail` storage, a name index `names/`), delivered on their next join; `/msg name text`, `/r`, Polish aliases (`/pw`, `/odp`, `/sz`, `/k`)
+- [x] Speech bubbles over the speaker (`SpeechBubble`: whisper small and short-range, shout big, lecture lines the largest); the chat panel marks whispers, shouts, DMs and mail
+- [x] `NetworkManager.server_message` / `send_op`: one generic path for new ops
+- [x] Tests: commands, line formats, bubbles; two clients: a conversation in the library is not heard in the gallery, a DM crosses the castle, unknown names are refused, a DM to an absent player waits in the mailbox and arrives on the next join
+- [ ] Paper birds: DMs drawn as a folded paper bird flying to the recipient (Term E)
+- [ ] Moderation: word filter, report, mute (section 7 of the roadmap)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

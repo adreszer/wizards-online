@@ -18,7 +18,8 @@ func _ready() -> void:
 	_input_field.max_length = NetworkProtocol.MAX_CHAT_LENGTH
 	_input_field.text_submitted.connect(_on_submitted)
 	_input_field.focus_exited.connect(_on_focus_exited)
-	NetworkManager.chat_message_received.connect(_on_message)
+	NetworkManager.chat_line_received.connect(_on_line)
+	NetworkManager.lecture_received.connect(_on_lecture)
 	NetworkManager.system_message.connect(add_system_line)
 	NetworkManager.cheat_result_received.connect(_on_cheat_result)
 	NetworkManager.school_clock_changed.connect(_on_school_clock_changed)
@@ -65,7 +66,10 @@ func close() -> void:
 
 func _on_submitted(text: String) -> void:
 	var clean := NetworkProtocol.sanitize_chat(text)
-	if ChatCommands.is_command(clean):
+	var chat := ChatCommands.parse_chat(clean, NetworkManager.chat_manager.last_dm_from)
+	if not chat.is_empty():
+		_send_chat(chat)
+	elif ChatCommands.is_command(clean):
 		add_system_line(clean)
 		add_system_line(ChatCommands.run(clean, get_tree().get_first_node_in_group(&"local_player")))
 	elif not clean.is_empty():
@@ -81,9 +85,52 @@ func _on_focus_exited() -> void:
 		close()
 
 
-func _on_message(sender_name: String, text: String, is_self: bool) -> void:
+## A whisper, shout or direct message typed as a command.
+func _send_chat(chat: Dictionary) -> void:
+	if not GameSession.is_online():
+		add_system_line(tr("CHAT_OFFLINE_COMMANDS_ONLY"))
+		return
+	if chat.mode == "dm":
+		if str(chat.get("to", "")) == "" or str(chat.text) == "":
+			add_system_line(tr("CHAT_DM_USAGE"))
+		else:
+			NetworkManager.send_dm(chat.to, chat.text)
+	elif str(chat.text) == "":
+		add_system_line(tr("CHAT_MODE_USAGE"))
+	else:
+		NetworkManager.send_chat(chat.text, chat.mode)
+
+
+func _on_line(line: Dictionary) -> void:
+	_append(line_bbcode(line))
+
+
+func _on_lecture(by_name: String, text: String) -> void:
+	_append("[color=#f0d080][b]%s[/b][/color] %s" % [_escape(tr("LECTURE_SENDER") % by_name), _escape(text)])
+
+
+## One chat or DM line as BBCode: say "[Name] text", whisper and shout marked, DMs
+## "[from Name]" / "[to Name]" (and "from the mailbox" when it waited for us).
+static func line_bbcode(line: Dictionary) -> String:
+	var name := _escape(str(line.get("name", "?")))
+	var text := _escape(str(line.get("text", "")))
+	var is_self: bool = line.get("self", false)
+	match str(line.get("mode", "say")):
+		"whisper":
+			return "[color=#a8b4c8][i][%s] %s %s[/i][/color]" % [name, TranslationServer.translate("CHAT_WHISPERS"), text]
+		"shout":
+			return "[color=#ffcf80][b][%s] %s %s[/b][/color]" % [name, TranslationServer.translate("CHAT_SHOUTS"), text]
+		"dm":
+			var head: String
+			if is_self:
+				head = TranslationServer.translate("CHAT_DM_TO") % _escape(str(line.get("to_name", "")))
+			else:
+				head = TranslationServer.translate("CHAT_DM_FROM") % name
+			if line.get("mail", false):
+				head += " " + TranslationServer.translate("CHAT_DM_FROM_MAIL")
+			return "[color=#f0a8e0][%s][/color] %s" % [head, text]
 	var color := "#c9b3ff" if is_self else "#9fd3ff"
-	_append("[color=%s][%s][/color] %s" % [color, _escape(sender_name), _escape(text)])
+	return "[color=%s][%s][/color] %s" % [color, name, text]
 
 
 func _on_cheat_result(ok: bool, item_id: String, reason: String) -> void:

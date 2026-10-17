@@ -25,7 +25,7 @@ HUD_STATUS_CONNECTING,Connecting…,Łączenie…
 HUD_STATUS_OFFLINE,Offline,Offline
 HUD_STATUS_OFFLINE_REASON,Offline (%s),Offline (%s)
 CHAT_PLACEHOLDER,"Say something… (Enter to send, Esc to close)","Napisz coś… (Enter wysyła, Esc zamyka)"
-CHAT_HINT_OPEN,Press Enter to chat.,"Naciśnij Enter, aby pisać na czacie."
+CHAT_HINT_OPEN,"Press Enter to talk: players near you hear it. /w whispers, /s shouts, /msg name text writes to one player.","Naciśnij Enter, aby mówić: słyszą cię gracze w pobliżu. /sz szepcze, /k krzyczy, /pw imię tekst pisze do jednej osoby."
 CHAT_OFFLINE,You are offline; chat is unavailable.,Jesteś offline; czat jest niedostępny.
 CHAT_PLAYER_JOINED,%s joined the area.,%s pojawia się w okolicy.
 CHAT_PLAYER_LEFT,%s left the area.,%s opuszcza okolicę.
@@ -449,3 +449,16 @@ CALENDAR_EXAMS,exam week,tydzień egzaminów
 CALENDAR_HOLIDAY,"Holidays: %s, no lessons","Wolne: %s, bez lekcji"
 CALENDAR_BETWEEN_TERMS,"Between terms; %s starts %s","Przerwa między semestrami; %s od %s"
 TIMETABLE_EXAM,exam,egzamin
+CHAT_WHISPERS,whispers:,szepcze:
+CHAT_SHOUTS,shouts:,krzyczy:
+CHAT_DM_TO,to %s,do: %s
+CHAT_DM_FROM,from %s,od: %s
+CHAT_DM_FROM_MAIL,(while you were away),(gdy cię nie było)
+CHAT_DM_MAILED,%s is not in the castle; the message will wait for them.,%s nie ma w zamku; wiadomość poczeka.
+CHAT_DM_NO_PLAYER,Nobody called %s has been to the castle.,Nikt o imieniu %s nie bywał w zamku.
+CHAT_DM_MAILBOX_FULL,%s's mailbox is full.,Skrzynka gracza %s jest pełna.
+CHAT_DM_USAGE,"Direct message: /msg name text (a name with spaces in quotes), /r text replies.","Wiadomość prywatna: /pw imię tekst (imię ze spacją w cudzysłowie), /odp tekst odpowiada."
+CHAT_MODE_USAGE,"Whisper: /w text (only those right next to you), shout: /s text (heard far away).","Szept: /sz tekst (słyszą tylko stojący obok), krzyk: /k tekst (słychać daleko)."
+CHAT_TOO_SOON,Slow down a little.,Trochę wolniej.
+CHAT_SHOUT_TOO_SOON,You can shout again in %d s.,Znów krzyknąć możesz za %d s.
+CHAT_REFUSED,Message not sent (%s).,Nie wysłano wiadomości (%s).

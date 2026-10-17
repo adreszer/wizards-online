@@ -62,6 +62,8 @@ var _tick_start: Transform3D
 var _visual_base: Transform3D
 ## Off-hand socket the held item (torch…) is parented to.
 var off_hand: Node3D
+## What this character last said (chat, lectures), over the nameplate.
+var speech_bubble: SpeechBubble
 
 
 func _ready() -> void:
@@ -76,6 +78,10 @@ func _ready() -> void:
 	broom_rider.setup(self, movement, inventory, visual)
 	_visual_base = visual.transform
 	nameplate.set_display_name(display_name)
+	speech_bubble = SpeechBubble.new()
+	speech_bubble.name = "SpeechBubble"
+	speech_bubble.position = Vector3(0.0, 2.75, 0.0)
+	add_child(speech_bubble)
 	if is_local:
 		_setup_local()
 	else:
@@ -148,6 +154,11 @@ func _find_off_hand() -> Node3D:
 ## Remote players: the held item id arrives from the server, already validated.
 func set_remote_held_item(item_id: String) -> void:
 	held_item_mount.show_item(ItemRegistry.load_definition(item_id))
+
+
+## Shows a line this character said (mode: say, whisper, shout, lecture) over their head.
+func say(text: String, mode: String = "say") -> void:
+	speech_bubble.show_line(text, mode)
 
 
 ## Role and house come from the server (own profile or roster); the nameplate

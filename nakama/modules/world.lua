@@ -10,7 +10,6 @@ local Economy = require("economy")
 local Records = require("records")
 
 local WORLD_LABEL = "world"
-local MAX_CHAT_LENGTH = P.MAX_CHAT_LENGTH
 
 local function find_or_create_world()
   local matches = nk.match_list(1, true, WORLD_LABEL, 0, 200, "")
@@ -27,21 +26,10 @@ local function rpc_join_world(context, payload)
 end
 nk.register_rpc(rpc_join_world, P.RPC_JOIN_WORLD)
 
--- Reject oversized or empty chat messages before they are stored/broadcast.
+-- Chat goes through the world match (chat.lua decides who hears a line), so Nakama's
+-- own channels are closed: a client posting to a room would otherwise reach everyone.
 local function before_channel_message_send(context, payload)
-  local content = payload.channel_message_send and payload.channel_message_send.content
-  if not content then
-    return nil
-  end
-  local ok, decoded = pcall(nk.json_decode, content)
-  if not ok or type(decoded) ~= "table" or type(decoded.text) ~= "string" then
-    return nil
-  end
-  local text = decoded.text:gsub("^%s+", ""):gsub("%s+$", "")
-  if #text == 0 or #text > MAX_CHAT_LENGTH then
-    return nil
-  end
-  return payload
+  return nil
 end
 nk.register_rt_before(before_channel_message_send, "ChannelMessageSend")
 

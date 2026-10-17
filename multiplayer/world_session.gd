@@ -47,6 +47,9 @@ signal clock_received(payload: Dictionary)
 signal timetable_received(payload: Dictionary)
 ## A professor's lecture line in the local player's classroom.
 signal lecture_received(by_name: String, text: String)
+## Every match message the server sent, decoded (op code, payload, sender session id).
+## Newer features listen here instead of adding a dedicated signal per op.
+signal message_received(op_code: int, payload: Dictionary)
 
 var socket: NakamaSocket
 var match_id: String = ""
@@ -109,6 +112,8 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 		return
 	var payload := NetworkProtocol.decode(data.data)
 	var sender_sid := data.presence.session_id if data.presence != null else ""
+	if data.op_code != NetworkProtocol.OP_STATE:
+		message_received.emit(data.op_code, payload)
 	match data.op_code:
 		NetworkProtocol.OP_STATE:
 			state_received.emit(sender_sid, payload)

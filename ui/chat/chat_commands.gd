@@ -14,6 +14,10 @@ extends RefCounted
 ## inventory: the request goes up as OP_CHEAT and is accepted from admins, or
 ## from anyone while nakama/content/school_rules.json has cheats_enabled.
 
+const WHISPER_ALIASES: Array[String] = ["w", "whisper", "szept", "sz"]
+const SHOUT_ALIASES: Array[String] = ["s", "shout", "krzyk", "k"]
+const DM_ALIASES: Array[String] = ["msg", "dm", "pw", "tell", "napisz"]
+const REPLY_ALIASES: Array[String] = ["r", "reply", "odp", "odpowiedz"]
 const GIVE_ALIASES: Array[String] = ["give", "daj"]
 const BROOM_ALIASES: Array[String] = ["broom", "miotla", "miotła"]
 const HELP_ALIASES: Array[String] = ["help", "pomoc", "?"]
@@ -29,6 +33,38 @@ const PLACE_ALIASES := {"station": "@station", "stacja": "@station", "dworzec": 
 
 static func is_command(text: String) -> bool:
 	return text.begins_with("/")
+
+
+## Chat modes typed as commands: "/w text" (whisper), "/s text" (shout), "/msg name text"
+## (a direct message; a name with spaces goes in quotes), "/r text" (reply to the last DM).
+## Returns {mode: "whisper" | "shout" | "dm", to?, text} or {} when `text` is not one;
+## {mode: "dm", to: "", text: ""} for a DM without a recipient or text (show the usage).
+static func parse_chat(text: String, last_dm_from: String = "") -> Dictionary:
+	if not text.begins_with("/"):
+		return {}
+	var body := text.substr(1)
+	var space := body.find(" ")
+	var name := (body if space < 0 else body.substr(0, space)).to_lower()
+	var rest := "" if space < 0 else body.substr(space + 1).strip_edges()
+	if WHISPER_ALIASES.has(name):
+		return {"mode": NetworkProtocol.CHAT_WHISPER, "text": rest}
+	if SHOUT_ALIASES.has(name):
+		return {"mode": NetworkProtocol.CHAT_SHOUT, "text": rest}
+	if REPLY_ALIASES.has(name):
+		return {"mode": "dm", "to": last_dm_from, "text": rest}
+	if DM_ALIASES.has(name):
+		var to := ""
+		if rest.begins_with("\""):
+			var close := rest.find("\"", 1)
+			if close > 0:
+				to = rest.substr(1, close - 1)
+				rest = rest.substr(close + 1).strip_edges()
+		else:
+			var gap := rest.find(" ")
+			to = rest if gap < 0 else rest.substr(0, gap)
+			rest = "" if gap < 0 else rest.substr(gap + 1).strip_edges()
+		return {"mode": "dm", "to": to.strip_edges(), "text": rest}
+	return {}
 
 
 ## Runs a command for `player` (the local Player, may be null). Returns the line

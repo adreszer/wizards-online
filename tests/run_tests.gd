@@ -79,6 +79,7 @@ func _run() -> void:
 	await _test_setpieces()
 	await _test_day_night()
 	await _test_timetable()
+	await _test_chat()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2053,6 +2054,38 @@ func _test_day_night() -> void:
 	game.queue_free()
 	await get_tree().process_frame
 	await get_tree().process_frame
+
+
+func _test_chat() -> void:
+	t.section("Chat")
+	t.check(ChatCommands.parse_chat("hello").is_empty() and ChatCommands.parse_chat("/time 12").is_empty(), "plain lines and cheats are not chat modes")
+	var w := ChatCommands.parse_chat("/sz psst over here")
+	t.check(w.mode == "whisper" and w.text == "psst over here", "/sz whispers")
+	t.check(ChatCommands.parse_chat("/s HELLO").mode == "shout" and ChatCommands.parse_chat("/krzyk hej").text == "hej", "/s and /krzyk shout")
+	var dm := ChatCommands.parse_chat("/pw Ola see you at lunch")
+	t.check(dm.mode == "dm" and dm.to == "Ola" and dm.text == "see you at lunch", "/pw name text writes a direct message")
+	var quoted := ChatCommands.parse_chat("/msg \"Anna Maria\" hi there")
+	t.check(quoted.to == "Anna Maria" and quoted.text == "hi there", "a name with spaces goes in quotes")
+	var reply := ChatCommands.parse_chat("/r thanks", "Kuba")
+	t.check(reply.mode == "dm" and reply.to == "Kuba" and reply.text == "thanks", "/r answers the last sender")
+	t.check(ChatCommands.parse_chat("/msg").to == "" and ChatCommands.parse_chat("/r hi").to == "", "a DM without a recipient is recognised (usage shown)")
+	var ChatPanelScript: GDScript = load("res://ui/chat/chat_panel.gd")
+	var say_line: String = ChatPanelScript.line_bbcode({"mode": "say", "name": "Ola", "text": "hi [b]", "self": false})
+	t.check(say_line.contains("[Ola]") and not say_line.contains("[b]"), "a say line names the speaker and escapes BBCode (%s)" % say_line)
+	t.check(ChatPanelScript.line_bbcode({"mode": "whisper", "name": "Ola", "text": "psst"}).contains(tr("CHAT_WHISPERS"))
+		and ChatPanelScript.line_bbcode({"mode": "shout", "name": "Ola", "text": "HEY"}).contains(tr("CHAT_SHOUTS")), "whispers and shouts are marked")
+	var mail_line: String = ChatPanelScript.line_bbcode({"mode": "dm", "name": "Kuba", "text": "hi", "self": false, "mail": true})
+	t.check(mail_line.contains(tr("CHAT_DM_FROM") % "Kuba") and mail_line.contains(tr("CHAT_DM_FROM_MAIL")), "a DM from the mailbox says so")
+	t.check(ChatPanelScript.line_bbcode({"mode": "dm", "name": "Me", "to_name": "Kuba", "text": "hi", "self": true}).contains(tr("CHAT_DM_TO") % "Kuba"), "our own DM names its recipient")
+	t.check(ChatManager.result_text("too_soon", {"mode": "shout", "wait": 7}) == tr("CHAT_SHOUT_TOO_SOON") % 7
+		and ChatManager.result_text("no_such_player", {"to_name": "X"}) == tr("CHAT_DM_NO_PLAYER") % "X", "refusals read as sentences")
+	var p := await _spawn_player(Vector3(0, 1, 0))
+	p.say("Good morning!", "say")
+	t.check(p.speech_bubble.visible and p.speech_bubble.text == "Good morning!" and p.speech_bubble.visibility_range_end == SpeechBubble.STYLE.say.range, "saying something shows a bubble over the head")
+	p.say("PSST", "whisper")
+	t.check(p.speech_bubble.visibility_range_end < 10.0 and p.speech_bubble.font_size < SpeechBubble.STYLE.say.size, "a whisper bubble is small and only readable up close")
+	await _wait(10.0)
+	t.check(not p.speech_bubble.visible, "the bubble fades after a few seconds")
 
 
 func _test_timetable() -> void:
