@@ -5,9 +5,11 @@ extends RefCounted
 ## sanitises what it receives and asks for changes; it never decides them.
 
 const ROLE_STUDENT := "student"
+## A student trusted by the house: deducts small amounts of points, lets guests in.
+const ROLE_PREFECT := "prefect"
 const ROLE_PROFESSOR := "professor"
 const ROLE_ADMIN := "admin"
-const ROLES: Array[String] = [ROLE_STUDENT, ROLE_PROFESSOR, ROLE_ADMIN]
+const ROLES: Array[String] = [ROLE_STUDENT, ROLE_PREFECT, ROLE_PROFESSOR, ROLE_ADMIN]
 const MAX_HOUSE := 4
 ## School years (placeholder names: First Circle … Seventh Circle, YEAR_n).
 const MAX_YEAR := 7
@@ -84,6 +86,8 @@ static func title_key(role: String) -> String:
 			return "ROLE_PROFESSOR_TITLE"
 		ROLE_ADMIN:
 			return "ROLE_ADMIN_TITLE"
+		ROLE_PREFECT:
+			return "ROLE_PREFECT_TITLE"
 	return ""
 
 

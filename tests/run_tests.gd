@@ -91,6 +91,7 @@ func _run() -> void:
 	_test_journal()
 	_test_grades()
 	await _test_books()
+	await _test_prefects()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2516,6 +2517,25 @@ func _test_books() -> void:
 	t.check(not GameSession.ui_input_captured, "and it closes")
 	panel.queue_free()
 	castle.queue_free()
+
+
+func _test_prefects() -> void:
+	t.section("Prefects")
+	t.check(CharacterProfile.sanitize_role("prefect") == CharacterProfile.ROLE_PREFECT and CharacterProfile.title_key("prefect") == "ROLE_PREFECT_TITLE"
+		and not CharacterProfile.is_staff("prefect"), "prefect is a role with a title, not staff")
+	var door := HOUSE_DOOR_SCENE.instantiate() as HouseDoor
+	door.house = 2
+	add_child(door)
+	var p := await _spawn_player(Vector3(0, 1, 0))
+	p.house = 3
+	t.check(not door.admits(p), "another house's door stays shut")
+	NetworkManager.guest_passes[2] = NetworkManager.server_time() + 60.0
+	t.check(door.admits(p), "a prefect's guest pass opens it")
+	NetworkManager.guest_passes[2] = NetworkManager.server_time() - 1.0
+	t.check(not door.admits(p), "until the pass runs out")
+	NetworkManager.guest_passes.clear()
+	door.queue_free()
+	t.check(ChatCommands.run("/odejmij 2", null) == tr("DEDUCT_USAGE") and ChatCommands.run("/gosc", null) == tr("GUEST_USAGE"), "prefect commands explain themselves")
 
 
 func _test_timetable() -> void:

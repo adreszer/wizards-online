@@ -103,6 +103,8 @@ var quiz: Dictionary = {}
 var quiz_answers: Array = []
 ## The running practical as we see it ({} = none) and, for the professor, everyone's progress.
 var practical: Dictionary = {}
+## Guest passes to other houses' rooms: house → until (server time, seconds).
+var guest_passes: Dictionary = {}
 var practical_progress: Dictionary = {}
 var _reconnect_attempts: int = 0
 var _reconnecting: bool = false
@@ -533,6 +535,16 @@ func stop_practical() -> void:
 	send_op(NetworkProtocol.OP_PRACTICAL, {"action": "stop"})
 
 
+## Whether a prefect's guest pass lets us through `house`'s doors right now.
+func has_guest_pass(house: int) -> bool:
+	return float(guest_passes.get(house, 0.0)) > server_time()
+
+
+## Prefect: let the player called `display_name` into our house's rooms for a while.
+func send_guest_pass(display_name: String) -> void:
+	send_op(NetworkProtocol.OP_GUEST_PASS, {"name": display_name})
+
+
 ## Professor running a lesson: homework for everyone who attended, due in `days`.
 func send_homework(text: String, days: int = 7) -> void:
 	send_op(NetworkProtocol.OP_HOMEWORK, {"text": text, "days": days})
@@ -580,6 +592,9 @@ func _on_lesson_message(op_code: int, payload: Dictionary) -> void:
 			if not payload.get("students", []) is Array:
 				practical_progress.students = []
 			practical_progress_changed.emit(practical_progress)
+		NetworkProtocol.OP_GUEST_PASS_GRANTED:
+			guest_passes[int(payload.get("house", 0))] = float(payload.get("until", 0))
+			GameEvents.notification_requested.emit(tr("GUEST_PASS_GRANTED") % [str(payload.get("by", "")), CharacterProfile.house_name(int(payload.get("house", 0)))], 6.0)
 		NetworkProtocol.OP_HOMEWORK_NEW:
 			var def := SubjectRegistry.load_definition(str(payload.get("subject", "")))
 			GameEvents.notification_requested.emit(tr("HOMEWORK_NEW") % [tr(def.display_name) if def != null else "?", str(payload.get("text", ""))], 8.0)
@@ -607,6 +622,7 @@ func _teardown() -> void:
 	chat_manager.leave()
 	quiz = {}
 	quiz_answers = []
+	guest_passes = {}
 	practical = {}
 	practical_progress = {}
 	await world_session.leave()

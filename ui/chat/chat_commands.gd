@@ -29,6 +29,8 @@ const SELF_STUDY_ALIASES: Array[String] = ["selfstudy", "samouk", "nauka"]
 const LOOK_ALIASES: Array[String] = ["look", "wyglad", "wygląd", "postac", "postać"]
 const RUNES_ALIASES: Array[String] = ["runes", "runy", "rune"]
 const EXAM_ALIASES: Array[String] = ["exam", "egzamin"]
+const GUEST_ALIASES: Array[String] = ["guest", "gosc", "gość"]
+const DEDUCT_ALIASES: Array[String] = ["deduct", "odejmij"]
 const STAND_ALIASES: Array[String] = ["stand", "wstan", "wstań"]
 const GIVE_ALIASES: Array[String] = ["give", "daj"]
 const BROOM_ALIASES: Array[String] = ["broom", "miotla", "miotła"]
@@ -94,6 +96,16 @@ static func run(text: String, player: Node) -> String:
 	if LOOK_ALIASES.has(name):
 		GameEvents.character_creator_requested.emit.call_deferred()
 		return ""
+	if GUEST_ALIASES.has(name):
+		if parts.size() < 2:
+			return _t("GUEST_USAGE")
+		NetworkManager.send_guest_pass(" ".join(parts.slice(1)))
+		return _t("GUEST_REQUESTED")
+	if DEDUCT_ALIASES.has(name):
+		if parts.size() < 4 or not parts[1].is_valid_int() or not parts[2].is_valid_int():
+			return _t("DEDUCT_USAGE")
+		NetworkManager.send_house_points(int(parts[1]), -absi(int(parts[2])), " ".join(parts.slice(3)))
+		return _t("DEDUCT_REQUESTED")
 	if EXAM_ALIASES.has(name):
 		if not NetworkManager.send_op(NetworkProtocol.OP_CHEAT, {"self_study": true, "exam": true}):
 			return _t("SELF_STUDY_ONLINE_ONLY")

@@ -136,6 +136,11 @@ const OP_MASTERY := 51
 const OP_HOMEWORK := 52
 ## server → each attendee online: {subject, text, due, by} new homework was set
 const OP_HOMEWORK_NEW := 53
+## client (prefect) → server: {name} let a player of another house into the prefect's house
+## rooms for a while (answered by OP_LESSON_TOOL_RESULT, tool "guest")
+const OP_GUEST_PASS := 54
+## server → the guest: {house, until, by} a guest pass to that house's doors
+const OP_GUEST_PASS_GRANTED := 55
 ## Chat modes (OP_CHAT): hearing ranges are the server's (chat.lua RANGES).
 const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"

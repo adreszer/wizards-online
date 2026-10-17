@@ -141,7 +141,9 @@ static func _get_rim_material() -> StandardMaterial3D:
 
 
 func admits(interactor: Node) -> bool:
-	return interactor != null and int(interactor.get("house")) == house
+	if interactor == null:
+		return false
+	return int(interactor.get("house")) == house or (interactor.is_in_group("local_player") and NetworkManager.has_guest_pass(house))
 
 
 func _on_interacted(interactor: Node) -> void:

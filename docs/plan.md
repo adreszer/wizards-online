@@ -441,6 +441,11 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Tests: books placed and titled with pages, opening and turning
 - [ ] Sealed stacks behind a permission slip a professor grants (needs professors to grant items)
 
+### Milestone 49 — Prefects
+- [x] Role `prefect` (set by admins, `admin_set_profile`), titled on the nameplate: deducts up to `max_prefect_points` (5) per change through the house points ledger (source `prefect`; `/odejmij <house> <points> <reason>`), and gives a student of another house a guest pass to the prefect's house rooms for `guest_pass_minutes` (`OP_GUEST_PASS`, `/gosc name`): their house doors open for the guest and the server accepts the guest's area reports there
+- [x] Tests: role, door with and without a pass; two clients: the limit, a small deduction, a guest pass
+- [ ] Heads of house (a professor's house-wide stats and house board posts); how prefects are chosen (owner decision)
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

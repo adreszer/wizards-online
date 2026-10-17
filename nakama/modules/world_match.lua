@@ -61,6 +61,7 @@ local OP_QUIZ_ANSWERS, OP_LESSON_TOOL_RESULT = P.OP_QUIZ_ANSWERS, P.OP_LESSON_TO
 local OP_PRACTICAL, OP_PRACTICAL_STATE, OP_PRACTICAL_PROGRESS = P.OP_PRACTICAL, P.OP_PRACTICAL_STATE, P.OP_PRACTICAL_PROGRESS
 local OP_APPEARANCE, OP_MASTERY = P.OP_APPEARANCE, P.OP_MASTERY
 local OP_HOMEWORK, OP_HOMEWORK_NEW = P.OP_HOMEWORK, P.OP_HOMEWORK_NEW
+local OP_GUEST_PASS, OP_GUEST_PASS_GRANTED = P.OP_GUEST_PASS, P.OP_GUEST_PASS_GRANTED
 -- Mastery: points per validated spell on a world object (practice targets give more),
 -- at most one award per spell per player every MASTERY_GAP seconds.
 local MASTERY_POINTS, MASTERY_PRACTICE_POINTS, MASTERY_GAP = 1, 2, 6
@@ -239,13 +240,14 @@ local function find_sid(state, user_id, name)
   return nil
 end
 
--- A player may only report an area that exists and, for house areas, belongs to their house.
-local function sanitize_area(id, profile)
+-- A player may only report an area that exists and, for house areas, belongs to their
+-- house (or a prefect of that house gave them a guest pass that has not run out).
+local function sanitize_area(id, profile, pass)
   if type(id) ~= "string" or #id > MAX_AREA_ID_BYTES or not AREAS[id] then
     return ""
   end
   local house = AREAS[id].house or 0
-  if house ~= 0 and (not profile or profile.house ~= house) then
+  if house ~= 0 and (not profile or profile.house ~= house) and not (pass and pass.house == house and pass.expires > nk.time() / 1000) then
     return ""
   end
   return id
@@ -695,7 +697,7 @@ function M.match_init(context, params)
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
-                  positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {} }
+                  positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {} }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -772,6 +774,7 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.positions[sid] = nil
       state.chat_at[sid] = nil
       state.mastery_at[sid] = nil
+      state.guest_passes[sid] = nil
       for area, lesson in pairs(state.lessons) do
         if lesson.by_sid == sid then
           close_lesson(dispatcher, state, area, "professor left")
@@ -830,7 +833,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     elseif message.op_code == OP_AREA then
       local ok, payload = pcall(nk.json_decode, message.data)
       if ok and type(payload) == "table" then
-        local area = sanitize_area(payload.id, state.profiles[sid])
+        local area = sanitize_area(payload.id, state.profiles[sid], state.guest_passes[sid])
         local changed = area ~= state.areas[sid]
         state.areas[sid] = area
         if changed and area ~= "" then
@@ -1064,8 +1067,11 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       local text = School.clean_text(payload.reason, state.rules.max_reason_bytes)
       local reason = nil
       local lesson = own_lesson(state, sid)
-      if not profile or not Profile.is_staff(profile.role) then
+      local prefect = profile and profile.role == "prefect"
+      if not profile or not (Profile.is_staff(profile.role) or prefect) then
         reason = "not_staff"
+      elseif prefect and (type(delta) ~= "number" or delta >= 0 or math.abs(delta) > state.rules.max_prefect_points) then
+        reason = "prefect_limit"
       elseif type(house) ~= "number" or house ~= math.floor(house) or house < 1 or house > School.HOUSES then
         reason = "bad_house"
       elseif type(delta) ~= "number" or delta ~= math.floor(delta) or delta == 0 or math.abs(delta) > state.rules.max_points_per_award then
@@ -1076,7 +1082,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         reason = "too_soon"
       elseif lesson and lesson.points + math.abs(delta) > state.rules.max_points_per_session then
         reason = "session_cap"
-      elseif not award_house_points(dispatcher, state, house, delta, text, sid, "professor", lesson and lesson.subject or "") then
+      elseif not award_house_points(dispatcher, state, house, delta, text, sid, prefect and "prefect" or "professor", lesson and lesson.subject or "") then
         reason = "storage"
       else
         state.points_at[sid] = now
@@ -1135,6 +1141,25 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         end
       end
       dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = "homework", reason = reason or "" }), { message.sender }, nil, true)
+    elseif message.op_code == OP_GUEST_PASS then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local profile = state.profiles[sid]
+      local target = type(payload.name) == "string" and find_sid(state, nil, payload.name) or nil
+      local reason
+      if not profile or (profile.role ~= "prefect" and profile.role ~= "admin") or profile.house == 0 then
+        reason = "not_prefect"
+      elseif not target then
+        reason = "no_such_player"
+      elseif state.profiles[target] and state.profiles[target].house == profile.house then
+        reason = "same_house"
+      else
+        local expires = now + state.rules.guest_pass_minutes * 60
+        state.guest_passes[target] = { house = profile.house, expires = expires }
+        dispatcher.broadcast_message(OP_GUEST_PASS_GRANTED, nk.json_encode({ house = profile.house, ["until"] = expires, by = state.names[sid] or "" }),
+          { state.presences[target] }, nil, true)
+      end
+      dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = "guest", reason = reason or "" }), { message.sender }, nil, true)
     elseif message.op_code == OP_APPEARANCE then
       local ok, payload = pcall(nk.json_decode, message.data)
       local profile = state.profiles[sid]

@@ -627,3 +627,9 @@ BOOK_SKY_P1,"From the astronomy tower the stars rise in the east and set in the 
 BOOK_SKY_P2,Astronomers use Duskveil to dim the light around them. Three is the number of balance and seven the number of wholeness; the old charts mark both.,"Astronomowie używają Zasłony Zmierzchu, by przygasić światło wokół siebie. Trzy to liczba równowagi, a siedem liczba pełni; stare mapy nieba zaznaczają obie."
 BOOK_PAGE,Page %d of %d,Strona %d z %d
 INTERACT_READ_BOOK,Read the book,Przeczytaj księgę
+ROLE_PREFECT_TITLE,Prefect,prefekt
+GUEST_PASS_GRANTED,"%s lets you into the %s rooms for a while.","%s wpuszcza cię na chwilę do pomieszczeń domu %s."
+GUEST_USAGE,"Prefects: /guest name lets a student of another house into your house rooms for ten minutes.","Prefekci: /gosc imię wpuszcza ucznia innego domu do pomieszczeń twojego domu na dziesięć minut."
+GUEST_REQUESTED,Guest pass requested.,Wysłano przepustkę.
+DEDUCT_USAGE,"Prefects: /deduct <house 1-4> <points, at most 5> <reason>.","Prefekci: /odejmij <dom 1-4> <punkty, najwyżej 5> <powód>."
+DEDUCT_REQUESTED,Deduction requested.,Wysłano odjęcie punktów.

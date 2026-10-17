@@ -113,7 +113,7 @@ Goal: attending a lesson is fun, and progress over weeks is visible.
 3. **Dormitories and personal space** (M ★★). A bed and trunk per player in the house dormitory; decorate it with earned items (pennants, trophies from mysteries, plants grown in Herb Lore). Visiting a friend's bed corner is a social activity.
 4. ~~**The house tally monument**~~ (built: *House Columns*, `HouseTally`). An original in-world equivalent of the points display in the great hall: four crystal columns that fill with light in house colours, updated live from the ledger, with a small burst when points change.
 5. **House cup and term ceremony** (M ★★★). At term end the great hall changes decor to the winning house's colours, the cup is awarded on stage, the winning house gets a cosmetic for next term.
-6. **Prefects and heads of house** (M ★★). New roles between student and professor: prefects can deduct small amounts of points, lead first-years, patrol at night, and open their house's door for guests; a head of house (professor) sees house-wide stats and posts to the house board.
+6. **Prefects and heads of house** (M ★★). *Prefects built (Milestone 49); heads of house still open.* New roles between student and professor: prefects can deduct small amounts of points, lead first-years, patrol at night, and open their house's door for guests; a head of house (professor) sees house-wide stats and posts to the house board.
 7. **House quests** (M ★★). Weekly house goals ("our house solves 3 mysteries", "100 practical tasks completed") with a house-wide reward. Gives low-population houses something to do together.
 
 ### Term D: "The castle is alive" (secrets and residents)

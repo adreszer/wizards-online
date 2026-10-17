@@ -50,6 +50,10 @@ M.DEFAULT_RULES = {
   coins_per_self_study = 5,
   -- Homework (homework.lua): a passing grade pays this much (earned, daily cap applies).
   coins_per_homework = 10,
+  -- Prefects: the most they may deduct at once, and how long a guest pass to their
+  -- house's rooms lasts.
+  max_prefect_points = 5,
+  guest_pass_minutes = 10,
 }
 M.HOUSES = 4
 M.POINTS_COLLECTION, M.TOTALS_KEY = "house_points", "totals"

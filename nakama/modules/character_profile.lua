@@ -14,7 +14,7 @@ local CHARACTERS = require("generated.characters")
 local M = {}
 
 M.COLLECTION, M.KEY = "character", "profile"
-M.ROLES = { student = true, professor = true, admin = true }
+M.ROLES = { student = true, prefect = true, professor = true, admin = true }
 M.MAX_HOUSE = 4
 M.MAX_YEAR = 7
 M.QUICK_SLOTS = 10
