@@ -72,3 +72,38 @@ func show_cup(cup: Dictionary) -> void:
 	_banner.material_override = mat
 	_label.text = tr("HOUSE_CUP_HOLDER") % CharacterProfile.house_name(winner)
 	_label.modulate = CharacterProfile.house_color(winner).lightened(0.3)
+	if cup.get("fresh", false):
+		ceremony(winner)
+
+
+## The ceremony when the cup is awarded live: confetti over the cup, the hall hung with the
+## winners' colours for CEREMONY_SECONDS, and the cup's fanfare (the music director's event track).
+const CEREMONY_SECONDS := 600.0
+var ceremony_decor: Node3D
+
+
+func ceremony(house: int) -> void:
+	add_child(PotionEffects.confetti_burst(Vector3(0, 2.5, 0)))
+	if ceremony_decor != null:
+		ceremony_decor.queue_free()
+	ceremony_decor = Node3D.new()
+	ceremony_decor.name = "CeremonyBanners"
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = CharacterProfile.house_color(house)
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.emission_enabled = true
+	mat.emission = CharacterProfile.house_color(house)
+	mat.emission_energy_multiplier = 0.3
+	for i in 8:
+		var banner := MeshInstance3D.new()
+		var q := QuadMesh.new()
+		q.size = Vector2(1.4, 3.6)
+		banner.mesh = q
+		banner.material_override = mat
+		banner.position = Vector3((i - 3.5) * 2.4, 5.0, 0.3)
+		ceremony_decor.add_child(banner)
+	add_child(ceremony_decor)
+	var decor := ceremony_decor
+	get_tree().create_timer(CEREMONY_SECONDS).timeout.connect(func() -> void:
+		if is_instance_valid(decor):
+			decor.queue_free())

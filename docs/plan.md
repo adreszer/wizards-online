@@ -537,6 +537,17 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Settings (`GameSettings`, `SettingsPanel`, pause menu or `/settings`): graphics presets (low…ultra), render scale with FSR, shadows, ambient occlusion, indirect light, glow, fog, VSync, an FPS cap; interface size, reduced motion, house symbols beside house colours, captions for sounds; rebindable keys
 - [ ] Steam (needs GodotSteam), account recovery
 
+### Milestone 64 — The living castle, finished: schedule, chains, seasons, stacks, portraits
+- [x] The shifting castle (`CastleSchedule`, exported as `generated/castle_schedule.lua`, `features/shifting.lua`): the globe room opens only on Wednesdays; by night the map room's door opens and the old cells' door shuts, by day the other way; the server drives them so nobody holds one against the schedule (offline the client follows the same rules)
+- [x] Mystery chains per year (`min_year`, `after` in `mysteries.json`): a first-year chain in three parts (the Starwatcher's trail: the sky atlas, the stargazing tower, the founders' chronicle, the portrait gallery, the hidden study) and a second-year mystery in the cellars and the old cells; closed mysteries do not even start
+- [x] Seasons and holidays (`Seasons`): the leaves turn with the months, snow in winter, blossom in spring, leaves drifting in autumn; rain on some days (the same for everyone) with heavier fog; Lantern Night, Midwinter and the end of the year dress the great hall, as does a ball (a school event of kind "ball"); floating candles in the hall all year
+- [x] Atmosphere per area (`DayNightCycle.ATMOSPHERES`): cold blue dungeons, a green greenhouse, a warm hazy great hall, golden libraries, starlit towers, blended over the hour's look; misty mornings; the moon's light follows its real phase (`moon_illumination`)
+- [x] The sealed stacks (`features/stacks.lua`): a professor's permission slip (`/slip name`) lets a student through the restricted stacks' door and counts them there; staff always
+- [x] Portraits as messengers (`features/portraits.lua`, `/portrait name text`): the next portrait the recipient passes delivers the message
+- [x] Duels: rule sets (`/duel name one|three|five`) and professor-refereed duels (`/referee a b [rules]`, both accept); the house cup's live award stages a ceremony (confetti, the hall hung in the winners' colours); exams are held in silence; a new character's first arrival is at the railway station; the journal's Post page keeps the session's paper birds
+- [x] Platform: a CI workflow (`.github/workflows/check.yml`, `tools/check.sh` on every push) and `tools/backup_nakama.sh` (pg_dump of the database)
+- [x] Tests: castle nodes in place, corners, beds, candles, seasons and holidays, the schedule (and its export), atmospheres, house symbols, presets and bindable actions, Lantern Chase layout, reminders; two clients: the permission slip before the stacks
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

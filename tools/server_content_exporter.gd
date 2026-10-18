@@ -21,6 +21,8 @@ static func build_all() -> Dictionary:
 		"warden.lua": _module("gameplay/school/night_warden.gd (NightWarden)", {"route": Array(NightWarden.ROUTE), "dwell": NightWarden.DWELL,
 			"curfew_start": NightWarden.CURFEW_START, "curfew_end": NightWarden.CURFEW_END}),
 		"sorting.lua": _module("resources/school/sorting.tres (HouseSorting)", _sorting()),
+		"castle_schedule.lua": _module("gameplay/world/castle_schedule.gd (CastleSchedule)", {"doors": CastleSchedule.DOORS.duplicate(true),
+			"night_from": CastleSchedule.NIGHT_FROM, "night_until": CastleSchedule.NIGHT_UNTIL}),
 		"characters.lua": _module("characters/character_registry.gd", _characters()),
 		"subjects.lua": _module("resources/school/subjects (SubjectRegistry)", _subjects()),
 		"protocol.lua": _module("multiplayer/network_protocol.gd", _protocol()),

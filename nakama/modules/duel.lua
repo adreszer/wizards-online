@@ -10,11 +10,14 @@
 local M = {}
 
 M.COUNTDOWN = 3
+-- Rule sets a challenger (or a refereeing professor) picks: hits to win.
+M.RULES = { three = 3, one = 1, five = 5 }
 M.CHALLENGE_SECONDS = 60
 M.HIT_GAP = 0.6
 
-function M.new(a_sid, b_sid, now)
-  return { a = a_sid, b = b_sid, state = "challenged", hits = { [a_sid] = 0, [b_sid] = 0 }, at = now, last_hit = {} }
+function M.new(a_sid, b_sid, now, rules)
+  local r = M.RULES[rules or ""] and rules or "three"
+  return { a = a_sid, b = b_sid, state = "challenged", hits = { [a_sid] = 0, [b_sid] = 0 }, at = now, last_hit = {}, rules = r, to_win = M.RULES[r] }
 end
 
 function M.opponent(duel, sid)

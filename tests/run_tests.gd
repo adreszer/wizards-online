@@ -2638,7 +2638,45 @@ func _test_school_life() -> void:
 		dt.show_detention({})
 		await get_tree().process_frame
 		t.check(dt.spots.is_empty(), "a served detention clears its chores")
+	for node_name in ["DormitoryCorners", "EchoResidents", "GardenBeds", "GroundsLife", "GuardianSync", "LanternChase", "CastleSchedule", "Seasons"]:
+		t.check(castle.get_node_or_null(node_name) != null, "the castle adds %s" % node_name)
+	var corners := castle.get_node_or_null("DormitoryCorners") as DormitoryCorners
+	if corners != null:
+		t.check(corners.dorm_of_house.size() == 4 and corners.beds_by_area.values().all(func(b: Array) -> bool: return b.size() >= 2), "every house dormitory has numbered beds (%s)" % str(corners.dorm_of_house))
+		corners.show_corners({"houses": {"3": {"1": {"name": "Ola", "decor": ["pennant", "brass_lantern"]}}}})
+		var corner := corners.find_child("Corner_Ola", true, false)
+		t.check(corner != null and corner.find_child("pennant", true, false) != null and corner.find_child("brass_lantern", true, false) != null, "a bed corner shows its owner and decorations")
+	var garden := castle.get_node_or_null("GardenBeds") as GardenBeds
+	t.check(garden != null and garden.beds.size() == GardenBeds.PLOTS, "the greenhouse has its beds")
+	var life := castle.get_node_or_null("GroundsLife") as GroundsLife
+	t.check(life != null and life.cauldrons.size() == 2 and life.creatures.size() == 3 and life.counters.size() >= 8, "cauldrons, paddock creatures and shop counters are in place")
+	var seasons := castle.get_node_or_null("Seasons") as Seasons
+	t.check(seasons != null and seasons.candles != null and seasons.candles.get_child_count() >= 20, "candles float in the great hall")
 	castle.queue_free()
+	await get_tree().process_frame
+
+	t.section("Seasons, schedule, atmosphere, settings")
+	t.check(Seasons.season_of(10) == "autumn" and Seasons.season_of(1) == "winter" and Seasons.season_of(4) == "spring" and Seasons.season_of(7) == "summer", "the four seasons by month")
+	t.check(Seasons.holiday_of(10, 31) == "lantern_night" and Seasons.holiday_of(12, 24) == "midwinter" and Seasons.holiday_of(1, 7) == "" and Seasons.holiday_of(6, 25) == "year_end", "holidays by date")
+	var decor := Seasons.build_decor("midwinter", Vector3.ZERO, Vector3(20, 9, 40))
+	t.check(decor.get_child_count() >= 30, "midwinter dresses the hall (%d)" % decor.get_child_count())
+	decor.free()
+	t.check(CastleSchedule.open_at("globe_room/door_1", 2, 12.0) and not CastleSchedule.open_at("globe_room/door_1", 3, 12.0), "the globe room opens only on Wednesdays")
+	t.check(CastleSchedule.open_at("map_room/door_1", 0, 23.0) and not CastleSchedule.open_at("map_room/door_1", 0, 12.0) and CastleSchedule.open_at("old_cells/door_1", 0, 12.0) and not CastleSchedule.open_at("old_cells/door_1", 0, 23.0),
+		"by night the corridors swap their doors")
+	var schedule: String = FileAccess.get_file_as_string("res://nakama/modules/generated/castle_schedule.lua")
+	t.check(schedule.contains("globe_room/door_1") and schedule.contains("night_from"), "the schedule is exported to the server")
+	t.check(DayNightCycle.atmosphere_for("cellars", "room") == "dungeon" and DayNightCycle.atmosphere_for("greenhouse", "classroom") == "greenhouse" and DayNightCycle.atmosphere_for("library", "library") == "library" and DayNightCycle.atmosphere_for("corridor_e_0", "corridor") == "", "areas have their own atmosphere")
+	var saved_symbols: Variant = GameSettings.get_value("house_symbols")
+	GameSettings.values["house_symbols"] = true
+	t.check(CharacterProfile.house_name(2).begins_with(GameSettings.HOUSE_SYMBOLS[2]), "houses can carry a symbol beside their colour (%s)" % CharacterProfile.house_name(2))
+	GameSettings.values["house_symbols"] = saved_symbols
+	t.check(GameSettings.PRESET_VALUES.has("low") and GameSettings.PRESET_VALUES["low"]["render_scale"] < 1.0 and GameSettings.BINDABLE.all(func(a: String) -> bool: return InputMap.has_action(a)), "graphics presets, and every bindable action exists")
+	var lc := LanternChase.layout_for(Vector3(0, 0, 0), Vector3(200, 20, 100))
+	t.check(is_equal_approx((lc.rings["a"] as Vector3).x, 80.0) and is_equal_approx((lc.homes["a"] as Vector3).x, -60.0), "Lantern Chase rings and homes match the server's layout")
+	var due := EventReminders.due({"events": [{"id": "e1", "title": "Feast", "at": 1000.0 + 200.0, "area": "great_hall"}, {"id": "e2", "title": "Later", "at": 1000.0 + 900.0}]}, {}, "Ola", 1000.0)
+	t.check(due.size() == 1 and due[0].title == "Feast", "reminders come five minutes ahead")
+	t.check(GameSettings.HOUSE_SYMBOLS.size() == 5 and RequestText.ladder_text({"top": [{"name": "Ola", "rating": 1012, "wins": 1, "losses": 0}]}).contains("Ola"), "the ladder reads as a list")
 
 
 func _test_timetable() -> void:

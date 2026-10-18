@@ -17,3 +17,4 @@ nakama/postgres-data/
 
 # Python
 __pycache__/
+backups/

@@ -92,6 +92,8 @@ func _run_a() -> void:
 	t.section("Echoes, the wing, the chart (admin)")
 	r = await NetworkManager.request("echo_reset", {"name": other_name})
 	t.check(r.ok, "an admin can restart a student's Echo stories (%s)" % str(r))
+	r = await NetworkManager.request("permission_slip", {"name": other_name})
+	t.check(r.ok, "a professor grants a permission slip for the sealed stacks (%s)" % str(r))
 	r = await NetworkManager.request("wing_state", {})
 	var before := int(r.data.get("points", -1))
 	t.check(r.ok and int(r.data.get("doors", 0)) >= 3, "the Unfinished Wing has sealed doors to open (%s)" % str(r))

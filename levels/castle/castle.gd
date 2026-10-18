@@ -54,6 +54,12 @@ func _ready() -> void:
 	var grounds_life := GroundsLife.new()
 	grounds_life.name = "GroundsLife"
 	add_child(grounds_life)
+	var seasons := Seasons.new()
+	seasons.name = "Seasons"
+	add_child(seasons)
+	var schedule := CastleSchedule.new()
+	schedule.name = "CastleSchedule"
+	add_child(schedule)
 	var guardians := GuardianSync.new()
 	guardians.name = "GuardianSync"
 	add_child(guardians)

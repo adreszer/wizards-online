@@ -50,6 +50,7 @@ func _ready() -> void:
 	var player: Node = _spawner.spawn_local(GameSession.display_name, NetworkManager.local_user_id)
 	GameEvents.level_completed.connect(_on_level_completed)
 	_show_satchel_hint(player)
+	_arrive(player)
 	# Offline, a first game opens the character creator (online the profile decides).
 	if not NetworkManager.is_online() and not GameSession.look.get("set", false):
 		GameEvents.character_creator_requested.emit.call_deferred()
@@ -72,6 +73,28 @@ func _build_map() -> void:
 	_minimap.set_map(castle_map)
 	_map_panel.set_map(castle_map)
 	_map_panel.toggled.connect(func(open: bool) -> void: _minimap.visible = not open)
+
+
+## A character's first time in the shared world starts at the railway station (feature
+## "arrival"); headless runs (tests, servers) stay at the start point.
+func _arrive(player: Node) -> void:
+	if not NetworkManager.is_in_world() or DisplayServer.get_name() == "headless":
+		return
+	var ok := await _wait_for_arrival()
+	if not ok or not NetworkManager.feature("arrival").get("first", false) or not is_instance_valid(player):
+		return
+	var at: Variant = ChatCommands.place_position(player as Node3D, "@station")
+	if at != null:
+		(player as Node3D).global_position = at
+		GameEvents.notification_requested.emit(tr("ARRIVAL_WELCOME"), 10.0)
+
+
+func _wait_for_arrival() -> bool:
+	for i in 300:
+		if not NetworkManager.feature("arrival").is_empty():
+			return true
+		await get_tree().process_frame
+	return false
 
 
 ## First-time nudge toward the torch (the server inventory may arrive a moment

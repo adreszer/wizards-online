@@ -116,6 +116,10 @@ var house_cup: Dictionary = {}
 ## Guest passes to other houses' rooms: house → until (server time, seconds).
 var guest_passes: Dictionary = {}
 var practical_progress: Dictionary = {}
+## Direct messages this session (newest first), for the journal's post page; offline mail
+## arrives as lines on join, so it is here too.
+var dm_history: Array = []
+const MAX_DM_HISTORY := 50
 ## The latest OP_PUSH data per feature kind ("detention", "friends", "clubs"…).
 var feature_state: Dictionary = {}
 var _request_seq: int = 0
@@ -161,6 +165,11 @@ func _ready() -> void:
 	chat_manager.bind(world_session)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	chat_manager.line_received.connect(chat_line_received.emit)
+	chat_manager.line_received.connect(func(line: Dictionary) -> void:
+		if line.get("kind", "") == "dm":
+			dm_history.push_front(line)
+			if dm_history.size() > MAX_DM_HISTORY:
+				dm_history.resize(MAX_DM_HISTORY))
 	chat_manager.system_message.connect(system_message.emit)
 	world_session.socket_closed.connect(_on_socket_closed)
 	world_session.server_clock_received.connect(func(server_ms: float, sent_ms: int) -> void:
@@ -757,6 +766,7 @@ func _on_lecture(by_name: String, text: String) -> void:
 
 func _teardown() -> void:
 	chat_manager.leave()
+	dm_history = []
 	quiz = {}
 	quiz_answers = []
 	guest_passes = {}

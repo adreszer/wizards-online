@@ -1,0 +1,25 @@
+# Runs the offline verification (tools/check.sh: castle generator tests, generated files
+# committed, scripts, gameplay tests) on every push and pull request.
+name: check
+on:
+  push:
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Godot 4.7.2
+        run: |
+          curl -sSL -o godot.zip https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          unzip -q godot.zip
+          echo "GODOT=$PWD/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Offline checks
+        run: tools/check.sh
+      - name: Logs
+        if: failure()
+        run: tail -n 80 .godot/check/*.log

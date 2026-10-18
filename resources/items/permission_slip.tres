@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://itempermslip1"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"permission_slip"
+display_name = "ITEM_PERMISSION_SLIP_NAME"
+description = "ITEM_PERMISSION_SLIP_DESC"
+max_stack = 1
+category = "tool"

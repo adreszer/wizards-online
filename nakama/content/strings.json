@@ -34,5 +34,53 @@
   "MYST_TALE_SOLVED": {
     "pl": "Poznajesz całą opowieść o założycielach zamku.",
     "en": "You have pieced together the tale of the castle's founders."
+  },
+  "MYST_Y1_STAR_1A": {
+    "pl": "Na marginesie atlasu nieba ktoś dopisał: „Policz gwiazdy z wieży, która patrzy na zachód”.",
+    "en": "In the margin of the sky atlas someone has written: “Count the stars from the tower that faces west.”"
+  },
+  "MYST_Y1_STAR_1B": {
+    "pl": "Ze szczytu wieży widać, że jedna gwiazda na tablicy jest wyryta głębiej niż reszta.",
+    "en": "From the top of the tower you can see that one star on the plaque is cut deeper than the rest."
+  },
+  "MYST_Y1_STAR_1_SOLVED": {
+    "pl": "Pod głęboko wyrytą gwiazdą widnieje znak założycieli. Ktoś zostawił tu ślad dla pierwszorocznych.",
+    "en": "Under the deep-cut star is the founders' mark. Someone left a trail here for first-years."
+  },
+  "MYST_Y1_STAR_2A": {
+    "pl": "Kronika założycieli wspomina „gwiazdę, która patrzy z płócien”.",
+    "en": "The founders' chronicle mentions “a star that looks out of the canvases”."
+  },
+  "MYST_Y1_STAR_2B": {
+    "pl": "Na jednym z portretów w galerii w tle świeci ta sama gwiazda. Malarz wskazuje nią wielką salę.",
+    "en": "On one portrait in the gallery the same star shines in the background. The painter points it at the great hall."
+  },
+  "MYST_Y1_STAR_2_SOLVED": {
+    "pl": "Tablica w wielkiej sali ma w rogu tę samą gwiazdę. Szlak prowadzi dalej, za mury.",
+    "en": "The plaque in the great hall has the same star in its corner. The trail leads on, behind the walls."
+  },
+  "MYST_Y1_STAR_3A": {
+    "pl": "„Mury zamku” opisują gabinet, którego nie ma na żadnym planie.",
+    "en": "“The Castle's Walls” describes a study that is on no plan."
+  },
+  "MYST_Y1_STAR_3B": {
+    "pl": "Ukryty gabinet. Na biurku leży mapa nieba z tą samą gwiazdą.",
+    "en": "The hidden study. On the desk lies a sky chart with the same star."
+  },
+  "MYST_Y1_STAR_3_SOLVED": {
+    "pl": "Szlak Gwiazdy Strażniczej zamknięty. Pierwszy rok pamięta, kto go przeszedł.",
+    "en": "The Starwatcher's trail is complete. The first year remembers who walked it."
+  },
+  "MYST_Y2_CELLAR_A": {
+    "pl": "W piwnicach, w blasku pochodni, słychać szepty zza ścian.",
+    "en": "In the cellars, by torchlight, whispers come through the walls."
+  },
+  "MYST_Y2_CELLAR_B": {
+    "pl": "Tablica wspomina dawne cele. Szepty dochodzą właśnie stamtąd.",
+    "en": "The plaque mentions the old cells. The whispers come from there."
+  },
+  "MYST_Y2_CELLAR_SOLVED": {
+    "pl": "W starych celach nie ma nikogo, tylko echo dawnych lekcji. Drugi rok poznał kolejną tajemnicę.",
+    "en": "Nobody is in the old cells, only the echo of old lessons. The second year has learned another secret."
   }
 }

@@ -10,6 +10,9 @@
 --   { event = "enter", area, holding? }                 holding: item id in hand
 --   { event = "together", area, players }               that many players in the area at once
 -- Optional per step: within_seconds (since the previous step), text (sent to the actor).
+-- Mystery chains: min_year (the character's school year must be at least this) and
+-- after (a discovery the player must already have: the previous part of a chain) keep a
+-- mystery closed until then; its steps do not even start.
 -- Mystery fields: id, scope ("world" | "house" | "player"), steps, reset_on_wrong,
 -- reset_after_minutes (world/house), on_solved = { set_state = {oid = state},
 -- text, discovery, house_points, coins }. coins: paid with a first discovery (economy.lua);
@@ -77,6 +80,8 @@ function M.validate(m, strings, seen)
   end
   if type(m.id) ~= "string" or m.id == "" then err("missing id") elseif seen[m.id] then err("duplicate id") end
   if not M.SCOPES[m.scope] then err("unknown scope " .. tostring(m.scope)) end
+  if m.min_year ~= nil and (type(m.min_year) ~= "number" or m.min_year < 1 or m.min_year > 7) then err("min_year must be 1..7") end
+  if m.after ~= nil and (type(m.after) ~= "string" or m.after == "") then err("after must name a discovery") end
   if type(m.steps) ~= "table" or #m.steps == 0 then err("no steps"); return errors end
   local effects = effect_types()
   for i, step in ipairs(m.steps) do
@@ -225,7 +230,8 @@ end
 function M.on_event(engine, mstate, ev, ctx)
   local actions = {}
   for _, m in ipairs(engine.list) do
-    local record = record_for(mstate, m, ev, ctx)
+    local closed = (m.min_year and (ev.year or 1) < m.min_year) or (m.after and not (ctx.has_discovery and ctx.has_discovery(m.after)))
+    local record = not closed and record_for(mstate, m, ev, ctx) or nil
     if record and not record.solved then
       local before = record.step
       local step = m.steps[record.step + 1]

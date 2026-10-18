@@ -1110,3 +1110,16 @@ ACTION_RAISE_HAND,Raise hand,Zgłoś się
 ACTION_CHAT,Chat,Czat
 ACTION_MAP,Map,Mapa
 REFUSED_NOT_FLYING,Fly through the ring on your broom.,Przeleć przez krąg na miotle.
+REFUSED_NO_PERMISSION,The sealed stacks need a permission slip from a professor.,Zakazany dział wymaga przepustki od profesora.
+SLIP_GRANTED,%s gives you a permission slip for the sealed stacks.,%s daje ci przepustkę do zakazanego działu.
+OK_PERMISSION_SLIP,Permission slip granted.,Przepustka wydana.
+ITEM_PERMISSION_SLIP_NAME,Permission Slip,Przepustka
+ITEM_PERMISSION_SLIP_DESC,Signed by a professor: you may read in the sealed stacks.,Podpisana przez profesora: możesz czytać w zakazanym dziale.
+PORTRAIT_MESSAGE,"A message for you, from %s: “%s”",Wiadomość dla ciebie od: %s. „%s”
+OK_PORTRAIT_MESSAGE,The portraits will pass it on.,Portrety przekażą wiadomość.
+DUEL_REFEREE_USAGE,"Usage: /referee name name [three | one | five] (professors, in a duelling room).","Użycie: /sedzia imię imię [trzy | jeden | pięć] (profesorowie, w sali pojedynków)."
+ARRIVAL_WELCOME,"Welcome! The train has brought you to the school's station. Follow the road up to the castle, and to the sorting stone in the great hall.","Witaj! Pociąg przywiózł cię na szkolną stację. Idź drogą do zamku, a potem do kamienia przydziału w wielkiej sali."
+REFUSED_EXAM_SILENCE,Silence during the exam. Whisper (/w) if you must.,"Cisza podczas egzaminu. Jeśli musisz, szepnij (/sz)."
+JOURNAL_TAB_POST,Post,Poczta
+JOURNAL_POST_EMPTY,No paper birds yet. Write to someone with /msg name text.,Jeszcze żadnych papierowych ptaków. Napisz do kogoś: /pw imię tekst.
+JOURNAL_POST_TO,to %s,do: %s

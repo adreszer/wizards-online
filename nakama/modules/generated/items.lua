@@ -193,6 +193,18 @@ return {
       sell_price = 0,
       shop = "tailor",
     },
+    permission_slip = {
+      burn_seconds = 0,
+      category = "tool",
+      effect = "",
+      effect_seconds = 0,
+      holdable = false,
+      max_stack = 1,
+      mount = false,
+      price = 0,
+      sell_price = 0,
+      shop = "",
+    },
     potion_colour = {
       burn_seconds = 0,
       category = "potion",
@@ -362,7 +374,7 @@ return {
       shop = "apothecary",
     },
   },
-  ids = { "torch", "broom", "pennant", "star_chart", "brass_lantern", "music_box", "trophy_small", "potted_moonpetal", "seed_glowcap", "seed_moonpetal", "seed_whisperroot", "seed_emberbloom", "glowcap", "moonpetal", "whisperroot", "emberbloom", "crystal_dust", "ember_salt", "dew_vial", "potion_glow", "potion_featherfall", "potion_voice", "potion_colour", "confetti_charm", "creature_treat", "familiar_mossling", "familiar_emberkit", "familiar_glimmerwing", "wayfinder_chart", "game_set" },
+  ids = { "torch", "broom", "pennant", "star_chart", "brass_lantern", "music_box", "trophy_small", "potted_moonpetal", "seed_glowcap", "seed_moonpetal", "seed_whisperroot", "seed_emberbloom", "glowcap", "moonpetal", "whisperroot", "emberbloom", "crystal_dust", "ember_salt", "dew_vial", "potion_glow", "potion_featherfall", "potion_voice", "potion_colour", "confetti_charm", "creature_treat", "familiar_mossling", "familiar_emberkit", "familiar_glimmerwing", "wayfinder_chart", "permission_slip", "game_set" },
   starting = {
     {
       count = 1,

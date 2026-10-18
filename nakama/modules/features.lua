@@ -42,6 +42,10 @@ M.MODULES = {
   require("features.admin"),
   require("features.plans"),
   require("features.analytics"),
+  require("features.shifting"),
+  require("features.stacks"),
+  require("features.portraits"),
+  require("features.arrival"),
 }
 
 local by_kind = {}

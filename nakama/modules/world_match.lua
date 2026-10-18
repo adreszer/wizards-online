@@ -712,7 +712,7 @@ end
 local function send_duel(dispatcher, state, duel)
   local payload = nk.json_encode({ id = duel.id, state = duel.state, a = duel.a, b = duel.b, a_name = state.names[duel.a] or "",
     b_name = state.names[duel.b] or "", hits = duel.hits, winner = duel.winner, forfeit = duel.forfeit, expired = duel.expired,
-    to_win = state.rules.duel_hits_to_win })
+    to_win = duel.to_win or state.rules.duel_hits_to_win, rules = duel.rules, referee = duel.referee_name })
   local seen, list = {}, {}
   for _, sid in ipairs({ duel.a, duel.b }) do
     if state.presences[sid] and not seen[sid] then seen[sid] = true; table.insert(list, state.presences[sid]) end
@@ -820,13 +820,19 @@ local function feed_mysteries(dispatcher, state, sid, ev)
     return
   end
   local inv = state.inventories[sid]
-  ev.sid, ev.uid, ev.house, ev.held = sid, p.user_id, profile.house, inv and inv.held or ""
+  ev.sid, ev.uid, ev.house, ev.held, ev.year = sid, p.user_id, profile.house, inv and inv.held or "", profile.year or 1
   ev.area = ev.area or state.areas[sid]
   ev.now = nk.time() / 1000
   local ctx = {
     players_in = function(area) return players_in(state, area) end,
     player_progress = function(uid) return state.progress[uid] end,
     progress_changed = function(uid) save_progress(uid, state.progress[uid]) end,
+    has_discovery = function(id)
+      for _, d in ipairs(profile.discoveries or {}) do
+        if d == id then return true end
+      end
+      return false
+    end,
   }
   run_actions(dispatcher, state, Mysteries.on_event(state.engine, state.mysteries, ev, ctx))
 end
@@ -1204,6 +1210,8 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       local ok, payload = pcall(nk.json_decode, message.data)
       if ok and type(payload) == "table" then
         local area = sanitize_area(payload.id, state.profiles[sid], state.guest_passes[sid])
+        -- Feature modules may keep a student out of a place (the sealed stacks without a slip).
+        if area ~= "" and not Features.allow(feature_api(dispatcher, state), "enter", sid, area) then area = "" end
         -- The report must agree with where the player's own state says they are; a
         -- report ahead of the next state waits for it (a few seconds at most).
         if position_fits(state, sid, area) then
@@ -1305,6 +1313,14 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       if ok and profile then
         local ctx = { sid = sid, area = state.areas[sid], knows = function(id) return knows_or_practises(state, sid, id) end }
         local ev, reason = Objects.validate(state.world, ctx, payload, now)
+        if ev then
+          local api = feature_api(dispatcher, state)
+          local allowed, why = Features.allow(api, "object", sid, ev)
+          if not allowed then
+            api.notice(sid, "REFUSED_" .. tostring(why):upper(), {}, 4)
+            ev, reason = nil, why
+          end
+        end
         if ev then
           local value = Objects.apply(state.world, ev, now)
           if value ~= nil then
@@ -1571,10 +1587,40 @@ function M.match_loop(context, dispatcher, tick, state, messages)
           reason = "busy"
         else
           state.duel_seq = state.duel_seq + 1
-          local duel = Duel.new(sid, target, now)
+          local duel = Duel.new(sid, target, now, payload.rules)
           duel.id = state.duel_seq
           state.duel_of[sid], state.duel_of[target] = duel, duel
           send_duel(dispatcher, state, duel)
+        end
+      elseif payload.action == "referee" then
+        -- A professor in a duelling room sets two students against each other (both still accept).
+        local a = type(payload.a) == "string" and find_sid(state, nil, payload.a) or nil
+        local b = type(payload.b) == "string" and find_sid(state, nil, payload.b) or nil
+        local profile = state.profiles[sid]
+        if not profile or not Profile.is_staff(profile.role) then
+          reason = "not_staff"
+        elseif not in_duel_area(state, sid) then
+          reason = "not_in_duel_area"
+        elseif not a or not b or a == b then
+          reason = "no_such_player"
+        elseif state.duel_of[a] or state.duel_of[b] then
+          reason = "busy"
+        else
+          state.duel_seq = state.duel_seq + 1
+          local duel = Duel.new(a, b, now, payload.rules)
+          duel.id, duel.referee, duel.referee_name = state.duel_seq, sid, state.names[sid] or ""
+          duel.accepted = {}
+          state.duel_of[a], state.duel_of[b] = duel, duel
+          send_duel(dispatcher, state, duel)
+        end
+      elseif payload.action == "accept" and mine and mine.referee and mine.state == "challenged" then
+        -- A refereed duel starts when both duellists accept.
+        if not in_duel_area(state, mine.a) or not in_duel_area(state, mine.b) then
+          reason = "not_in_duel_area"
+        else
+          mine.accepted[sid] = true
+          if mine.accepted[mine.a] and mine.accepted[mine.b] then Duel.accept(mine, now) end
+          send_duel(dispatcher, state, mine)
         end
       elseif payload.action == "accept" then
         if not mine or mine.b ~= sid or mine.state ~= "challenged" then
@@ -1603,7 +1649,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       local profile = state.profiles[sid]
       if duel and type(payload.sid) == "string" and type(payload.spell) == "string" and profile and Profile.knows(profile, payload.spell)
           and in_duel_area(state, sid) and in_duel_area(state, payload.sid) then
-        local result = Duel.hit(duel, sid, payload.sid, now, state.rules.duel_hits_to_win)
+        local result = Duel.hit(duel, sid, payload.sid, now, duel.to_win or state.rules.duel_hits_to_win)
         if result then
           if duel.state == "over" then end_duel(dispatcher, state, duel) else send_duel(dispatcher, state, duel) end
         end

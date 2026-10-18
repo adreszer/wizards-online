@@ -39,6 +39,7 @@ const ITEM_IDS: Array[String] = [
 	"familiar_emberkit",
 	"familiar_glimmerwing",
 	"wayfinder_chart",
+	"permission_slip",
 	"game_set",
 ]
 ## Items every new character owns (offline default; the server creates the

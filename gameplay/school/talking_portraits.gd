@@ -14,6 +14,8 @@ const IDLE_LINES := 4
 
 var portraits: Array[Transform3D] = []
 var _quiet_until: Dictionary = {}
+## Messages already spoken (their removal is on its way to the server).
+var _delivered: Dictionary = {}
 var _bubble: Label3D
 var _bubble_left := 0.0
 var _timer := 0.0
@@ -49,10 +51,27 @@ func _process(delta: float) -> void:
 	var now := Time.get_ticks_msec() / 1000.0
 	for i in portraits.size():
 		var p: Transform3D = portraits[i]
-		if p.origin.distance_to(player.global_position + Vector3.UP * 1.6) < REACH and now >= float(_quiet_until.get(i, 0.0)):
-			_quiet_until[i] = now + QUIET_SECONDS
-			speak(p, line_for(player.display_name, player.house, NetworkManager.rumours, i))
-			return
+		if p.origin.distance_to(player.global_position + Vector3.UP * 1.6) < REACH:
+			# A message other students left with the portraits is delivered by the first one passed.
+			var mail := waiting_message(_delivered)
+			if not mail.is_empty():
+				_delivered[str(mail.get("id", ""))] = true
+				speak(p, tr("PORTRAIT_MESSAGE") % [str(mail.get("from", "")), str(mail.get("text", ""))])
+				NetworkManager.request("portrait_read", {"id": str(mail.get("id", ""))})
+				return
+			if now >= float(_quiet_until.get(i, 0.0)):
+				_quiet_until[i] = now + QUIET_SECONDS
+				speak(p, line_for(player.display_name, player.house, NetworkManager.rumours, i))
+				return
+
+
+## The oldest message waiting with the portraits for the local student ({} for none).
+static func waiting_message(delivered: Dictionary = {}) -> Dictionary:
+	var list: Variant = NetworkManager.feature("portrait_mail").get("messages", [])
+	for m: Variant in (list if list is Array else []):
+		if m is Dictionary and not delivered.has(str((m as Dictionary).get("id", ""))):
+			return m
+	return {}
 
 
 ## What a portrait says: a greeting, then a rumour (or idle gossip, by portrait).

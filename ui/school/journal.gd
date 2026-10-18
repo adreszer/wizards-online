@@ -54,7 +54,7 @@ func _build() -> void:
 	_tabs = TabContainer.new()
 	_tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(_tabs)
-	for key in ["JOURNAL_TAB_TIMETABLE", "JOURNAL_TAB_SPELLS", "JOURNAL_TAB_RECORD", "JOURNAL_TAB_HOMEWORK", "JOURNAL_TAB_HOUSE", "JOURNAL_TAB_CALENDAR", "JOURNAL_TAB_DISCOVERIES"]:
+	for key in ["JOURNAL_TAB_TIMETABLE", "JOURNAL_TAB_SPELLS", "JOURNAL_TAB_RECORD", "JOURNAL_TAB_HOMEWORK", "JOURNAL_TAB_HOUSE", "JOURNAL_TAB_CALENDAR", "JOURNAL_TAB_POST", "JOURNAL_TAB_DISCOVERIES"]:
 		var page := RichTextLabel.new()
 		page.name = tr(key)
 		page.bbcode_enabled = true
@@ -128,6 +128,7 @@ func refresh() -> void:
 	(_pages["JOURNAL_TAB_SPELLS"] as RichTextLabel).text = spells_bbcode(_player.spell_caster if _player != null else null)
 	(_pages["JOURNAL_TAB_RECORD"] as RichTextLabel).text = record_bbcode(record) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	(_pages["JOURNAL_TAB_DISCOVERIES"] as RichTextLabel).text = discoveries_bbcode(profile.get("discoveries", []))
+	(_pages["JOURNAL_TAB_POST"] as RichTextLabel).text = post_bbcode(NetworkManager.dm_history)
 	(_pages["JOURNAL_TAB_CALENDAR"] as RichTextLabel).text = EventReminders.calendar_bbcode(NetworkManager.timetable, NetworkManager.feature("events"),
 		NetworkManager.feature("clubs"), NetworkManager.server_time()) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	(_pages["JOURNAL_TAB_HOUSE"] as RichTextLabel).text = house_bbcode(NetworkManager.house_quests, NetworkManager.get_house_totals(), _player.house if _player != null else 0) + board_bbcode(NetworkManager.feature("house_board")) + wing_bbcode(NetworkManager.feature("wing")) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
@@ -181,6 +182,18 @@ static func house_bbcode(quests: Dictionary, totals: PackedInt32Array, house: in
 
 
 ## Each assignment: subject, the task, due date, your answer and grade.
+## The post: direct messages (paper birds) this session, newest first.
+static func post_bbcode(lines: Array) -> String:
+	if lines.is_empty():
+		return TranslationServer.translate("JOURNAL_POST_EMPTY")
+	var out := PackedStringArray()
+	for l: Variant in lines:
+		var d: Dictionary = l
+		var who := (TranslationServer.translate("JOURNAL_POST_TO") % str(d.get("to_name", ""))) if d.get("self", false) else str(d.get("name", ""))
+		out.append("[b]%s[/b]%s: %s" % [who, " ✉" if d.get("mail", false) else "", str(d.get("text", ""))])
+	return "\n".join(out)
+
+
 ## The Unfinished Wing's shared progress (the whole school opens it together).
 static func wing_bbcode(wing: Dictionary) -> String:
 	if wing.is_empty():

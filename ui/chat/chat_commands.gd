@@ -33,6 +33,9 @@ const GUEST_ALIASES: Array[String] = ["guest", "gosc", "gość"]
 ## Duels: /duel name, /accept, /decline, /forfeit (Polish: /pojedynek, /przyjmij, /odrzuc, /poddaj).
 const DUEL_ALIASES := {"duel": "challenge", "pojedynek": "challenge", "accept": "accept", "przyjmij": "accept",
 	"decline": "decline", "odrzuc": "decline", "odrzuć": "decline", "forfeit": "forfeit", "poddaj": "forfeit"}
+## Rule sets for /duel name [rules] and /referee a b [rules] (hits to win).
+const DUEL_RULES := {"three": "three", "trzy": "three", "one": "one", "jeden": "one", "five": "five", "piec": "five", "pięć": "five"}
+const REFEREE_ALIASES: Array[String] = ["referee", "sedzia", "sędzia"]
 ## Moderation: /report name reason, /block name, /unblock name; staff /mute name [minutes], /kick name; admins /ban name reason.
 const MODERATION_ALIASES := {"report": "report", "zglos_gracza": "report", "zgłoś_gracza": "report", "block": "block", "blokuj": "block",
 	"unblock": "unblock", "odblokuj": "unblock", "mute": "mute", "wycisz": "mute", "kick": "kick", "wyrzuc": "kick", "wyrzuć": "kick", "ban": "ban"}
@@ -61,6 +64,8 @@ const REQUEST_COMMANDS := {
 	"familiar": ["familiar_set", ["kind"]], "chowaniec": ["familiar_set", ["kind"]],
 	"quiet": ["classroom_mute", []], "cisza": ["classroom_mute", []], "bell": ["classroom_bell", []], "dzwonek": ["classroom_bell", []],
 	"announce": ["admin_broadcast", ["text"]], "oglos": ["admin_broadcast", ["text"]], "ogłoś": ["admin_broadcast", ["text"]],
+	"portrait": ["portrait_message", ["name", "text"]], "portret": ["portrait_message", ["name", "text"]],
+	"slip": ["permission_slip", ["name"]], "przepustka": ["permission_slip", ["name"]],
 	"licence": ["flying_licence", ["name"]], "license": ["flying_licence", ["name"]], "licencja": ["flying_licence", ["name"]],
 	"event": ["event_schedule", ["kind", "at", "minutes", "area", "title"]], "wydarzenie": ["event_schedule", ["kind", "at", "minutes", "area", "title"]],
 }
@@ -136,11 +141,24 @@ static func run(text: String, player: Node) -> String:
 		var minutes := int(parts[2]) if action == "mute" and parts.size() > 2 and parts[2].is_valid_int() else 10
 		NetworkManager.send_moderation(action, parts[1], " ".join(parts.slice(2)) if action in ["report", "ban"] else "", minutes)
 		return _t("MODERATION_SENT")
+	if REFEREE_ALIASES.has(name):
+		if parts.size() < 3:
+			return _t("DUEL_REFEREE_USAGE")
+		var ref_rules := str(parts[3]).to_lower() if parts.size() > 3 else "three"
+		if not NetworkManager.send_op(NetworkProtocol.OP_DUEL, {"action": "referee", "a": parts[1], "b": parts[2], "rules": ref_rules}):
+			return _t("SELF_STUDY_ONLINE_ONLY")
+		return _t("MODERATION_SENT")
 	if DUEL_ALIASES.has(name):
 		var duel_action: String = DUEL_ALIASES[name]
 		if duel_action == "challenge" and parts.size() < 2:
 			return _t("DUEL_USAGE")
-		if not NetworkManager.send_op(NetworkProtocol.OP_DUEL, {"action": duel_action, "name": " ".join(parts.slice(1))}):
+		# "/duel name five": a rule set as the last word (three hits, one, five).
+		var words := parts.slice(1)
+		var rules := "three"
+		if words.size() > 1 and DUEL_RULES.has(str(words[-1]).to_lower()):
+			rules = DUEL_RULES[str(words[-1]).to_lower()]
+			words = words.slice(0, words.size() - 1)
+		if not NetworkManager.send_op(NetworkProtocol.OP_DUEL, {"action": duel_action, "name": " ".join(words), "rules": rules}):
 			return _t("SELF_STUDY_ONLINE_ONLY")
 		return _t("MODERATION_SENT")
 	if GUEST_ALIASES.has(name):

@@ -71,6 +71,9 @@ function M.allow(api, what, sid, mode)
   if what ~= "chat" or mode == "whisper" or mode == "dm" then return true end
   local c = rooms(api)[api.area(sid)]
   if c and c.muted and not api.is_staff(sid) then return false, "room_quiet" end
+  -- Exams are held in silence (the self-study exam lessons on exam days).
+  local lesson = api.state.lessons[api.area(sid)]
+  if lesson and lesson.exam and not api.is_staff(sid) then return false, "exam_silence" end
   return true
 end
 

@@ -15,6 +15,7 @@ local Clubs = require("features.clubs")
 local M = { name = "events" }
 
 M.COLLECTION, M.KEY = "school", "events"
+-- A "ball" dresses the great hall while it runs (Seasons on the client).
 M.KINDS = { feast = true, exam = true, mystery = true, duelling = true, ball = true, match = true, meeting = true, other = true }
 M.MAX_EVENTS = 40
 M.MAX_TITLE_BYTES = 80

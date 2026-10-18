@@ -145,14 +145,60 @@ static func look_at_hour(h: float) -> Dictionary:
 	return out
 
 
+## Per-area atmosphere over the hour's look: cold blue dungeons, a green greenhouse, a
+## warm hazy great hall, a golden library, starlit towers. Where the local player stands
+## picks it; it fades in and out over a second or two.
+const ATMOSPHERES := {
+	"dungeon": {"amb": Color(0.45, 0.55, 0.78), "amb_k": 0.8, "fog": Color(0.12, 0.17, 0.28), "fog_k": 3.0},
+	"greenhouse": {"amb": Color(0.55, 0.82, 0.5), "amb_k": 1.1, "fog": Color(0.28, 0.42, 0.26), "fog_k": 2.0},
+	"great_hall": {"amb": Color(0.95, 0.72, 0.5), "amb_k": 1.15, "fog": Color(0.45, 0.33, 0.22), "fog_k": 2.4},
+	"library": {"amb": Color(0.9, 0.75, 0.55), "amb_k": 1.0, "fog": Color(0.34, 0.28, 0.2), "fog_k": 1.5},
+	"tower": {"amb": Color(0.6, 0.66, 0.92), "amb_k": 0.95, "fog": Color(0.18, 0.2, 0.34), "fog_k": 1.3},
+}
+var atmosphere := ""
+var _atmosphere_weight := 0.0
+
+
+## Which atmosphere an area has ("" for none).
+static func atmosphere_for(area_id: String, kind: String) -> String:
+	if area_id in ["cellars", "dungeon_corridor", "old_cells", "undercroft", "cold_store", "hidden_wine_cellar"] or area_id.ends_with("_cm1"):
+		return "dungeon"
+	if area_id == "greenhouse":
+		return "greenhouse"
+	if area_id == "great_hall":
+		return "great_hall"
+	if kind == "library":
+		return "library"
+	if kind == "tower":
+		return "tower"
+	return ""
+
+
+func _current_atmosphere() -> String:
+	var me := get_tree().get_first_node_in_group(&"local_player") if is_inside_tree() else null
+	var tracker: AreaTracker = me.get("area_tracker") if me != null else null
+	if tracker == null:
+		return ""
+	return atmosphere_for(str(tracker.current_area_id()), tracker.current_kind())
+
+
 func apply_hours(h: float) -> void:
 	var look := look_at_hour(h)
 	daylight = look.day
+	var target := _current_atmosphere()
+	if target != atmosphere:
+		_atmosphere_weight = maxf(0.0, _atmosphere_weight - 0.2)
+		if _atmosphere_weight <= 0.0:
+			atmosphere = target
+	elif atmosphere != "":
+		_atmosphere_weight = minf(1.0, _atmosphere_weight + 0.2)
 	if environment != null:
-		environment.ambient_light_color = look.amb
-		environment.ambient_light_energy = look.amb_e
-		environment.fog_light_color = look.fog
-		environment.fog_density = look.fog_d
+		var atm: Dictionary = ATMOSPHERES.get(atmosphere, {})
+		var w := _atmosphere_weight if not atm.is_empty() else 0.0
+		environment.ambient_light_color = (look.amb as Color).lerp(atm.get("amb", look.amb), w * 0.6)
+		environment.ambient_light_energy = float(look.amb_e) * lerpf(1.0, float(atm.get("amb_k", 1.0)), w)
+		environment.fog_light_color = (look.fog as Color).lerp(atm.get("fog", look.fog), w * 0.7)
+		environment.fog_density = float(look.fog_d) * lerpf(1.0, float(atm.get("fog_k", 1.0)), w) * morning_mist(h) * (Seasons.RAIN_FOG if Seasons.rain_today else 1.0)
 	if sky_material != null:
 		sky_material.sky_top_color = look.top
 		sky_material.sky_horizon_color = look.hor
@@ -182,10 +228,29 @@ func _place_sky_light(to_sun: Vector3) -> void:
 		sky_light.light_energy = SUN_ENERGY * rise
 	else:
 		sky_light.light_color = MOON_COLOR
-		sky_light.light_energy = MOON_ENERGY * rise
+		# The moon waxes and wanes with the real calendar: a new moon gives a darker night.
+		sky_light.light_energy = MOON_ENERGY * rise * lerpf(0.25, 1.0, moon_illumination(Time.get_unix_time_from_system()))
 	# A light shines along its -Z: point it from the body toward the ground.
 	sky_light.global_basis = Basis.looking_at(-to_body, Vector3.UP)
 	sky_light.visible = rise > 0.001
+
+
+## How much of the moon is lit at unix time `t` (0 new … 1 full), from a known new moon
+## (2000-01-06 18:14 UTC) and the synodic month. Astronomy lessons can read it too.
+const NEW_MOON := 947182440.0
+const SYNODIC_DAYS := 29.530588
+
+
+static func moon_illumination(t: float) -> float:
+	var age := fposmod((t - NEW_MOON) / 86400.0, SYNODIC_DAYS) / SYNODIC_DAYS
+	return (1.0 - cos(age * TAU)) / 2.0
+
+
+## Mornings are misty: extra fog from first light until the sun is well up.
+static func morning_mist(hours: float) -> float:
+	if hours < 4.5 or hours > 9.0:
+		return 1.0
+	return 1.0 + 1.6 * sin((hours - 4.5) / 4.5 * PI)
 
 
 ## A star field for the night sky (equirectangular, blended in by sky_cover_modulate).
