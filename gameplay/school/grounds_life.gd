@@ -110,7 +110,8 @@ func _process(_delta: float) -> void:
 		if next.distance_to(c.global_position) > 0.001:
 			var ahead := wander(_paddock.global_position, _paddock.size, i, t + 0.5, kind == "glimmerwing")
 			c.global_position = next
-			if ahead.distance_to(next) > 0.01:
+			# Face where it walks next; only the ground direction counts (a glimmerwing also bobs).
+			if Vector2(ahead.x - next.x, ahead.z - next.z).length() > 0.01:
 				c.look_at(Vector3(ahead.x, next.y, ahead.z), Vector3.UP)
 		i += 1
 

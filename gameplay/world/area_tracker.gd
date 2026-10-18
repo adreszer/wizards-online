@@ -58,8 +58,9 @@ func _update() -> void:
 
 
 func _chest() -> Vector3:
+	# Leaving the tree (the world closing) still fires zone exits: no position then.
 	var body := get_parent() as Node3D
-	return body.global_position + Vector3.UP if body != null else Vector3.INF
+	return body.global_position + Vector3.UP if body != null and body.is_inside_tree() else Vector3.INF
 
 
 static func contains(z: AreaZone, point: Vector3) -> bool:
