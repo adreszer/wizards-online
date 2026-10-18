@@ -248,10 +248,21 @@ func _label(box: Rect2, text: String, font_size: int, color: Color, outline: boo
 	return used
 
 
+## Other players show only near you or, with the chart, house-mates who share their room.
+const NEAR_PLAYERS := 30.0
+
+
 func _draw_players() -> void:
+	var me_body := _local_player()
+	var sharing: Array = []
+	for m: Variant in NetworkManager.feature("chart_mates").get("mates", []) if NetworkManager.feature("chart_mates").get("mates", []) is Array else []:
+		sharing.append(str((m as Dictionary).get("name", "")))
 	for p in get_tree().get_nodes_in_group("remote_players"):
 		var body := p as Node3D
 		if body == null:
+			continue
+		var near := me_body != null and body.global_position.distance_to(me_body.global_position) <= NEAR_PLAYERS
+		if not near and not sharing.has(str(body.get("display_name"))):
 			continue
 		var at := world_to_screen(Vector2(body.global_position.x, body.global_position.z))
 		var house := int(body.get("house")) if body.get("house") != null else 0

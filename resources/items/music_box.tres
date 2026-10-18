@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://itemmusicbox01"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"music_box"
+display_name = "ITEM_MUSIC_BOX_NAME"
+description = "ITEM_MUSIC_BOX_DESC"
+max_stack = 1
+category = "decor"
+price = 40
+shop = "instrument_maker"
+sell_price = 0
+effect = ""
+effect_seconds = 0.0

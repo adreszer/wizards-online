@@ -78,7 +78,8 @@ static func _items() -> Dictionary:
 		var def := ItemRegistry.load_definition(id)
 		if def == null:
 			continue
-		by_id[id] = {"holdable": def.holdable, "max_stack": def.max_stack, "burn_seconds": def.burn_seconds, "mount": def.is_mount()}
+		by_id[id] = {"holdable": def.holdable, "max_stack": def.max_stack, "burn_seconds": def.burn_seconds, "mount": def.is_mount(),
+			"category": def.category, "price": def.price, "shop": def.shop, "sell_price": def.sell_price, "effect": def.effect, "effect_seconds": def.effect_seconds}
 	return {"ids": ItemRegistry.ITEM_IDS.duplicate(), "by_id": by_id, "starting": ItemRegistry.STARTING_ITEMS.duplicate(true)}
 
 

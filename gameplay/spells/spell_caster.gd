@@ -60,6 +60,13 @@ var _global_cooldown: float = 0.0
 var mastery: Dictionary = {}
 
 
+## True while a professor runs a lesson in their room (ProfessorPanel sets it): casts
+## are demonstrations, drawn bigger and slower for everyone.
+var demonstrating: bool = false
+const DEMO_SCALE := 1.7
+const DEMO_SPEED := 0.55
+
+
 func mastery_level(definition: SpellDefinition) -> int:
 	return SpellMastery.level_of(int(mastery.get(String(definition.id), 0))) if definition != null else 0
 
@@ -271,8 +278,8 @@ func try_cast(power: float = 1.0) -> bool:
 
 
 ## Cosmetic replay of another player's cast (never affects local puzzle state).
-func cast_remote(definition: SpellDefinition, origin: Vector3, direction: Vector3, level: int = 0) -> void:
-	_spawn_projectile(definition, origin, direction.normalized(), true, level)
+func cast_remote(definition: SpellDefinition, origin: Vector3, direction: Vector3, level: int = 0, demo: bool = false) -> void:
+	_spawn_projectile(definition, origin, direction.normalized(), true, level, 1.0, demo)
 	spell_cast.emit(definition, origin, direction)
 
 
@@ -350,7 +357,7 @@ func _has_line_of_sight(from: Vector3, to: Vector3, expected: Node) -> bool:
 	return result["collider"] == expected
 
 
-func _spawn_projectile(definition: SpellDefinition, origin: Vector3, direction: Vector3, cosmetic: bool, level: int = 0, power: float = 1.0) -> void:
+func _spawn_projectile(definition: SpellDefinition, origin: Vector3, direction: Vector3, cosmetic: bool, level: int = 0, power: float = 1.0, demo: bool = false) -> void:
 	var scene := definition.projectile_scene
 	if scene == null:
 		push_warning("SpellDefinition %s has no projectile scene" % definition.id)
@@ -366,6 +373,10 @@ func _spawn_projectile(definition: SpellDefinition, origin: Vector3, direction: 
 	projectile.global_position = origin
 	if level > 0:
 		projectile.scale *= SpellMastery.visual_scale(level)
+	# A professor demonstrating in their lesson: bigger and slower, so the room can follow it.
+	if demo or (demonstrating and not cosmetic):
+		projectile.scale *= DEMO_SCALE
+		projectile.speed *= DEMO_SPEED
 	if definition.cast_sound != null:
 		var player := AudioStreamPlayer3D.new()
 		player.stream = definition.cast_sound

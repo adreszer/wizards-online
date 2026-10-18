@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://itemstarchart01"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"star_chart"
+display_name = "ITEM_STAR_CHART_NAME"
+description = "ITEM_STAR_CHART_DESC"
+max_stack = 1
+category = "decor"
+price = 25
+shop = "stationer"
+sell_price = 0
+effect = ""
+effect_seconds = 0.0

@@ -84,6 +84,7 @@ func _ready() -> void:
 	_students.item_selected.connect(func(_i: int) -> void: _update_buttons())
 	_spells.item_selected.connect(func(_i: int) -> void: _update_buttons())
 	NetworkManager.lessons_changed.connect(func(_l: Dictionary) -> void: if is_open: refresh())
+	NetworkManager.lessons_changed.connect(func(_l: Dictionary) -> void: _update_demonstrating())
 	NetworkManager.lesson_result_received.connect(_on_lesson_result)
 	NetworkManager.house_points_result_received.connect(_on_points_result)
 	_lesson_button.pressed.connect(_on_lesson_pressed)
@@ -99,8 +100,54 @@ func _ready() -> void:
 		_house_option.add_item(CharacterProfile.house_name(h), h)
 	_list_spells("")
 	_build_board_tab()
+	_build_room_tab()
 	NetworkManager.quiz_answers_changed.connect(_on_quiz_answers)
 	NetworkManager.lesson_tool_result_received.connect(_on_tool_result)
+
+
+## The "Room" tab: classroom controls (quiet the room, lock the doors, ring the bell),
+## a flying licence or a detention for a student by name, and sharing the selected plan.
+var _room_name: LineEdit
+
+
+func _build_room_tab() -> void:
+	var tabs: TabContainer = _root.get_node("Panel/VBox/Tabs")
+	var room := VBoxContainer.new()
+	room.name = tr("LESSON_TAB_ROOM")
+	tabs.add_child(room)
+	var row := HBoxContainer.new()
+	room.add_child(row)
+	row.add_child(_button(tr("ROOM_QUIET"), func() -> void: _room_request("classroom_mute", {"on": true})))
+	row.add_child(_button(tr("ROOM_TALK"), func() -> void: _room_request("classroom_mute", {"on": false})))
+	row.add_child(_button(tr("ROOM_LOCK"), func() -> void: _room_request("classroom_lock", {"on": true})))
+	row.add_child(_button(tr("ROOM_UNLOCK"), func() -> void: _room_request("classroom_lock", {"on": false})))
+	row.add_child(_button(tr("ROOM_BELL"), func() -> void: _room_request("classroom_bell", {})))
+	var who := HBoxContainer.new()
+	room.add_child(who)
+	_room_name = LineEdit.new()
+	_room_name.placeholder_text = tr("ROOM_STUDENT_NAME")
+	_room_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	who.add_child(_room_name)
+	who.add_child(_button(tr("ROOM_LICENCE"), func() -> void: _room_request("flying_licence", {"name": _room_name.text.strip_edges()})))
+	who.add_child(_button(tr("ROOM_DETENTION"), func() -> void: _room_request("detention_assign", {"name": _room_name.text.strip_edges()})))
+	room.add_child(_button(tr("PLAN_SHARE"), share_plan))
+
+
+func _room_request(kind: String, payload: Dictionary) -> void:
+	var r: Dictionary = await NetworkManager.request(kind, payload)
+	_show(RequestText.describe(kind, r))
+
+
+## Shares the selected plan with the staff room, under the subject of this classroom.
+func share_plan() -> void:
+	var index := _plan_option.selected
+	if index < 1 or index - 1 >= _plans.size() or _plans[index - 1].get("shared", false):
+		_show(tr("PLAN_SHARE_PICK"))
+		return
+	var tracker := _player.get("area_tracker") as AreaTracker if _player != null else null
+	var subject := SubjectRegistry.for_area(str(tracker.current_area_id())) if tracker != null else null
+	var r: Dictionary = await NetworkManager.request("plan_share", {"id": str(_plans[index - 1]["id"]), "subject": str(subject.id) if subject != null else ""})
+	_show(RequestText.describe("plan_share", r))
 
 
 ## Splits the panel into tabs: "Lesson" (everything that was there) and "Board & quiz".
@@ -480,6 +527,12 @@ func current_lesson() -> Dictionary:
 
 
 ## True when the local player runs the lesson in this room (or is an admin there).
+## Casting while running your lesson is a demonstration (SpellCaster.demonstrating).
+func _update_demonstrating() -> void:
+	if _player != null and _player.get("spell_caster") != null:
+		(_player.get("spell_caster") as SpellCaster).demonstrating = runs_lesson()
+
+
 func runs_lesson() -> bool:
 	var lesson := current_lesson()
 	if lesson.is_empty():
@@ -668,6 +721,12 @@ func _load_plans(select_id: String = "") -> void:
 	if not NetworkManager.is_online():
 		return
 	_plans = await NetworkManager.list_lesson_plans()
+	# Plans other professors shared: teach from them, or save a copy as your own.
+	var shared: Dictionary = await NetworkManager.request("plans_shared", {})
+	for p: Variant in (shared.data.get("plans", []) if shared.ok and shared.data.get("plans", []) is Array else []):
+		var d: Dictionary = p
+		if str(d.get("owner", "")) != NetworkManager.local_user_id:
+			_plans.append({"id": "", "title": "★ %s (%s)" % [str(d.get("title", "")), str(d.get("owner_name", ""))], "lines": d.get("lines", []), "shared": true})
 	_plan_option.clear()
 	_plan_option.add_item(tr("PLAN_NEW"))
 	for plan: Dictionary in _plans:

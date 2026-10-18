@@ -57,6 +57,13 @@ M.DEFAULT_RULES = {
   -- Duels (duel.lua): only in these areas, first to this many hits.
   duel_areas = { "duelling_hall", "class_warding" },
   duel_hits_to_win = 3,
+  -- The village shops (features/shops.lua): "weekends" (Saturday and Sunday, school
+  -- time) or "always". Staff may shop any day.
+  village_open = "weekends",
+  -- Chat lines and direct messages are kept this many days for moderation (features/chatlog.lua).
+  chat_log_days = 7,
+  -- Anonymous daily counts (features/analytics.lua) are kept this many days.
+  analytics_days = 60,
   -- Curfew: points a student caught by the night warden costs their house (once a night).
   curfew_points = 5,
 }

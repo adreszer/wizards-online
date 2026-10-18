@@ -667,8 +667,8 @@ func request(kind: String, payload: Dictionary = {}, timeout: float = 10.0) -> D
 	_request_seq += 1
 	var id := _request_seq
 	var body := payload.duplicate()
-	body.id = id
-	body.kind = kind
+	body.rid = id
+	body.req = kind
 	send_op(NetworkProtocol.OP_REQUEST, body)
 	var waited := 0.0
 	while not _replies.has(id) and waited < timeout:
@@ -713,7 +713,7 @@ func _on_feature_message(op_code: int, payload: Dictionary) -> void:
 	match op_code:
 		NetworkProtocol.OP_REPLY:
 			var data: Variant = payload.get("data", {})
-			_replies[int(payload.get("id", 0))] = {"ok": payload.get("ok", false) == true, "reason": str(payload.get("reason", "")),
+			_replies[int(payload.get("rid", 0))] = {"ok": payload.get("ok", false) == true, "reason": str(payload.get("reason", "")),
 				"data": data if data is Dictionary else {}}
 		NetworkProtocol.OP_PUSH:
 			var kind := str(payload.get("kind", ""))

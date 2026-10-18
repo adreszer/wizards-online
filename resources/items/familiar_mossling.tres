@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://itemfamiliarmoss01"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"familiar_mossling"
+display_name = "ITEM_FAMILIAR_MOSSLING_NAME"
+description = "ITEM_FAMILIAR_MOSSLING_DESC"
+max_stack = 1
+category = "familiar"
+price = 0
+shop = ""
+sell_price = 0
+effect = ""
+effect_seconds = 0.0

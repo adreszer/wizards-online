@@ -1,0 +1,12 @@
+{
+  "_comment": "Shared dungeon guardians (features/guardians.lua): ids are the generated node names without the CrystalGuardian_ prefix. night_only guardians wake only during curfew.",
+  "respawn_seconds": 120,
+  "reward": { "house_points": 3, "coins": 5 },
+  "damage": { "force": 20, "fire": 25, "frost": 20, "wind": 15, "water": 15, "dark": 15, "light": 5, "levitate": 5 },
+  "default_damage": 10,
+  "guardians": {
+    "cellars_guardian_east": { "area": "cellars", "hp": 100 },
+    "cellars_guardian_west": { "area": "cellars", "hp": 100 },
+    "dungeon_corridor_guardian_north": { "area": "dungeon_corridor", "hp": 140, "night_only": true }
+  }
+}

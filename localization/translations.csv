@@ -60,7 +60,7 @@ INTERACT_STUDY_TOME,Study the tome,Przestudiuj księgę
 NOTIFY_SPELL_LEARNED,Learned %s — it sits on your hotbar (keys 1–0). Aim with the centre of the screen and press Cast (LMB).,Poznajesz czar %s — trafił na pasek czarów (klawisze 1–0). Celuj środkiem ekranu i naciśnij Czar (LPM).
 NOTIFY_SECRET_PASSAGE,A hidden passage opens!,Otwiera się ukryte przejście!
 NOTIFY_DEEP_WATER,"The water is too deep, so you scramble back to the shore.","Woda jest za głęboka, więc wracasz na brzeg."
-NOTIFY_TRICK_STEP,"A step gives way under your foot! Jump to pull free.","Stopień zapada się pod stopą! Skocz, żeby się uwolnić."
+NOTIFY_TRICK_STEP,A step gives way under your foot! Jump to pull free.,"Stopień zapada się pod stopą! Skocz, żeby się uwolnić."
 NOTIFY_CHECKPOINT,Checkpoint reached,Punkt kontrolny
 NOTIFY_STATUES_ALIGNED,The statues' gaze aligns. Something unlocked.,Spojrzenia posągów się zbiegają. Coś się odblokowało.
 NOTIFY_LEVER_STUCK,The lever will not budge while the statues look away.,"Dźwignia ani drgnie, dopóki posągi patrzą w inną stronę."
@@ -92,7 +92,7 @@ INVENTORY_CLOSE_HINT,Tab or Esc closes,Tab lub Esc zamyka
 NOTIFY_INVENTORY_HINT,You carry a torch. Press Tab to open your satchel and take it in hand.,"Masz przy sobie pochodnię. Naciśnij Tab, aby otworzyć sakwę i wziąć ją do ręki."
 ITEM_DEFAULT_NAME,Item,Przedmiot
 ITEM_TORCH_NAME,Torch,Pochodnia
-ITEM_TORCH_DESC,An everburning torch. Held in hand it lights the halls around you and never goes out.,"Wieczna pochodnia. Trzymana w dłoni oświetla sale wokół ciebie i nigdy nie gaśnie."
+ITEM_TORCH_DESC,An everburning torch. Held in hand it lights the halls around you and never goes out.,Wieczna pochodnia. Trzymana w dłoni oświetla sale wokół ciebie i nigdy nie gaśnie.
 AREA_UNKNOWN,Unknown place,Nieznane miejsce
 AREA_GROUNDS,The Grounds,Błonia
 AREA_GREENHOUSE,Greenhouse (Herbology),Szklarnia (Zielarstwo)
@@ -368,7 +368,7 @@ NOTIFY_FLIGHT_CONTROLS,Flying: the broom follows the mouse · W forward · Space
 INVENTORY_RIDING_MARK,(riding),(w locie)
 INVENTORY_CLICK_TO_RIDE,Click to mount it or land (shortcut: B).,"Kliknij, aby wsiąść albo wylądować (skrót: B)."
 CHAT_OFFLINE_COMMANDS_ONLY,Offline there is nobody to talk to; only commands work here (/help).,Offline nie ma z kim rozmawiać; działają tylko komendy (/pomoc).
-CHEAT_HELP,"Talk: /w whisper · /s shout · /msg name text · /r reply. Gestures: /wave /bow /raise /clap /point /shrug /cheer /notes /sit /stand (G opens the menu, H raises a hand). Dev: /broom gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /plan opens the timetable · /coins <amount> changes your purse · /goto <place> takes you there (station, village, castle, an area) · /help this list.","Rozmowa: /sz szept · /k krzyk · /pw imię tekst · /odp odpowiedź. Gesty: /machaj /ukłon /ręka /klaszcz /wskaż /wzrusz /wiwat /notuj /usiądź /wstań (G otwiera menu, H zgłasza się). Dla testów: /miotla daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /plan otwiera plan lekcji · /korony <ilość> zmienia zawartość sakiewki · /idz <miejsce> przenosi na miejsce (stacja, wioska, zamek, obszar) · /pomoc ta lista."
+CHEAT_HELP,"Talk: /w whisper · /s shout · /msg name text · /r reply. Gestures: /wave /bow /raise /clap /point /shrug /cheer /notes /sit /stand (G opens the menu, H raises a hand). Dev: /broom gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /plan opens the timetable · /coins <amount> changes your purse · /goto <place> takes you there (station, village, castle, an area) · /help this list. School life: /friends · /friend name · /profile name · /clubs · /game name · /watch · /ladder · /chase join a|b · /drink potion · /adopt kind · /familiar kind · /decorate · /share on|off · /wing · /settings. Staff: /detention name · /licence name · /quiet · /bell · /head name house · /houseboard text · /housestats · /event kind minutes length area title · /announce text · /admin.","Rozmowa: /sz szept · /k krzyk · /pw imię tekst · /odp odpowiedź. Gesty: /machaj /ukłon /ręka /klaszcz /wskaż /wzrusz /wiwat /notuj /usiądź /wstań (G otwiera menu, H zgłasza się). Dla testów: /miotla daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /plan otwiera plan lekcji · /korony <ilość> zmienia zawartość sakiewki · /idz <miejsce> przenosi na miejsce (stacja, wioska, zamek, obszar) · /pomoc ta lista. Życie szkoły: /przyjaciele · /przyjaciel imię · /profil imię · /kluby · /gra imię · /patrz · /ranking · /poscig dolacz a|b · /wypij eliksir · /adoptuj rodzaj · /chowaniec rodzaj · /dekoruj · /udostepnij on|off · /skrzydlo · /ustawienia. Kadra: /kara imię · /licencja imię · /cisza · /dzwonek · /opiekun imię dom · /ogloszenie tekst · /dom · /wydarzenie rodzaj minuty długość miejsce tytuł · /oglos tekst · /admin."
 CHEAT_GIVE_USAGE,Usage: /give <item>. Items: %s,Użycie: /daj <przedmiot>. Przedmioty: %s
 CHEAT_UNKNOWN,Unknown command: %s (try /help).,Nieznana komenda: %s (spróbuj /pomoc).
 CHEAT_UNKNOWN_ITEM,"No item called ""%s"". Items: %s",Nie ma przedmiotu „%s”. Przedmioty: %s
@@ -447,7 +447,7 @@ BREAK_MAY,May holidays,Majówka
 CALENDAR_TERM_WEEK,"%s, week %d","%s, tydzień %d"
 CALENDAR_EXAMS,exam week,tydzień egzaminów
 CALENDAR_HOLIDAY,"Holidays: %s, no lessons","Wolne: %s, bez lekcji"
-CALENDAR_BETWEEN_TERMS,"Between terms; %s starts %s","Przerwa między semestrami; %s od %s"
+CALENDAR_BETWEEN_TERMS,Between terms; %s starts %s,Przerwa między semestrami; %s od %s
 TIMETABLE_EXAM,exam,egzamin
 CHAT_WHISPERS,whispers:,szepcze:
 CHAT_SHOUTS,shouts:,krzyczy:
@@ -475,15 +475,15 @@ GESTURE_SHRUG,Shrug,Wzrusz ramionami
 GESTURE_CHEER,Cheer,Wiwatuj
 GESTURE_NOTES,Take notes,Notuj
 EMOTE_MENU_TITLE,Gestures,Gesty
-EMOTE_MENU_FOOTER,"1–8 or click · H raises your hand · G or Esc closes","1–8 albo kliknięcie · H zgłasza się · G lub Esc zamyka"
+EMOTE_MENU_FOOTER,1–8 or click · H raises your hand · G or Esc closes,1–8 albo kliknięcie · H zgłasza się · G lub Esc zamyka
 LESSON_RAISED_HAND,(hand raised),(zgłasza się)
 BOARD_NEXT_LESSON,Next lesson: %s %s,Następna lekcja: %s %s
 QUIZ_TITLE,Question from %s,Pytanie od: %s
 QUIZ_TYPE_ANSWER,Your answer…,Twoja odpowiedź…
 QUIZ_SEND,Answer,Odpowiedz
-QUIZ_HINT_CHOICES,"Choose with 1–6 or a click. Esc: later (K brings it back).","Wybierz klawiszem 1–6 albo kliknięciem. Esc: później (K wraca do pytania)."
-QUIZ_HINT_OPEN,"Type your answer and press Enter. Esc: later (K brings it back).","Wpisz odpowiedź i naciśnij Enter. Esc: później (K wraca do pytania)."
-QUIZ_ANSWERED,"Answer sent; you can still change it until the question closes.","Odpowiedź wysłana; możesz ją zmienić, dopóki pytanie jest otwarte."
+QUIZ_HINT_CHOICES,Choose with 1–6 or a click. Esc: later (K brings it back).,Wybierz klawiszem 1–6 albo kliknięciem. Esc: później (K wraca do pytania).
+QUIZ_HINT_OPEN,Type your answer and press Enter. Esc: later (K brings it back).,Wpisz odpowiedź i naciśnij Enter. Esc: później (K wraca do pytania).
+QUIZ_ANSWERED,Answer sent; you can still change it until the question closes.,"Odpowiedź wysłana; możesz ją zmienić, dopóki pytanie jest otwarte."
 QUIZ_RIGHT,Correct!,Dobrze!
 QUIZ_WRONG,Not quite.,Niezupełnie.
 QUIZ_CLOSED_NO_ANSWER,The question is closed; you did not answer.,"Pytanie zamknięte, bez twojej odpowiedzi."
@@ -491,7 +491,7 @@ QUIZ_CLOSED_WAITING_MARK,The question is closed; the professor will mark your an
 LESSON_TAB_LESSON,Lesson,Lekcja
 LESSON_TAB_BOARD,Board & quiz,Tablica i pytania
 BOARD_TITLE,The classroom board,Tablica w klasie
-BOARD_PLACEHOLDER,What the board should show (students see it in the room),"Co ma być na tablicy (uczniowie widzą to w klasie)"
+BOARD_PLACEHOLDER,What the board should show (students see it in the room),Co ma być na tablicy (uczniowie widzą to w klasie)
 BOARD_WRITE,Write on the board,Napisz na tablicy
 BOARD_WIPE,Wipe the board,Zetrzyj tablicę
 BOARD_WRITTEN,Written on the board.,Napisano na tablicy.
@@ -513,7 +513,7 @@ PRACTICAL_PROGRESS,Practice target: %d of %d,Tarcza ćwiczeniowa: %d z %d
 PRACTICAL_DONE,Practical done!,Ćwiczenie zaliczone!
 PRACTICAL_OVER,The practical is over.,Ćwiczenie zakończone.
 LESSON_TAB_PRACTICAL,Practical,Ćwiczenie
-PRACTICAL_PANEL_INTRO,"Students in the room may cast the chosen spell for practice and must hit the classroom's practice target (the rune disc at the front) as many times as set. Ticked: the spell is theirs once they finish.","Uczniowie w klasie mogą ćwiczyć wybrane zaklęcie i muszą trafić tarczę ćwiczeniową (runiczny krąg z przodu klasy) tyle razy, ile ustawisz. Zaznaczone: po zaliczeniu zaklęcie zostaje z nimi."
+PRACTICAL_PANEL_INTRO,Students in the room may cast the chosen spell for practice and must hit the classroom's practice target (the rune disc at the front) as many times as set. Ticked: the spell is theirs once they finish.,"Uczniowie w klasie mogą ćwiczyć wybrane zaklęcie i muszą trafić tarczę ćwiczeniową (runiczny krąg z przodu klasy) tyle razy, ile ustawisz. Zaznaczone: po zaliczeniu zaklęcie zostaje z nimi."
 PRACTICAL_HITS,Hits,Trafienia
 PRACTICAL_GRANT,Teach it to those who finish,"Naucz tych, którzy zaliczą"
 PRACTICAL_START,Start the practical,Rozpocznij ćwiczenie
@@ -528,7 +528,7 @@ SELF_STUDY_ONLINE_ONLY,Self-study lessons run in the online school.,Lekcje nauki
 SELF_STUDY_NO_PLAN,This room has no self-study plan.,Ta sala nie ma planu nauki własnej.
 SELF_STUDY_ALREADY_OPEN,A lesson is already running here.,Tu już trwa lekcja.
 CREATOR_TITLE,Your character,Twoja postać
-CREATOR_INTRO,"Choose how you look. Your house colours appear on the trim once you are sorted. You can change this later with /look.","Wybierz, jak wyglądasz. Barwy domu pojawią się na wykończeniach po przydziale. Później zmienisz to komendą /wyglad."
+CREATOR_INTRO,Choose how you look. Your house colours appear on the trim once you are sorted. You can change this later with /look.,"Wybierz, jak wyglądasz. Barwy domu pojawią się na wykończeniach po przydziale. Później zmienisz to komendą /wyglad."
 CREATOR_BODY,Body,Sylwetka
 CREATOR_SKIN,Skin tone,Odcień skóry
 CREATOR_ROBE,Robe colour,Kolor szaty
@@ -574,9 +574,9 @@ JOURNAL_MASTERY_NEXT,(%d to the next rank),(do następnego stopnia: %d)
 JOURNAL_RUNE,rune: %s,runa: %s
 JOURNAL_RECORD_EMPTY,No lessons recorded yet.,Nie zapisano jeszcze żadnych lekcji.
 JOURNAL_RECORD_OFFLINE,The school record is kept in the online school.,Dziennik prowadzi szkoła online.
-JOURNAL_RECORD_LINE,"lessons %d · self-study %d · answers %d of %d right · practicals %d","lekcje %d · nauka własna %d · dobre odpowiedzi %d z %d · ćwiczenia %d"
+JOURNAL_RECORD_LINE,lessons %d · self-study %d · answers %d of %d right · practicals %d,lekcje %d · nauka własna %d · dobre odpowiedzi %d z %d · ćwiczenia %d
 JOURNAL_NO_DISCOVERIES,Nothing discovered yet. The castle keeps its secrets.,Jeszcze nic nie odkryto. Zamek strzeże swoich tajemnic.
-JOURNAL_DISCOVERIES,"Mysteries solved: %d · hidden rooms found: %d","Rozwiązane tajemnice: %d · odnalezione ukryte komnaty: %d"
+JOURNAL_DISCOVERIES,Mysteries solved: %d · hidden rooms found: %d,Rozwiązane tajemnice: %d · odnalezione ukryte komnaty: %d
 JOURNAL_TAB_HOMEWORK,Homework,Prace domowe
 HOMEWORK_NEW,New homework (%s): %s,Nowa praca domowa (%s): %s
 HOMEWORK_NONE,No homework. Enjoy it while it lasts.,Brak prac domowych. Korzystaj póki możesz.
@@ -590,7 +590,7 @@ HOMEWORK_HAND_IN,Hand in,Oddaj
 HOMEWORK_HANDED_IN,Homework handed in.,Praca domowa oddana.
 HOMEWORK_REFUSED,Not handed in (%s).,Nie oddano (%s).
 JOURNAL_HOMEWORK_LINE,"homework %d, average %.1f","prace domowe: %d, średnia %.1f"
-HOMEWORK_TASK_PLACEHOLDER,"The task (e.g. describe two uses of the Uplift charm)","Zadanie (np. opisz dwa zastosowania zaklęcia Uniesienia)"
+HOMEWORK_TASK_PLACEHOLDER,The task (e.g. describe two uses of the Uplift charm),Zadanie (np. opisz dwa zastosowania zaklęcia Uniesienia)
 HOMEWORK_DAYS,Days,Dni
 HOMEWORK_SET,Set homework,Zadaj pracę domową
 HOMEWORK_SET_DONE,Homework set for everyone who attended.,Zadano pracę domową wszystkim obecnym.
@@ -628,12 +628,12 @@ BOOK_SKY_P2,Astronomers use Duskveil to dim the light around them. Three is the 
 BOOK_PAGE,Page %d of %d,Strona %d z %d
 INTERACT_READ_BOOK,Read the book,Przeczytaj księgę
 ROLE_PREFECT_TITLE,Prefect,prefekt
-GUEST_PASS_GRANTED,"%s lets you into the %s rooms for a while.","%s wpuszcza cię na chwilę do pomieszczeń domu %s."
-GUEST_USAGE,"Prefects: /guest name lets a student of another house into your house rooms for ten minutes.","Prefekci: /gosc imię wpuszcza ucznia innego domu do pomieszczeń twojego domu na dziesięć minut."
+GUEST_PASS_GRANTED,%s lets you into the %s rooms for a while.,%s wpuszcza cię na chwilę do pomieszczeń domu %s.
+GUEST_USAGE,Prefects: /guest name lets a student of another house into your house rooms for ten minutes.,Prefekci: /gosc imię wpuszcza ucznia innego domu do pomieszczeń twojego domu na dziesięć minut.
 GUEST_REQUESTED,Guest pass requested.,Wysłano przepustkę.
 DEDUCT_USAGE,"Prefects: /deduct <house 1-4> <points, at most 5> <reason>.","Prefekci: /odejmij <dom 1-4> <punkty, najwyżej 5> <powód>."
 DEDUCT_REQUESTED,Deduction requested.,Wysłano odjęcie punktów.
-HOUSE_CUP_AWARDED,"The house cup goes to %s! The new term's tally starts from zero.","Puchar Domów zdobywa %s! Punktacja nowego semestru zaczyna się od zera."
+HOUSE_CUP_AWARDED,The house cup goes to %s! The new term's tally starts from zero.,Puchar Domów zdobywa %s! Punktacja nowego semestru zaczyna się od zera.
 HOUSE_CUP_HOLDER,House Cup: %s,Puchar Domów: %s
 JOURNAL_TAB_HOUSE,House,Dom
 QUEST_LESSONS,Attend %d lessons together,Wspólnie przyjdźcie na %d lekcji
@@ -641,31 +641,31 @@ QUEST_PRACTICALS,Finish %d practicals,Zaliczcie %d ćwiczeń
 QUEST_QUIZ,Give %d right answers in lessons,Udzielcie %d dobrych odpowiedzi na lekcjach
 QUEST_MYSTERIES,Solve %d mysteries,Rozwiążcie %d tajemnice
 QUEST_NONE,No house quests this week.,W tym tygodniu domy nie mają zadań.
-QUEST_DONE,"%s completed a house quest: %s (+%d points)!","%s wypełnia zadanie domu: %s (+%d punktów)!"
-QUEST_TALLY,"House points: %d · %d · %d · %d","Punkty domów: %d · %d · %d · %d"
+QUEST_DONE,%s completed a house quest: %s (+%d points)!,%s wypełnia zadanie domu: %s (+%d punktów)!
+QUEST_TALLY,House points: %d · %d · %d · %d,Punkty domów: %d · %d · %d · %d
 CHAT_MUTED,You are muted for now.,Masz teraz wyciszony czat.
 CHAT_BLOCKED,%s does not take your messages.,%s nie przyjmuje twoich wiadomości.
 MODERATION_USAGE,"/report name reason · /block name · /unblock name · staff: /mute name [minutes], /kick name · admins: /ban name reason","/zglos_gracza imię powód · /blokuj imię · /odblokuj imię · kadra: /wycisz imię [minuty], /wyrzuc imię · administratorzy: /ban imię powód"
 MODERATION_SENT,Sent.,Wysłano.
-DUEL_CHALLENGED,"%s challenges you to a duel! /accept (/przyjmij) or /decline (/odrzuc).","%s wyzywa cię na pojedynek! /przyjmij albo /odrzuc."
+DUEL_CHALLENGED,%s challenges you to a duel! /accept (/przyjmij) or /decline (/odrzuc).,%s wyzywa cię na pojedynek! /przyjmij albo /odrzuc.
 DUEL_EXPIRED,The duel did not happen.,Pojedynek się nie odbył.
 DUEL_WON_BY,%s wins the duel!,%s wygrywa pojedynek!
 DUEL_BANNER_CHALLENGE,%s challenges %s,%s wyzywa: %s
-DUEL_BANNER_COUNTDOWN,"%s and %s bow… the duel begins","%s i %s kłaniają się… pojedynek się zaczyna"
-DUEL_BANNER_SCORE,"%s %d : %d %s · first to %d","%s %d : %d %s · do %d trafień"
+DUEL_BANNER_COUNTDOWN,%s and %s bow… the duel begins,%s i %s kłaniają się… pojedynek się zaczyna
+DUEL_BANNER_SCORE,%s %d : %d %s · first to %d,%s %d : %d %s · do %d trafień
 DUEL_USAGE,"Duels happen in the duelling hall or the Defence classroom: /duel name, then the other player types /accept.","Pojedynki odbywają się w sali pojedynków albo w klasie obrony: /pojedynek imię, druga osoba wpisuje /przyjmij."
 WARDEN_NAME,The Night Warden,Nocny Strażnik
-WARDEN_CAUGHT,"The warden's lantern finds you. Out of bed after curfew: your house loses points.","Latarnia strażnika cię wyłapuje. Poza łóżkiem po ciszy nocnej: twój dom traci punkty."
+WARDEN_CAUGHT,The warden's lantern finds you. Out of bed after curfew: your house loses points.,Latarnia strażnika cię wyłapuje. Poza łóżkiem po ciszy nocnej: twój dom traci punkty.
 PORTRAIT_GREET,"Ah, %s.","A, %s."
 PORTRAIT_GREET_HOUSE,"Ah, %s of %s.","A, %s z domu %s."
 RUMOUR_HEADER,They say:,Mówi się:
-RUMOUR_SOLVED,"They say someone from %s solved one of the castle's mysteries…","Mówią, że ktoś z domu %s rozwiązał jedną z tajemnic zamku…"
-RUMOUR_QUEST,"They say %s finished this week's house quest.","Mówią, że %s wypełnił tygodniowe zadanie domu."
-RUMOUR_CUP,"They say %s still celebrates the house cup.","Mówią, że %s wciąż świętuje zdobycie pucharu."
-RUMOUR_IDLE_1,"Someone heard knocking behind a bookshelf in the library.","Ktoś słyszał pukanie za regałem w bibliotece."
+RUMOUR_SOLVED,They say someone from %s solved one of the castle's mysteries…,"Mówią, że ktoś z domu %s rozwiązał jedną z tajemnic zamku…"
+RUMOUR_QUEST,They say %s finished this week's house quest.,"Mówią, że %s wypełnił tygodniowe zadanie domu."
+RUMOUR_CUP,They say %s still celebrates the house cup.,"Mówią, że %s wciąż świętuje zdobycie pucharu."
+RUMOUR_IDLE_1,Someone heard knocking behind a bookshelf in the library.,Ktoś słyszał pukanie za regałem w bibliotece.
 RUMOUR_IDLE_2,"The turning stairs never stop at the same landing twice in a row, you know.","Ruchome schody nigdy nie stają dwa razy z rzędu przy tym samym podeście, wiesz?"
-RUMOUR_IDLE_3,"Mind the warden after ten. His lantern sees further than he does.","Uważaj na strażnika po dziesiątej. Jego latarnia widzi dalej niż on."
-RUMOUR_IDLE_4,"The founders' cracked cauldron is still somewhere in the castle.","Pęknięty kociołek założycieli wciąż jest gdzieś w zamku."
+RUMOUR_IDLE_3,Mind the warden after ten. His lantern sees further than he does.,Uważaj na strażnika po dziesiątej. Jego latarnia widzi dalej niż on.
+RUMOUR_IDLE_4,The founders' cracked cauldron is still somewhere in the castle.,Pęknięty kociołek założycieli wciąż jest gdzieś w zamku.
 REQUEST_DONE,Done.,Gotowe.
 REFUSED_GENERIC,Not possible (%s).,Nie da się (%s).
 REFUSED_OFFLINE,"Only online, in the shared castle.","Tylko online, we wspólnym zamku."
@@ -744,3 +744,369 @@ HOUSE_STATS_LINE,"%s: %d points, %d members (%d online). Since the last cup: %s.
 OK_HOUSE_HEAD_SET,Head of house named.,Opiekun domu wyznaczony.
 OK_HOUSE_BOARD_POST,Posted on the house board.,Ogłoszono na tablicy domu.
 OK_RIDDLE_RESET,The riddle waits for them again.,Zagadka znowu na nich czeka.
+INTERACT_TALK_ECHO,Speak to the Echo,Przemów do Echa
+ECHO_WAITING,"The Echo waits, patient as dust. You have not done what it asked yet.","Echo czeka, cierpliwe jak kurz. Jeszcze nie zrobiłeś tego, o co prosiło."
+ECHO_GOAL_MET,Done. %s will want to hear about it.,Zrobione. %s zechce o tym usłyszeć.
+ECHO_ILSA_NAME,"Ilsa Marrow, archivist","Ilsa Marrow, archiwistka"
+ECHO_ILSA_1,I kept these shelves for forty years and lost one book. It was taken to the restricted stacks. Go and see if it is still there.,"Pilnowałam tych półek przez czterdzieści lat i zgubiłam jedną książkę. Zabrano ją do zakazanego działu. Idź sprawdzić, czy wciąż tam jest."
+ECHO_ILSA_2,Gone? Then it went to be rebound and never came back. The bindery is the last place it could be.,"Nie ma jej? Więc poszła do oprawy i nigdy nie wróciła. Introligatornia to ostatnie miejsce, gdzie może być."
+ECHO_ILSA_3,"Empty shelves, then. I suppose some books are meant to be lost, and some archivists meant to stop looking. Thank you for looking with me.","Puste półki. Chyba niektóre książki mają zginąć, a niektóre archiwistki przestać szukać. Dziękuję, że szukałeś ze mną."
+ECHO_ILSA_AFTER,Read something today. Anything. The shelves like being needed.,Przeczytaj dziś coś. Cokolwiek. Półki lubią być potrzebne.
+ECHO_TEODOR_NAME,"Teodor Brann, bell-keeper","Teodor Brann, dzwonnik"
+ECHO_TEODOR_1,The great bell went silent the night I fell asleep at the top of the tower. Climb up and tell me: is the clapper still on its hook?,"Wielki dzwon zamilkł tej nocy, gdy zasnąłem na szczycie wieży. Wejdź na górę i powiedz mi: czy serce dzwonu wciąż wisi na haku?"
+ECHO_TEODOR_2,"On its hook, good. But a bell must be heard at night to be trusted. Go up again after dark and listen.","Na haku, dobrze. Ale dzwon trzeba usłyszeć nocą, żeby mu ufać. Wejdź jeszcze raz po zmroku i posłuchaj."
+ECHO_TEODOR_3,"You heard the hours strike, did you not? Then it was never the bell that stopped. Only me. I can rest now.","Słyszałeś, jak wybijają godziny, prawda? Więc to nigdy nie dzwon przestał. Tylko ja. Teraz mogę odpocząć."
+ECHO_TEODOR_AFTER,"Listen at midnight. Count to twelve. If you count thirteen, come and tell me.","Posłuchaj o północy. Policz do dwunastu. Jeśli doliczysz do trzynastu, przyjdź mi powiedzieć."
+ECHO_WREN_NAME,"Wren Hollow, gardener","Wren Hollow, ogrodniczka"
+ECHO_WREN_1,My glowcaps lit this greenhouse when there were no lamps. Grow one and bring it to me; I would like to see the light again.,"Moje świetliki oświetlały tę cieplarnię, kiedy nie było lamp. Wyhoduj jednego i przynieś mi; chciałabym znów zobaczyć to światło."
+ECHO_WREN_2,"Still green, still glowing. I planted the first ones by the old stone circle. Go and see whether any grew wild.","Wciąż zielony, wciąż świeci. Pierwsze zasadziłam przy starym kamiennym kręgu. Idź zobaczyć, czy któreś zdziczały."
+ECHO_WREN_3,Wild ones by the stones! Then the garden kept growing without me. Take these seeds; plant something that outlives you.,"Dzikie przy kamieniach! Więc ogród rósł dalej beze mnie. Weź te nasiona; posadź coś, co cię przetrwa."
+ECHO_WREN_AFTER,"Water in the morning, never at noon. Plants are like students: they sulk in the heat.","Podlewaj rano, nigdy w południe. Rośliny są jak uczniowie: dąsają się w upale."
+ECHO_ALDOUS_NAME,"Aldous Fenn, boatman","Aldous Fenn, przewoźnik"
+ECHO_ALDOUS_1,I ferried every first-year across this lake for thirty autumns. There is a tunnel under the water that I never dared to walk. Will you?,"Przez trzydzieści jesieni przewoziłem przez jezioro każdego pierwszoroczniaka. Pod wodą jest tunel, którym nigdy nie odważyłem się przejść. Przejdziesz?"
+ECHO_ALDOUS_2,"You walked it! Nobody should cross alone, though. Bring a friend to the landing stage, the way I always made them come in pairs.","Przeszedłeś! Ale nikt nie powinien przeprawiać się sam. Przyprowadź kogoś na pomost, tak jak zawsze kazałem przychodzić parami."
+ECHO_ALDOUS_3,"Two of you on the stage, just like the old days. The lake remembers every crossing. Now it remembers yours.","Was dwoje na pomoście, zupełnie jak dawniej. Jezioro pamięta każdą przeprawę. Teraz pamięta i waszą."
+ECHO_ALDOUS_AFTER,Mind the third plank. It has been loose since I was a boy.,"Uważaj na trzecią deskę. Jest obluzowana, odkąd byłem chłopcem."
+INTERACT_DECORATE,Decorate your corner,Udekoruj swój kąt
+DECOR_TITLE,Your bed corner,Twój kąt przy łóżku
+DECOR_HINT,Tick up to three things to hang over your bed. Everyone who visits the dormitory sees them.,"Zaznacz do trzech rzeczy do powieszenia nad łóżkiem. Zobaczy je każdy, kto odwiedzi dormitorium."
+DECOR_SAVE,Hang them up,Powieś
+DECOR_SAVED,Your corner is decorated.,Twój kąt jest udekorowany.
+DECOR_NONE,You have no decorations yet. Shops in the village sell some; others are earned.,"Nie masz jeszcze ozdób. Część sprzedają sklepy w wiosce, inne trzeba zdobyć."
+DECOR_TOO_MANY,At most %d.,Najwyżej %d.
+OK_DORM_DECORATE,Your corner is decorated.,Twój kąt jest udekorowany.
+WING_ROOM_OPENED,The Unfinished Wing: another door has opened (%d of %d)!,Niedokończone Skrzydło: otworzyły się kolejne drzwi (%d z %d)!
+WING_STATE_LINE,"The Unfinished Wing: %d of %d doors open, the school's progress %d (the next door at %d).","Niedokończone Skrzydło: otwarte drzwi %d z %d, postęp szkoły %d (następne drzwi przy %d)."
+RUMOUR_WING,They say a sealed door in the Unfinished Wing has opened.,"Mówią, że w Niedokończonym Skrzydle otworzyły się zapieczętowane drzwi."
+JOURNAL_WING,The Unfinished Wing,Niedokończone Skrzydło
+OK_CHART_SHARE,Your chart setting is saved.,Ustawienie mapy zapisane.
+CHART_SHARING_ON,House-mates with the chart can see which room you are in.,"Współdomownicy z mapą widzą, w której sali jesteś."
+CHART_SHARING_OFF,Your room stays your own.,Twoja sala pozostaje tylko twoja.
+ITEM_PENNANT_NAME,House Pennant,Proporczyk domu
+ITEM_PENNANT_DESC,"A felt pennant in your house's colours, for the wall over your bed.","Filcowy proporczyk w barwach twojego domu, na ścianę nad łóżkiem."
+ITEM_STAR_CHART_NAME,Star Chart,Mapa nieba
+ITEM_STAR_CHART_DESC,A hand-inked chart of the autumn sky.,Ręcznie wykreślona mapa jesiennego nieba.
+ITEM_BRASS_LANTERN_NAME,Brass Lantern,Mosiężna latarenka
+ITEM_BRASS_LANTERN_DESC,A small lantern that glows warmly by your bed.,"Mała latarenka, która ciepło świeci przy łóżku."
+ITEM_MUSIC_BOX_NAME,Music Box,Pozytywka
+ITEM_MUSIC_BOX_DESC,Plays a tune nobody in the castle can quite name.,"Gra melodię, której nikt w zamku nie potrafi nazwać."
+ITEM_TROPHY_SMALL_NAME,Small Trophy,Mały puchar
+ITEM_TROPHY_SMALL_DESC,Won fairly. Polished by someone in detention.,Zdobyty uczciwie. Wypolerowany przez kogoś na szlabanie.
+ITEM_POTTED_MOONPETAL_NAME,Potted Moonpetal,Księżycówka w doniczce
+ITEM_POTTED_MOONPETAL_DESC,"A moonpetal you grew yourself, potted for your windowsill.","Księżycówka wyhodowana własnoręcznie, w doniczce na parapet."
+ITEM_SEED_GLOWCAP_NAME,Glowcap Spores,Zarodniki świetlika
+ITEM_SEED_GLOWCAP_DESC,Plant in a greenhouse bed. Grows a mushroom that glows in the dark.,Do posadzenia na grządce w cieplarni. Wyrasta z nich świecący grzyb.
+ITEM_SEED_MOONPETAL_NAME,Moonpetal Seeds,Nasiona księżycówki
+ITEM_SEED_MOONPETAL_DESC,A pale flower that opens at night.,"Blady kwiat, który otwiera się nocą."
+ITEM_SEED_WHISPERROOT_NAME,Whisperroot Cuttings,Sadzonki szeptokorzenia
+ITEM_SEED_WHISPERROOT_DESC,A root that murmurs while it grows.,"Korzeń, który mruczy, kiedy rośnie."
+ITEM_SEED_EMBERBLOOM_NAME,Emberbloom Seeds,Nasiona żarzycy
+ITEM_SEED_EMBERBLOOM_DESC,A warm red flower. Keep it away from paper.,Ciepły czerwony kwiat. Trzymać z dala od papieru.
+ITEM_GLOWCAP_NAME,Glowcap,Świetlik
+ITEM_GLOWCAP_DESC,A mushroom with a soft green glow.,Grzyb o miękkim zielonym blasku.
+ITEM_MOONPETAL_NAME,Moonpetal,Księżycówka
+ITEM_MOONPETAL_DESC,"Silver petals, cool to the touch.","Srebrne płatki, chłodne w dotyku."
+ITEM_WHISPERROOT_NAME,Whisperroot,Szeptokorzeń
+ITEM_WHISPERROOT_DESC,Still murmuring.,Wciąż mruczy.
+ITEM_EMBERBLOOM_NAME,Emberbloom,Żarzyca
+ITEM_EMBERBLOOM_DESC,"Warm as a coal, but it does not burn.","Ciepła jak węgielek, ale nie parzy."
+ITEM_CRYSTAL_DUST_NAME,Crystal Dust,Pył kryształowy
+ITEM_CRYSTAL_DUST_DESC,Ground quartz that catches the light.,"Mielony kwarc, który łapie światło."
+ITEM_EMBER_SALT_NAME,Ember Salt,Sól żarowa
+ITEM_EMBER_SALT_DESC,Red salt that crackles in a cauldron.,"Czerwona sól, która trzaska w kociołku."
+ITEM_DEW_VIAL_NAME,Vial of Dew,Fiolka rosy
+ITEM_DEW_VIAL_DESC,Morning dew from the castle lawns.,Poranna rosa z zamkowych trawników.
+ITEM_POTION_GLOW_NAME,Glowing Draught,Wywar świetlisty
+ITEM_POTION_GLOW_DESC,You shine softly for a few minutes. Useful in the dungeons.,Przez kilka minut łagodnie świecisz. Przydatne w lochach.
+ITEM_POTION_FEATHERFALL_NAME,Featherfall Tonic,Tonik piórkowy
+ITEM_POTION_FEATHERFALL_DESC,You fall as gently as a feather.,Spadasz łagodnie jak piórko.
+ITEM_POTION_VOICE_NAME,Squeaking Syrup,Syrop piskliwy
+ITEM_POTION_VOICE_DESC,Your words come out in a tiny high voice.,Twoje słowa wychodzą cieniutkim głosikiem.
+ITEM_POTION_COLOUR_NAME,Robe-Dye Elixir,Eliksir barwiący
+ITEM_POTION_COLOUR_DESC,Your robe changes colour for a while.,Twoja szata na jakiś czas zmienia kolor.
+ITEM_CONFETTI_CHARM_NAME,Confetti Charm,Zaklęte konfetti
+ITEM_CONFETTI_CHARM_DESC,Bursts into harmless sparkling confetti.,"Wybucha nieszkodliwym, iskrzącym konfetti."
+ITEM_CREATURE_TREAT_NAME,Creature Treats,Przysmaki dla stworzeń
+ITEM_CREATURE_TREAT_DESC,Every creature on the grounds likes these.,Każde stworzenie na błoniach je lubi.
+ITEM_FAMILIAR_MOSSLING_NAME,Mossling,Mszak
+ITEM_FAMILIAR_MOSSLING_DESC,A tiny moss sprite that rides on your shoulder.,"Maleńki mszysty duszek, który jeździ na twoim ramieniu."
+ITEM_FAMILIAR_EMBERKIT_NAME,Emberkit,Żarlisek
+ITEM_FAMILIAR_EMBERKIT_DESC,A fox kit with a tail like a banked fire.,Liszek z ogonem jak przygaszone ognisko.
+ITEM_FAMILIAR_GLIMMERWING_NAME,Glimmerwing,Lśniskrzydł
+ITEM_FAMILIAR_GLIMMERWING_DESC,A moth whose wings shed a faint light.,"Ćma, której skrzydła sieją słabe światło."
+ITEM_WAYFINDER_CHART_NAME,Wayfinder's Chart,Mapa Wędrowca
+ITEM_WAYFINDER_CHART_DESC,A map that draws itself as you explore. Hidden rooms stay hidden until you find them.,"Mapa, która sama się rysuje, gdy zwiedzasz. Ukryte komnaty pozostają ukryte, póki ich nie znajdziesz."
+ITEM_GAME_SET_NAME,Star Stones Set,Zestaw Gwiezdnych Kamieni
+ITEM_GAME_SET_DESC,A travelling set of the common-room board game.,Podróżny zestaw gry planszowej z pokoju wspólnego.
+JOURNAL_TAB_CALENDAR,Calendar,Kalendarz
+CALENDAR_EMPTY,Nothing planned yet.,Na razie nic nie zaplanowano.
+CALENDAR_CLUB,Club meeting: %s · %s,Spotkanie klubu: %s · %s
+CALENDAR_MEALS,"Meals in the great hall every school day: breakfast 7:00, lunch 12:00, dinner 18:30 (school time).","Posiłki w wielkiej sali każdego dnia: śniadanie 7:00, obiad 12:00, kolacja 18:30 (czas szkolny)."
+EVENT_REMINDER,In five minutes: %s (%s).,Za pięć minut: %s (%s).
+EVENT_STARTS,Starting now: %s (%s).,Zaczyna się: %s (%s).
+EVENT_ANYWHERE,all over the castle,w całym zamku
+OK_EVENT_SCHEDULE,Event scheduled.,Wydarzenie zaplanowane.
+OK_EVENT_CANCEL,Event cancelled.,Wydarzenie odwołane.
+REFUSED_BAD_KIND,There is no such kind of event.,Nie ma takiego rodzaju wydarzenia.
+REFUSED_UNKNOWN_AREA,There is no such place.,Nie ma takiego miejsca.
+REFUSED_NO_EVENT,There is no such event.,Nie ma takiego wydarzenia.
+FRIENDS_TITLE,Friends,Przyjaciele
+FRIENDS_NAME,A name,Imię
+FRIENDS_ADD,Add friend,Dodaj przyjaciela
+FRIENDS_ACCEPT,Accept,Przyjmij
+FRIENDS_DECLINE,Decline,Odrzuć
+FRIENDS_REMOVE,Remove,Usuń
+FRIENDS_INCOMING,%s wants to be friends.,%s chce się zaprzyjaźnić.
+FRIENDS_OUTGOING,Asked: %s,Zaproszono: %s
+FRIENDS_ONLINE,in the castle,w zamku
+FRIENDS_ONLINE_IN,in the castle: %s,w zamku: %s
+FRIENDS_OFFLINE,away,nieobecny
+FRIENDS_NONE,No friends yet. Look at someone and press Interact to see their card.,"Na razie bez przyjaciół. Spójrz na kogoś i naciśnij Interakcję, by zobaczyć jego kartę."
+FRIEND_ASKED,%s wants to be friends (/friends).,%s chce się zaprzyjaźnić (/przyjaciele).
+OK_FRIEND_ADD,Asked. You are friends once they accept.,"Zaproszono. Zostaniecie przyjaciółmi, gdy przyjmie."
+OK_FRIEND_ACCEPT,You are friends now.,Jesteście teraz przyjaciółmi.
+OK_FRIEND_REMOVE,Done.,Gotowe.
+CLUBS_TITLE,Clubs and societies,Kluby i stowarzyszenia
+CLUBS_NEW_NAME,Name of a new club,Nazwa nowego klubu
+CLUBS_FOUND,Found,Załóż
+CLUBS_MEMBERS,%d members,członków: %d
+CLUBS_JOIN,Join,Dołącz
+CLUBS_LEAVE,Leave,Odejdź
+CLUBS_BOARD,Board,Tablica
+CLUBS_BACK,Back,Wróć
+CLUBS_POST_HINT,Post to the club board (Enter),Wpis na tablicę klubu (Enter)
+CLUBS_MEETING,Meeting %s · %s,Spotkanie %s · %s
+CLUBS_NONE,No clubs yet. Found the first one!,Nie ma jeszcze klubów. Załóż pierwszy!
+CLUB_MEETING_STARTS,%s meets now: %s.,%s ma teraz spotkanie: %s.
+OK_CLUB_CREATE,Your club is founded.,Klub założony.
+OK_CLUB_JOIN,Welcome to the club.,Witaj w klubie.
+OK_CLUB_LEAVE,You left the club.,Odszedłeś z klubu.
+OK_CLUB_POST,Posted.,Opublikowano.
+OK_CLUB_BOOK,Room booked.,Sala zarezerwowana.
+OK_CLUB_CLOSE,The club is closed.,Klub rozwiązany.
+GAME_TITLE,Star Stones,Gwiezdne Kamienie
+GAME_ACCEPT,Play,Graj
+GAME_DECLINE,Not now,Nie teraz
+GAME_RESIGN,Resign,Poddaj się
+GAME_INVITE,Play Star Stones,Zagraj w Gwiezdne Kamienie
+GAME_NONE,No game here. Invite someone in the same room: /game name.,Nikt tu nie gra. Zaproś kogoś w tej samej sali: /gra imię.
+GAME_WAITING,%s invites %s…,%s zaprasza: %s…
+GAME_TURN,%s against %s: %s to play. Four in a line wins.,%s przeciw %s: ruch ma %s. Cztery w linii wygrywają.
+GAME_WON,%s wins!,Wygrywa %s!
+GAME_DRAW,A draw: the frame is full.,Remis: rama jest pełna.
+GAME_INVITED,%s invites you to Star Stones.,%s zaprasza cię do Gwiezdnych Kamieni.
+OK_GAME_INVITE,Invitation sent.,Zaproszenie wysłane.
+OK_GAME_RESIGN,You resigned.,Poddałeś się.
+LADDER_HEADER,The duel ladder:,Drabinka pojedynków:
+LADDER_EMPTY,No ranked duels this season yet.,W tym sezonie nie było jeszcze pojedynków rankingowych.
+LADDER_TITLE_1,Ladder champion,Mistrz drabinki
+LADDER_TITLE_2,Ladder runner-up,Wicemistrz drabinki
+LADDER_TITLE_3,Ladder third place,Trzecie miejsce drabinki
+TITLE_HEAD_OF_1,Head of Drakoryn,Opiekun Drakoryn
+TITLE_HEAD_OF_2,Head of Grypheon,Opiekun Grypheon
+TITLE_HEAD_OF_3,Head of Phoenara,Opiekun Phoenara
+TITLE_HEAD_OF_4,Head of Hipporys,Opiekun Hipporys
+ROLE_STUDENT_TITLE,Student,Uczeń
+INTERACT_PROFILE,See their card,Zobacz kartę
+PROFILE_LOADING,…,…
+PROFILE_UNSORTED,not sorted yet,jeszcze bez domu
+PROFILE_FAVOURITE,Favourite spell: %s,Ulubione zaklęcie: %s
+PROFILE_DISCOVERIES,Discoveries: %d,Odkrycia: %d
+PROFILE_CLUBS,Clubs: %s,Kluby: %s
+PROFILE_GAMES,"Star Stones: %d won, %d drawn, %d lost","Gwiezdne Kamienie: wygrane %d, remisy %d, przegrane %d"
+PROFILE_RATING,Duel rating: %d,Ranking pojedynków: %d
+PROFILE_FAMILIAR,Familiar: %s,Chowaniec: %s
+PROFILE_USAGE,Usage: /profile name,Użycie: /profil imię
+CHASE_USAGE,"Lantern Chase: /chase join a|b, /chase start, /chase leave (on the pitch).","Pościg z Latarnią: /poscig dolacz a|b, /poscig start, /poscig odejdz (na boisku)."
+CHASE_LOBBY,"Lantern Chase: pick a team (/chase join a or b), then /chase start.","Pościg z Latarnią: wybierz drużynę (/poscig dolacz a lub b), potem /poscig start."
+CHASE_HUD,Lantern Chase  %d : %d   %d:%02d,Pościg z Latarnią  %d : %d   %d:%02d
+CHASE_STARTS,Lantern Chase begins! Carry your lit lantern through the far ring.,Pościg z Latarnią się zaczyna! Przenieś zapaloną latarnię przez dalszy krąg.
+CHASE_SCORED,%s scores! %d : %d,%s zdobywa punkt! %d : %d
+CHASE_WON,"Your team wins the Lantern Chase, %d : %d!","Twoja drużyna wygrywa Pościg z Latarnią, %d : %d!"
+CHASE_LOST,"The other team wins the Lantern Chase, %d : %d.","Pościg z Latarnią wygrywa druga drużyna, %d : %d."
+CHASE_DRAW,"The Lantern Chase ends in a draw, %d : %d.","Pościg z Latarnią kończy się remisem, %d : %d."
+CHASE_NOT_YOUR_LANTERN,That is the other team's lantern.,To latarnia drugiej drużyny.
+INTERACT_LANTERN,Take or relight the lantern,Weź lub zapal latarnię
+RUMOUR_CHASE,They say %s won a Lantern Chase match on the pitch.,"Mówią, że %s wygrał mecz Pościgu z Latarnią na boisku."
+OK_CHASE_JOIN,You joined the team.,Dołączyłeś do drużyny.
+OK_CHASE_LEAVE,You left the match.,Opuściłeś mecz.
+OK_CHASE_START,The match starts.,Mecz się zaczyna.
+REFUSED_TEAM_FULL,That team is full.,Ta drużyna jest pełna.
+REFUSED_NOT_PLAYING,You are not playing.,Nie grasz.
+REFUSED_NEED_TWO_TEAMS,Both teams need a player.,Obie drużyny potrzebują gracza.
+REFUSED_ALREADY_CARRIED,Someone carries it already.,Ktoś już ją niesie.
+REFUSED_LANTERN_OUT,It is out: relight it first (fire).,Zgasła: najpierw ją zapal (ogniem).
+REFUSED_TOO_FAR,Too far away.,Za daleko.
+REFUSED_NOT_CARRYING,You do not carry a lit lantern.,Nie niesiesz zapalonej latarni.
+REFUSED_WRONG_SPELL,That spell does not do it.,To zaklęcie tego nie zrobi.
+REFUSED_NOT_THE_CARRIER,They do not carry a lantern.,Ta osoba nie niesie latarni.
+REFUSED_ALREADY_LIT,It is lit already.,Już się pali.
+REFUSED_NOT_HERE,"Not here, not now.","Nie tutaj, nie teraz."
+REFUSED_NO_LICENCE,You need a flying licence first: pass a flying lesson.,Najpierw potrzebujesz licencji lotniczej: zalicz lekcję latania.
+REFUSED_NOT_FLYING_LESSON,Only in the flying classroom or on the pitch.,Tylko w sali latania albo na boisku.
+FLYING_LICENCE_GRANTED,%s passes your flying lesson: you have a licence and a broom.,%s zalicza twoją lekcję latania: masz licencję i miotłę.
+OK_FLYING_LICENCE,Licence granted.,Licencja przyznana.
+OK_FLYING_REVOKE,Licence taken away.,Licencja odebrana.
+REFUSED_UNKNOWN_GUARDIAN,There is no such guardian.,Nie ma takiego strażnika.
+REFUSED_ALREADY_DOWN,It is down already.,Już leży.
+REFUSED_OUT_OF_REACH,Out of reach.,Poza zasięgiem.
+REFUSED_UNKNOWN_SPELL,There is no such spell.,Nie ma takiego zaklęcia.
+REFUSED_SPELL_NOT_KNOWN,You do not know that spell.,Nie znasz tego zaklęcia.
+GUARDIAN_DEFEATED_TOGETHER,The guardian falls. Your house earns points for it.,Strażnik pada. Twój dom zdobywa za to punkty.
+INTERACT_GARDEN_BED,Tend the bed,Zajmij się grządką
+GARDEN_RIPE_LABEL,ripe!,dojrzałe!
+GARDEN_THIRSTY,needs water,trzeba podlać
+GARDEN_NO_SEEDS,You have no seeds. The apothecary in the village sells them.,Nie masz nasion. Sprzedaje je apteka w wiosce.
+GARDEN_DONE,Done.,Zrobione.
+GARDEN_RIPE,Your %s is ripe in the greenhouse.,Twój %s dojrzał w cieplarni.
+REFUSED_PLOT_TAKEN,Something grows there already.,Coś już tam rośnie.
+REFUSED_NOT_A_SEED,That is not a seed.,To nie jest nasiono.
+REFUSED_NOTHING_PLANTED,Nothing is planted there.,Nic tam nie posadzono.
+REFUSED_NEEDS_WATER,Water it first.,Najpierw to podlej.
+REFUSED_NOT_RIPE,It is not ripe yet.,To jeszcze nie dojrzało.
+REFUSED_NOT_YOURS,That is someone else's.,To należy do kogoś innego.
+INTERACT_CAULDRON,Use the cauldron,Użyj kociołka
+CAULDRON_TITLE,Cauldron,Kociołek
+CAULDRON_STIR,Stir,Zamieszaj
+CAULDRON_STIR_N,stir ×%d,mieszanie ×%d
+CAULDRON_HEAT_LOW,Low heat,Mały ogień
+CAULDRON_HEAT_HIGH,High heat,Duży ogień
+CAULDRON_BOTTLE,Bottle,Rozlej
+CAULDRON_EMPTY,Empty,Wylej
+CAULDRON_EMPTY_POT,empty,pusto
+CAULDRON_STEPS,In the cauldron: %s,W kociołku: %s
+CAULDRON_DRINK,Drink: %s,Wypij: %s
+CAULDRON_NO_INGREDIENTS,"No ingredients: grow herbs in the greenhouse, buy the rest at the apothecary.","Brak składników: wyhoduj zioła w cieplarni, resztę kup w aptece."
+CAULDRON_BOOK,Recipe book,Księga receptur
+CAULDRON_WAIT,"wait %d s, bottle","odczekaj %d s, rozlej"
+CAULDRON_SLUDGE,A grey sludge. Not quite.,Szara breja. Nie do końca.
+CAULDRON_BREWED,"%s, quality %d.","%s, jakość %d."
+BREW_REPORT,%s brewed %s (quality %d).,%s uwarzył: %s (jakość %d).
+BREW_REPORT_FAILED,%s brewed a grey sludge.,%s uwarzył szarą breję.
+REFUSED_NOT_AN_INGREDIENT,That does not go into a cauldron.,To nie trafia do kociołka.
+REFUSED_EMPTY_CAULDRON,The cauldron is empty.,Kociołek jest pusty.
+REFUSED_NOT_READY,Not yet: let it settle.,Jeszcze nie: niech się przegryzie.
+REFUSED_NOT_A_POTION,That is not a potion.,To nie jest eliksir.
+OK_POTION_DRINK,You drink it.,Wypijasz.
+INTERACT_CREATURE,Feed or pet,Nakarm lub pogłaszcz
+CREATURE_MOSSLING,the mossling,mszak
+CREATURE_EMBERKIT,the emberkit,żarlisek
+CREATURE_GLIMMERWING,the glimmerwing,lśniskrzydł
+CREATURE_BOND,%s trusts you a little more (%d).,%s ufa ci trochę bardziej (%d).
+CREATURE_BOND_ADOPT,%s would follow you home now (%d): /adopt.,%s poszedłby teraz za tobą (%d): /adoptuj.
+REFUSED_UNKNOWN_CREATURE,There is no such creature here.,Nie ma tu takiego stworzenia.
+REFUSED_TOO_SOON,Give it a minute.,Daj mu chwilę.
+REFUSED_NO_TREATS,You have no treats.,Nie masz przysmaków.
+REFUSED_BOND_TOO_WEAK,It does not trust you enough yet.,Jeszcze nie ufa ci dość.
+OK_CREATURE_ADOPT,It follows you home.,Idzie za tobą do domu.
+OK_FAMILIAR_SET,Your familiar comes along.,Twój chowaniec idzie z tobą.
+INTERACT_SHOP,Browse the shop,Obejrzyj towary
+SHOP_PURSE,Your purse: %d coins,Sakiewka: %d koron
+SHOP_CLOSED,The village is open at weekends.,Wioska jest otwarta w weekendy.
+SHOP_BUY,Buy,Kup
+SHOP_SELL,Sell,Sprzedaj
+SHOP_WE_BUY,We buy %s for %d,Kupimy: %s za %d
+SHOP_BOUGHT,Bought.,Kupione.
+SHOP_SOLD,Sold.,Sprzedane.
+REFUSED_NOT_FOR_SALE,That is not for sale.,To nie jest na sprzedaż.
+REFUSED_WRONG_SHOP,This shop does not deal in that.,Ten sklep tym nie handluje.
+REFUSED_VILLAGE_CLOSED,The village is closed until the weekend.,Wioska jest zamknięta do weekendu.
+REFUSED_ALREADY_OWNED,You have as many as you can carry.,"Masz tyle, ile zdołasz unieść."
+REFUSED_NOT_BOUGHT,They do not buy that.,Tego tu nie kupują.
+LESSON_TAB_ROOM,Room,Sala
+ROOM_QUIET,"Quiet, please",Proszę o ciszę
+ROOM_TALK,You may talk,Można rozmawiać
+ROOM_LOCK,Lock the doors,Zamknij drzwi
+ROOM_UNLOCK,Unlock,Otwórz
+ROOM_BELL,Ring the bell,Zadzwoń dzwonkiem
+ROOM_STUDENT_NAME,A student's name,Imię ucznia
+ROOM_LICENCE,Flying licence,Licencja lotnicza
+ROOM_DETENTION,Detention,Szlaban
+PLAN_SHARE,Share the selected plan with the staff room,Udostępnij wybrany plan pokojowi nauczycielskiemu
+PLAN_SHARE_PICK,Pick one of your own saved plans first.,Najpierw wybierz jeden ze swoich zapisanych planów.
+OK_PLAN_SHARE,Plan shared with the staff room.,Plan udostępniony pokojowi nauczycielskiemu.
+OK_PLAN_APPROVE,Approval changed.,Zatwierdzenie zmienione.
+OK_CLASSROOM_MUTE,Done.,Gotowe.
+OK_CLASSROOM_LOCK,Done.,Gotowe.
+OK_CLASSROOM_BELL,The bell rings.,Dzwonek dzwoni.
+CLASSROOM_QUIET,%s asks for quiet: only whispers now.,%s prosi o ciszę: teraz tylko szeptem.
+CLASSROOM_QUIET_OFF,%s lets the room talk again.,%s pozwala znów rozmawiać.
+CLASSROOM_BELL,%s rings the bell: eyes to the front!,%s dzwoni dzwonkiem: oczy na tablicę!
+REFUSED_ROOM_QUIET,The professor asked for quiet. Whisper (/w) if you must.,"Profesor prosi o ciszę. Jeśli musisz, szepnij (/sz)."
+REFUSED_NO_LESSON,No lesson runs here.,Nie ma tu lekcji.
+REFUSED_NOT_YOUR_LESSON,That is not your lesson.,To nie twoja lekcja.
+REFUSED_BAD_ROLE,There is no such role.,Nie ma takiej roli.
+REFUSED_BAD_YEAR,Years run from 1 to 7.,Lata nauki to od 1 do 7.
+REFUSED_BAD_SLOT,"That timetable slot is not valid (day, start hh:mm, minutes, subject or room).","Ten wpis planu jest niepoprawny (dzień, początek gg:mm, minuty, przedmiot lub sala)."
+REFUSED_NO_PLAN,There is no such plan.,Nie ma takiego planu.
+REFUSED_UNKNOWN_SUBJECT,There is no such subject.,Nie ma takiego przedmiotu.
+REFUSED_NO_SUBJECT,Share the plan from a classroom so it has a subject.,"Udostępnij plan w sali lekcyjnej, żeby miał przedmiot."
+ADMIN_BROADCAST,"%s, to the whole castle: %s","%s, do całego zamku: %s"
+ADMIN_TITLE,Administration,Administracja
+ADMIN_TAB_WHO,Who is here,Kto jest
+ADMIN_TAB_BROADCAST,Broadcast,Ogłoszenie
+ADMIN_TAB_TIMETABLE,Timetable,Plan lekcji
+ADMIN_TAB_REPORTS,Reports,Zgłoszenia
+ADMIN_TAB_CHATLOG,Chat log,Dziennik czatu
+ADMIN_TAB_EVENTS,Events,Wydarzenia
+ADMIN_TAB_PLANS,Shared plans,Wspólne plany
+ADMIN_TAB_WING,The wing,Skrzydło
+ADMIN_HOUSE,house ,dom 
+ADMIN_YEAR,year ,rok 
+ADMIN_SET,Set,Ustaw
+ADMIN_REFRESH,Refresh,Odśwież
+ADMIN_SEND,Send,Wyślij
+ADMIN_BROADCAST_HINT,A message for everyone in the castle,Wiadomość dla wszystkich w zamku
+ADMIN_SLOT_SET,Add or change slot,Dodaj lub zmień wpis
+ADMIN_SLOT_REMOVE,Remove slot (by id),Usuń wpis (po id)
+ADMIN_SLOT_RESET,Back to the file,Przywróć z pliku
+ADMIN_CHATLOG_NAME,A name (empty: everyone),Imię (puste: wszyscy)
+ADMIN_EVENT_ADD,"Schedule (kind: feast, exam, mystery, duelling, ball, match, meeting, other)","Zaplanuj (rodzaj: feast, exam, mystery, duelling, ball, match, meeting, other)"
+ADMIN_APPROVE,Approve for self-study,Zatwierdź do samouczenia
+ADMIN_UNAPPROVE,Withdraw approval,Cofnij zatwierdzenie
+ADMIN_WING_ADD,Add progress to the wing,Dodaj postęp skrzydła
+ADMIN_NOTHING,Nothing here.,Nic tu nie ma.
+OK_ADMIN_SET,Changed.,Zmieniono.
+OK_ADMIN_BROADCAST,Sent to everyone.,Wysłano do wszystkich.
+OK_WING_CONTRIBUTE,Progress added.,Dodano postęp.
+SETTINGS_TITLE,Settings,Ustawienia
+SETTINGS_TAB_GRAPHICS,Graphics,Grafika
+SETTINGS_TAB_ACCESS,Accessibility,Dostępność
+SETTINGS_TAB_KEYS,Keys,Klawisze
+SETTINGS_PRESET,Quality,Jakość
+SETTINGS_PRESET_LOW,Low,Niska
+SETTINGS_PRESET_MEDIUM,Medium,Średnia
+SETTINGS_PRESET_HIGH,High,Wysoka
+SETTINGS_PRESET_ULTRA,Ultra,Najwyższa
+SETTINGS_RENDER_SCALE,Render scale,Skala renderowania
+SETTINGS_FSR,Upscale with FSR,Skalowanie FSR
+SETTINGS_SHADOWS,Shadows,Cienie
+SETTINGS_SSAO,Ambient occlusion,Okluzja otoczenia
+SETTINGS_SSIL,Indirect light,Światło pośrednie
+SETTINGS_GLOW,Glow,Poświata
+SETTINGS_FOG,Fog,Mgła
+SETTINGS_VSYNC,VSync,Synchronizacja pionowa
+SETTINGS_FPS_CAP,FPS limit (0 = none),Limit klatek (0 = brak)
+SETTINGS_UI_SCALE,Interface size,Rozmiar interfejsu
+SETTINGS_REDUCE_MOTION,Reduce motion (no banking or bobbing on the broom),Mniej ruchu (bez przechyłów i kołysania na miotle)
+SETTINGS_HOUSE_SYMBOLS,House symbols beside house colours,Symbole domów obok ich barw
+SETTINGS_CAPTIONS,Captions for sounds,Napisy do dźwięków
+SETTINGS_CLICK_CAST,Casting is a click by default; rune tracing is optional (/runes).,Rzucanie zaklęć to domyślnie kliknięcie; rysowanie run jest opcjonalne (/runy).
+SETTINGS_PRESS_KEY,Press a key…,Naciśnij klawisz…
+CAPTION_BELL,[the bell rings ×%d],[dzwon bije ×%d]
+CAPTION_PAPER_BIRD,[a paper bird rustles in],[szelest papierowego ptaka]
+ACTION_MOVE_FORWARD,Forward,Naprzód
+ACTION_MOVE_BACKWARD,Back,Do tyłu
+ACTION_MOVE_LEFT,Left,W lewo
+ACTION_MOVE_RIGHT,Right,W prawo
+ACTION_JUMP,Jump,Skok
+ACTION_SPRINT,Run,Bieg
+ACTION_INTERACT,Interact,Interakcja
+ACTION_CAST,Cast,Rzuć zaklęcie
+ACTION_MOUNT,Broom,Miotła
+ACTION_JOURNAL,Journal,Dziennik
+ACTION_EMOTE_MENU,Gestures,Gesty
+ACTION_RAISE_HAND,Raise hand,Zgłoś się
+ACTION_CHAT,Chat,Czat
+ACTION_MAP,Map,Mapa
+REFUSED_NOT_FLYING,Fly through the ring on your broom.,Przeleć przez krąg na miotle.

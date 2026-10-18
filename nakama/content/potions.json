@@ -1,0 +1,9 @@
+{
+  "_comment": "Potion recipes (features/potions.lua): steps in order; add = an ingredient (taken from the inventory), stir = that many stirs in a row, heat = low|high; then wait at least `wait` seconds after the last step and bottle. Brewing well (bottled within 15 s of the wait) gives quality 6; later bottling lowers it.",
+  "recipes": {
+    "potion_glow": { "steps": [ { "add": "glowcap" }, { "add": "crystal_dust" }, { "stir": 3 }, { "heat": "high" } ], "wait": 10 },
+    "potion_featherfall": { "steps": [ { "add": "moonpetal" }, { "add": "dew_vial" }, { "stir": 2 }, { "heat": "low" } ], "wait": 8 },
+    "potion_voice": { "steps": [ { "add": "whisperroot" }, { "add": "dew_vial" }, { "stir": 4 }, { "heat": "low" } ], "wait": 6 },
+    "potion_colour": { "steps": [ { "add": "emberbloom" }, { "add": "ember_salt" }, { "add": "crystal_dust" }, { "stir": 3 }, { "heat": "high" } ], "wait": 12 }
+  }
+}

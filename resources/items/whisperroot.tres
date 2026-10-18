@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://itemwhisperroot01"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"whisperroot"
+display_name = "ITEM_WHISPERROOT_NAME"
+description = "ITEM_WHISPERROOT_DESC"
+max_stack = 20
+category = "herb"
+price = 0
+shop = "apothecary"
+sell_price = 3
+effect = ""
+effect_seconds = 0.0

@@ -43,6 +43,7 @@ var ui_input_captured: bool = false:
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_load_settings()
+	GameSettings.load_settings()
 	_apply_command_line_overrides()
 	Localization.apply(language)
 	if display_name.is_empty():

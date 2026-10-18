@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://itemseedglowcap01"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"seed_glowcap"
+display_name = "ITEM_SEED_GLOWCAP_NAME"
+description = "ITEM_SEED_GLOWCAP_DESC"
+max_stack = 20
+category = "seed"
+price = 3
+shop = "apothecary"
+sell_price = 0
+effect = ""
+effect_seconds = 0.0

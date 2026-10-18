@@ -9,6 +9,11 @@ extends Node
 ## Secret areas (kind "secret") stay off the map until this character has
 ## found them: walking in reveals one at once, and online the server records it
 ## in the profile's discoveries as "map:<area id>" so it stays revealed.
+##
+## Online the plain map is the school's plan: halls, corridors, classrooms, the
+## library, stairs, the grounds and your own house's rooms. The Wayfinder's Chart (an
+## item) draws every other place once you have walked into it (the server keeps what
+## each student explored, feature "explored"). Offline every ordinary room is drawn.
 
 ## The level was (re)read: rooms, stairs and terrain may all be new.
 signal rebuilt()
@@ -23,6 +28,9 @@ const MAX_GROUNDS_LABEL_SIZE := 1000.0
 ## Rooms outside the castle (the village's shops, inns, post office, station hall): they
 ## stand on the terrain, so they are drawn with the ground floor whatever their height.
 const OUTSIDE_KINDS := ["shop", "inn", "post_office", "station"]
+## What the school's plan shows without the chart.
+const PLAN_KINDS := ["hall", "corridor", "classroom", "library", "stair_turret", "shaft", "outdoor", "grounds", "bridge", "shop", "inn", "post_office", "station"]
+const CHART_ITEM := "wayfinder_chart"
 
 ## {id, key, kind, house, rect: Rect2 (x, z), lo, hi (storeys, inclusive), secret}
 ## sorted largest first, so nested rooms draw over the ones they sit in.
@@ -40,6 +48,8 @@ var castle_bounds := Rect2()
 var terrain: Terrain
 
 var _revealed: Dictionary = {}
+## Area ids this character has walked into (online, from the server).
+var explored: Dictionary = {}
 
 
 static func storey_of(y: float) -> int:
@@ -51,6 +61,9 @@ func _ready() -> void:
 	GameEvents.area_entered.connect(_on_area_entered)
 	NetworkManager.profile_received.connect(_on_profile)
 	_on_profile(NetworkManager.get_local_profile())
+	NetworkManager.pushed.connect(_on_pushed)
+	NetworkManager.inventory_received.connect(func(_s: Dictionary) -> void: changed.emit())
+	_on_pushed("explored", NetworkManager.feature("explored"))
 
 
 ## Reads the level's Zones, Stairs and Grounds/Terrain (missing parts are skipped).
@@ -102,9 +115,34 @@ func build(level: Node) -> void:
 	rebuilt.emit()
 
 
-## True when the room is drawn: every ordinary room, secrets once found.
+## True when the room is drawn: secrets once found; online the plan's rooms and your
+## house's, and with the chart everything you explored; offline every ordinary room.
 func is_known(room: Dictionary) -> bool:
-	return not room["secret"] or _revealed.has(room["id"])
+	if room["secret"]:
+		return _revealed.has(room["id"])
+	if not NetworkManager.is_in_world():
+		return true
+	if PLAN_KINDS.has(room["kind"]) or (int(room["house"]) > 0 and int(room["house"]) == NetworkManager.get_local_house()):
+		return true
+	return has_chart() and explored.has(room["id"])
+
+
+## Whether the local character carries the Wayfinder's Chart.
+static func has_chart() -> bool:
+	var inv: Variant = NetworkManager.get_local_inventory().get("items", [])
+	return inv is Array and (inv as Array).any(func(e: Variant) -> bool: return e is Dictionary and str(e.get("id", "")) == CHART_ITEM)
+
+
+func _on_pushed(kind: String, data: Dictionary) -> void:
+	if kind == "explored":
+		explored.clear()
+		var list: Variant = data.get("areas", [])
+		for a: Variant in (list if list is Array else []):
+			explored[str(a)] = true
+		changed.emit()
+	elif kind == "explored_new":
+		explored[str(data.get("area", ""))] = true
+		changed.emit()
 
 
 func is_revealed(area_id: String) -> bool:

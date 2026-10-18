@@ -92,4 +92,8 @@ static func result_text(reason: String, payload: Dictionary = {}) -> String:
 			return TranslationServer.translate("CHAT_MUTED")
 		"blocked":
 			return TranslationServer.translate("CHAT_BLOCKED") % str(payload.get("to_name", ""))
+	# Refusals from the server's feature modules (a quieted classroom…) have their own lines.
+	var key := "REFUSED_" + reason.to_upper()
+	if TranslationServer.translate(key) != key:
+		return TranslationServer.translate(key)
 	return TranslationServer.translate("CHAT_REFUSED") % reason

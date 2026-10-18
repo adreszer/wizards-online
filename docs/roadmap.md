@@ -110,7 +110,7 @@ Goal: attending a lesson is fun, and progress over weeks is visible.
 
 1. **House crests and banners** (S–M ★★★). Crests for Drakoryn, Grypheon, Phoenara, Hipporys on doors, banners, robes, common rooms and the menu. Already in `plan.md`.
 2. **Common rooms that feel like home** (M ★★★). *Entry ritual built (Milestone 57): the riddle of the week on each house door; per-room decor waits for art.* Each one with its own style, fireplace, armchairs, notice board, trophy shelf. Unique entry rituals (a riddle of the week on the door, a gesture, a spell) instead of a plain door.
-3. **Dormitories and personal space** (M ★★). A bed and trunk per player in the house dormitory; decorate it with earned items (pennants, trophies from mysteries, plants grown in Herb Lore). Visiting a friend's bed corner is a social activity.
+3. ~~**Dormitories and personal space**~~ (built: Milestone 58, a bed per member, name plates, owned decorations). (M ★★). A bed and trunk per player in the house dormitory; decorate it with earned items (pennants, trophies from mysteries, plants grown in Herb Lore). Visiting a friend's bed corner is a social activity.
 4. ~~**The house tally monument**~~ (built: *House Columns*, `HouseTally`). An original in-world equivalent of the points display in the great hall: four crystal columns that fill with light in house colours, updated live from the ledger, with a small burst when points change.
 5. **House cup and term ceremony** (M ★★★). *Built (Milestone 50): awarded each term, shown in the great hall, brighter trim for the holders; the staged ceremony is still open.* At term end the great hall changes decor to the winning house's colours, the cup is awarded on stage, the winning house gets a cosmetic for next term.
 6. **Prefects and heads of house** (M ★★). *Built: prefects (Milestone 49), heads of house with house numbers and the house board (Milestone 57).* New roles between student and professor: prefects can deduct small amounts of points, lead first-years, patrol at night, and open their house's door for guests; a head of house (professor) sees house-wide stats and posts to the house board.
@@ -120,40 +120,40 @@ Goal: attending a lesson is fun, and progress over weeks is visible.
 
 1. **Moving and shifting castle** (M ★★★). Some staircases rotate on a schedule, some corridors swap at night, a door that only appears on certain days. Server-owned state, so everyone sees the same castle. The generator's stair and door data make this cheap to author.
 2. **Talking portraits** (M ★★★). *Built (Milestone 55): greetings by name and house, rumours from real events; messengers and mystery hints still open.* Painted NPCs on walls who greet you by name, comment on your house, hint at mysteries, gossip about other players' achievements ("a Phoenara student found the loft yesterday…"), and act as messengers between portraits.
-3. **The *Echoes*** (M ★★). Translucent memories of former students and staff, each tied to a part of the castle, with a short questline and lore. Original replacement for the classic ghost residents.
+3. ~~**The *Echoes***~~ (built: Milestone 58, four Echoes with three-part stories). (M ★★). Translucent memories of former students and staff, each tied to a part of the castle, with a short questline and lore. Original replacement for the classic ghost residents.
 4. **Curfew and the night warden** (M ★★★). *Built (Milestone 54): a warden on a shared-time patrol, caught students cost their house points once a night; detention tasks and richer stealth still open.* After curfew students outside their common room risk being caught by an NPC warden with a lantern familiar that patrols corridors (stealth: light, noise, line of sight). Caught → small point loss and a detention task. Some mysteries can only be done after curfew, which creates the best kind of risk.
 5. ~~**Detention tasks**~~ (built: Milestone 56, chores in a room, secrets in the trophy room and kitchens). (S–M ★★). Minigames assigned by professors, prefects or the warden: polish trophies, re-shelve the library, sort ingredients, scrub cauldrons. Sometimes detention leads to a secret (the trophy room has a hidden switch).
-6. **A self-filling map** (M ★★). An enchanted map item (*Wayfinder's Chart*, placeholder) that draws the castle as you explore, marks discoveries, and can show house-mates' locations if they share. Hidden rooms stay hidden on it until found. *Started (plan M33): a castle map and minimap read from the generated level; hidden rooms already stay off it until found. Still open: the chart as an item, drawing only what you explored, house-mates.*
+6. ~~**A self-filling map**~~ (built: Milestone 58, the Wayfinder's Chart draws what you explored, shared house-mates). (M ★★). An enchanted map item (*Wayfinder's Chart*, placeholder) that draws the castle as you explore, marks discoveries, and can show house-mates' locations if they share. Hidden rooms stay hidden on it until found. *Started (plan M33): a castle map and minimap read from the generated level; hidden rooms already stay off it until found. Still open: the chart as an item, drawing only what you explored, house-mates.*
 7. **Mystery chains per year** (L ★★★). Each school year has a story mystery spread across the castle, solved over a term (clues in books, portraits, Echoes, lessons). First-years cannot reach some parts; later years can. This is the long-term content engine; the mystery step engine already supports it.
-8. **The *Unfinished Wing*** (L ★★★). A sealed part of the castle that the whole server opens room by room through community goals (points earned, mysteries solved). New content gets released as "the next room has opened", and every player shares the moment.
+8. ~~**The *Unfinished Wing***~~ (built: Milestone 58, doors open one by one on the school's shared progress). (L ★★★). A sealed part of the castle that the whole server opens room by room through community goals (points earned, mysteries solved). New content gets released as "the next room has opened", and every player shares the moment.
 9. **Seasons and holidays** (M ★★). The grounds change over the year (autumn leaves, snow, spring blossom); holiday decorations in the great hall; a winter ball event; end-of-year farewell.
 10. ~~**Rumour board**~~ (built: Milestone 55, rumours from server events on the notice boards and in portraits). (S ★). A notice board where anonymous rumours appear (authored by the owner or generated from server events): "Someone heard knocking behind the third bookshelf." Directs players toward secrets without spoiling them.
 
 ### Term E: "My people are here" (social)
 
-1. **Friends, DMs as paper birds, offline mail** (M ★★). DMs fly to the recipient as a folded paper bird in the world (and land in the journal's inbox when they are offline).
-2. **Emotes wheel and expressions** (S ★★). Ties to Term A animations.
-3. **Clubs and societies** (M ★★). Player-created clubs with a board, a badge and a bookable room (astronomy club on the tower at night, a gardening society in the greenhouse, a chess-like game club).
-4. **Board and parlour games** (M ★★). An original wizard board game playable at common-room tables; animated cards; a game with enchanted pieces. Great low-population content: two players are enough.
-5. **Events calendar** (S ★★). In the journal: lessons, feasts, club meetings, duels, community mysteries, with reminders.
-6. **Player profiles** (S ★). Click a nameplate: house, year, titles, favourite spell, discoveries count, club badges.
+1. ~~**Friends, DMs as paper birds, offline mail**~~ (built: Milestones 39 and 59). (M ★★). DMs fly to the recipient as a folded paper bird in the world (and land in the journal's inbox when they are offline).
+2. ~~**Emotes wheel and expressions**~~ (built: Milestone 40, the gesture menu on G). (S ★★). Ties to Term A animations.
+3. ~~**Clubs and societies**~~ (built: Milestone 59). (M ★★). Player-created clubs with a board, a badge and a bookable room (astronomy club on the tower at night, a gardening society in the greenhouse, a chess-like game club).
+4. ~~**Board and parlour games**~~ (built: Milestone 59, Star Stones). (M ★★). An original wizard board game playable at common-room tables; animated cards; a game with enchanted pieces. Great low-population content: two players are enough.
+5. ~~**Events calendar**~~ (built: Milestone 59). (S ★★). In the journal: lessons, feasts, club meetings, duels, community mysteries, with reminders.
+6. ~~**Player profiles**~~ (built: Milestone 59). (S ★). Click a nameplate: house, year, titles, favourite spell, discoveries count, club badges.
 
 ### Term F: "Sanctioned combat and sport" (duels, flying)
 
 1. **Duelling club** (L ★★★). *Built (Milestone 53): consent-based duels in the duelling rooms, server-validated hits, first to three; professor-run club modes still open.* A duelling hall with a stage and an audience. A professor (or a prefect, later) runs a duel: both players accept, bow, a countdown, then spells hit each other only inside the arena volume. Server validates targets and damage; health is a separate duel meter so nothing persists. Rules sets: first to three hits, disarm only, shields allowed. Spectators cheer with emotes; house points stay professor-awarded, never wagered.
-2. **Duel ladder** (M ★★). Ranked duels during scheduled club hours; season rewards are cosmetic.
-3. **Flying lessons for real** (L ★★★). The broom and the flight mode exist (Milestone 13b: racks and a dev cheat hand them out, flying is outdoors only). Next: the Flying professor grants brooms in lessons instead of open racks, flight rules per area checked server-side, a modelled broom (the riding pose is procedural for now).
-4. **An original flying sport** (L ★★★). Design proposal, *Lantern Chase* (placeholder): two teams of four fly around the grounds; one lit lantern per team must be carried through the opponents' rings; defenders try to snuff it with Galewind or Wellspring, carriers relight with Emberkindle. Uses existing spells, rewards teamwork, and is clearly our own. Inter-house matches feed the house cup.
-5. **Shared enemies** (L ★★). Already planned (Milestone 17): server-authoritative guardians in the dungeons, co-op for groups, curfew-only spawns.
+2. ~~**Duel ladder**~~ (built: Milestone 59). (M ★★). Ranked duels during scheduled club hours; season rewards are cosmetic.
+3. **Flying lessons for real** (L ★★★). *Built (Milestone 60): licences from a professor, racks and the workshop need one, server-checked flight areas; a modelled broom waits for art.* The broom and the flight mode exist (Milestone 13b: racks and a dev cheat hand them out, flying is outdoors only). Next: the Flying professor grants brooms in lessons instead of open racks, flight rules per area checked server-side, a modelled broom (the riding pose is procedural for now).
+4. ~~**An original flying sport**~~ (built: Milestone 60, Lantern Chase). (L ★★★). Design proposal, *Lantern Chase* (placeholder): two teams of four fly around the grounds; one lit lantern per team must be carried through the opponents' rings; defenders try to snuff it with Galewind or Wellspring, carriers relight with Emberkindle. Uses existing spells, rewards teamwork, and is clearly our own. Inter-house matches feed the house cup.
+5. **Shared enemies** (L ★★). *Built (Milestone 60): shared health, deaths, respawns and rewards, curfew-only guardian; positions are still each client's own.* Already planned (Milestone 17): server-authoritative guardians in the dungeons, co-op for groups, curfew-only spawns.
 
 ### Term G: "Beyond the walls" (grounds and the wider world)
 
 1. **The grounds properly** (L ★★★). A lake with a water shader, a forest edge (forbidden at night, original name), the greenhouse in glass, the beast paddock with creatures, a stone circle, a boathouse, a clock tower. The castle silhouette visible from outside with lit windows. Planned as generated grounds in `docs/castle-generation.md` (Milestones 26–27).
-2. **Herbology gardening** (M ★★). Plant, water, grow and harvest magical plants in the greenhouse (Quicksprout helps). Plants are ingredients for Potions.
-3. **Potion brewing** (M ★★★). A cauldron minigame (order, stirring, heat, timing). Brewed potions are consumables (glow-in-dark, featherfall, voice-change, colour-change robes for an hour). Professors can grade the results.
-4. **Care of Magical Creatures and familiars** (L ★★★). Original creatures to care for in lessons; later a personal familiar that follows you, sits on your shoulder, sleeps on your dorm bed. Huge for attachment.
-5. **The village weekend** (L ★★). An original nearby village reachable on scheduled weekends: shops for cosmetics, a tea house to meet, a post office for paper birds. Needs an economy (below). The village itself is built (Milestone 36: high street, square, nine shops, an inn, a tea house, the post office, all walk-in areas with stable ids) together with the railway station where new players will arrive; next come the shop logic, the weekend schedule and the arrival flow.
-6. **Economy (careful)** (M ★). A small currency earned by attendance, homework and events, spent on cosmetics and decoration. No buying spells or points. The currency exists (Milestone 37: server wallet with a ledger, paid for attending lessons and first mystery solves, daily cap, admin grants); next: something to buy in the village shops, homework and event rewards.
+2. ~~**Herbology gardening**~~ (built: Milestone 61). (M ★★). Plant, water, grow and harvest magical plants in the greenhouse (Quicksprout helps). Plants are ingredients for Potions.
+3. ~~**Potion brewing**~~ (built: Milestone 61). (M ★★★). A cauldron minigame (order, stirring, heat, timing). Brewed potions are consumables (glow-in-dark, featherfall, voice-change, colour-change robes for an hour). Professors can grade the results.
+4. **Care of Magical Creatures and familiars** (L ★★★). *Built (Milestone 61): paddock creatures, bonds, adoptable familiars that walk with you; creature models wait for art.* Original creatures to care for in lessons; later a personal familiar that follows you, sits on your shoulder, sleeps on your dorm bed. Huge for attachment.
+5. **The village weekend** (L ★★). *Shops built (Milestone 61), open at weekends by the rules; the arrival flow is still open.* An original nearby village reachable on scheduled weekends: shops for cosmetics, a tea house to meet, a post office for paper birds. Needs an economy (below). The village itself is built (Milestone 36: high street, square, nine shops, an inn, a tea house, the post office, all walk-in areas with stable ids) together with the railway station where new players will arrive; next come the shop logic, the weekend schedule and the arrival flow.
+6. ~~**Economy (careful)**~~ (built: Milestones 37 and 61; spending in the shops, no buying spells or points). (M ★). A small currency earned by attendance, homework and events, spent on cosmetics and decoration. No buying spells or points. The currency exists (Milestone 37: server wallet with a ledger, paid for attending lessons and first mystery solves, daily cap, admin grants); next: something to buy in the village shops, homework and event rewards.
 
 ---
 
@@ -198,7 +198,7 @@ Ordered by "biggest change on screen per day of work".
 ### 5.6 Post-processing and rendering
 
 - Tonemapper (AgX or ACES), SSAO, SSIL, glow tuned for candles, subtle chromatic aberration and vignette off by default, depth of field in photo mode and dialogues. (S ★★)
-- **Graphics settings menu** with presets (low/medium/high/ultra), render scale, FSR, shadows, GI, fog, VSync and FPS cap. Needed before anyone with a laptop plays. (M ★★★)
+- ~~**Graphics settings menu**~~ (built: Milestone 63) with presets (low/medium/high/ultra), render scale, FSR, shadows, GI, fog, VSync and FPS cap. Needed before anyone with a laptop plays. (M ★★★)
 - LODs on generated props, HLOD per wing, occlusion already in place; a perf budget per area (e.g. 60 fps on a mid laptop at medium). (M ★★)
 
 ### 5.7 UI art direction
@@ -219,12 +219,12 @@ Ordered by "biggest change on screen per day of work".
 
 Professors are the scarcest resource; every minute a professor spends fighting the UI is a lesson that does not happen.
 
-- **In-game lesson panel 2.0** (M ★★★): roster with raised hands, attendance, quick point buttons with reasons, board text, quiz launcher, practical task launcher, spell grant to "everyone who completed the task".
-- **Lesson plan editor in game** (M ★★): write and reorder lines, quizzes and tasks; share a plan with other professors; mark a plan as approved for self-study.
-- **Classroom controls** (S ★★): mute room chat except the professor, seat students, lock the door during exams, summon latecomers' attention (a bell).
-- **Professor demonstrations** (S ★★): cast a spell with a larger, slower, highlighted effect for teaching.
-- **In-game admin UI** (M ★★★): set roles and houses, reset mysteries, schedule events, edit timetable, broadcast to the castle, see who is online and where. Replaces `tools/set_role.sh` for day-to-day use (already in `plan.md`).
-- **Event scheduler** (M ★★): feasts, exams, community mysteries, duelling hours as data with start times; server runs them.
+- ~~**In-game lesson panel 2.0**~~ (built: Milestones 40–41, 46, 62) (M ★★★): roster with raised hands, attendance, quick point buttons with reasons, board text, quiz launcher, practical task launcher, spell grant to "everyone who completed the task".
+- **Lesson plan editor in game** (M ★★; *sharing and self-study approval built in Milestone 62*): write and reorder lines, quizzes and tasks; share a plan with other professors; mark a plan as approved for self-study.
+- ~~**Classroom controls**~~ (built: Milestone 62) (S ★★): mute room chat except the professor, seat students, lock the door during exams, summon latecomers' attention (a bell).
+- ~~**Professor demonstrations**~~ (built: Milestone 62) (S ★★): cast a spell with a larger, slower, highlighted effect for teaching.
+- ~~**In-game admin UI**~~ (built: Milestone 62) (M ★★★): set roles and houses, reset mysteries, schedule events, edit timetable, broadcast to the castle, see who is online and where. Replaces `tools/set_role.sh` for day-to-day use (already in `plan.md`).
+- ~~**Event scheduler**~~ (built: Milestone 59) (M ★★): feasts, exams, community mysteries, duelling hours as data with start times; server runs them.
 
 ---
 
@@ -232,14 +232,14 @@ Professors are the scarcest resource; every minute a professor spends fighting t
 
 Required before opening to the public:
 
-- **Moderation** (M, required; *built in Milestone 52 except retained chat logs and an admin report view*): word filter (PL + EN), report player, mute/kick/ban for admins and professors, chat logs retained for a limited time, block list for DMs, age-appropriate defaults. Young players are the natural audience of this genre, so this is not optional.
+- **Moderation** (M, required; *built in Milestones 52 and 62–63, chat logs kept seven days and an admin report view included*): word filter (PL + EN), report player, mute/kick/ban for admins and professors, chat logs retained for a limited time, block list for DMs, age-appropriate defaults. Young players are the natural audience of this genre, so this is not optional.
 - **Account and identity** (M): device auth today; add Steam auth when GodotSteam lands, account recovery, display-name rules.
-- **Persistence of world state** across restarts (already in `plan.md`) and backups of Nakama storage.
-- **Server-side position sanity** for area reports (already in `plan.md`) so lesson and house logic cannot be spoofed.
+- **Persistence of world state** across restarts (*world objects built in Milestone 63*; mystery progress of world mysteries still in memory) and backups of Nakama storage.
+- ~~**Server-side position sanity**~~ (built: Milestone 63) for area reports (already in `plan.md`) so lesson and house logic cannot be spoofed.
 - **CI** running `tools/check.sh` and `tools/check_build.sh` on every push.
-- **Analytics (privacy-respecting)**: which areas people visit, where they get lost, which mysteries stall, lesson attendance. Guides content work.
+- **Analytics (privacy-respecting)** (*daily anonymous counts built in Milestone 63*): which areas people visit, where they get lost, which mysteries stall, lesson attendance. Guides content work.
 - **Steam**: store page, achievements tied to discoveries and ceremonies (not grind), rich presence ("In the Potions classroom"), PL + EN.
-- **Accessibility**: rebindable keys, subtitles for all audio cues, colour-blind safe house colours (crests and patterns, not colour alone), text size, motion reduction (camera bob, fog), click-casting alternative to gestures.
+- **Accessibility** (*built in Milestone 63: rebindable keys, interface size, reduced motion, house symbols, captions*): rebindable keys, subtitles for all audio cues, colour-blind safe house colours (crests and patterns, not colour alone), text size, motion reduction (camera bob, fog), click-casting alternative to gestures.
 
 ---
 

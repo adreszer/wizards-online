@@ -67,6 +67,8 @@ func ring(ev: Dictionary) -> void:
 			text = tr("TIMETABLE_STARTS_NOW") % [title, room]
 		_:
 			text = tr("TIMETABLE_ENDED") % title
+	if GameSettings.get_value("captions"):
+		text = tr("CAPTION_BELL") % int(STROKES.get(str(ev.event), 1)) + " " + text
 	GameEvents.notification_requested.emit(text, 6.0)
 	GameEvents.school_bell_rang.emit(str(ev.event), entry)
 	_strike(int(STROKES.get(str(ev.event), 1)))

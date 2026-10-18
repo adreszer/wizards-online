@@ -201,7 +201,8 @@ func _on_spell_cast(sid: String, cast: Dictionary) -> void:
 	if definition == null:
 		return
 	player.synchronizer.receive_spell_cast(definition,
-		NetworkProtocol.array_to_vec3(cast.get("o")), NetworkProtocol.array_to_vec3(cast.get("d")), clampi(int(cast.get("l", 0)), 0, SpellMastery.THRESHOLDS.size() - 1))
+		NetworkProtocol.array_to_vec3(cast.get("o")), NetworkProtocol.array_to_vec3(cast.get("d")), clampi(int(cast.get("l", 0)), 0, SpellMastery.THRESHOLDS.size() - 1),
+		cast.get("x", false) == true)
 
 
 func _on_held_item(sid: String, item_id: String) -> void:

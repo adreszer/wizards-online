@@ -1,0 +1,24 @@
+{
+  "echoes": {
+    "ilsa": { "area": "library", "steps": [
+      { "line": "ECHO_ILSA_1", "goal": { "visit": "restricted_stacks" } },
+      { "line": "ECHO_ILSA_2", "goal": { "visit": "bindery" } },
+      { "line": "ECHO_ILSA_3" } ],
+      "reward": { "coins": 20, "discovery": "echo_ilsa" } },
+    "teodor": { "area": "clock_tower_0", "steps": [
+      { "line": "ECHO_TEODOR_1", "goal": { "visit": "clock_tower_5" } },
+      { "line": "ECHO_TEODOR_2", "goal": { "night_visit": "clock_tower_5" } },
+      { "line": "ECHO_TEODOR_3" } ],
+      "reward": { "coins": 20, "discovery": "echo_teodor" } },
+    "wren": { "area": "greenhouse", "steps": [
+      { "line": "ECHO_WREN_1", "goal": { "item": "glowcap" } },
+      { "line": "ECHO_WREN_2", "goal": { "visit": "stone_circle" } },
+      { "line": "ECHO_WREN_3" } ],
+      "reward": { "coins": 25, "discovery": "echo_wren", "item": "seed_moonpetal" } },
+    "aldous": { "area": "boathouse", "steps": [
+      { "line": "ECHO_ALDOUS_1", "goal": { "visit": "lake_tunnel" } },
+      { "line": "ECHO_ALDOUS_2", "goal": { "together": "landing_stage" } },
+      { "line": "ECHO_ALDOUS_3" } ],
+      "reward": { "coins": 25, "discovery": "echo_aldous" } }
+  }
+}

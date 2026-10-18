@@ -11,4 +11,7 @@ description = "ITEM_BROOM_DESC"
 max_stack = 1
 holdable = false
 burn_seconds = 0.0
+category = "tool"
+price = 60
+shop = "broom_workshop"
 mount_scene = ExtResource("2")

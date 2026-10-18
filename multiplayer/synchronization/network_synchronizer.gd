@@ -94,6 +94,7 @@ func _on_local_spell_cast(definition: SpellDefinition, origin: Vector3, directio
 		"o": [origin.x, origin.y, origin.z],
 		"d": [direction.x, direction.y, direction.z],
 		"l": (player.spell_caster as SpellCaster).mastery_level(definition),
+		"x": (player.spell_caster as SpellCaster).demonstrating,
 	})
 
 
@@ -166,9 +167,9 @@ func receive_state(state: Dictionary) -> void:
 	gestures.set_remote(StringName(str(state.get("e", ""))), clampf(float(state.get("h", 0.0)), 0.0, 1.5))
 
 
-func receive_spell_cast(definition: SpellDefinition, origin: Vector3, direction: Vector3, level: int = 0) -> void:
+func receive_spell_cast(definition: SpellDefinition, origin: Vector3, direction: Vector3, level: int = 0, demo: bool = false) -> void:
 	var caster: SpellCaster = player.spell_caster
-	caster.cast_remote(definition, origin, direction, level)
+	caster.cast_remote(definition, origin, direction, level, demo)
 
 
 func receive_held_item(item_id: String) -> void:

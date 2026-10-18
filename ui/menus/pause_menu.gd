@@ -15,6 +15,14 @@ func _ready() -> void:
 	_resume.pressed.connect(_toggle)
 	_menu.pressed.connect(func() -> void: _set_paused(false); return_to_menu_requested.emit())
 	_quit.pressed.connect(get_tree().quit)
+	var settings := Button.new()
+	settings.name = "SettingsButton"
+	settings.text = tr("SETTINGS_TITLE")
+	settings.pressed.connect(func() -> void:
+		_set_paused(false)
+		GameEvents.panel_requested.emit("settings", {}))
+	_quit.get_parent().add_child(settings)
+	_quit.get_parent().move_child(settings, _quit.get_index())
 
 
 func _unhandled_input(event: InputEvent) -> void:

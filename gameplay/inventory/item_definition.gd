@@ -25,6 +25,17 @@ extends Resource
 ## makes the item a mount: the satchel and the Mount action fly on it instead
 ## of taking it in hand (see BroomRider).
 @export var mount_scene: PackedScene
+## What kind of thing it is: "tool", "decor" (hangs over a dormitory bed), "seed",
+## "herb", "ingredient", "potion" (drunk for an effect), "treat", "familiar", "map".
+@export var category: String = "tool"
+## Price in coins at a village shop (0 = not sold) and which shop's area sells it.
+@export var price: int = 0
+@export var shop: String = ""
+## Coins a shop pays for one (herbs at the apothecary; 0 = not bought).
+@export var sell_price: int = 0
+## Potions: the effect drinking one gives and for how long.
+@export var effect: String = ""
+@export var effect_seconds: float = 0.0
 
 
 func is_stackable() -> bool:

@@ -72,7 +72,8 @@ static func house_name_key(house: int) -> String:
 
 static func house_name(house: int) -> String:
 	var key := house_name_key(house)
-	return TranslationServer.translate(key) if not key.is_empty() else ""
+	# Accessibility: a symbol beside the name, so houses never rely on colour alone.
+	return GameSettings.house_label(house, TranslationServer.translate(key)) if not key.is_empty() else ""
 
 
 static func house_color(house: int) -> Color:

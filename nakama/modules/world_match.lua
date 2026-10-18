@@ -46,6 +46,9 @@ local Moderation = require("moderation")
 local Duel = require("duel")
 local WARDEN = require("generated.warden")
 local Features = require("features")
+local Plans = require("features.plans")
+local Store = require("store")
+local WORLD_OBJECTS = require("generated.world_objects")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -83,6 +86,10 @@ local TICK_RATE = 15
 -- Bytes, not characters: the client caps names at 16 characters, which with
 -- UTF-8 diacritics (Polish etc.) can take more bytes.
 local MAX_NAME_BYTES = 48
+-- Area reports are checked against the player's position (metres beyond the zone box).
+local POSITION_SLACK, PENDING_AREA_SECONDS = 3.0, 4.0
+-- World objects are written to storage at most this often after a change.
+local WORLD_SAVE_SECONDS = 10
 
 local M = {}
 
@@ -613,7 +620,8 @@ local function open_self_study(dispatcher, state, o, now)
   state.lessons[o.area] = lesson
   state.held_slots[o.id .. "@" .. o.t0] = true
   local plan = state.self_study.plans[o.subject]
-  SelfStudy.start(lesson, o.exam and SelfStudy.exam_plan(plan) or plan, now)
+  -- A lesson plan an admin approved for this subject is read first (features/plans.lua).
+  SelfStudy.start(lesson, o.exam and SelfStudy.exam_plan(plan) or Plans.with_approved(plan, o.subject), now)
   nk.logger_info(string.format("self-study: %s in %s (slot %s)", o.subject, o.area, o.id))
   send_lessons(dispatcher, state, nil)
 end
@@ -823,6 +831,68 @@ local function feed_mysteries(dispatcher, state, sid, ev)
   run_actions(dispatcher, state, Mysteries.on_event(state.engine, state.mysteries, ev, ctx))
 end
 
+-- World objects outlive a server restart: their states (but not torches, which relight
+-- on timers) are written to storage when they changed, at most every WORLD_SAVE_SECONDS.
+local function lasting_objects(objects)
+  local out = {}
+  for oid, s in pairs(objects) do
+    local def = WORLD_OBJECTS[oid]
+    if def and def.kind ~= "wall_torch" then out[oid] = s end
+  end
+  return out
+end
+
+local function save_world(state, now)
+  if now - (state.world_saved_at or 0) < WORLD_SAVE_SECONDS then return end
+  state.world_saved_at = now
+  local value = { objects = lasting_objects(state.world.objects) }
+  local encoded = nk.json_encode(value)
+  if encoded ~= state.world_saved then
+    state.world_saved = encoded
+    Store.write("world", "objects", nil, value)
+  end
+end
+
+-- Built further down (it needs every helper); declared here for set_area.
+local feature_api
+
+-- Whether `sid`'s last reported position lies in (or within POSITION_SLACK of) `area`'s
+-- zone box (world_areas.lua c/s). No position yet, no box, or no area: nothing to check.
+local function position_fits(state, sid, area)
+  local def = area ~= "" and AREAS[area] or nil
+  local pos = state.positions[sid]
+  if not def or not def.c or not def.s or not pos then return true end
+  for i = 1, 3 do
+    if math.abs(pos[i] - def.c[i]) > def.s[i] / 2 + POSITION_SLACK then return false end
+  end
+  return true
+end
+
+-- The player is in `area` now (already checked): lessons, quizzes, practicals, the
+-- mystery engine, the map's secrets and the feature modules hear of it.
+local function set_area(dispatcher, state, sid, area)
+  local changed = area ~= state.areas[sid]
+  local previous = state.areas[sid] or ""
+  state.areas[sid] = area
+  if not changed then return end
+  Features.each("area", feature_api(dispatcher, state), sid, area, previous)
+  if area == "" then return end
+  local p = state.presences[sid]
+  local lesson = state.lessons[area]
+  if lesson and lesson.by_sid ~= sid and p then
+    lesson.attendance[p.user_id] = state.names[sid] or ""
+  end
+  if lesson and lesson.quiz then send_quiz(dispatcher, state, area, sid) end
+  if lesson and lesson.practical then send_practical(dispatcher, state, area, sid) end
+  feed_mysteries(dispatcher, state, sid, { event = "enter", area = area })
+  -- A secret area, once walked into, stays on this character's map.
+  local profile = state.profiles[sid]
+  if AREAS[area].kind == "secret" and profile and p and Profile.discover(profile, "map:" .. area) then
+    Profile.write(p.user_id, profile)
+    send_profile(dispatcher, state, sid)
+  end
+end
+
 -- Takes `n` (default 1) of `id` from `sid`'s inventory. Returns true when they had enough.
 local function take_item(dispatcher, state, sid, id, n)
   local inv, p = state.inventories[sid], state.presences[sid]
@@ -852,7 +922,7 @@ end
 
 -- The helpers feature modules (features.lua) work through: the match state to read,
 -- and every way they may change the world, bound to this dispatcher.
-local function feature_api(dispatcher, state)
+function feature_api(dispatcher, state)
   local api = { nk = nk, state = state, now = nk.time() / 1000, AREAS = AREAS, ITEMS = ITEMS, rules = state.rules }
   function api.uid(sid) local p = state.presences[sid] return p and p.user_id or nil end
   function api.name(sid) return state.names[sid] or "" end
@@ -863,6 +933,8 @@ local function feature_api(dispatcher, state)
   function api.is_admin(sid) return api.role(sid) == "admin" end
   function api.area(sid) return state.areas[sid] or "" end
   function api.position(sid) return state.positions[sid] end
+  -- Whether the player's latest state has them on a broom.
+  function api.riding(sid) return state.riding_at[sid] ~= nil end
   function api.locale(sid) return state.locales[sid] or "pl" end
   function api.online(sid) return state.presences[sid] ~= nil end
   function api.find(name) return find_sid(state, nil, name) end
@@ -931,6 +1003,15 @@ local function feature_api(dispatcher, state)
     broadcast_object(dispatcher, oid, value)
   end
   function api.drive(oid, on) state.world.driven[oid] = on or nil end
+  function api.profile_changed(sid)
+    api.save_profile(sid)
+    broadcast_profile_change(dispatcher, state, sid)
+  end
+  function api.reload_timetable()
+    state.timetable = Timetable.load()
+    send_timetable(dispatcher, state, nil)
+    return #state.timetable.slots
+  end
   return api
 end
 
@@ -940,8 +1021,13 @@ function M.match_init(context, params)
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
                   positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup(),
-                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0, caught_night = {}, rumours = {}, finished_duels = {}, features = {} }
+                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0, caught_night = {}, rumours = {}, finished_duels = {}, features = {}, flight_checked = {}, pending_area = {}, riding_at = {} }
   state.world.driven = state.engine.driven
+  local saved = Store.read("world", "objects", nil)
+  if saved and type(saved.objects) == "table" then
+    for oid, s in pairs(lasting_objects(saved.objects)) do state.world.objects[oid] = s end
+    state.world_saved = nk.json_encode({ objects = lasting_objects(state.world.objects) })
+  end
   return state, TICK_RATE, "world"
 end
 
@@ -950,6 +1036,10 @@ function M.match_join_attempt(context, dispatcher, tick, state, presence, metada
     return state, false, "banned"
   end
   state.names[presence.session_id] = sanitize_name(metadata and metadata.display_name, presence.username)
+  -- Display names go through the word filter: a filtered name falls back to the account's username.
+  if Moderation.filter(state.names[presence.session_id], state.filter) ~= state.names[presence.session_id] then
+    state.names[presence.session_id] = sanitize_name(presence.username, "student")
+  end
   state.chars[presence.session_id] = sanitize_character(metadata and metadata.character)
   local locale = metadata and metadata.locale
   state.locales[presence.session_id] = (locale == "en" or locale == "pl") and locale or Mysteries.FALLBACK_LOCALE
@@ -1031,6 +1121,9 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.guest_passes[sid] = nil
       state.blocks[sid] = nil
       state.moderation[sid] = nil
+      state.flight_checked[sid] = nil
+      state.pending_area[sid] = nil
+      state.riding_at[sid] = nil
       for area, lesson in pairs(state.lessons) do
         if lesson.by_sid == sid then
           close_lesson(dispatcher, state, area, "professor left")
@@ -1068,6 +1161,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     tick_self_study(dispatcher, state, now)
     tick_duels(dispatcher, state, now)
     Features.each("tick", feature_api(dispatcher, state), now)
+    save_world(state, now)
     if tick % (TICK_RATE * 60) == 0 then check_term_end(dispatcher, state, now) end
     local occupied = function(area) return #players_in(state, area) > 0 end
     run_actions(dispatcher, state, Mysteries.tick(state.engine, state.mysteries, nk.time() / 1000, occupied))
@@ -1076,6 +1170,23 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     local sid = message.sender.session_id
     if message.op_code == OP_STATE then
       state.positions[sid] = Chat.position_of(message.data) or state.positions[sid]
+      local pending = state.pending_area[sid]
+      if pending then
+        if position_fits(state, sid, pending.area) then
+          state.pending_area[sid] = nil
+          set_area(dispatcher, state, sid, pending.area)
+        elseif now - pending.at > PENDING_AREA_SECONDS then
+          state.pending_area[sid] = nil
+          nk.logger_info(string.format("area report %s from %s refused: not where their state is", pending.area, state.names[sid] or sid))
+        end
+      end
+      -- Riders: where flying is allowed is the server's call (features/flying.lua).
+      local riding = message.data:find('"m":"broom"', 1, true) ~= nil
+      state.riding_at[sid] = riding and now or nil
+      if riding and now - (state.flight_checked[sid] or 0) >= 1 then
+        state.flight_checked[sid] = now
+        Features.each("flying", feature_api(dispatcher, state), sid)
+      end
       local rest = others(state, sid)
       if #rest > 0 then
         dispatcher.broadcast_message(OP_STATE, message.data, rest, message.sender, false)
@@ -1093,24 +1204,13 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       local ok, payload = pcall(nk.json_decode, message.data)
       if ok and type(payload) == "table" then
         local area = sanitize_area(payload.id, state.profiles[sid], state.guest_passes[sid])
-        local changed = area ~= state.areas[sid]
-        local previous = state.areas[sid] or ""
-        state.areas[sid] = area
-        if changed then Features.each("area", feature_api(dispatcher, state), sid, area, previous) end
-        if changed and area ~= "" then
-          local lesson = state.lessons[area]
-          if lesson and lesson.by_sid ~= sid then
-            lesson.attendance[message.sender.user_id] = state.names[sid] or ""
-          end
-          if lesson and lesson.quiz then send_quiz(dispatcher, state, area, sid) end
-          if lesson and lesson.practical then send_practical(dispatcher, state, area, sid) end
-          feed_mysteries(dispatcher, state, sid, { event = "enter", area = area })
-          -- A secret area, once walked into, stays on this character's map.
-          local profile = state.profiles[sid]
-          if AREAS[area].kind == "secret" and profile and Profile.discover(profile, "map:" .. area) then
-            Profile.write(message.sender.user_id, profile)
-            send_profile(dispatcher, state, sid)
-          end
+        -- The report must agree with where the player's own state says they are; a
+        -- report ahead of the next state waits for it (a few seconds at most).
+        if position_fits(state, sid, area) then
+          state.pending_area[sid] = nil
+          set_area(dispatcher, state, sid, area)
+        else
+          state.pending_area[sid] = { area = area, at = now }
         end
       end
     elseif message.op_code == OP_SORT then
@@ -1211,7 +1311,12 @@ function M.match_loop(context, dispatcher, tick, state, messages)
             broadcast_object(dispatcher, ev.oid, value)
           end
           if ev.obj.kind == "item_rack" and ev.event == "interact" then
-            give_item(dispatcher, state, sid, ev.obj.item_id)
+            local allowed, why = Features.allow(feature_api(dispatcher, state), "take_item", sid, ev.obj.item_id)
+            if allowed then
+              give_item(dispatcher, state, sid, ev.obj.item_id)
+            else
+              feature_api(dispatcher, state).notice(sid, "REFUSED_" .. tostring(why):upper(), {}, 5)
+            end
           end
           if ev.obj.kind == "practice_target" and ev.event == "spell" then
             count_practice_hit(dispatcher, state, sid, ev.spell)
@@ -1378,12 +1483,21 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       elseif last[mode] and now - last[mode] < cooldown then
         chat_refused(dispatcher, message.sender, "too_soon", { mode = mode, wait = math.ceil(cooldown - (now - last[mode])) })
       else
-        last[mode] = now
-        if mode == "dm" then
-          send_dm(dispatcher, state, sid, type(payload.to) == "string" and payload.to or "", text)
+        -- Feature modules may refuse a line (a quieted classroom) and see every delivered one (the chat log).
+        local api = feature_api(dispatcher, state)
+        local allowed, why = Features.allow(api, "chat", sid, mode)
+        if not allowed then
+          chat_refused(dispatcher, message.sender, why or "refused")
         else
-          dispatcher.broadcast_message(OP_CHAT_LINE, nk.json_encode({ sid = sid, name = state.names[sid] or "", text = text, mode = mode }),
-            listeners_of(state, sid, mode), nil, true)
+          last[mode] = now
+          local to = type(payload.to) == "string" and payload.to or ""
+          Features.each("chat_line", api, sid, mode, text, mode == "dm" and to or nil)
+          if mode == "dm" then
+            send_dm(dispatcher, state, sid, to, text)
+          else
+            dispatcher.broadcast_message(OP_CHAT_LINE, nk.json_encode({ sid = sid, name = state.names[sid] or "", text = text, mode = mode,
+              voice = Features.first("chat_voice", api, sid) }), listeners_of(state, sid, mode), nil, true)
+          end
         end
       end
     elseif message.op_code == OP_HOMEWORK then
@@ -1659,7 +1773,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       payload = ok and type(payload) == "table" and payload or {}
       local done, reason, data = Features.request(feature_api(dispatcher, state), sid, payload)
       if state.presences[sid] then
-        dispatcher.broadcast_message(P.OP_REPLY, nk.json_encode({ id = tonumber(payload.id) or 0, kind = tostring(payload.kind or ""), ok = done,
+        dispatcher.broadcast_message(P.OP_REPLY, nk.json_encode({ rid = tonumber(payload.rid) or 0, req = tostring(payload.req or ""), ok = done,
           reason = reason, data = data }), { message.sender }, nil, true)
       end
     elseif message.op_code == OP_PING then

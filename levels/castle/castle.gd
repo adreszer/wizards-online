@@ -42,6 +42,24 @@ func _ready() -> void:
 	var cup := HouseCupDisplay.new()
 	cup.name = "HouseCupDisplay"
 	add_child(cup)
+	var corners := DormitoryCorners.new()
+	corners.name = "DormitoryCorners"
+	add_child(corners)
+	var echoes := EchoResidents.new()
+	echoes.name = "EchoResidents"
+	add_child(echoes)
+	var garden := GardenBeds.new()
+	garden.name = "GardenBeds"
+	add_child(garden)
+	var grounds_life := GroundsLife.new()
+	grounds_life.name = "GroundsLife"
+	add_child(grounds_life)
+	var guardians := GuardianSync.new()
+	guardians.name = "GuardianSync"
+	add_child(guardians)
+	var chase := LanternChase.new()
+	chase.name = "LanternChase"
+	add_child(chase)
 	var detention := DetentionTasks.new()
 	detention.name = "DetentionTasks"
 	add_child(detention)

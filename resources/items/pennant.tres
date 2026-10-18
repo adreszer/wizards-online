@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://itempennant01"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"pennant"
+display_name = "ITEM_PENNANT_NAME"
+description = "ITEM_PENNANT_DESC"
+max_stack = 1
+category = "decor"
+price = 20
+shop = "tailor"
+sell_price = 0
+effect = ""
+effect_seconds = 0.0

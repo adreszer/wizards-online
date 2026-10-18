@@ -496,14 +496,20 @@ def wall_torch(r, pos, rot):
     inst(f"Torch_{node_name(oid)}", K("wall_torch"), pos, parent="Torches",
          rot_y=math.radians(rot), props=oid_props(oid, extra), groups=["world_objects"])
 
+def zone_box(r):
+    """The AreaZone box of room `r`: centre (x, y, z) and size (w, h, d)."""
+    cx, cz = r.centre()
+    h = r.bands * STOREY
+    y = r.y + h / 2
+    if r.get("zone_y"):
+        lo, hi = r.get("zone_y")
+        h, y = hi - lo, (lo + hi) / 2
+    return cx, y, cz, r.x1 - r.x0, h, r.z1 - r.z0
+
+
 def emit_zones():
     for r in rooms.values():
-        cx, cz = r.centre()
-        h = r.bands * STOREY
-        y = r.y + h / 2
-        if r.get("zone_y"):
-            lo, hi = r.get("zone_y")
-            h, y = hi - lo, (lo + hi) / 2
+        cx, y, cz, _w, h, _d = zone_box(r)
         inst(f"Zone_{r.id}", K("area_zone"), (cx, y, cz), parent="Zones",
              props={"area_id": f'&"{r.id}"', "display_key": f'"{r.name_key}"', "kind": f'"{r.kind}"',
                     "house": str(r.house), "size": f"Vector3({r.x1 - r.x0:.1f}, {h:.1f}, {r.z1 - r.z0:.1f})"})

@@ -158,6 +158,7 @@ func _setup_local() -> void:
 	movement.flying_changed.connect(broom_rider.on_flying_changed)
 	movement.flying_changed.connect(_on_flying_changed)
 	area_tracker.area_changed.connect(broom_rider.on_area_changed)
+	NetworkManager.pushed.connect(broom_rider.on_server_flight)
 	inventory.changed.connect(broom_rider.on_inventory_changed)
 	movement.stepped.connect(_on_stepped)
 	spell_caster.setup(self, peer_id, camera_rig, cast_origin)
@@ -244,6 +245,30 @@ func _setup_remote() -> void:
 	synchronizer.setup_remote(self)
 	synchronizer.movement_state_received.connect(animation_controller.set_movement_state_name)
 	synchronizer.mount_received.connect(broom_rider.set_remote_mount)
+	if peer_id != "":
+		_add_profile_target()
+
+
+## Looking at another player and pressing Interact opens their profile card.
+func _add_profile_target() -> void:
+	var area := Area3D.new()
+	area.name = "ProfileTarget"
+	area.collision_layer = InteractSpot.LAYER_INTERACTABLE
+	area.collision_mask = 0
+	area.monitoring = false
+	var shape := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.4
+	capsule.height = 1.8
+	shape.shape = capsule
+	shape.position = Vector3(0, 0.9, 0)
+	area.add_child(shape)
+	var i := Interactable.new()
+	i.prompt_text = "INTERACT_PROFILE"
+	i.focus_point_offset = Vector3(0, 1.4, 0)
+	area.add_child(i)
+	i.interacted.connect(func(_who: Node) -> void: GameEvents.panel_requested.emit("profile", {"name": display_name}))
+	add_child(area)
 
 
 func _on_stepped(displacement: Vector3, duration: float) -> void:

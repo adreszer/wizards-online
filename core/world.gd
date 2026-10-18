@@ -30,12 +30,23 @@ func _ready() -> void:
 	var journal := Journal.new()
 	journal.name = "Journal"
 	add_child(journal)
-	for panel: FeaturePanel in [RiddlePanel.new()]:
+	for panel: FeaturePanel in [RiddlePanel.new(), DecorPanel.new(), FriendsPanel.new(), ClubsPanel.new(), GamePanel.new(), ProfileCard.new(),
+			CauldronPanel.new(), ShopPanel.new(), AdminPanel.new(), SettingsPanel.new()]:
 		panel.name = panel.get_script().get_global_name()
 		add_child(panel)
+	var effects := PotionEffects.new()
+	effects.name = "PotionEffects"
+	add_child(effects)
+	var reminders := EventReminders.new()
+	reminders.name = "EventReminders"
+	add_child(reminders)
+	var birds := PaperBirds.new()
+	birds.name = "PaperBirds"
+	add_child(birds)
 	var creator := CharacterCreator.new()
 	creator.name = "CharacterCreator"
 	add_child(creator)
+	GameSettings.apply(get_tree())
 	var player: Node = _spawner.spawn_local(GameSession.display_name, NetworkManager.local_user_id)
 	GameEvents.level_completed.connect(_on_level_completed)
 	_show_satchel_hint(player)

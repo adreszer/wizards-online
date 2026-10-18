@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://itempotioncolour01"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"potion_colour"
+display_name = "ITEM_POTION_COLOUR_NAME"
+description = "ITEM_POTION_COLOUR_DESC"
+max_stack = 5
+category = "potion"
+price = 0
+shop = ""
+sell_price = 0
+effect = "colour"
+effect_seconds = 600.0

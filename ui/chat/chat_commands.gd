@@ -37,6 +37,14 @@ const DUEL_ALIASES := {"duel": "challenge", "pojedynek": "challenge", "accept": 
 const MODERATION_ALIASES := {"report": "report", "zglos_gracza": "report", "zgłoś_gracza": "report", "block": "block", "blokuj": "block",
 	"unblock": "unblock", "odblokuj": "unblock", "mute": "mute", "wycisz": "mute", "kick": "kick", "wyrzuc": "kick", "wyrzuć": "kick", "ban": "ban"}
 const DEDUCT_ALIASES: Array[String] = ["deduct", "odejmij"]
+## The Wayfinder's Chart: /share [on|off] shows (or hides) your room to house-mates with a chart.
+const SHARE_ALIASES: Array[String] = ["share", "udostepnij", "udostępnij"]
+## Lantern Chase on the pitch: /chase join a|b, /chase start, /chase leave.
+const CHASE_ALIASES: Array[String] = ["chase", "poscig", "pościg"]
+const DECORATE_ALIASES: Array[String] = ["decorate", "dekoruj"]
+## Panels by command: /friends, /clubs, /watch (the game in this room), /profile name.
+const PANEL_ALIASES := {"friends": "friends", "przyjaciele": "friends", "clubs": "clubs", "kluby": "clubs", "watch": "game", "patrz": "game", "admin": "admin", "settings": "settings", "ustawienia": "settings",
+	"profile": "profile", "profil": "profile"}
 ## Commands that are feature requests (NetworkManager.request): alias → [kind, argument names];
 ## the last argument takes the rest of the line. The answer comes back as a chat line.
 const REQUEST_COMMANDS := {
@@ -44,6 +52,17 @@ const REQUEST_COMMANDS := {
 	"housestats": ["house_stats", ["house"]], "dom": ["house_stats", ["house"]],
 	"houseboard": ["house_board_post", ["text"]], "ogloszenie": ["house_board_post", ["text"]], "ogłoszenie": ["house_board_post", ["text"]],
 	"head": ["house_head_set", ["name", "house"]], "opiekun": ["house_head_set", ["name", "house"]],
+	"wing": ["wing_state", []], "skrzydlo": ["wing_state", []], "skrzydło": ["wing_state", []],
+	"friend": ["friend_add", ["name"]], "przyjaciel": ["friend_add", ["name"]], "unfriend": ["friend_remove", ["name"]], "usun_przyjaciela": ["friend_remove", ["name"]],
+	"game": ["game_invite", ["name"]], "gra": ["game_invite", ["name"]], "resign": ["game_resign", []], "poddaj_gre": ["game_resign", []],
+	"ladder": ["ladder_view", []], "ranking": ["ladder_view", []],
+	"drink": ["potion_drink", ["item"]], "wypij": ["potion_drink", ["item"]],
+	"adopt": ["creature_adopt", ["kind"]], "adoptuj": ["creature_adopt", ["kind"]],
+	"familiar": ["familiar_set", ["kind"]], "chowaniec": ["familiar_set", ["kind"]],
+	"quiet": ["classroom_mute", []], "cisza": ["classroom_mute", []], "bell": ["classroom_bell", []], "dzwonek": ["classroom_bell", []],
+	"announce": ["admin_broadcast", ["text"]], "oglos": ["admin_broadcast", ["text"]], "ogłoś": ["admin_broadcast", ["text"]],
+	"licence": ["flying_licence", ["name"]], "license": ["flying_licence", ["name"]], "licencja": ["flying_licence", ["name"]],
+	"event": ["event_schedule", ["kind", "at", "minutes", "area", "title"]], "wydarzenie": ["event_schedule", ["kind", "at", "minutes", "area", "title"]],
 }
 const STAND_ALIASES: Array[String] = ["stand", "wstan", "wstań"]
 const GIVE_ALIASES: Array[String] = ["give", "daj"]
@@ -129,6 +148,24 @@ static func run(text: String, player: Node) -> String:
 			return _t("GUEST_USAGE")
 		NetworkManager.send_guest_pass(" ".join(parts.slice(1)))
 		return _t("GUEST_REQUESTED")
+	if CHASE_ALIASES.has(name):
+		var sub := parts[1].to_lower() if parts.size() > 1 else ""
+		var kinds := {"join": "chase_join", "dolacz": "chase_join", "dołącz": "chase_join", "start": "chase_start", "leave": "chase_leave", "odejdz": "chase_leave", "odejdź": "chase_leave"}
+		if not kinds.has(sub):
+			return _t("CHASE_USAGE")
+		return request_command([kinds[sub], ["team"]], parts.slice(2))
+	if SHARE_ALIASES.has(name):
+		var on := parts.size() < 2 or parts[1].to_lower() in ["on", "tak", "yes", "1"]
+		NetworkManager.request_and_report("chart_share", {"share": on})
+		return _t("CHART_SHARING_ON") if on else _t("CHART_SHARING_OFF")
+	if PANEL_ALIASES.has(name):
+		if PANEL_ALIASES[name] == "profile" and parts.size() < 2:
+			return _t("PROFILE_USAGE")
+		GameEvents.panel_requested.emit.call_deferred(PANEL_ALIASES[name], {"name": " ".join(parts.slice(1))})
+		return ""
+	if DECORATE_ALIASES.has(name):
+		GameEvents.panel_requested.emit.call_deferred("decor", {})
+		return ""
 	if REQUEST_COMMANDS.has(name):
 		return request_command(REQUEST_COMMANDS[name], parts.slice(1))
 	if DEDUCT_ALIASES.has(name):

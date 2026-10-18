@@ -184,6 +184,32 @@ function M.calendar_payload(tt, day)
   return out
 end
 
+M.OVERRIDES_COLLECTION, M.OVERRIDES_KEY = "school", "timetable_overrides"
+
+-- The in-game timetable changes: { add = { raw slots }, remove = { [id] = true } }.
+function M.load_overrides()
+  local ok, objects = pcall(nk.storage_read, { { collection = M.OVERRIDES_COLLECTION, key = M.OVERRIDES_KEY, user_id = nil } })
+  local v = ok and objects and objects[1] and objects[1].value or {}
+  local out = { add = {}, remove = {} }
+  if type(v) == "table" then
+    if type(v.add) == "table" then
+      for _, s in ipairs(v.add) do
+        if type(s) == "table" then table.insert(out.add, s) end
+      end
+    end
+    if type(v.remove) == "table" then
+      for id, on in pairs(v.remove) do
+        if on == true then out.remove[id] = true end
+      end
+    end
+  end
+  return out
+end
+
+function M.save_overrides(o)
+  return pcall(nk.storage_write, { { collection = M.OVERRIDES_COLLECTION, key = M.OVERRIDES_KEY, user_id = nil, value = o, permission_read = 0, permission_write = 0 } })
+end
+
 -- Reads and validates the timetable; bad slots are logged and left out.
 function M.load()
   local tt = { utc_offset_minutes = 60, dst = "", days_ahead = 7, slots = {}, calendar = M.load_calendar() }
@@ -200,8 +226,16 @@ function M.load()
   if type(data.utc_offset_minutes) == "number" then tt.utc_offset_minutes = data.utc_offset_minutes end
   if data.dst == "eu" then tt.dst = "eu" end
   if type(data.days_ahead) == "number" then tt.days_ahead = math.max(1, math.min(14, math.floor(data.days_ahead))) end
-  local seen = {}
+  -- Changes made in the game (admin panel, features/admin.lua) sit in storage on top of the file:
+  -- slots removed by id, slots added (an added slot with a file slot's id replaces it).
+  local overrides = M.load_overrides()
+  local raws = {}
   for _, raw in ipairs(type(data.slots) == "table" and data.slots or {}) do
+    if type(raw) ~= "table" or not overrides.remove[raw.id] then table.insert(raws, raw) end
+  end
+  for _, raw in ipairs(overrides.add) do table.insert(raws, raw) end
+  local seen = {}
+  for _, raw in ipairs(raws) do
     local slot, why = M.sanitize_slot(raw)
     if slot and seen[slot.id] then
       slot, why = nil, "duplicate id"

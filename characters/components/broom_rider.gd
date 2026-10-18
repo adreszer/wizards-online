@@ -67,6 +67,13 @@ func setup(player: Node, movement: PlayerMovement, inventory: Inventory, attach:
 		skeleton.add_child(ride_pose)
 
 
+## Online the server checks where riders are (feature "flight"): told to land, we land.
+func on_server_flight(kind: String, data: Dictionary) -> void:
+	if kind == "flight" and data.get("land", false) and mount != null and _player != null and _player.get("is_local") == true:
+		dismount()
+		GameEvents.notification_requested.emit(tr("NOTIFY_NO_FLYING_HERE"), 4.0)
+
+
 ## Local player: start riding the first mount item carried, or land.
 ## Returns true when the rider state changed.
 func toggle() -> bool:
@@ -209,6 +216,11 @@ func _process(delta: float) -> void:
 		target_roll = clampf(yaw_rate * 0.14 * clampf(horizontal / 8.0, 0.0, 1.0), -0.55, 0.55)
 		_bob_time += delta
 		bob = sin(_bob_time * 2.2) * 0.05 * (1.0 - clampf(horizontal / 10.0, 0.0, 1.0))
+		# Reduced motion (settings): no banking or bobbing, a calmer ride.
+		if GameSettings.get_value("reduce_motion"):
+			target_roll = 0.0
+			target_pitch *= 0.3
+			bob = 0.0
 	var t := 1.0 - exp(-6.0 * delta)
 	_pitch = lerpf(_pitch, target_pitch, t)
 	_roll = lerpf(_roll, target_roll, t)

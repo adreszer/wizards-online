@@ -12,5 +12,6 @@
   "lesson_coin_minutes": 10,
   "coins_per_mystery": 15,
   "max_daily_coins": 100,
-  "max_coin_grant": 1000
+  "max_coin_grant": 1000,
+  "village_open": "always"
 }

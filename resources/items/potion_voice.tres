@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://itempotionvoice01"]
+
+[ext_resource type="Script" path="res://gameplay/inventory/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"potion_voice"
+display_name = "ITEM_POTION_VOICE_NAME"
+description = "ITEM_POTION_VOICE_DESC"
+max_stack = 5
+category = "potion"
+price = 0
+shop = ""
+sell_price = 0
+effect = "voice"
+effect_seconds = 180.0

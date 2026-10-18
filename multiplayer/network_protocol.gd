@@ -161,10 +161,11 @@ const OP_DUEL_STATE := 61
 const OP_CAUGHT := 62
 ## server → all (and joiners): {rumours: [{k: translation key, house, at}]} anonymous rumours from real events, newest first
 const OP_RUMOURS := 63
-## client → server: {id, kind, ...} a request to one of the server's feature modules (detention,
-## clubs, friends, shops, gardens…; see nakama/modules/features/), answered by OP_REPLY
+## client → server: {rid, req, ...} a request `req` to one of the server's feature modules (detention,
+## clubs, friends, shops, gardens…; see nakama/modules/features/), answered by OP_REPLY; the
+## envelope's names keep clear of the request's own fields (an id, a kind)
 const OP_REQUEST := 64
-## server → requester: {id, kind, ok, reason, data} the answer to an OP_REQUEST
+## server → requester: {rid, req, ok, reason, data} the answer to an OP_REQUEST
 const OP_REPLY := 65
 ## server → some or all players: {kind, data} a feature's state (kept in NetworkManager.feature_state[kind]);
 ## kind "notice" is a translated notification {key, args}
