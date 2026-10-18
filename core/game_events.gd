@@ -58,5 +58,9 @@ signal character_creator_requested()
 ## Someone opened a book: its title key and page keys (BookPanel shows it).
 signal book_requested(title_key: String, page_keys: PackedStringArray)
 
+## Something asked for one of the school-life panels by name ("riddle", "profile",
+## "friends", "clubs", "shop", "game"…) with its arguments; the panel opens itself.
+signal panel_requested(panel: String, args: Dictionary)
+
 ## The local player's spell hit another player (only a duel makes that count).
 signal spell_hit_player(peer_id: String, spell_id: StringName)

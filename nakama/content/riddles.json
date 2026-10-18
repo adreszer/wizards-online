@@ -1,0 +1,20 @@
+{
+  "riddles": [
+    { "q": { "pl": "Im więcej mi zabierasz, tym większa się staję. Czym jestem?", "en": "The more you take from me, the bigger I grow. What am I?" },
+      "a": ["dziura", "jama", "hole", "a hole", "pit"] },
+    { "q": { "pl": "Mam klucze, lecz nie otworzę żadnych drzwi. Czym jestem?", "en": "I have keys but open no door. What am I?" },
+      "a": ["fortepian", "pianino", "klawiatura", "piano", "keyboard"] },
+    { "q": { "pl": "Biegnę, choć nie mam nóg; mam koryto, choć nie jestem świnią. Czym jestem?", "en": "I run without legs and have a bed but never sleep. What am I?" },
+      "a": ["rzeka", "strumien", "river", "stream"] },
+    { "q": { "pl": "Rośnie, gdy je karmisz, umiera, gdy je poisz. Co to?", "en": "Feed me and I grow, give me a drink and I die. What am I?" },
+      "a": ["ogien", "plomien", "fire", "flame"] },
+    { "q": { "pl": "Mówię bez ust i słyszę bez uszu; budzi mnie wiatr. Kim jestem?", "en": "I speak without a mouth and hear without ears; the wind wakes me. What am I?" },
+      "a": ["echo", "echem"] },
+    { "q": { "pl": "Ma szyję, ale nie ma głowy; nosi korek zamiast kapelusza. Co to?", "en": "It has a neck but no head and wears a cork for a hat. What is it?" },
+      "a": ["butelka", "flaszka", "bottle"] },
+    { "q": { "pl": "Im jest mnie więcej, tym mniej widzisz. Czym jestem?", "en": "The more of me there is, the less you see. What am I?" },
+      "a": ["ciemnosc", "mrok", "mgla", "darkness", "dark", "fog"] },
+    { "q": { "pl": "Ma wiele zębów, ale nigdy nie gryzie. Co to?", "en": "It has many teeth but never bites. What is it?" },
+      "a": ["grzebien", "comb", "a comb"] }
+  ]
+}

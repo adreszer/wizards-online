@@ -4,7 +4,9 @@ extends Node
 ## now. Zones can nest (a greenhouse inside the grounds), so the smallest
 ## zone the player is in wins (entering a room and its enclosing area in the
 ## same physics step reports both in arbitrary order) and leaving it falls
-## back to the enclosing one.
+## back to the enclosing one. Standing on an upper storey the feet also reach a
+## few centimetres into the room below, so zones that hold the player's chest
+## come first.
 ## Systems that need "where am I" (server area reports, lesson tools,
 ## proximity chat) read [member current_zone] or listen to [signal area_changed].
 
@@ -44,13 +46,25 @@ func _on_area_exited(_id: StringName, zone: Node) -> void:
 func _update() -> void:
 	_stack = _stack.filter(func(z: AreaZone) -> bool: return is_instance_valid(z))
 	var top: AreaZone = null
-	for z in _stack:
+	var chest := _chest()
+	var holding := _stack.filter(func(z: AreaZone) -> bool: return contains(z, chest))
+	for z: AreaZone in (holding if not holding.is_empty() else _stack):
 		if top == null or _volume(z) <= _volume(top):
 			top = z
 	if top == current_zone:
 		return
 	current_zone = top
 	area_changed.emit(current_zone)
+
+
+func _chest() -> Vector3:
+	var body := get_parent() as Node3D
+	return body.global_position + Vector3.UP if body != null else Vector3.INF
+
+
+static func contains(z: AreaZone, point: Vector3) -> bool:
+	var d := (point - z.global_position).abs()
+	return d.x <= z.size.x / 2.0 and d.y <= z.size.y / 2.0 and d.z <= z.size.z / 2.0
 
 
 static func _volume(z: AreaZone) -> float:

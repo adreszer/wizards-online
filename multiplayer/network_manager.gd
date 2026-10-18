@@ -80,6 +80,8 @@ signal lesson_tool_result_received(ok: bool, tool: String, reason: String)
 ## to_name, mail} (see ChatManager).
 signal chat_line_received(line: Dictionary)
 signal system_message(text: String)
+## A feature module's state arrived (OP_PUSH); the latest is in feature_state[kind].
+signal pushed(kind: String, data: Dictionary)
 
 const CONNECT_TIMEOUT_SECONDS := 5
 
@@ -114,6 +116,10 @@ var house_cup: Dictionary = {}
 ## Guest passes to other houses' rooms: house → until (server time, seconds).
 var guest_passes: Dictionary = {}
 var practical_progress: Dictionary = {}
+## The latest OP_PUSH data per feature kind ("detention", "friends", "clubs"…).
+var feature_state: Dictionary = {}
+var _request_seq: int = 0
+var _replies: Dictionary = {}
 var _reconnect_attempts: int = 0
 var _reconnecting: bool = false
 
@@ -151,6 +157,7 @@ func _ready() -> void:
 		timetable_changed.emit())
 	world_session.message_received.connect(server_message.emit)
 	world_session.message_received.connect(_on_lesson_message)
+	world_session.message_received.connect(_on_feature_message)
 	chat_manager.bind(world_session)
 	chat_manager.message_received.connect(chat_message_received.emit)
 	chat_manager.line_received.connect(chat_line_received.emit)
@@ -652,6 +659,86 @@ func _on_lesson_message(op_code: int, payload: Dictionary) -> void:
 			lesson_tool_result_received.emit(payload.get("ok", false) == true, str(payload.get("tool", "")), str(payload.get("reason", "")))
 
 
+## Sends a feature request (OP_REQUEST) and waits for its answer:
+## {ok, reason, data}; {ok: false, reason: "offline" | "timeout"} without one.
+func request(kind: String, payload: Dictionary = {}, timeout: float = 10.0) -> Dictionary:
+	if not is_in_world():
+		return {"ok": false, "reason": "offline", "data": {}}
+	_request_seq += 1
+	var id := _request_seq
+	var body := payload.duplicate()
+	body.id = id
+	body.kind = kind
+	send_op(NetworkProtocol.OP_REQUEST, body)
+	var waited := 0.0
+	while not _replies.has(id) and waited < timeout:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+	if not _replies.has(id):
+		return {"ok": false, "reason": "timeout", "data": {}}
+	var reply: Dictionary = _replies[id]
+	_replies.erase(id)
+	return reply
+
+
+## Sends a request and reports the outcome as a chat system line.
+func request_and_report(kind: String, payload: Dictionary = {}) -> Dictionary:
+	var r: Dictionary = await request(kind, payload)
+	system_message.emit(RequestText.describe(kind, r))
+	return r
+
+
+## The player-facing line for a request's answer: "OK_<KIND>" (or a generic "done"),
+## or the refusal reason's "REFUSED_<REASON>" (or a generic refusal naming it).
+static func result_text(kind: String, r: Dictionary) -> String:
+	if r.get("ok", false):
+		var key := "OK_" + kind.to_upper()
+		var text := TranslationServer.translate(key)
+		return text if text != key else TranslationServer.translate("REQUEST_DONE")
+	return refusal_text(str(r.get("reason", "")))
+
+
+static func refusal_text(reason: String) -> String:
+	var key := "REFUSED_" + reason.to_upper()
+	var text := TranslationServer.translate(key)
+	return text if text != key else TranslationServer.translate("REFUSED_GENERIC") % reason
+
+
+## A feature's latest pushed state ({} before any).
+func feature(kind: String) -> Dictionary:
+	return feature_state.get(kind, {})
+
+
+func _on_feature_message(op_code: int, payload: Dictionary) -> void:
+	match op_code:
+		NetworkProtocol.OP_REPLY:
+			var data: Variant = payload.get("data", {})
+			_replies[int(payload.get("id", 0))] = {"ok": payload.get("ok", false) == true, "reason": str(payload.get("reason", "")),
+				"data": data if data is Dictionary else {}}
+		NetworkProtocol.OP_PUSH:
+			var kind := str(payload.get("kind", ""))
+			var data: Variant = payload.get("data", {})
+			var d: Dictionary = data if data is Dictionary else {}
+			if kind == "notice":
+				GameEvents.notification_requested.emit(notice_text(d), clampf(float(d.get("seconds", 6.0)), 1.0, 15.0))
+				return
+			feature_state[kind] = d
+			pushed.emit(kind, d)
+
+
+## A server notice {key, args} in the player's language: args that are translation keys are translated too.
+static func notice_text(d: Dictionary) -> String:
+	var text := TranslationServer.translate(str(d.get("key", "")))
+	var args: Variant = d.get("args", [])
+	if args is Array and not (args as Array).is_empty():
+		var out: Array = []
+		for a: Variant in args:
+			out.append(TranslationServer.translate(a) if a is String and (a as String).to_upper() == a and (a as String).contains("_") else a)
+		if text.count("%") >= out.size():
+			text = text % out
+	return text
+
+
 func _on_server_text(text: String, seconds: float) -> void:
 	var clean := text.strip_edges()
 	if clean.is_empty():
@@ -678,6 +765,8 @@ func _teardown() -> void:
 	rumours = []
 	practical = {}
 	practical_progress = {}
+	feature_state = {}
+	_replies = {}
 	await world_session.leave()
 	state_synchronizer.reset()
 

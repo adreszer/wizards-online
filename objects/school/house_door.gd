@@ -148,6 +148,10 @@ func admits(interactor: Node) -> bool:
 
 func _on_interacted(interactor: Node) -> void:
 	if admits(interactor):
+		# Members answer the riddle of the week first (online; guests with a pass do not).
+		if interactor.is_in_group("local_player") and int(interactor.get("house")) == house and RiddlePanel.must_answer(house):
+			GameEvents.panel_requested.emit("riddle", {"door": self})
+			return
 		open()
 	else:
 		refused.emit(interactor)

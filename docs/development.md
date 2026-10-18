@@ -114,6 +114,12 @@ godot --headless --path . tests/run_multiplayer_test.tscn -- --instance=1 --name
 sleep 4
 godot --headless --path . tests/run_multiplayer_test.tscn -- --instance=2 --name=ClientB --role=b
 
+# the feature modules (detention, riddles, heads of house, clubs, games…): two clients again,
+# A becomes an admin, B a student; they wait for each other through direct messages
+godot --headless --path . tests/run_features_test.tscn -- --instance=1 --name=ClientA &
+sleep 4
+godot --headless --path . tests/run_features_test.tscn -- --instance=2 --name=ClientB --role=b
+
 # reconnect: start it, then `docker compose restart nakama` while it runs
 godot --headless --path . tests/run_reconnect_test.tscn -- --instance=3
 

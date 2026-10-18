@@ -636,8 +636,10 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 			t.check(ok and player.speech_bubble.visible and player.speech_bubble.text == "anyone in the library?", "the speaker hears themselves and shows a speech bubble")
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("founders_tale"), 10.0)
 	t.check(ok, "solving a mystery records a discovery on the profile")
-	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 15, 10.0)
-	t.check(ok and wallets.back()[1] == 15 and wallets.back()[2] == "mystery", "a first solve pays coins (%s)" % str(wallets))
+	# A graded homework pays too (when the professor grades it), so count the mystery payments.
+	var mystery_pay := func() -> Array: return wallets.filter(func(w: Array) -> bool: return w[2] == "mystery")
+	ok = await _wait_until(func() -> bool: return mystery_pay.call().size() >= 1, 10.0)
+	t.check(ok and mystery_pay.call()[0][1] == 15, "a first solve pays coins (%s)" % str(wallets))
 	t.check(notifications.has(Currency.change_line(15, "mystery", "founders_tale")), "and says so")
 	t.check(server_texts.size() >= 3 and not server_texts.any(func(x: String) -> bool: return x.begins_with("MYST_")), "clues arrive as resolved text, not keys (%s)" % str(server_texts))
 	# World scope, two players: the loft opens only with someone else in the gallery.
@@ -655,7 +657,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	t.check(ok, "with two players present the spell solves the mystery and opens the loft")
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("loft"), 10.0)
 	t.check(ok, "the solver gets the loft discovery")
-	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 30, 10.0)
+	ok = await _wait_until(func() -> bool: return mystery_pay.call().size() >= 2 and mystery_pay.call()[1][1] == 15, 10.0)
 	t.check(ok, "the second mystery pays too (%d)" % NetworkManager.get_coins())
 	await _enter_classroom(spawner, Vector3(2, 0, 0))
 	# (The professor awards the house cup meanwhile, which starts every tally from zero.)
@@ -683,11 +685,12 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 
 	t.section("Purse (student)")
 	var refusals := cheat_results.size()
+	var purse := NetworkManager.get_coins()
 	ChatCommands.run("/coins -500", player)
 	ok = await _wait_until(func() -> bool: return cheat_results.size() > refusals, 10.0)
-	t.check(ok and cheat_results.back()["reason"] == "insufficient" and NetworkManager.get_coins() == 30, "the purse never goes below zero (%s)" % str(cheat_results.back() if ok else {}))
+	t.check(ok and cheat_results.back()["reason"] == "insufficient" and NetworkManager.get_coins() == purse, "the purse never goes below zero (%s)" % str(cheat_results.back() if ok else {}))
 	ChatCommands.run("/coins 5", player)
-	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == 35, 10.0)
+	ok = await _wait_until(func() -> bool: return NetworkManager.get_coins() == purse + 5, 10.0)
 	t.check(ok, "the dev cheat adds coins through the server")
 	var mine: Dictionary = await NetworkManager.wallet_ledger(20)
 	# Accounts persist between runs: read the history back to this run's reset.
@@ -696,7 +699,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 		if str(e.get("reason", "")) == "reset":
 			break
 		sources.append(str(e.get("source", "")))
-	t.check(int(mine.get("coins", -1)) == 35 and sources.count("mystery") == 2 and not sources.has("lesson"),
+	t.check(int(mine.get("coins", -1)) == purse + 5 and sources.count("mystery") == 2 and not sources.has("lesson") and sources.count("homework") <= 1,
 		"the student's own ledger: two mysteries, no pay for a lesson shorter than the rules' minimum (%s)" % str(sources))
 	var theirs: Dictionary = await NetworkManager.wallet_ledger(5, "someone-else")
 	t.check(theirs.has("error"), "a student cannot read someone else's purse")

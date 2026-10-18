@@ -95,6 +95,7 @@ func _run() -> void:
 	await _test_house_cup()
 	_test_warden()
 	await _test_portraits()
+	await _test_school_life()
 	_test_localization()
 	await _test_characters()
 	_test_server_content()
@@ -2594,6 +2595,52 @@ func _test_portraits() -> void:
 	castle.queue_free()
 
 
+## The feature modules (nakama/modules/features/) and what the castle shows for them.
+func _test_school_life() -> void:
+	t.section("School life features")
+	# Every refusal a feature module can answer has a player-facing line.
+	var missing: Array[String] = []
+	var regex := RegEx.create_from_string("return nil, \"([a-z_]+)\"")
+	for f in DirAccess.get_files_at("res://nakama/modules/features"):
+		for m in regex.search_all(FileAccess.get_file_as_string("res://nakama/modules/features/" + f)):
+			var key := "REFUSED_" + m.get_string(1).to_upper()
+			if tr(key) == key and not missing.has(key):
+				missing.append(key)
+	t.check(missing.is_empty(), "every feature refusal is translated (%s)" % ", ".join(missing))
+	var areas: Dictionary = {}
+	for line in FileAccess.get_file_as_string("res://nakama/modules/world_areas.lua").split("\n"):
+		if line.strip_edges().begins_with("[\""):
+			areas[line.strip_edges().get_slice("\"", 1)] = true
+	var detention: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://nakama/content/detention.json"))
+	var bad: Array[String] = []
+	for id: String in detention.tasks:
+		var task: Dictionary = detention.tasks[id]
+		if not areas.has(task.area) or tr("DETENTION_TASK_" + id.to_upper()) == "DETENTION_TASK_" + id.to_upper() or tr("INTERACT_DETENTION_" + id.to_upper()) == "INTERACT_DETENTION_" + id.to_upper():
+			bad.append(id)
+	t.check(bad.is_empty() and detention.warden_tasks.all(func(w: String) -> bool: return detention.tasks.has(w)), "detention tasks are in real rooms and translated (%s)" % ", ".join(bad))
+	var text := NetworkManager.notice_text({"key": "DETENTION_GIVEN", "args": ["Prof", "DETENTION_TASK_POLISH_TROPHIES", "AREA_TROPHY_ROOM"]})
+	t.check(text.contains("Prof") and text.contains(tr("DETENTION_TASK_POLISH_TROPHIES")) and text.contains(tr("AREA_TROPHY_ROOM")), "server notices are translated with their arguments (%s)" % text)
+	t.check(NetworkManager.refusal_text("too_fast") == tr("REFUSED_TOO_FAST") and NetworkManager.refusal_text("zzz").contains("zzz"), "refusals read as sentences")
+
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var dt := castle.get_node_or_null("DetentionTasks") as DetentionTasks
+	t.check(dt != null, "the castle shows detention tasks")
+	if dt != null:
+		dt.show_detention({"task": "polish_trophies", "area": "trophy_room", "spots": 5, "done": [2.0]})
+		var zone: AreaZone = dt._zones["trophy_room"]
+		var inside := dt.spots.all(func(s: InteractSpot) -> bool:
+			var d := (s.global_position - zone.global_position).abs()
+			return d.x < zone.size.x / 2.0 and d.z < zone.size.z / 2.0)
+		t.check(dt.spots.size() == 5 and inside, "a detention puts its chores in its room (%d)" % dt.spots.size())
+		t.check(not dt.spots[1].interactable.enabled and dt.spots[0].interactable.enabled, "done chores are dimmed, the rest wait")
+		dt.show_detention({})
+		await get_tree().process_frame
+		t.check(dt.spots.is_empty(), "a served detention clears its chores")
+	castle.queue_free()
+
+
 func _test_timetable() -> void:
 	t.section("Timetable")
 	# 2026-10-12 was a Monday; school time is UTC+2 (summer time) in this payload.
@@ -2610,6 +2657,11 @@ func _test_timetable() -> void:
 	var st := tt.school_time(charms)
 	t.check(st.weekday == 0 and st.hour == 18 and st.minute == 0 and tt.clock_text(charms) == "18:00" and tt.day_key(charms) == "DAY_MON",
 		"times read in school time (Monday 18:00)")
+	var dst := Timetable.new()
+	dst.apply({"tz": 120, "base": 60, "dst": "eu", "slots": []})
+	var after_change := 1792886400.0 + 16 * 3600.0   # 2026-10-25 (the clocks go back) 16:00 UTC = 17:00 winter time
+	t.check(dst.clock_text(after_change) == "17:00" and dst.clock_text(monday + 16 * 3600.0) == "18:00",
+		"a lesson after the clocks change shows at its own hour (%s)" % dst.clock_text(after_change))
 	t.check(tt.next_after(charms - 60.0).id == "mon_charms" and tt.current(charms + 60.0, "class_sigilcraft").id == "mon_charms"
 		and tt.current(charms + 60.0, "library").is_empty(), "next and running lessons")
 	var events := tt.events_between(charms - 400.0, charms + 10.0)

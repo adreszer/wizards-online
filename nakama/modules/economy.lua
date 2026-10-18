@@ -20,8 +20,10 @@ local M = {}
 
 M.CURRENCY = "coins"
 M.DAILY_COLLECTION, M.DAILY_KEY = "economy", "daily"
-M.EARNED_SOURCES = { lesson = true, mystery = true, homework = true }
-M.SOURCES = { lesson = true, mystery = true, admin = true, shop = true }
+-- Earned coins count toward the daily cap: lessons, mysteries, homework, the Echoes'
+-- stories, school events (matches, games, ladder seasons) and selling produce.
+M.EARNED_SOURCES = { lesson = true, mystery = true, homework = true, echo = true, event = true, sale = true }
+M.SOURCES = { lesson = true, mystery = true, admin = true, shop = true, homework = true, echo = true, event = true, sale = true }
 M.MAX_LEDGER = 100
 
 local function wallet_of(account)

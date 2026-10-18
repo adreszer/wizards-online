@@ -42,6 +42,9 @@ func _ready() -> void:
 	var cup := HouseCupDisplay.new()
 	cup.name = "HouseCupDisplay"
 	add_child(cup)
+	var detention := DetentionTasks.new()
+	detention.name = "DetentionTasks"
+	add_child(detention)
 	var meals := FeastMeals.new()
 	meals.name = "FeastMeals"
 	add_child(meals)

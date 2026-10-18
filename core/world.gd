@@ -30,6 +30,9 @@ func _ready() -> void:
 	var journal := Journal.new()
 	journal.name = "Journal"
 	add_child(journal)
+	for panel: FeaturePanel in [RiddlePanel.new()]:
+		panel.name = panel.get_script().get_global_name()
+		add_child(panel)
 	var creator := CharacterCreator.new()
 	creator.name = "CharacterCreator"
 	add_child(creator)

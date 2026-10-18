@@ -18,6 +18,10 @@ const DAY_KEYS: Array[String] = ["DAY_MON", "DAY_TUE", "DAY_WED", "DAY_THU", "DA
 var entries: Array[Dictionary] = []
 ## The school's UTC offset in minutes (school time = epoch + tz × 60).
 var tz_minutes := 0
+## The school's standard offset and whether EU summer time applies (so a lesson after
+## the clocks change shows at its own hour, not shifted by today's offset).
+var base_minutes := 0
+var dst_eu := false
 ## True once the server has sent one (online).
 var received := false
 ## Today in the school calendar (nakama/content/calendar.json): {term?: name key,
@@ -27,6 +31,8 @@ var calendar: Dictionary = {}
 
 func apply(payload: Dictionary) -> void:
 	tz_minutes = int(payload.get("tz", 0))
+	base_minutes = int(payload.get("base", tz_minutes))
+	dst_eu = str(payload.get("dst", "")) == "eu"
 	calendar = payload.get("cal", {}) if payload.get("cal", {}) is Dictionary else {}
 	entries.clear()
 	var raw: Variant = payload.get("slots", [])
@@ -50,6 +56,7 @@ func clear() -> void:
 	entries.clear()
 	calendar = {}
 	tz_minutes = 0
+	dst_eu = false
 	received = false
 
 
@@ -96,10 +103,28 @@ func events_between(from: float, to: float) -> Array[Dictionary]:
 
 ## School-time calendar fields of `t` (weekday 0 = Monday, hour, minute, day number).
 func school_time(t: float) -> Dictionary:
-	var local := int(floor(t)) + tz_minutes * 60
+	var local := int(floor(t)) + offset_minutes_at(t) * 60
 	var day := int(floor(local / 86400.0))
 	var secs := local - day * 86400
 	return {"weekday": posmod(day + 3, 7), "hour": secs / 3600, "minute": (secs % 3600) / 60, "day": day}
+
+
+## The school's UTC offset in minutes at `t` (summer time from the last Sunday of March
+## to the last Sunday of October, 01:00 UTC, when the timetable uses EU rules).
+func offset_minutes_at(t: float) -> int:
+	if not dst_eu:
+		return tz_minutes
+	return base_minutes + (60 if eu_summer(t) else 0)
+
+
+static func eu_summer(t: float) -> bool:
+	var year: int = Time.get_datetime_dict_from_unix_time(int(t)).year
+	return t >= _last_sunday(year, 3) + 3600 and t < _last_sunday(year, 10) + 3600
+
+
+static func _last_sunday(year: int, month: int) -> int:
+	var u := Time.get_unix_time_from_datetime_dict({"year": year, "month": month, "day": 31, "hour": 0, "minute": 0, "second": 0})
+	return u - int(Time.get_datetime_dict_from_unix_time(u).weekday) * 86400
 
 
 ## "18:00" in school time.

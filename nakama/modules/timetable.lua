@@ -257,6 +257,12 @@ function M.school_day(tt, now)
   return math.floor((now + M.offset_at(tt, now)) / 86400)
 end
 
+-- The id of the calendar term `now` falls in ("" outside terms).
+function M.term_id(tt, now)
+  local info = M.day_info(tt, M.school_day(tt, now))
+  return info.term and info.term.id or ""
+end
+
 -- OP_TIMETABLE payload: the school's current UTC offset (minutes, for showing
 -- times in school time) and the occurrences.
 function M.payload(tt, now)
@@ -264,7 +270,7 @@ function M.payload(tt, now)
   for _, o in ipairs(M.occurrences(tt, now)) do
     table.insert(list, { id = o.id, k = o.kind, s = o.subject, a = o.area, p = o.professor, t0 = o.t0, t1 = o.t1, x = o.exam or nil })
   end
-  return nk.json_encode({ tz = math.floor(M.offset_at(tt, now) / 60), slots = list,
+  return nk.json_encode({ tz = math.floor(M.offset_at(tt, now) / 60), base = tt.utc_offset_minutes, dst = tt.dst, slots = list,
                           cal = M.calendar_payload(tt, M.school_day(tt, now)) })
 end
 

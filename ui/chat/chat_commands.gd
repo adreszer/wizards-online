@@ -37,6 +37,14 @@ const DUEL_ALIASES := {"duel": "challenge", "pojedynek": "challenge", "accept": 
 const MODERATION_ALIASES := {"report": "report", "zglos_gracza": "report", "zgłoś_gracza": "report", "block": "block", "blokuj": "block",
 	"unblock": "unblock", "odblokuj": "unblock", "mute": "mute", "wycisz": "mute", "kick": "kick", "wyrzuc": "kick", "wyrzuć": "kick", "ban": "ban"}
 const DEDUCT_ALIASES: Array[String] = ["deduct", "odejmij"]
+## Commands that are feature requests (NetworkManager.request): alias → [kind, argument names];
+## the last argument takes the rest of the line. The answer comes back as a chat line.
+const REQUEST_COMMANDS := {
+	"detention": ["detention_assign", ["name", "task"]], "kara": ["detention_assign", ["name", "task"]],
+	"housestats": ["house_stats", ["house"]], "dom": ["house_stats", ["house"]],
+	"houseboard": ["house_board_post", ["text"]], "ogloszenie": ["house_board_post", ["text"]], "ogłoszenie": ["house_board_post", ["text"]],
+	"head": ["house_head_set", ["name", "house"]], "opiekun": ["house_head_set", ["name", "house"]],
+}
 const STAND_ALIASES: Array[String] = ["stand", "wstan", "wstań"]
 const GIVE_ALIASES: Array[String] = ["give", "daj"]
 const BROOM_ALIASES: Array[String] = ["broom", "miotla", "miotła"]
@@ -121,6 +129,8 @@ static func run(text: String, player: Node) -> String:
 			return _t("GUEST_USAGE")
 		NetworkManager.send_guest_pass(" ".join(parts.slice(1)))
 		return _t("GUEST_REQUESTED")
+	if REQUEST_COMMANDS.has(name):
+		return request_command(REQUEST_COMMANDS[name], parts.slice(1))
 	if DEDUCT_ALIASES.has(name):
 		if parts.size() < 4 or not parts[1].is_valid_int() or not parts[2].is_valid_int():
 			return _t("DEDUCT_USAGE")
@@ -151,6 +161,20 @@ static func run(text: String, player: Node) -> String:
 	if GOTO_ALIASES.has(name):
 		return goto(parts[1] if parts.size() > 1 else "", player)
 	return _t("CHEAT_UNKNOWN") % text
+
+
+## Sends a feature request built from the command's words (see REQUEST_COMMANDS).
+static func request_command(spec: Array, words: Array) -> String:
+	if not NetworkManager.is_in_world():
+		return _t("SELF_STUDY_ONLINE_ONLY")
+	var names: Array = spec[1]
+	var payload := {}
+	for i in names.size():
+		if i >= words.size():
+			break
+		payload[names[i]] = " ".join(words.slice(i)) if i == names.size() - 1 else str(words[i])
+	NetworkManager.request_and_report(spec[0], payload)
+	return _t("MODERATION_SENT")
 
 
 ## A gesture, sitting down or standing up for the local player.

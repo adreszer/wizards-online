@@ -45,6 +45,7 @@ local Quests = require("house_quests")
 local Moderation = require("moderation")
 local Duel = require("duel")
 local WARDEN = require("generated.warden")
+local Features = require("features")
 
 local P = require("generated.protocol")
 local OP_STATE, OP_SPELL_CAST, OP_HELD_ITEM, OP_AREA = P.OP_STATE, P.OP_SPELL_CAST, P.OP_HELD_ITEM, P.OP_AREA
@@ -720,6 +721,8 @@ local function end_duel(dispatcher, state, duel)
     nk.logger_info(string.format("duel: %s beat %s", state.names[duel.winner] or "?", state.names[Duel.opponent(duel, duel.winner)] or "?"))
   end
   state.duel_of[duel.a], state.duel_of[duel.b] = nil, nil
+  -- For feature modules (the ladder) on the next tick.
+  table.insert(state.finished_duels, duel)
 end
 
 local function tick_duels(dispatcher, state, now)
@@ -820,13 +823,124 @@ local function feed_mysteries(dispatcher, state, sid, ev)
   run_actions(dispatcher, state, Mysteries.on_event(state.engine, state.mysteries, ev, ctx))
 end
 
+-- Takes `n` (default 1) of `id` from `sid`'s inventory. Returns true when they had enough.
+local function take_item(dispatcher, state, sid, id, n)
+  local inv, p = state.inventories[sid], state.presences[sid]
+  n = n or 1
+  if not inv or not p then return false end
+  for i, e in ipairs(inv.items) do
+    if e.id == id and e.count >= n then
+      e.count = e.count - n
+      if e.count == 0 then
+        table.remove(inv.items, i)
+        if inv.held == id then inv.held = "" end
+      end
+      write_inventory(p.user_id, inv)
+      dispatcher.broadcast_message(OP_INVENTORY, nk.json_encode(inv), { p }, nil, true)
+      return true
+    end
+  end
+  return false
+end
+
+local function count_item(state, sid, id)
+  for _, e in ipairs((state.inventories[sid] or { items = {} }).items) do
+    if e.id == id then return e.count end
+  end
+  return 0
+end
+
+-- The helpers feature modules (features.lua) work through: the match state to read,
+-- and every way they may change the world, bound to this dispatcher.
+local function feature_api(dispatcher, state)
+  local api = { nk = nk, state = state, now = nk.time() / 1000, AREAS = AREAS, ITEMS = ITEMS, rules = state.rules }
+  function api.uid(sid) local p = state.presences[sid] return p and p.user_id or nil end
+  function api.name(sid) return state.names[sid] or "" end
+  function api.profile(sid) return state.profiles[sid] end
+  function api.role(sid) local pr = state.profiles[sid] return pr and pr.role or "student" end
+  function api.house(sid) local pr = state.profiles[sid] return pr and pr.house or 0 end
+  function api.is_staff(sid) local r = api.role(sid) return r == "professor" or r == "admin" end
+  function api.is_admin(sid) return api.role(sid) == "admin" end
+  function api.area(sid) return state.areas[sid] or "" end
+  function api.position(sid) return state.positions[sid] end
+  function api.locale(sid) return state.locales[sid] or "pl" end
+  function api.online(sid) return state.presences[sid] ~= nil end
+  function api.find(name) return find_sid(state, nil, name) end
+  function api.sid_of_user(uid) return sid_of_user(state, uid) end
+  function api.players_in(area) return players_in(state, area) end
+  function api.sids()
+    local out = {}
+    for sid, _ in pairs(state.presences) do table.insert(out, sid) end
+    return out
+  end
+  function api.save_profile(sid)
+    local p = state.presences[sid]
+    if p and state.profiles[sid] then
+      Profile.write(p.user_id, state.profiles[sid])
+      send_profile(dispatcher, state, sid)
+    end
+  end
+  -- OP_PUSH {kind, data} to `sids` (a list, one sid, or nil for everyone).
+  function api.push(kind, data, sids)
+    local list
+    if sids ~= nil then
+      list = {}
+      for _, sid in ipairs(type(sids) == "table" and sids or { sids }) do
+        if state.presences[sid] then table.insert(list, state.presences[sid]) end
+      end
+      if #list == 0 then return end
+    end
+    dispatcher.broadcast_message(P.OP_PUSH, nk.json_encode({ kind = kind, data = data }), list, nil, true)
+  end
+  -- A notification the client translates: `key` and its `args` (translation keys among them are translated).
+  function api.notice(sids, key, args, seconds)
+    api.push("notice", { key = key, args = args or {}, seconds = seconds or 6 }, sids)
+  end
+  function api.award(house, delta, reason, source, by_sid)
+    return award_house_points(dispatcher, state, house, delta, reason, by_sid, source)
+  end
+  function api.pay(sid, amount, source, detail)
+    return pay(dispatcher, state, sid, amount, { source = source }, detail)
+  end
+  -- Coins taken for a purchase (or a fee): ok, balance, reason.
+  function api.spend(sid, amount, reason)
+    local uid = api.uid(sid)
+    if not uid then return false, 0, "offline" end
+    local done, balance, why = Economy.spend(uid, amount, reason)
+    if done then send_wallet(dispatcher, state, sid, balance, -amount, "shop", reason) end
+    return done, balance, why
+  end
+  function api.give_item(sid, id) return give_item(dispatcher, state, sid, id) end
+  function api.take_item(sid, id, n) return take_item(dispatcher, state, sid, id, n) end
+  function api.count_item(sid, id) return count_item(state, sid, id) end
+  function api.rumour(key, house) add_rumour(dispatcher, state, key, house) end
+  function api.text(sid, key) send_text(dispatcher, state, sid, key) end
+  function api.log(entry) Records.log_lesson(entry) end
+  function api.feed(sid, ev) feed_mysteries(dispatcher, state, sid, ev) end
+  function api.grant_spell(sid, id, by_name) return grant_spell(dispatcher, state, sid, id, by_name) end
+  function api.school_hours()
+    local day = School.day_seconds(state.rules)
+    return ((api.now + state.clock_offset) / day % 1) * 24
+  end
+  function api.school_day() return Timetable.school_day(state.timetable, api.now) end
+  function api.timetable() return state.timetable end
+  -- World objects: the state of one, set it (sent to everyone), and whether players may change it.
+  function api.object_state(oid) return Objects.state_of(state.world, oid) end
+  function api.set_object(oid, value)
+    state.world.objects[oid] = value
+    broadcast_object(dispatcher, oid, value)
+  end
+  function api.drive(oid, on) state.world.driven[oid] = on or nil end
+  return api
+end
+
 function M.match_init(context, params)
   local state = { presences = {}, names = {}, chars = {}, inventories = {}, profiles = {}, areas = {}, locales = {},
                   progress = {}, world = Objects.new_world(), mysteries = Mysteries.new_state(), engine = Mysteries.load(),
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
                   positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup(),
-                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0, caught_night = {}, rumours = {} }
+                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0, caught_night = {}, rumours = {}, finished_duels = {}, features = {} }
   state.world.driven = state.engine.driven
   return state, TICK_RATE, "world"
 end
@@ -883,6 +997,7 @@ function M.match_join(context, dispatcher, tick, state, presences)
     send_wallet(dispatcher, state, p.session_id, Economy.balance(p.user_id))
     send_clock(dispatcher, state, { p })
     send_timetable(dispatcher, state, { p })
+    Features.each("join", feature_api(dispatcher, state), p.session_id)
     -- Direct messages that arrived while the player was away.
     for _, mail in ipairs(Chat.take_mail(p.user_id)) do
       mail.mail = true
@@ -901,6 +1016,7 @@ function M.match_leave(context, dispatcher, tick, state, presences)
     local sid = p.session_id
     if state.presences[sid] then
       local entry = entry_for(state, sid)
+      Features.each("leave", feature_api(dispatcher, state), sid)
       state.presences[sid] = nil
       state.names[sid] = nil
       state.chars[sid] = nil
@@ -951,6 +1067,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
     check_ended_slots(state, now)
     tick_self_study(dispatcher, state, now)
     tick_duels(dispatcher, state, now)
+    Features.each("tick", feature_api(dispatcher, state), now)
     if tick % (TICK_RATE * 60) == 0 then check_term_end(dispatcher, state, now) end
     local occupied = function(area) return #players_in(state, area) > 0 end
     run_actions(dispatcher, state, Mysteries.tick(state.engine, state.mysteries, nk.time() / 1000, occupied))
@@ -977,7 +1094,9 @@ function M.match_loop(context, dispatcher, tick, state, messages)
       if ok and type(payload) == "table" then
         local area = sanitize_area(payload.id, state.profiles[sid], state.guest_passes[sid])
         local changed = area ~= state.areas[sid]
+        local previous = state.areas[sid] or ""
         state.areas[sid] = area
+        if changed then Features.each("area", feature_api(dispatcher, state), sid, area, previous) end
         if changed and area ~= "" then
           local lesson = state.lessons[area]
           if lesson and lesson.by_sid ~= sid then
@@ -1108,6 +1227,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
             end
           end
           feed_mysteries(dispatcher, state, sid, { event = ev.event, object = ev.oid, effect_type = ev.effect_type, state = Objects.state_of(state.world, ev.oid) })
+          Features.each("event", feature_api(dispatcher, state), sid, ev)
         else
           nk.logger_debug(string.format("world event from %s refused: %s", sid, tostring(reason)))
         end
@@ -1320,6 +1440,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         award_house_points(dispatcher, state, profile.house, -state.rules.curfew_points, "out after curfew: " .. (state.names[sid] or ""), nil, "curfew")
         Records.log_lesson({ kind = "detention", subject = "", area = area, slot = "", by = "", by_name = "warden", opened_at = now, closed_at = now,
                              why = "curfew", attended = { [message.sender.user_id] = state.names[sid] or "" }, points = state.rules.curfew_points })
+        Features.each("caught", feature_api(dispatcher, state), sid)
       end
     elseif message.op_code == OP_DUEL then
       local ok, payload = pcall(nk.json_decode, message.data)
@@ -1533,6 +1654,14 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         end
       end
       dispatcher.broadcast_message(OP_LESSON_TOOL_RESULT, nk.json_encode({ ok = reason == nil, tool = tool, reason = reason or "" }), { message.sender }, nil, true)
+    elseif message.op_code == P.OP_REQUEST then
+      local ok, payload = pcall(nk.json_decode, message.data)
+      payload = ok and type(payload) == "table" and payload or {}
+      local done, reason, data = Features.request(feature_api(dispatcher, state), sid, payload)
+      if state.presences[sid] then
+        dispatcher.broadcast_message(P.OP_REPLY, nk.json_encode({ id = tonumber(payload.id) or 0, kind = tostring(payload.kind or ""), ok = done,
+          reason = reason, data = data }), { message.sender }, nil, true)
+      end
     elseif message.op_code == OP_PING then
       -- Echo the client's send time with the server's clock (ms since the epoch), so
       -- clients can agree on one time for scheduled movers (shifting stairs, clockwork).

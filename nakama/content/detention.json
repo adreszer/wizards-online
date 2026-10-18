@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "polish_trophies": { "area": "trophy_room", "spots": 5, "secret": "DETENTION_SECRET_TROPHIES" },
+    "reshelve_books": { "area": "library", "spots": 6 },
+    "sort_ingredients": { "area": "class_elixirs", "spots": 5 },
+    "scrub_pots": { "area": "kitchens", "spots": 4, "secret": "DETENTION_SECRET_KITCHENS" }
+  },
+  "warden_tasks": ["polish_trophies", "reshelve_books", "scrub_pots"]
+}

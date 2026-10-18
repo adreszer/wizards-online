@@ -128,7 +128,7 @@ func refresh() -> void:
 	(_pages["JOURNAL_TAB_SPELLS"] as RichTextLabel).text = spells_bbcode(_player.spell_caster if _player != null else null)
 	(_pages["JOURNAL_TAB_RECORD"] as RichTextLabel).text = record_bbcode(record) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	(_pages["JOURNAL_TAB_DISCOVERIES"] as RichTextLabel).text = discoveries_bbcode(profile.get("discoveries", []))
-	(_pages["JOURNAL_TAB_HOUSE"] as RichTextLabel).text = house_bbcode(NetworkManager.house_quests, NetworkManager.get_house_totals(), _player.house if _player != null else 0) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
+	(_pages["JOURNAL_TAB_HOUSE"] as RichTextLabel).text = house_bbcode(NetworkManager.house_quests, NetworkManager.get_house_totals(), _player.house if _player != null else 0) + board_bbcode(NetworkManager.feature("house_board")) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	var now := NetworkManager.server_time()
 	(_pages["JOURNAL_TAB_HOMEWORK"] as RichTextLabel).text = homework_bbcode(homework, now) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	_hw_pick.clear()
@@ -179,6 +179,19 @@ static func house_bbcode(quests: Dictionary, totals: PackedInt32Array, house: in
 
 
 ## Each assignment: subject, the task, due date, your answer and grade.
+## The house board: the head of house's and prefects' posts, newest first.
+static func board_bbcode(board: Dictionary) -> String:
+	var posts: Variant = board.get("posts", [])
+	var out := "\n\n[b]%s[/b]" % TranslationServer.translate("HOUSE_BOARD_TITLE")
+	if str(board.get("head", "")) != "":
+		out += "  " + TranslationServer.translate("HOUSE_BOARD_HEAD") % str(board.head)
+	if not posts is Array or (posts as Array).is_empty():
+		return out + "\n" + TranslationServer.translate("HOUSE_BOARD_EMPTY")
+	for p: Dictionary in posts:
+		out += "\n• %s [i]— %s[/i]" % [str(p.get("text", "")), str(p.get("by", ""))]
+	return out
+
+
 static func homework_bbcode(list: Array, now: float) -> String:
 	if list.is_empty():
 		return TranslationServer.translate("HOMEWORK_NONE")

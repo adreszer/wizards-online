@@ -666,3 +666,81 @@ RUMOUR_IDLE_1,"Someone heard knocking behind a bookshelf in the library.","Ktoś
 RUMOUR_IDLE_2,"The turning stairs never stop at the same landing twice in a row, you know.","Ruchome schody nigdy nie stają dwa razy z rzędu przy tym samym podeście, wiesz?"
 RUMOUR_IDLE_3,"Mind the warden after ten. His lantern sees further than he does.","Uważaj na strażnika po dziesiątej. Jego latarnia widzi dalej niż on."
 RUMOUR_IDLE_4,"The founders' cracked cauldron is still somewhere in the castle.","Pęknięty kociołek założycieli wciąż jest gdzieś w zamku."
+REQUEST_DONE,Done.,Gotowe.
+REFUSED_GENERIC,Not possible (%s).,Nie da się (%s).
+REFUSED_OFFLINE,"Only online, in the shared castle.","Tylko online, we wspólnym zamku."
+REFUSED_TIMEOUT,The castle did not answer. Try again.,Zamek nie odpowiedział. Spróbuj ponownie.
+REFUSED_NOT_ALLOWED,You may not do that.,Nie wolno ci tego zrobić.
+REFUSED_NO_SUCH_PLAYER,Nobody of that name is in the castle.,Nikogo o tym imieniu nie ma w zamku.
+REFUSED_WRONG_ROOM,Not here: go to the right room first.,Nie tutaj: najpierw idź do właściwej sali.
+REFUSED_TOO_FAST,Not so fast.,Nie tak szybko.
+REFUSED_ALREADY_DONE,That is already done.,To już zrobione.
+REFUSED_NOT_A_STUDENT,Only students get that.,To dotyczy tylko uczniów.
+REFUSED_OTHER_HOUSE,Only for students of your own house.,Tylko dla uczniów twojego domu.
+REFUSED_ALREADY_IN_DETENTION,They already have a detention.,Ta osoba ma już szlaban.
+REFUSED_UNKNOWN_TASK,There is no such task.,Nie ma takiego zadania.
+REFUSED_NO_DETENTION,You have no detention.,Nie masz szlabanu.
+REFUSED_UNKNOWN_REQUEST,The castle does not know that request.,Zamek nie zna takiej prośby.
+REFUSED_SERVER_ERROR,Something went wrong in the castle.,Coś poszło nie tak w zamku.
+REFUSED_INSUFFICIENT,Not enough coins.,Za mało koron.
+OK_DETENTION_ASSIGN,Detention given.,Szlaban zadany.
+DETENTION_GIVEN,Detention from %s: %s in the %s.,"Szlaban od: %s. Zadanie: %s, miejsce: %s."
+DETENTION_DONE,Detention served: %s.,Szlaban odbyty: %s.
+DETENTION_TASK_POLISH_TROPHIES,polish the trophies,wypolerować trofea
+DETENTION_TASK_RESHELVE_BOOKS,put the books back on the shelves,odłożyć książki na półki
+DETENTION_TASK_SORT_INGREDIENTS,sort the potion ingredients,posortować składniki eliksirów
+DETENTION_TASK_SCRUB_POTS,scrub the kitchen pots,wyszorować kuchenne garnki
+INTERACT_DETENTION_POLISH_TROPHIES,Polish,Poleruj
+INTERACT_DETENTION_RESHELVE_BOOKS,Shelve the book,Odłóż książkę
+INTERACT_DETENTION_SORT_INGREDIENTS,Sort,Sortuj
+INTERACT_DETENTION_SCRUB_POTS,Scrub,Szoruj
+DETENTION_SECRET_TROPHIES,"Under the last cup something clicks, as if a catch gave way behind the cabinet.","Pod ostatnim pucharem coś klika, jakby za gablotą puścił zatrzask."
+DETENTION_SECRET_KITCHENS,Behind the biggest pot the tiles sound hollow.,Za największym garnkiem kafle brzmią głucho.
+REFUSED_NO_PLAYER,That player is not in the castle.,Tego gracza nie ma w zamku.
+REFUSED_BAD_SPOT,Nothing to do there.,Tu nie ma nic do zrobienia.
+REFUSED_ALREADY_FOUNDED,You have already founded a club.,Założyłeś już klub.
+REFUSED_ALREADY_FRIENDS,You are friends already.,Już jesteście przyjaciółmi.
+REFUSED_ALREADY_MEMBER,You are a member already.,Już należysz do tego klubu.
+REFUSED_ALREADY_PLAYING,Finish your game first.,Najpierw skończ swoją grę.
+REFUSED_BAD_AMOUNT,That amount will not do.,Ta ilość się nie nada.
+REFUSED_BAD_HOUSE,There is no such house.,Nie ma takiego domu.
+REFUSED_BAD_LENGTH,A meeting lasts from 15 minutes to two hours.,Spotkanie trwa od 15 minut do dwóch godzin.
+REFUSED_BAD_MOVE,That move is not allowed.,Taki ruch jest niedozwolony.
+REFUSED_BAD_TIME,Pick a time within the next two weeks.,Wybierz termin w ciągu najbliższych dwóch tygodni.
+REFUSED_BUSY,They are busy with another game.,Ta osoba gra już w coś innego.
+REFUSED_COLUMN_FULL,That column is full.,Ta kolumna jest pełna.
+REFUSED_EMPTY,Write something first.,Najpierw coś napisz.
+REFUSED_NAME_NOT_ALLOWED,That name is not allowed.,Ta nazwa jest niedozwolona.
+REFUSED_NAME_TAKEN,That name is taken.,Ta nazwa jest zajęta.
+REFUSED_NAME_TOO_SHORT,The name is too short.,Nazwa jest za krótka.
+REFUSED_NO_CLUB,There is no such club.,Nie ma takiego klubu.
+REFUSED_NO_GAME,You are not playing.,Nie grasz teraz.
+REFUSED_NO_HOUSE,You need a house first: visit the sorting stone.,Najpierw potrzebujesz domu: odwiedź kamień przydziału.
+REFUSED_NO_INVITE,Nobody has invited you.,Nikt cię nie zaprosił.
+REFUSED_NO_REQUEST,There is no such request.,Nie ma takiego zaproszenia.
+REFUSED_NOT_A_HEAD,Only a head of house sees that.,To widzi tylko opiekun domu.
+REFUSED_NOT_A_PROFESSOR,Only a professor can be a head of house.,Opiekunem domu może być tylko profesor.
+REFUSED_NOT_BOOKABLE,That room cannot be booked.,Tej sali nie można zarezerwować.
+REFUSED_NOT_DECOR,That does not hang over a bed.,Tego nie powiesisz nad łóżkiem.
+REFUSED_NOT_FRIENDS,You are not friends.,Nie jesteście przyjaciółmi.
+REFUSED_NOT_MEMBER,You are not in that club.,Nie należysz do tego klubu.
+REFUSED_NOT_OWNED,You do not have that.,Nie masz tego.
+REFUSED_NOT_TOGETHER,You both have to be in the same room.,Musicie być w tej samej sali.
+REFUSED_NOT_YOUR_TURN,It is not your turn.,To nie twoja kolej.
+REFUSED_NOT_YOURSELF,Not with yourself.,Nie z samym sobą.
+REFUSED_ROOM_TAKEN,Another club has that room then.,Inny klub ma wtedy tę salę.
+REFUSED_TOO_MANY,That is too many.,To za dużo.
+REFUSED_UNKNOWN_ECHO,There is no such Echo.,Nie ma takiego Echa.
+REFUSED_WRONG_ANSWER,Wrong. The door stays shut.,Źle. Drzwi pozostają zamknięte.
+RIDDLE_TITLE,The door asks,Drzwi pytają
+RIDDLE_PLACEHOLDER,Your answer,Twoja odpowiedź
+RIDDLE_ANSWER,Answer,Odpowiedz
+RIDDLE_RIGHT,Right! The door swings open.,Dobrze! Drzwi się otwierają.
+HOUSE_BOARD_HEADER,House notice:,Ogłoszenie domu:
+HOUSE_BOARD_TITLE,House board,Tablica domu
+HOUSE_BOARD_HEAD,Head of house: %s,Opiekun domu: %s
+HOUSE_BOARD_EMPTY,Nothing posted yet.,Na razie nic nie ogłoszono.
+HOUSE_STATS_LINE,"%s: %d points, %d members (%d online). Since the last cup: %s.","%s: %d pkt, %d członków (%d w zamku). Od ostatniego pucharu: %s."
+OK_HOUSE_HEAD_SET,Head of house named.,Opiekun domu wyznaczony.
+OK_HOUSE_BOARD_POST,Posted on the house board.,Ogłoszono na tablicy domu.
+OK_RIDDLE_RESET,The riddle waits for them again.,Zagadka znowu na nich czeka.
