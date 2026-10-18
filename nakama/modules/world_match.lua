@@ -1909,6 +1909,14 @@ function M.match_signal(context, dispatcher, tick, state, data)
     write_inventory(state.presences[sid].user_id, inv)
     dispatcher.broadcast_message(OP_INVENTORY, nk.json_encode(inv), { state.presences[sid] }, nil, true)
   end
+  -- A flying licence given (true) or taken away (false) by an admin (features/flying.lua).
+  if type(request.flying_licence) == "boolean" then
+    local lic = { broom = request.flying_licence, by = "admin", at = nk.time() / 1000 }
+    state.features.licences = state.features.licences or {}
+    state.features.licences[sid] = lic
+    Store.write("school", "licences", state.presences[sid].user_id, lic, true)
+    dispatcher.broadcast_message(P.OP_PUSH, nk.json_encode({ kind = "licence", data = { broom = lic.broom } }), { state.presences[sid] }, nil, true)
+  end
   if request.reset_purse == true then
     send_wallet(dispatcher, state, sid, Economy.reset(state.presences[sid].user_id, "admin"))
   end

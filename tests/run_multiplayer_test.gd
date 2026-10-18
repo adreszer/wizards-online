@@ -605,7 +605,9 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	ok = await _wait_until(func() -> bool: return int(player.spell_caster.mastery.get("arcane_pulse", 0)) >= 1 and int(player.spell_caster.mastery.get("uplift", 0)) >= 2, 10.0)
 	t.check(ok, "real use earns mastery on the server (%s)" % str(player.spell_caster.mastery))
 	await _wait(1.0)
-	t.check(object_events.size() == 1, "events from the wrong area, for unknown objects or with an unknown spell are dropped (%s)" % str(object_events))
+	# Doors on the castle's schedule (CastleSchedule) change by themselves; leave them out.
+	var own_events := object_events.filter(func(e: Array) -> bool: return not CastleSchedule.DOORS.has(str(e[0])))
+	t.check(own_events.size() == 1, "events from the wrong area, for unknown objects or with an unknown spell are dropped (%s)" % str(object_events))
 	t.check(NetworkManager.get_world_object_states().get("undercroft/secret_wall") == hidden_before, "the out-of-reach secret wall did not change")
 
 	t.section("Mysteries (student)")
@@ -715,7 +717,8 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 	cheat_results.clear()   # the brooms section counts its own cheat answers
 
 	t.section("Brooms (student)")
-	var reset_inv: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "reset_inventory": true}, HTTP_KEY)
+	# Broom racks serve licensed flyers (features/flying.lua); the admin tool gives the licence.
+	var reset_inv: Dictionary = await NetworkManager.admin_set_profile({"user_id": NetworkManager.local_user_id, "reset_inventory": true, "flying_licence": true}, HTTP_KEY)
 	ok = await _wait_until(func() -> bool: return not player.inventory.has(&"broom") and player.inventory.has(&"torch"), 10.0)
 	t.check(reset_inv.get("ok", false) == true and ok, "admin reset the inventory to the starting kit")
 	t.check(not player.broom_rider.toggle(), "no broom, no flight")

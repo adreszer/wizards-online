@@ -545,6 +545,7 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] The sealed stacks (`features/stacks.lua`): a professor's permission slip (`/slip name`) lets a student through the restricted stacks' door and counts them there; staff always
 - [x] Portraits as messengers (`features/portraits.lua`, `/portrait name text`): the next portrait the recipient passes delivers the message
 - [x] Duels: rule sets (`/duel name one|three|five`) and professor-refereed duels (`/referee a b [rules]`, both accept); the house cup's live award stages a ceremony (confetti, the hall hung in the winners' colours); exams are held in silence; a new character's first arrival is at the railway station; the journal's Post page keeps the session's paper birds
+- [x] Admins can give or take a flying licence with `admin_set_profile` (`flying_licence`)
 - [x] Platform: a CI workflow (`.github/workflows/check.yml`, `tools/check.sh` on every push) and `tools/backup_nakama.sh` (pg_dump of the database)
 - [x] Tests: castle nodes in place, corners, beds, candles, seasons and holidays, the schedule (and its export), atmospheres, house symbols, presets and bindable actions, Lantern Chase layout, reminders; two clients: the permission slip before the stacks
 
