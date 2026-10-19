@@ -14,7 +14,7 @@ extends RefCounted
 ## origin is the back, like every wall prop).
 const BY_SCENE := {
 	"res://objects/environment/props/student_bench.tscn": [[-0.45, 0.54, 0.0, 0.0, true], [0.45, 0.54, 0.0, 0.0, true]],
-	"res://objects/environment/placeholders/chair.tscn": [[0.0, 0.48, 0.27, 180.0]],
+	"res://objects/environment/props/chair.tscn": [[0.0, 0.49, 0.35, 180.0]],
 	"res://objects/environment/props/armchair.tscn": [[0.0, 0.49, 0.55, 180.0]],
 	"res://objects/environment/props/sofa.tscn": [[-0.55, 0.45, 0.55, 180.0], [0.0, 0.45, 0.55, 180.0], [0.55, 0.45, 0.55, 180.0]],
 }

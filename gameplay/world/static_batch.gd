@@ -33,6 +33,18 @@ const BATCHABLE := [
 	"res://objects/environment/props/sofa.tscn",
 	"res://objects/environment/props/globe.tscn",
 	"res://objects/environment/props/cauldron.tscn",
+	"res://objects/environment/props/table.tscn",
+	"res://objects/environment/props/chair.tscn",
+	"res://objects/environment/props/candelabra.tscn",
+	"res://objects/environment/props/cabinet.tscn",
+	"res://objects/environment/props/barrel.tscn",
+	"res://objects/environment/props/crate.tscn",
+	"res://objects/environment/props/trunk.tscn",
+	"res://objects/environment/props/chest.tscn",
+	"res://objects/environment/props/plant_pot.tscn",
+	"res://objects/environment/props/statue.tscn",
+	"res://objects/environment/props/armour.tscn",
+	"res://objects/environment/props/telescope.tscn",
 ]
 ## Group of every batch (Seats looks through them).
 const GROUP := &"static_batch"

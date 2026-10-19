@@ -2216,7 +2216,7 @@ func _test_gestures() -> void:
 	var from_front := Seats.facing_from(seats[0], Vector3(10, 0, 8))   # standing on its -Z side
 	var from_back := Seats.facing_from(seats[0], Vector3(10, 0, 12))
 	t.check((-from_front.basis.z).z > 0.9 and (-from_back.basis.z).z < -0.9, "a bench sitter faces away from the side they came from")
-	var chair := Seats.for_instance("res://objects/environment/placeholders/chair.tscn", at)[0]
+	var chair := Seats.for_instance("res://objects/environment/props/chair.tscn", at)[0]
 	t.check(not chair.both and (-(chair.t as Transform3D).basis.z).z > 0.9, "a chair faces its front (+Z)")
 
 	var castle := CASTLE_SCENE.instantiate()
