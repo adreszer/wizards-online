@@ -39,6 +39,6 @@
  },
  "window_by_kind": {"hall": "window_double", "library": "window_double", "common_room": "window_double", "classroom": "window_wide"},
  "flora": {},
- "props": {},
+ "props": {"cauldron": "res://objects/environment/props/cauldron.tscn"},
  "floor_tiles": {"plain": ["floor_tile_plain", 0.46], "ornate": ["floor_tile_ornate", 0.22]}
 }
