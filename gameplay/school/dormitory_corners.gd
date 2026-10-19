@@ -7,7 +7,7 @@ extends Node3D
 ## Beds are batched props, so StaticBatch records where they stand; they are numbered
 ## per dormitory in a stable order (by position). castle.gd adds this.
 
-const BED := "res://objects/environment/placeholders/bed.tscn"
+const BED := "res://objects/environment/props/bed.tscn"
 const COLOR_SPOT := Color(0.85, 0.75, 0.45)
 
 ## dormitory area id -> beds (global transforms) in number order
@@ -96,11 +96,11 @@ static func build_corner(at: Transform3D, owner: String, decor: Array, house: in
 	plate.pixel_size = 0.004
 	plate.outline_size = 6
 	plate.modulate = Color(0.95, 0.88, 0.7)
-	plate.position = Vector3(0, 1.25, 0.08)
+	plate.position = Vector3(0, 1.7, 0.08)
 	corner.add_child(plate)
 	for i in decor.size():
 		var piece := decor_mesh(str(decor[i]), house)
-		piece.position = Vector3((i - 1) * 0.6, 1.85, 0.06)
+		piece.position = Vector3((i - 1) * 0.6, 2.3, 0.06)
 		corner.add_child(piece)
 	return corner
 

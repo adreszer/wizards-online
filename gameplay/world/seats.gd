@@ -15,8 +15,8 @@ extends RefCounted
 const BY_SCENE := {
 	"res://objects/environment/props/student_bench.tscn": [[-0.45, 0.54, 0.0, 0.0, true], [0.45, 0.54, 0.0, 0.0, true]],
 	"res://objects/environment/placeholders/chair.tscn": [[0.0, 0.48, 0.27, 180.0]],
-	"res://objects/environment/placeholders/armchair.tscn": [[0.0, 0.45, 0.5, 180.0]],
-	"res://objects/environment/placeholders/sofa.tscn": [[-0.5, 0.45, 0.5, 180.0], [0.5, 0.45, 0.5, 180.0]],
+	"res://objects/environment/props/armchair.tscn": [[0.0, 0.49, 0.55, 180.0]],
+	"res://objects/environment/props/sofa.tscn": [[-0.55, 0.45, 0.55, 180.0], [0.0, 0.45, 0.55, 180.0], [0.55, 0.45, 0.55, 180.0]],
 }
 ## How close (metres, feet to seat) a seat must be to sit on it.
 const REACH := 1.8
