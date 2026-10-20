@@ -13,6 +13,8 @@ Godot draws without mipmaps and a 1024 px crest shown at 24 px would shimmer):
   crest_N_<house>_mono_48.png  the same at 48 px (HUD and list icons)
 
   emblem.png / emblem_512.png  the school emblem (four houses around the book), 1024 / 512 px
+  wordmark.png / wordmark_640.png  the game name lettering (owner's), 2048 / 640 px wide
+  splash.png                   the emblem over the wordmark, for the boot splash
   icon.png                     the mark (book and star in a ring), 1024 px: window and app icon
   icon.ico                     Windows icon; 16 and 24 px use the book and star alone, as the
                                ring's thin lines vanish at that size
@@ -113,6 +115,45 @@ def icon() -> None:
     disc.resize((256, 256), Image.LANCZOS).save(OUT / "icon_small.png", optimize=True)
 
 
+def unpremultiplied(im: Image.Image, bg: tuple, alpha: Image.Image) -> Image.Image:
+    """The colour each pixel would have had without the background showing through."""
+    out = Image.new("RGBA", im.size)
+    px, a_px, o = im.load(), alpha.load(), out.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            a = a_px[x, y]
+            if a == 0:
+                o[x, y] = (0, 0, 0, 0)
+                continue
+            f = a / 255
+            o[x, y] = tuple(max(0, min(255, int((px[x, y][i] - bg[i] * (1 - f)) / f))) for i in range(3)) + (a,)
+    return out
+
+
+def wordmark() -> Image.Image:
+    """The lettering on transparency, cropped to the art with a small margin."""
+    im = Image.open(SRC / "wordmark.png").convert("RGB")
+    bg = im.getpixel((4, 4))
+    diff = ImageChops.difference(im, Image.new("RGB", im.size, bg)).convert("L")
+    alpha = diff.point(lambda v: max(0, min(255, (v - 8) * 3)))
+    out = unpremultiplied(im, bg, alpha)
+    box = alpha.point(lambda v: 255 if v > 30 else 0).getbbox()
+    pad = 24
+    out = out.crop((max(0, box[0] - pad), max(0, box[1] - pad), min(im.width, box[2] + pad), min(im.height, box[3] + pad)))
+    for width, name in [(2048, "wordmark.png"), (640, "wordmark_640.png")]:
+        out.resize((width, round(out.height * width / out.width)), Image.LANCZOS).save(OUT / name, optimize=True)
+    return out
+
+
+def splash(mark: Image.Image) -> None:
+    emblem = Image.open(OUT / "emblem.png").resize((560, 560), Image.LANCZOS)
+    word = mark.resize((900, round(mark.height * 900 / mark.width)), Image.LANCZOS)
+    canvas = Image.new("RGBA", (960, 560 + 20 + word.height), (0, 0, 0, 0))
+    canvas.alpha_composite(emblem, ((960 - 560) // 2, 0))
+    canvas.alpha_composite(word, ((960 - 900) // 2, 580))
+    canvas.save(OUT / "splash.png", optimize=True)
+
+
 def main() -> None:
     for house in HOUSES:
         colour(SRC / f"crest_{house}.png", OUT / f"crest_{house}.png")
@@ -120,7 +161,8 @@ def main() -> None:
         print("crest", house)
     colour(SRC / "emblem.png", OUT / "emblem.png", 512, 0.85)
     icon()
-    print("emblem and icon")
+    splash(wordmark())
+    print("emblem, wordmark, splash and icon")
 
 
 if __name__ == "__main__":

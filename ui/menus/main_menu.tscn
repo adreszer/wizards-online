@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://mainmenu00001"]
+[gd_scene load_steps=4 format=3 uid="uid://mainmenu00001"]
 
 [ext_resource type="Script" path="res://ui/menus/main_menu.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/ui/brand/emblem_512.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/ui/brand/wordmark_640.png" id="3"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -38,18 +39,19 @@ layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="Emblem" type="TextureRect" parent="Center/Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 230)
+custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Title" type="Label" parent="Center/Panel/Margin/VBox"]
-theme_type_variation = &"TitleLabel"
+[node name="Wordmark" type="TextureRect" parent="Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
-theme_override_font_sizes/font_size = 60
-text = "Arcane Academy"
-horizontal_alignment = 1
+tooltip_text = "Arcane Academy"
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Subtitle" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
