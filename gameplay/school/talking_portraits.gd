@@ -14,6 +14,9 @@ const QUIET_SECONDS := 90.0
 const SHOW_SECONDS := 7.0
 const IDLE_LINES := 4
 
+## A portrait spoke (LivePortraits has a live sitter gesture along).
+signal spoke(portrait: Transform3D)
+
 var portraits: Array[Transform3D] = []
 var _quiet_until: Dictionary = {}
 ## Messages already spoken (their removal is on its way to the server).
@@ -26,6 +29,13 @@ var _timer := 0.0
 
 static func is_portrait(path: String) -> bool:
 	return path == PORTRAIT or path.begins_with(PORTRAIT_DIR)
+
+
+## The sitter a portrait scene shows (portrait_07.tscn → 7), 0 for the placeholder.
+static func sitter_of(path: String) -> int:
+	if not path.begins_with(PORTRAIT_DIR):
+		return 0
+	return path.get_file().get_basename().trim_prefix("portrait_").to_int()
 
 
 func _ready() -> void:
@@ -99,3 +109,4 @@ func speak(portrait: Transform3D, text: String) -> void:
 	_bubble.global_position = portrait.origin + portrait.basis.z * 0.6 + Vector3.UP * 0.6
 	_bubble.visible = true
 	_bubble_left = SHOW_SECONDS
+	spoke.emit(portrait)

@@ -78,8 +78,10 @@ var seats: Array[Dictionary] = []
 var boards: Array[Transform3D] = []
 ## Where every feast table stands (global transforms), for FeastMeals.
 var feast_tables: Array[Transform3D] = []
-## Where every portrait hangs, for TalkingPortraits.
+## Where every portrait hangs, for TalkingPortraits and LivePortraits.
 var portraits: Array[Transform3D] = []
+## Which sitter each of those portraits shows (portrait_07.tscn → 7; 0 = a placeholder).
+var portrait_sitters: Array[int] = []
 ## Where every bed stands, for DormitoryCorners.
 var beds: Array[Transform3D] = []
 
@@ -151,6 +153,7 @@ func add(scene: PackedScene, xform: Transform3D) -> bool:
 		feast_tables.append(xform)
 	elif TalkingPortraits.is_portrait(scene.resource_path):
 		portraits.append(xform)
+		portrait_sitters.append(TalkingPortraits.sitter_of(scene.resource_path))
 	elif scene.resource_path == DormitoryCorners.BED:
 		beds.append(xform)
 	if Seats.BY_SCENE.has(scene.resource_path):

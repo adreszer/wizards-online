@@ -2592,6 +2592,18 @@ func _test_portraits() -> void:
 		p.global_position = tp.portraits[0].origin + tp.portraits[0].basis.z * 1.2 - Vector3.UP * 1.5
 		await _wait(1.2)
 		t.check(tp._bubble.visible and tp._bubble.text.contains(p.display_name), "walking up to one makes it speak")
+		var lps := castle.get_node_or_null("LivePortraits") as LivePortraits
+		var sitters_known := lps != null and lps.sitters.size() == lps.portraits.size() and lps.sitters.has(1) and lps.sitters.has(10)
+		t.check(sitters_known, "every portrait knows its sitter (1-10 hung in turn)")
+		if lps != null:
+			var lp: LivePortrait = lps.live.get(0)
+			t.check(lp != null and lp.sitter == lps.sitters[0] and lps.live.size() <= LivePortraits.MAX_LIVE,
+				"the portrait in front of the player comes alive with its own sitter (%d live)" % lps.live.size())
+			if lp != null and LivePortrait.is_rigged(lp.sitter):
+				t.check(lp.is_gesturing(), "and gestures as it speaks")
+			p.global_position = tp.portraits[0].origin - tp.portraits[0].basis.z * 3.0 - Vector3.UP * 1.5
+			await _wait(1.5)
+			t.check(not lps.live.has(0), "behind the wall (or walked away) it goes back to paint")
 	castle.queue_free()
 	# Rigged sitters (living portraits): the players' gestures drive them too.
 	for id in ["01", "02", "03", "04", "05", "06", "07"]:
