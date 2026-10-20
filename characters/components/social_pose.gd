@@ -79,6 +79,15 @@ func _process_modification_with_delta(delta: float) -> void:
 			_place_relative(skeleton, g, "Spine", Basis(LEFT, 0.32 * depth), 1.0)
 			_place_relative(skeleton, g, "Spine1", Basis(LEFT, 0.3 * depth), 1.0)
 			_place_relative(skeleton, g, "Spine2", Basis(LEFT, 0.22 * depth), 1.0)
+		&"nod":
+			# Portraits only: two slow nods.
+			var dip := sin(clampf(elapsed / 1.4, 0.0, 1.0) * TAU) * 0.5 + 0.5
+			_turn_head(skeleton, g, Basis(LEFT, 0.22 * (1.0 - dip) * smoothstep(0.0, 0.2, elapsed)))
+		&"salute":
+			# Portraits only: the right hand up to the brow, held, then down.
+			var up := smoothstep(0.0, 0.4, elapsed) * (1.0 - smoothstep(1.5, 1.9, elapsed))
+			_reach(skeleton, g, "Right", (-UP).lerp(RIGHT * 0.75 + UP * 0.2 + FWD * 0.35, up).normalized(),
+				(-UP * 0.3 + FWD * 0.5).lerp(LEFT * 0.8 + UP * 0.45 + FWD * 0.2, up).normalized())
 		&"notes":
 			var scribble := sin(_time * 11.0) * 0.06
 			_turn_head(skeleton, g, Basis(LEFT, 0.38))

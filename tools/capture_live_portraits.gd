@@ -1,6 +1,6 @@
 extends Node
 ## Dev tool: each sitter's painted portrait beside its live one (LivePortrait), under
-## the same light, plus a wave, to check that the live canvas matches the painting
+## the same light, plus its greeting, to check that the live canvas matches the painting
 ## (needs a window; not --headless).
 ##   godot --path . tools/capture_live_portraits.tscn -- --out=/absolute/dir [--sitters=1,2]
 
@@ -51,9 +51,9 @@ func _ready() -> void:
 		await _save("live_%02d_rest.png" % id)
 		# The sitter's own view, before the varnish (to register it against the painting).
 		live.get_child(0).get_texture().get_image().save_png(_out.path_join("raw_%02d.png" % id))
-		if live.gesture(&"wave"):
+		if live.greet():
 			await get_tree().create_timer(0.9).timeout
-			await _save("live_%02d_wave.png" % id)
+			await _save("live_%02d_greet.png" % id)
 		painted.queue_free()
 		live.queue_free()
 		await _frames(2)

@@ -3,8 +3,9 @@ extends Node3D
 ## One portrait come to life: the sitter's model in its own small world, framed and lit
 ## like the portrait studio (tools/render_portrait.py: 85 mm lens, warm key, cool fill,
 ## rim light, dark warm backdrop), drawn onto a canvas laid over the painted one through
-## the paintings' oil varnish (live_portrait.gdshader), cross-fading from the painting. Rigged sitters breathe, follow
-## the player with their head (SitterPose) and gesture (SocialPose); busts sway.
+## the paintings' oil varnish (live_portrait.gdshader), cross-fading from the painting.
+## Rigged sitters breathe, follow the player with their head (SitterPose) and gesture
+## (SocialPose) in their own manner (MANNERS); busts sway and nod.
 ## LivePortraits creates these at the portrait's transform and frees them again.
 
 const MODEL := "res://assets/models/portraits/sitter_%02d.glb"
@@ -29,6 +30,22 @@ const FRAMING := {
 	8: Vector2(1.42, 0.008), 9: Vector2(1.40, -0.008), 10: Vector2(1.38, 0.0),
 }
 
+## Each sitter's greeting and idle gestures, in character.
+const MANNERS := {
+	1: {"greet": &"wave", "idle": [&"nod", &"point", &"shrug"]},       # the star-robed wizard
+	2: {"greet": &"nod", "idle": [&"nod", &"bow"]},                     # the stern witch
+	3: {"greet": &"wave", "idle": [&"point", &"shrug", &"nod"]},        # the young scholar
+	4: {"greet": &"cheer", "idle": [&"wave", &"clap", &"shrug"]},       # the jolly alchemist
+	5: {"greet": &"bow", "idle": [&"nod", &"point"]},                   # the sorceress
+	6: {"greet": &"point", "idle": [&"nod", &"point", &"shrug"]},       # the astronomer, at the sky
+	7: {"greet": &"salute", "idle": [&"salute", &"nod", &"point"]},     # the battle-mage
+	8: {"greet": &"nod", "idle": [&"nod"]},
+	9: {"greet": &"nod", "idle": [&"nod"]},
+	10: {"greet": &"nod", "idle": [&"nod"]},
+}
+## Gestures only portraits make (SocialPose draws them), with their lengths.
+const PORTRAIT_GESTURES := {&"nod": 1.6, &"salute": 2.0}
+
 var sitter := 0
 ## Fading out before LivePortraits frees it.
 var leaving := false
@@ -39,6 +56,7 @@ var _material: ShaderMaterial
 var _sitter_pose: SitterPose
 var _social: SocialPose
 var _gesture_left := 0.0
+var _gesture_id: StringName = &""
 var _fade := 0.0
 var _time := 0.0
 var _look := Vector2.ZERO
@@ -143,14 +161,28 @@ func look_toward(world_point: Vector3) -> void:
 		_sitter_pose.look = _look
 
 
-## Plays a one-shot gesture (Gestures.ONE_SHOT) if this sitter is rigged.
+## Plays a one-shot gesture (Gestures.ONE_SHOT or PORTRAIT_GESTURES); busts only nod.
 func gesture(id: StringName) -> bool:
-	if _social == null or not Gestures.ONE_SHOT.has(id) or _gesture_left > 0.0:
+	var seconds: float = Gestures.ONE_SHOT.get(id, PORTRAIT_GESTURES.get(id, 0.0))
+	if seconds <= 0.0 or _gesture_left > 0.0 or (_social == null and id != &"nod"):
 		return false
-	_social.gesture = id
-	_social.elapsed = 0.0
-	_gesture_left = Gestures.ONE_SHOT[id]
+	if _social != null:
+		_social.gesture = id
+		_social.elapsed = 0.0
+	_gesture_left = seconds
+	_gesture_id = id
 	return true
+
+
+## The sitter's greeting when the portrait speaks.
+func greet() -> bool:
+	return gesture(MANNERS.get(sitter, {}).get("greet", &"wave"))
+
+
+## One of the sitter's idle gestures, at random.
+func idle_gesture() -> bool:
+	var idle: Array = MANNERS.get(sitter, {}).get("idle", [&"nod"])
+	return gesture(idle[randi() % idle.size()])
 
 
 func is_gesturing() -> bool:
@@ -164,8 +196,8 @@ func _process(delta: float) -> void:
 	if leaving and _fade <= 0.0:
 		queue_free()
 		return
+	_gesture_left = maxf(0.0, _gesture_left - delta)
 	if _social != null:
-		_gesture_left = maxf(0.0, _gesture_left - delta)
 		_social.influence = move_toward(_social.influence, 1.0 if _gesture_left > 0.0 else 0.0, delta * Gestures.BLEND_SPEED)
 		_social.active = _social.influence > 0.0
 		if not _social.active:
@@ -173,5 +205,9 @@ func _process(delta: float) -> void:
 	elif _model != null:
 		# Busts: a slow sway and breath, turned a little toward the viewer.
 		_model.rotation.y = lerpf(_model.rotation.y, _look.x * 0.35 + sin(_time * 0.45) * 0.03, minf(1.0, delta * 2.0))
-		_model.rotation.x = sin(_time * 0.31) * 0.012
+		var nod := 0.0
+		if _gesture_id == &"nod" and _gesture_left > 0.0:
+			var t := 1.0 - _gesture_left / float(PORTRAIT_GESTURES[&"nod"])
+			nod = (0.5 - 0.5 * cos(t * TAU * 2.0)) * 0.05
+		_model.rotation.x = sin(_time * 0.31) * 0.012 + nod
 		_model.scale = Vector3(1.0, 1.0 + sin(_time * TAU / 4.2) * 0.006, 1.0)

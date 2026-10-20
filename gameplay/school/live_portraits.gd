@@ -2,16 +2,17 @@ class_name LivePortraits
 extends Node
 ## The castle's portraits move. Paintings stay paint at a distance; the nearest few in
 ## front of the local player turn live (LivePortrait: the sitter's model drawn onto the
-## canvas): they breathe, turn their head to follow the player, wave when they speak
-## (TalkingPortraits.spoke) and now and then gesture on their own while the player
-## lingers. castle.gd adds it after TalkingPortraits.
+## canvas): they breathe, turn their head to follow the player, greet in their own
+## manner when they speak (TalkingPortraits.spoke) and now and then gesture on their
+## own while the player lingers. castle.gd adds it after TalkingPortraits.
 
 const RANGE := 7.0
 const MAX_LIVE := 2
-## Idle gestures while the player stays near, every IDLE_GAP seconds or so.
-const IDLE_GESTURES: Array[StringName] = [&"wave", &"shrug", &"point", &"bow"]
-const IDLE_REACH := 4.5
-const IDLE_GAP := Vector2(14.0, 30.0)
+## Idle gestures (LivePortrait.MANNERS) while the player stays near: the first after
+## IDLE_FIRST seconds, then every IDLE_GAP.
+const IDLE_REACH := 5.0
+const IDLE_FIRST := Vector2(3.0, 7.0)
+const IDLE_GAP := Vector2(9.0, 18.0)
 
 var portraits: Array[Transform3D] = []
 var sitters: Array[int] = []
@@ -19,7 +20,7 @@ var sitters: Array[int] = []
 var live: Dictionary = {}
 var _timer := 0.0
 var _next_idle: Dictionary = {}
-## Portraits that spoke before they came alive (index -> until when to still wave).
+## Portraits that spoke before they came alive (index -> until when to still greet).
 var _spoke_at: Dictionary = {}
 
 
@@ -51,11 +52,11 @@ func _process(delta: float) -> void:
 		var lp: LivePortrait = live[i]
 		if not is_instance_valid(lp) or lp.leaving or portraits[i].origin.distance_to(head) > IDLE_REACH:
 			continue
-		if now >= float(_next_idle.get(i, now + 4.0)):
-			lp.gesture(IDLE_GESTURES[randi() % IDLE_GESTURES.size()])
+		if not _next_idle.has(i):
+			_next_idle[i] = now + randf_range(IDLE_FIRST.x, IDLE_FIRST.y)
+		elif now >= float(_next_idle[i]):
+			lp.idle_gesture()
 			_next_idle[i] = now + randf_range(IDLE_GAP.x, IDLE_GAP.y)
-		elif not _next_idle.has(i):
-			_next_idle[i] = now + randf_range(4.0, 10.0)
 
 
 ## Which portraits should be live for a viewer at `head`: the nearest MAX_LIVE with a
@@ -98,7 +99,7 @@ func update_live(head: Vector3) -> void:
 		lp.look_toward(head)
 		live[i] = lp
 		if float(_spoke_at.get(i, 0.0)) > Time.get_ticks_msec() / 1000.0:
-			lp.gesture(&"wave")
+			lp.greet()
 		_spoke_at.erase(i)
 
 
@@ -108,7 +109,7 @@ func _on_spoke(portrait: Transform3D) -> void:
 			continue
 		var lp: LivePortrait = live.get(i)
 		if lp != null and is_instance_valid(lp):
-			lp.gesture(&"wave")
+			lp.greet()
 		else:
 			_spoke_at[i] = Time.get_ticks_msec() / 1000.0 + 2.0
 		return

@@ -2599,12 +2599,21 @@ func _test_portraits() -> void:
 			var lp: LivePortrait = lps.live.get(0)
 			t.check(lp != null and lp.sitter == lps.sitters[0] and lps.live.size() <= LivePortraits.MAX_LIVE,
 				"the portrait in front of the player comes alive with its own sitter (%d live)" % lps.live.size())
-			if lp != null and LivePortrait.is_rigged(lp.sitter):
-				t.check(lp.is_gesturing(), "and gestures as it speaks")
+			if lp != null:
+				t.check(lp.is_gesturing(), "and greets in its own manner as it speaks")
 			p.global_position = tp.portraits[0].origin - tp.portraits[0].basis.z * 3.0 - Vector3.UP * 1.5
 			await _wait(1.5)
 			t.check(not lps.live.has(0), "behind the wall (or walked away) it goes back to paint")
 	castle.queue_free()
+	var greeted := []
+	for id in range(1, 11):
+		var lp := LivePortrait.new()
+		add_child(lp)
+		lp.setup(id)
+		if lp.greet() and lp.is_gesturing():
+			greeted.append(id)
+		lp.free()
+	t.check(greeted.size() == 10, "every sitter has a greeting it can make (%s)" % [greeted])
 	# Rigged sitters (living portraits): the players' gestures drive them too.
 	for id in ["01", "02", "03", "04", "05", "06", "07"]:
 		var sitter: Node3D = (load("res://assets/models/portraits/sitter_%s.glb" % id) as PackedScene).instantiate()
