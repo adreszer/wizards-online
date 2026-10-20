@@ -18,6 +18,15 @@ const MAX_YEAR := 7
 ## HOUSE_<n>_NAME / HOUSE_<n>_ANIMAL; colours: dragon green, griffin gold,
 ## phoenix flame, sea blue.
 const HOUSE_COLORS: Array[Color] = [Color(0.75, 0.75, 0.78), Color(0.2, 0.68, 0.38), Color(0.92, 0.72, 0.25), Color(0.95, 0.42, 0.18), Color(0.28, 0.55, 0.92)]
+## House crests in assets/ui/brand/ (made by tools/prep_crests.py, see
+## assets/ui/PROVENANCE.md). Full: colour, 1024 px, for 3D (mipmapped);
+## CARD: colour at 256 px for 2D panels; MONO: a white glyph to tint, 1024 px;
+## ICON: the glyph at 48 px for HUD and list icons.
+const CREST_FULL := ""
+const CREST_CARD := "_256"
+const CREST_MONO := "_mono"
+const CREST_ICON := "_mono_48"
+const CREST_SLUGS: Array[String] = ["", "1_drakoryn", "2_grypheon", "3_phoenara", "4_hipporys"]
 
 
 static func sanitize_role(role: String) -> String:
@@ -78,6 +87,18 @@ static func house_name(house: int) -> String:
 
 static func house_color(house: int) -> Color:
 	return HOUSE_COLORS[sanitize_house(house)]
+
+
+static func crest_path(house: int, variant: String = CREST_FULL) -> String:
+	if house < 1 or house > MAX_HOUSE:
+		return ""
+	return "res://assets/ui/brand/crest_%s%s.png" % [CREST_SLUGS[house], variant]
+
+
+## The house's crest, or null for the unsorted.
+static func crest(house: int, variant: String = CREST_FULL) -> Texture2D:
+	var path := crest_path(house, variant)
+	return load(path) as Texture2D if path != "" else null
 
 
 ## Translation key for a role's title shown next to a name ("" for students).

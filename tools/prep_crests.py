@@ -4,9 +4,12 @@ Sources live in assets/ui/brand/source/ (as generated, square, 1254 px):
   crest_N_<house>.png       colour crest on dark ink
   crest_N_<house>_mono.png  single-colour crest, dark ink on white
 
-Outputs in assets/ui/brand/ (1024 px):
-  crest_N_<house>.png       colour crest, background outside the seal removed
-  crest_N_<house>_mono.png  white glyph on alpha, tinted in the engine (modulate)
+Outputs in assets/ui/brand/ (1024 px, plus pre-shrunk copies for 2D, where
+Godot draws without mipmaps and a 1024 px crest shown at 24 px would shimmer):
+  crest_N_<house>.png          colour crest, background outside the seal removed
+  crest_N_<house>_256.png      the same at 256 px (sorting reveal, cards)
+  crest_N_<house>_mono.png     white glyph on alpha, tinted in the engine (modulate)
+  crest_N_<house>_mono_48.png  the same at 48 px (HUD and list icons)
 
 Run: python3 tools/prep_crests.py   (needs Pillow)
 """
@@ -24,6 +27,12 @@ HOUSES = ["1_drakoryn", "2_grypheon", "3_phoenara", "4_hipporys"]
 SEAL_RADIUS = 0.86
 
 
+def save(im: Image.Image, dst: Path, small: int) -> None:
+    im.resize((SIZE, SIZE), Image.LANCZOS).save(dst, optimize=True)
+    small_dst = dst.with_name(f"{dst.stem}_{small}.png")
+    im.resize((small, small), Image.LANCZOS).save(small_dst, optimize=True)
+
+
 def colour(src: Path, dst: Path) -> None:
     im = Image.open(src).convert("RGB")
     w, h = im.size
@@ -38,7 +47,7 @@ def colour(src: Path, dst: Path) -> None:
     alpha = ImageChops.lighter(keyed, seal)
     out = im.copy()
     out.putalpha(alpha)
-    out.resize((SIZE, SIZE), Image.LANCZOS).save(dst, optimize=True)
+    save(out, dst, 256)
 
 
 def mono(src: Path, dst: Path) -> None:
@@ -47,7 +56,7 @@ def mono(src: Path, dst: Path) -> None:
     alpha = ImageOps.invert(lum).point(lambda v: max(0, min(255, (v - 6) * 255 // 190)))
     out = Image.new("RGBA", lum.size, (255, 255, 255, 0))
     out.putalpha(alpha)
-    out.resize((SIZE, SIZE), Image.LANCZOS).save(dst, optimize=True)
+    save(out, dst, 48)
 
 
 def main() -> None:

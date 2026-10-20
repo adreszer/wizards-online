@@ -11,6 +11,7 @@ extends CanvasLayer
 @onready var _held_label: Label = %HeldLabel
 @onready var _role_label: Label = %RoleLabel
 @onready var _house_label: Label = %HouseLabel
+@onready var _house_crest: TextureRect = %HouseCrest
 @onready var _coins_label: Label = %CoinsLabel
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _notification_label: Label = %NotificationLabel
@@ -248,8 +249,8 @@ func _on_profile_received(_profile: Dictionary) -> void:
 	_refresh_role()
 
 
-## House points tally (index 0 = house 1), one coloured "<name> <points>" per
-## house; hidden while there is none (offline).
+## House points tally (index 0 = house 1): each house's crest in its colour
+## and its points; hidden while there is none (offline).
 func set_house_totals(totals: PackedInt32Array) -> void:
 	for child in _house_tally.get_children():
 		child.queue_free()
@@ -257,19 +258,40 @@ func set_house_totals(totals: PackedInt32Array) -> void:
 	if not _house_tally.visible:
 		return
 	for h in range(1, CharacterProfile.MAX_HOUSE + 1):
+		var entry := HBoxContainer.new()
+		entry.add_theme_constant_override("separation", 3)
+		entry.tooltip_text = tr("HUD_HOUSE_POINTS") % [CharacterProfile.house_name(h), totals[h - 1]]
+		var crest := _crest_icon(h)
+		crest.custom_minimum_size = Vector2(20, 20)
+		entry.add_child(crest)
 		var label := Label.new()
-		label.text = tr("HUD_HOUSE_POINTS") % [CharacterProfile.house_name(h), totals[h - 1]]
+		label.text = str(totals[h - 1])
 		label.add_theme_color_override("font_color", CharacterProfile.HOUSE_COLORS[h])
-		_house_tally.add_child(label)
+		entry.add_child(label)
+		_house_tally.add_child(entry)
 
 
 ## Text of the tally labels, for tests.
 func house_tally_text() -> String:
 	var parts := PackedStringArray()
-	for child in _house_tally.get_children():
-		if child is Label and not child.is_queued_for_deletion():
-			parts.append((child as Label).text)
+	for entry in _house_tally.get_children():
+		if entry.is_queued_for_deletion():
+			continue
+		for child in entry.get_children():
+			if child is Label:
+				parts.append((child as Label).text)
 	return " ".join(parts)
+
+
+## A house's crest as a small glyph in the house colour.
+static func _crest_icon(house: int) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.texture = CharacterProfile.crest(house, CharacterProfile.CREST_ICON)
+	icon.modulate = CharacterProfile.house_color(house)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return icon
 
 
 ## The purse line; a gain or loss also shows as a notification.
@@ -289,9 +311,13 @@ func _refresh_house() -> void:
 	if house == 0:
 		_house_label.text = tr("HUD_HOUSE_NONE")
 		_house_label.remove_theme_color_override("font_color")
+		_house_crest.visible = false
 	else:
 		_house_label.text = tr("HUD_HOUSE") % CharacterProfile.house_name(house)
 		_house_label.add_theme_color_override("font_color", CharacterProfile.house_color(house))
+		_house_crest.texture = CharacterProfile.crest(house, CharacterProfile.CREST_ICON)
+		_house_crest.modulate = CharacterProfile.house_color(house)
+		_house_crest.visible = true
 
 
 ## Students see nothing; staff see their role and the lesson-tools key.

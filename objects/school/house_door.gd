@@ -8,7 +8,8 @@ extends Node3D
 ## The same oak leaves as CastleDoor (the second turned 180°, each its own
 ## AnimatableBody3D so the collision swings with it), each carrying the house
 ## house crest on both faces: one round emblem with an iron rim, split down the
-## meeting line, so it reads as a single crest while the door is shut and
+## meeting line (the crest image is mapped across both halves), so it reads as
+## a single crest while the door is shut and
 ## parts when it opens. The leaves swing toward the door's +Z side, which the
 ## generator turns into the house area.
 
@@ -46,6 +47,9 @@ const CREST_THICKNESS := 0.025
 ## Leaf face (half the leaf's thickness) the crest sits on.
 const LEAF_FACE := 0.07
 const MEETING_X := 1.784
+## Share of the crest image's half-width the field shows: the seal's outer
+## ring, leaving the notches outside under the iron rim.
+const CREST_IMAGE_RADIUS := 0.45
 
 static var _rim_material: StandardMaterial3D
 
@@ -62,13 +66,21 @@ func _ready() -> void:
 
 func _apply_house_visual() -> void:
 	var color := CharacterProfile.house_color(house)
+	var crest := CharacterProfile.crest(house)
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
-	mat.emission_enabled = true
-	mat.emission = color
-	mat.emission_energy_multiplier = 0.5
-	mat.metallic = 0.3
-	mat.roughness = 0.4
+	if crest != null:
+		# An enamel plate lit from within, like the plain field before it. Unshaded:
+		# the crest light sits right in front of it and would wash the colours out.
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.albedo_texture = crest
+		mat.albedo_color = Color(0.85, 0.85, 0.85)
+	else:
+		mat.albedo_color = color
+		mat.emission_enabled = true
+		mat.emission = color
+		mat.emission_energy_multiplier = 0.5
+		mat.metallic = 0.3
+		mat.roughness = 0.4
 	for field in _crest_fields:
 		field.material_override = mat
 	_light.light_color = color
@@ -90,15 +102,16 @@ func _build_crests() -> void:
 			hinge.add_child(rim)
 			var field := MeshInstance3D.new()
 			field.name = "CrestField" + suffix
-			field.mesh = _half_disc(CREST_RADIUS - CREST_RIM, side)
+			field.mesh = _half_disc(CREST_RADIUS - CREST_RIM, side, face < 0.0)
 			field.position = Vector3(side * MEETING_X, CREST_HEIGHT, z + face * 0.004)
 			hinge.add_child(field)
 			_crest_fields.append(field)
 
 
 ## A half disc of `radius` lying in the XY plane, toward -x (side 1) or +x (side -1)
-## from the meeting line, CREST_THICKNESS thick.
-static func _half_disc(radius: float, side: float) -> ArrayMesh:
+## from the meeting line, CREST_THICKNESS thick. UVs place the crest image
+## centred on the meeting line; `mirror` flips it for a field seen from -z.
+static func _half_disc(radius: float, side: float, mirror: bool = false) -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var steps := 16
@@ -116,18 +129,21 @@ static func _half_disc(radius: float, side: float) -> ArrayMesh:
 			var a := p0 if zf > 0.0 else p1
 			var c := p1 if zf > 0.0 else p0
 			st.set_normal(Vector3(0, 0, signf(zf)))
-			st.add_vertex(Vector3(0, 0, zf))
-			st.add_vertex(c + Vector3(0, 0, zf))
-			st.add_vertex(a + Vector3(0, 0, zf))
+			for v: Vector3 in [Vector3.ZERO, c, a]:
+				st.set_uv(_crest_uv(v, radius, mirror))
+				st.add_vertex(v + Vector3(0, 0, zf))
 		var n := ((p0 + p1) / 2.0).normalized()
 		st.set_normal(n)
-		st.add_vertex(p0 + Vector3(0, 0, half))
-		st.add_vertex(p0 + Vector3(0, 0, -half))
-		st.add_vertex(p1 + Vector3(0, 0, half))
-		st.add_vertex(p1 + Vector3(0, 0, half))
-		st.add_vertex(p0 + Vector3(0, 0, -half))
-		st.add_vertex(p1 + Vector3(0, 0, -half))
+		for v: Vector3 in [p0 + Vector3(0, 0, half), p0 + Vector3(0, 0, -half), p1 + Vector3(0, 0, half),
+				p1 + Vector3(0, 0, half), p0 + Vector3(0, 0, -half), p1 + Vector3(0, 0, -half)]:
+			st.set_uv(_crest_uv(v, radius, mirror))
+			st.add_vertex(v)
 	return st.commit()
+
+
+static func _crest_uv(p: Vector3, radius: float, mirror: bool) -> Vector2:
+	var x := -p.x if mirror else p.x
+	return Vector2(0.5 + x / radius * CREST_IMAGE_RADIUS, 0.5 - p.y / radius * CREST_IMAGE_RADIUS)
 
 
 static func _get_rim_material() -> StandardMaterial3D:

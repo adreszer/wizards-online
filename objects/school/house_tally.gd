@@ -19,6 +19,8 @@ const SCALE_STEP := 100
 ## A house with any points never shows an empty column.
 const MIN_FILL := 0.03
 const NUMERALS: Array[String] = ["I", "II", "III", "IV"]
+## Height of the house crest standing on the lintel above each column, metres.
+const CREST_SIZE := 0.8
 
 ## Totals in house order (index 0 = house 1); empty while there is no tally.
 var totals: PackedInt32Array = PackedInt32Array()
@@ -219,21 +221,14 @@ func _build() -> void:
 		column.add_child(light)
 		_lights.append(light)
 
-		var crest := MeshInstance3D.new()
-		var crest_mesh := SphereMesh.new()
-		crest_mesh.radius = 0.2
-		crest_mesh.height = 0.4
-		crest.mesh = crest_mesh
-		var crest_mat := StandardMaterial3D.new()
-		crest_mat.albedo_color = colour
-		crest_mat.emission_enabled = true
-		crest_mat.emission = colour
-		crest_mat.emission_energy_multiplier = 1.2
-		crest.material_override = crest_mat
-		crest.position = Vector3(0, PLINTH_HEIGHT + COLUMN_HEIGHT + 0.6, 0)
+		var crest := Sprite3D.new()
+		crest.name = "Crest"
+		crest.texture = CharacterProfile.crest(house)
+		crest.pixel_size = CREST_SIZE / crest.texture.get_width()
+		crest.position = Vector3(0, PLINTH_HEIGHT + COLUMN_HEIGHT + 0.4 + CREST_SIZE * 0.55, 0.35)
 		column.add_child(crest)
 
-		var rank := _label("Rank", "", 92, Vector3(0, PLINTH_HEIGHT + COLUMN_HEIGHT + 1.1, 0), column)
+		var rank := _label("Rank", "", 92, Vector3(0, PLINTH_HEIGHT + COLUMN_HEIGHT + 1.6, 0), column)
 		rank.outline_size = 18
 		_rank_labels.append(rank)
 		var points := _label("Points", "", 56, Vector3(0, PLINTH_HEIGHT * 0.5, 0.76), column)

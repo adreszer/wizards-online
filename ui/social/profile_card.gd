@@ -46,7 +46,9 @@ func refresh() -> void:
 static func card_bbcode(d: Dictionary) -> String:
 	var lines := PackedStringArray()
 	var house := int(d.get("house", 0))
-	lines.append("[b]%s[/b] · %s" % [CharacterProfile.house_name(house) if house > 0 else TranslationServer.translate("PROFILE_UNSORTED"),
+	# The card sits on parchment: the house crest is inked, not coloured.
+	var crest := "[img=28x28 color=#%s]%s[/img] " % [UiTokens.INK.to_html(false), CharacterProfile.crest_path(house, CharacterProfile.CREST_ICON)] if house > 0 else ""
+	lines.append("%s[b]%s[/b] · %s" % [crest, CharacterProfile.house_name(house) if house > 0 else TranslationServer.translate("PROFILE_UNSORTED"),
 		TranslationServer.translate("YEAR_%d" % int(d.get("year", 1)))])
 	var titles: Variant = d.get("titles", [])
 	if titles is Array and not (titles as Array).is_empty():

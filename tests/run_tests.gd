@@ -750,6 +750,15 @@ func _test_spell_effects() -> void:
 	caster.select_slot(0)
 	await get_tree().process_frame
 	t.check(hud.hotbar_selected_index() == 0 and hud.get_node("%Hotbar").get_child_count() == SpellCaster.QUICK_SLOT_COUNT, "hotbar follows selection and has ten slots")
+	var old_house: int = player.house
+	player.set_profile(str(player.role), 4)
+	var hud_crest: TextureRect = hud.get_node("%HouseCrest")
+	t.check(hud_crest.visible and hud_crest.texture == CharacterProfile.crest(4, CharacterProfile.CREST_ICON) and hud_crest.modulate == CharacterProfile.house_color(4), "the HUD shows the player's house crest in the house colour")
+	player.set_profile(str(player.role), 0)
+	t.check(not hud_crest.visible, "the unsorted have no crest on the HUD")
+	player.set_profile(str(player.role), old_house)
+	hud.set_house_totals(PackedInt32Array([5, 10, 15, 20]))
+	t.check(hud.house_tally_text() == "5 10 15 20" and hud.get_node("%HouseTally").get_child(0).get_child(0) is TextureRect, "the HUD tally pairs each crest with its points")
 	hud.queue_free()
 	await _clear([floor_body, aim])
 
@@ -862,6 +871,11 @@ func _test_houses() -> void:
 	var tie := PackedInt32Array([0, 1, 1, 0, 0])
 	t.check(HouseSorting.pick(tie) == 1 and HouseSorting.pick(tie, PackedInt32Array([0, 5, 2, 0, 0])) == 2, "ties go to the emptier house")
 	t.check(CharacterProfile.house_name(2) == tr("HOUSE_2_NAME") and CharacterProfile.house_name(0) == "" and CharacterProfile.house_color(9) == CharacterProfile.HOUSE_COLORS[4], "house names and colours resolve")
+	var crests_ok := CharacterProfile.crest(0) == null and CharacterProfile.crest_path(5) == ""
+	for h in range(1, CharacterProfile.MAX_HOUSE + 1):
+		for variant in [CharacterProfile.CREST_FULL, CharacterProfile.CREST_CARD, CharacterProfile.CREST_MONO, CharacterProfile.CREST_ICON]:
+			crests_ok = crests_ok and CharacterProfile.crest(h, variant) != null
+	t.check(crests_ok, "every house has its crest in all four variants, the unsorted none")
 
 	var floor_body := TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(40, 1, 40))
 	await _spawn_player(Vector3(0, 0.1, 0))
@@ -875,6 +889,8 @@ func _test_houses() -> void:
 	add_child(door)
 	door.global_position = Vector3(0, 0, -3)
 	await get_tree().process_frame
+	var crest_mat := (door.get_node("HingeL/CrestFieldFront") as MeshInstance3D).material_override as StandardMaterial3D
+	t.check(crest_mat.albedo_texture == CharacterProfile.crest(2), "the house door carries its house crest")
 	var refusals: Array = []
 	door.refused.connect(func(who: Node) -> void: refusals.append(who))
 	var interactable: Interactable = door.get_node("HingeL/Interactable")
@@ -916,6 +932,7 @@ func _test_houses() -> void:
 				break
 	t.check(completed == [3] and player.house == 3 and panel.get_node("%CloseButton").visible, "answering every question sorts the offline player into house 3")
 	t.check(panel.get_node("%Question").text == tr("SORT_RESULT") % tr("HOUSE_3_NAME"), "the panel announces the house")
+	t.check(panel.get_node("%Crest").visible and (panel.get_node("%Crest") as TextureRect).texture == CharacterProfile.crest(3, CharacterProfile.CREST_CARD), "the panel reveals the house crest")
 	panel.close()
 	t.check(not panel.is_open and not GameSession.ui_input_captured, "closing the panel releases input")
 	stone.get_node("Interactable").interact(player)
@@ -934,6 +951,7 @@ func _test_houses() -> void:
 	t.check(tally.ranks == PackedInt32Array([2, 1, 2, 4]) and is_equal_approx(tally.fill_target(2), 0.6) and is_equal_approx(tally.fill_target(1), 0.15) and tally.fill_target(4) == 0.0, "the leader fills against 200, a negative house stays empty")
 	t.check((tally.get_node("Column2/Rank") as Label3D).text == "I" and (tally.get_node("Column4/Rank") as Label3D).text == "IV", "rank numerals stand above the columns")
 	t.check((tally.get_node("Column2/Points") as Label3D).text == "%s\n%s" % [tr("HOUSE_2_NAME"), tr("TALLY_POINTS") % 120], "the plinth names each house and its points")
+	t.check((tally.get_node("Column3/Crest") as Sprite3D).texture == CharacterProfile.crest(3), "each column carries its house crest")
 	t.check(tally.burst_count == 0, "the first tally does not burst")
 	tally.set_totals(PackedInt32Array([45, 120, 30, -5]))
 	t.check(tally.burst_count == 1 and tally.ranks[0] == 2 and tally.ranks[2] == 3, "a change bursts on that column and re-ranks")

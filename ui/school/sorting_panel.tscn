@@ -73,6 +73,14 @@ theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 autowrap_mode = 3
 
+[node name="Crest" type="TextureRect" parent="Root/Panel/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 190)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Answers" type="VBoxContainer" parent="Root/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2

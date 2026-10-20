@@ -76,7 +76,20 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.98, 0.86, 0.45, 1)
 text = "HUD_COINS"
 
-[node name="HouseLabel" type="Label" parent="TopLeft/VBox"]
+[node name="HouseRow" type="HBoxContainer" parent="TopLeft/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HouseCrest" type="TextureRect" parent="TopLeft/VBox/HouseRow"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HouseLabel" type="Label" parent="TopLeft/VBox/HouseRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "HUD_HOUSE_NONE"

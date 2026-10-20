@@ -11,6 +11,7 @@ signal sorting_completed(house: int)
 @onready var _question: Label = %Question
 @onready var _answers: VBoxContainer = %Answers
 @onready var _result: Label = %Result
+@onready var _crest: TextureRect = %Crest
 @onready var _close_button: Button = %CloseButton
 
 var is_open: bool = false
@@ -49,6 +50,7 @@ func open() -> void:
 	answers.clear()
 	_waiting = false
 	_result.text = ""
+	_crest.visible = false
 	_close_button.visible = false
 	_show_question()
 
@@ -118,12 +120,25 @@ func _finish(ok: bool, house: int, reason: String) -> void:
 	if ok:
 		_question.text = tr("SORT_RESULT") % CharacterProfile.house_name(house)
 		_result.text = tr("SORT_WELCOME")
+		_reveal_crest(house)
 		sorting_completed.emit(house)
 	else:
 		var key := "SORT_REASON_" + reason
 		var text := tr(key)
 		_question.text = tr("SORT_FAILED") % (text if text != key else reason)
 	_close_button.visible = true
+
+
+## The house crest fades and grows in above the welcome.
+func _reveal_crest(house: int) -> void:
+	_crest.texture = CharacterProfile.crest(house, CharacterProfile.CREST_CARD)
+	_crest.visible = _crest.texture != null
+	_crest.modulate.a = 0.0
+	_crest.pivot_offset_ratio = Vector2(0.5, 0.5)
+	_crest.scale = Vector2(0.85, 0.85)
+	var tween := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_crest, "modulate:a", 1.0, UiTokens.SLOW * 2.0)
+	tween.tween_property(_crest, "scale", Vector2.ONE, UiTokens.SLOW * 2.0)
 
 
 func _notification(what: int) -> void:
