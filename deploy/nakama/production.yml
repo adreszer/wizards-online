@@ -1,0 +1,21 @@
+# Nakama configuration for the hosted server. Secrets are not here: start.sh
+# passes them as flags from the environment.
+name: wizards-prod
+data_dir: /nakama/data
+
+logger:
+  level: INFO
+
+socket:
+  port: 7350
+  max_message_size_bytes: 4096
+
+session:
+  token_expiry_sec: 7200
+
+runtime:
+  path: /nakama/data/modules
+
+match:
+  input_queue_size: 256
+  call_queue_size: 256

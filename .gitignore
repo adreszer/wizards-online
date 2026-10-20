@@ -18,3 +18,4 @@ nakama/postgres-data/
 # Python
 __pycache__/
 backups/
+nakama/content/school_rules.local.json

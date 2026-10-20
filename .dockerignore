@@ -1,0 +1,5 @@
+# Docker builds (deploy/nakama/Dockerfile) only need the server.
+*
+!nakama/modules
+!nakama/content
+!deploy/nakama

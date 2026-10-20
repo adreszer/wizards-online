@@ -278,6 +278,9 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] `tools/check_build.sh` + `tools/list_pck.py`: exports a pack, fails on server/dev files or any server-only text or mystery id in its bytes (verified to catch a deliberate leak)
 - [x] Offline practice mysteries (`content/offline_mysteries.json`, `OfflineMysteryEngine`): the secret walls get their own public offline solutions; the online ones stay server-only
 - [ ] Run `tools/check_build.sh` in CI once there is CI
+- [x] Hosted server for Coolify (`docker-compose.coolify.yml`, `deploy/nakama/`: image with modules and content baked in, secrets from the environment, cheats off through `school_rules.local.json`); `docs/deploy.md`
+- [ ] Release client points at the hosted server (`.template` overrides of `game/network/*`)
+- [ ] Client/server version check on join; release script (tests, leak check, exports, butler push to itch.io)
 
 ### Milestones 24–32 — Generated castle and grounds at scale (design: docs/castle-generation.md)
 Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B) are validators that refuse to write the scene; ids and details in the design doc.

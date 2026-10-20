@@ -74,20 +74,29 @@ M.MAX_PLAN_LINES = 100
 M.MAX_TITLE_BYTES = 80
 M.CLOCK_COLLECTION, M.CLOCK_KEY = "school", "clock"
 
+-- Optional per-server overrides on top of the rules file (not in git; the production
+-- image ships one that switches cheats off, see deploy/nakama/).
+M.LOCAL_RULES_PATH = "../content/school_rules.local.json"
+
+local function merge_rules(rules, path)
+  local ok, text = pcall(nk.file_read, path)
+  if not ok then return false end
+  local ok2, data = pcall(nk.json_decode, text)
+  if ok2 and type(data) == "table" then
+    for k, v in pairs(data) do
+      if M.DEFAULT_RULES[k] ~= nil and type(v) == type(M.DEFAULT_RULES[k]) then rules[k] = v end
+    end
+  end
+  return true
+end
+
 function M.load_rules()
   local rules = {}
   for k, v in pairs(M.DEFAULT_RULES) do rules[k] = v end
-  local ok, text = pcall(nk.file_read, M.RULES_PATH)
-  if ok then
-    local ok2, data = pcall(nk.json_decode, text)
-    if ok2 and type(data) == "table" then
-      for k, v in pairs(data) do
-        if M.DEFAULT_RULES[k] ~= nil and type(v) == type(M.DEFAULT_RULES[k]) then rules[k] = v end
-      end
-    end
-  else
+  if not merge_rules(rules, M.RULES_PATH) then
     nk.logger_warn("school: cannot read " .. M.RULES_PATH .. ", using defaults")
   end
+  merge_rules(rules, M.LOCAL_RULES_PATH)
   return rules
 end
 
