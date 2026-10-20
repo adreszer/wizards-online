@@ -1,12 +1,45 @@
 extends Node
 ## UI checks: every character the game can show (translations, server strings and
 ## non-ASCII literals in scripts) is drawn by the interface font, and every letter of
-## the translations by the display and text fonts. Run:
+## the translations by the display and text fonts; and no screen under ui/ styles
+## itself (style boxes, theme overrides, colour literals) outside ui/theme/ and
+## ui/components/, except the files still waiting for their migration. Run:
 ##   godot --headless --path . tests/check_ui.tscn
 
 ## Symbols only ever drawn in the interface font (bullets, arrows, marks); the display
 ## and text faces need not have them.
 const UI_ONLY_SYMBOLS := "✕✓✗•●○◆◇▲▼◀▶←→↑↓★☆♪⌛⏳"
+
+## Lines that style a control by hand, per file, still allowed while the screens move
+## to the theme and the components (docs/ui.md, Milestone 65 onward). The list only
+## shrinks: a file that gains one fails, a file that loses one must lower its entry.
+const STYLE_ALLOWLIST := {
+	"res://ui/chat/chat_panel.tscn": 3,
+	"res://ui/common/feature_panel.gd": 1,
+	"res://ui/debug/debug_overlay.gd": 3,
+	"res://ui/debug/debug_overlay.tscn": 4,
+	"res://ui/hud/hud.gd": 14,
+	"res://ui/hud/hud.tscn": 18,
+	"res://ui/inventory/inventory_panel.gd": 1,
+	"res://ui/inventory/inventory_panel.tscn": 6,
+	"res://ui/map/map_panel.tscn": 10,
+	"res://ui/map/map_view.gd": 28,
+	"res://ui/map/minimap.tscn": 5,
+	"res://ui/menus/main_menu.tscn": 8,
+	"res://ui/menus/pause_menu.tscn": 3,
+	"res://ui/school/book_panel.gd": 7,
+	"res://ui/school/character_creator.gd": 13,
+	"res://ui/school/duel_hud.gd": 3,
+	"res://ui/school/journal.gd": 7,
+	"res://ui/school/professor_panel.tscn": 12,
+	"res://ui/school/quiz_panel.gd": 8,
+	"res://ui/school/sorting_panel.tscn": 9,
+	"res://ui/school/timetable_panel.tscn": 7,
+	"res://ui/social/clubs_panel.gd": 3,
+	"res://ui/social/emote_menu.gd": 5,
+	"res://ui/social/game_panel.gd": 3,
+}
+const STYLE_PATTERN := "add_theme_[a-z_]+_override|StyleBox(Flat|Texture|Line|Empty)\\.new\\(\\)|theme_override_|\\[sub_resource type=\"StyleBox|Color\\("
 
 var _failures: int = 0
 
@@ -25,11 +58,12 @@ func _ready() -> void:
 			letters[c] = true
 	for path: String in [UiFonts.DISPLAY, UiFonts.DISPLAY_BOLD, UiFonts.TEXT, UiFonts.TEXT_ITALIC, UiFonts.TEXT_BOLD]:
 		_check(path, letters)
+	_check_styles()
 	if _failures == 0:
 		print("UI_CHECK_OK: %d characters covered" % everything.size())
 		get_tree().quit(0)
 	else:
-		print("UI_CHECK_FAILED: %d fonts miss characters" % _failures)
+		print("UI_CHECK_FAILED: %d problems" % _failures)
 		get_tree().quit(1)
 
 
@@ -42,6 +76,28 @@ func _check(path: String, chars: Dictionary) -> void:
 	if not missing.is_empty():
 		push_error("%s misses: %s" % [path, ", ".join(missing)])
 		_failures += 1
+
+
+func _check_styles() -> void:
+	var pattern := RegEx.create_from_string(STYLE_PATTERN)
+	for path in _scripts("res://ui"):
+		if path.begins_with("res://ui/theme/") or path.begins_with("res://ui/components/"):
+			continue
+		var lines := 0
+		for line in FileAccess.get_file_as_string(path).split("\n"):
+			if pattern.search(line) != null:
+				lines += 1
+		var allowed: int = STYLE_ALLOWLIST.get(path, 0)
+		if lines > allowed:
+			push_error("%s styles controls by hand on %d lines (allowed %d): use the theme or a component" % [path, lines, allowed])
+			_failures += 1
+		elif lines < allowed:
+			push_error("%s now has %d hand-styled lines: lower its STYLE_ALLOWLIST entry from %d" % [path, lines, allowed])
+			_failures += 1
+	for path: String in STYLE_ALLOWLIST:
+		if not FileAccess.file_exists(path):
+			push_error("STYLE_ALLOWLIST names a missing file: " + path)
+			_failures += 1
 
 
 func _translation_chars() -> Dictionary:

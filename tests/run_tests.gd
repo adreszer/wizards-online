@@ -98,6 +98,7 @@ func _run() -> void:
 	await _test_school_life()
 	_test_localization()
 	_test_server_address_lock()
+	await _test_ui_window()
 	await _test_characters()
 	_test_server_content()
 	await _test_world_objects()
@@ -105,6 +106,26 @@ func _run() -> void:
 	print(t.summary())
 	get_tree().quit(1 if t.failed > 0 else 0)
 
+
+
+## FeaturePanel draws its card as a UiWindow: the parchment frame from the theme, the
+## title row, and the close control closing the panel.
+func _test_ui_window() -> void:
+	var panel := RiddlePanel.new()
+	add_child(panel)
+	await get_tree().process_frame
+	var card := panel.card
+	t.check(card is UiWindow and card.theme_type_variation == &"ParchmentWindow" and card.theme != null, "feature panels sit in a parchment UiWindow")
+	t.check(card.get_theme_stylebox("panel") is StyleBoxFlat and (card.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.is_equal_approx(UiTokens.PARCHMENT), "the window frame comes from the theme")
+	panel.open_panel()
+	t.check(card.visible and panel.is_open and GameSession.ui_input_captured, "opening shows the window")
+	card.close_button.pressed.emit()
+	t.check(not card.visible and not panel.is_open and not GameSession.ui_input_captured, "the close control closes the panel")
+	var chrome := UiWindow.new(UiWindow.Family.CHROME)
+	add_child(chrome)
+	t.check(chrome.theme == null and (chrome.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.is_equal_approx(UiTokens.OAK_SOLID), "a chrome window takes the oak frame from the project theme")
+	chrome.queue_free()
+	panel.queue_free()
 
 
 ## Exported builds hide the server fields; the editor shows them.

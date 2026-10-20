@@ -22,7 +22,6 @@ func _build() -> void:
 	_text = RichTextLabel.new()
 	_text.bbcode_enabled = true
 	_text.fit_content = true
-	_text.add_theme_color_override("default_color", INK)
 	body.add_child(_text)
 	_actions = HBoxContainer.new()
 	body.add_child(_actions)

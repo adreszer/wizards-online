@@ -42,7 +42,6 @@ func _build() -> void:
 	_book = RichTextLabel.new()
 	_book.bbcode_enabled = true
 	_book.fit_content = true
-	_book.add_theme_color_override("default_color", INK)
 	body.add_child(_book)
 
 

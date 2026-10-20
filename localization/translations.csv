@@ -1124,3 +1124,4 @@ REFUSED_EXAM_SILENCE,Silence during the exam. Whisper (/w) if you must.,"Cisza p
 JOURNAL_TAB_POST,Post,Poczta
 JOURNAL_POST_EMPTY,No paper birds yet. Write to someone with /msg name text.,Jeszcze żadnych papierowych ptaków. Napisz do kogoś: /pw imię tekst.
 JOURNAL_POST_TO,to %s,do: %s
+UI_CLOSE,Close,Zamknij

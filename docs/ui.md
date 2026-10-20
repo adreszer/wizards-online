@@ -129,7 +129,7 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - [x] `UiTokens` (palette, spacing, radii, sizes, motion); the oak theme styles every control type in every state (buttons, option/menu buttons, check boxes, fields, popups, tooltips, tabs, lists, trees, scroll bars, sliders, progress bars, separators, focus rings); `ui/theme/parchment_theme.tres` turns everything inside a paper surface into ink (FeaturePanel cards and books use it)
 - [x] Fixed: wrapping labels in a row shrank to one letter per line (settings, cauldron)
 - [ ] `UiRouter`: panel stack, Esc, input capture, mouse mode, modal dim, HUD fade, focus on open; migrate every panel to it
-- [ ] `FeaturePanel` → `UiWindow` (still flat-styled); remove per-panel style overrides (allowlist test, shrinking)
+- [~] `FeaturePanel` → `UiWindow` (still flat-styled): done, `ui/components/ui_window.gd` (parchment and chrome families from the theme's `ParchmentWindow`/`ChromeWindow` and `Window*` variations, title row, close control, status line, footer hints, open fade); every FeaturePanel uses it. Per-panel style overrides: `tests/check_ui.gd` fails on hand styling under `ui/` outside `ui/theme/` and `ui/components/` beyond a per-file allowlist that only shrinks; the remaining screens (HUD, journal, map, sorting, timetable, professor, quiz, satchel, chat, menus) move onto `UiWindow` and off the list
 - [ ] Missing-key test; fix `AREA_`, the notification/chat overlap, the undimmed pause backdrop
 - **Result:** the whole game in one consistent style and real fonts, with no new art yet.
 

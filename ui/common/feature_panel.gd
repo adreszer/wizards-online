@@ -1,64 +1,31 @@
 class_name FeaturePanel
 extends CanvasLayer
 ## Base for the small school-life panels (riddle door, profile card, friends, clubs, shop,
-## cauldron, board game, admin…): a parchment card in the middle of the screen with a
+## cauldron, board game, admin…): a parchment UiWindow in the middle of the screen with a
 ## title, a body the subclass fills (`body`) and a close button; Esc closes; while open
 ## it holds the keyboard and frees the mouse. Subclasses build their content in
 ## _build() and refill it in refresh().
 
 var is_open := false
-var card: PanelContainer
+var card: UiWindow
 var title_label: Label
 var body: VBoxContainer
 var status_label: Label
 ## Half the card's size in pixels.
 var half_size := Vector2(330, 240)
 
-const INK := Color(0.2, 0.13, 0.07)
+const INK := UiTokens.INK
 
 
 func _ready() -> void:
 	layer = 4
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	card = PanelContainer.new()
-	card.set_anchors_preset(Control.PRESET_CENTER)
-	card.offset_left = -half_size.x
-	card.offset_right = half_size.x
-	card.offset_top = -half_size.y
-	card.offset_bottom = half_size.y
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.9, 0.85, 0.72, 0.98)
-	style.border_color = Color(0.45, 0.3, 0.16)
-	style.set_border_width_all(3)
-	style.set_corner_radius_all(4)
-	style.set_content_margin_all(20)
-	card.add_theme_stylebox_override("panel", style)
-	card.theme = load(UiTokens.PARCHMENT_THEME)
-	var outer := VBoxContainer.new()
-	card.add_child(outer)
-	var head := HBoxContainer.new()
-	outer.add_child(head)
-	title_label = Label.new()
-	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_label.theme_type_variation = &"TitleLabel"
-	title_label.add_theme_color_override("font_color", INK)
-	head.add_child(title_label)
-	var close_button := Button.new()
-	close_button.text = "✕"
-	close_button.set_meta(&"ui_sound", &"")
-	close_button.pressed.connect(close)
-	head.add_child(close_button)
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	outer.add_child(scroll)
-	body = VBoxContainer.new()
-	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(body)
-	status_label = Label.new()
-	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status_label.add_theme_color_override("font_color", Color(0.45, 0.2, 0.1))
-	outer.add_child(status_label)
+	card = UiWindow.new()
+	card.centre(half_size)
+	card.close_requested.connect(close)
+	title_label = card.title_label
+	body = card.body
+	status_label = card.status_label
 	card.visible = false
 	add_child(card)
 	_build()
@@ -77,7 +44,7 @@ func refresh() -> void:
 func open_panel() -> void:
 	is_open = true
 	UiSounds.play(&"panel_open")
-	card.visible = true
+	card.show_window()
 	status_label.text = ""
 	GameSession.ui_input_captured = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -89,7 +56,7 @@ func close() -> void:
 		return
 	is_open = false
 	UiSounds.play(&"panel_close")
-	card.visible = false
+	card.hide_window()
 	GameSession.ui_input_captured = false
 	if DisplayServer.get_name() != "headless":
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -109,8 +76,8 @@ func label(text: String, size: int = 16) -> Label:
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	# A wrapping label has no width of its own; in a row it would shrink to one letter.
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_color", INK)
+	if size != UiTokens.SIZE_BODY:
+		l.add_theme_font_size_override("font_size", size)
 	return l
 
 

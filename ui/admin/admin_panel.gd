@@ -40,7 +40,6 @@ func _text_out(page: VBoxContainer, key: String) -> RichTextLabel:
 	var t := RichTextLabel.new()
 	t.bbcode_enabled = true
 	t.fit_content = true
-	t.add_theme_color_override("default_color", INK)
 	page.add_child(t)
 	_out[key] = t
 	return t

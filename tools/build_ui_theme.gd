@@ -105,6 +105,7 @@ func _oak_theme() -> Theme:
 	t.set_color("font_outline_color", "ProgressBar", T.OAK_SOLID)
 	t.set_constant("outline_size", "ProgressBar", 3)
 	_separators(t, T.OAK_LINE)
+	_windows(t, "ChromeWindow", T.OAK_SOLID, T.BRASS_DIM, T.CANDLE_SOFT, T.BRASS_BRIGHT, T.DANGER)
 	return t
 
 
@@ -159,10 +160,33 @@ func _parchment_theme() -> Theme:
 	t.set_color("font_color", "ProgressBar", T.INK)
 	t.set_constant("outline_size", "ProgressBar", 0)
 	_separators(t, Color(T.INK_SOFT, 0.35))
+	_windows(t, "ParchmentWindow", T.PARCHMENT, T.PARCHMENT_EDGE, T.INK_SOFT, T.RUBRIC, T.RUBRIC)
 	return t
 
 
 # --- Shared pieces ---
+
+## The UiWindow frame (`window`, a PanelContainer variation) and its parts, defined in
+## both themes so a window and everything in it resolve from the theme it carries:
+## WindowClose (the close control), WindowStatus (the line under the body, for answers
+## and refusals) and WindowFooter (key hints).
+func _windows(t: Theme, window: String, bg: Color, edge: Color, soft: Color, lit: Color, status: Color) -> void:
+	t.set_type_variation(window, "PanelContainer")
+	var frame := _box(bg, edge, 3, T.RADIUS, Vector2(T.SPACE_5, T.SPACE_4))
+	frame.shadow_color = T.SHADOW
+	frame.shadow_size = 14
+	frame.shadow_offset = Vector2(0, 4)
+	t.set_stylebox("panel", window, frame)
+	t.set_type_variation("WindowClose", "Button")
+	var bare := _empty(Vector2(T.SPACE_2, T.SPACE_1))
+	_button_styles(t, "WindowClose", bare, bare, bare, bare, _focus(lit))
+	_button_colors(t, "WindowClose", soft, lit, lit, Color(soft, 0.4))
+	t.set_font_size("font_size", "WindowClose", T.SIZE_LARGE)
+	t.set_type_variation("WindowStatus", "Label")
+	t.set_color("font_color", "WindowStatus", status)
+	t.set_type_variation("WindowFooter", "Label")
+	t.set_color("font_color", "WindowFooter", soft)
+	t.set_font_size("font_size", "WindowFooter", T.SIZE_HINT)
 
 func _fonts(t: Theme) -> void:
 	t.set_font("bold_font", "RichTextLabel", load(UiFonts.UI_BOLD))

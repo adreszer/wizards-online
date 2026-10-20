@@ -104,7 +104,8 @@ Everything after the standalone `--` is a user argument and is ignored by Godot 
 # load every script/scene (catches parse errors)
 godot --headless --path . tests/check_scripts.tscn
 
-# UI: every character the game shows is in the fonts
+# UI: every character the game shows is in the fonts, and no screen styles itself by hand
+# beyond its STYLE_ALLOWLIST entry (the list only shrinks: lower an entry when you remove one)
 godot --headless --path . tests/check_ui.tscn
 # after changing fonts or theme values: rewrite ui/theme/ (commit the output)
 godot --headless --path . -s tools/build_ui_theme.gd

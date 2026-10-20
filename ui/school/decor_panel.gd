@@ -33,7 +33,6 @@ func refresh() -> void:
 		var def := ItemRegistry.load_definition(id)
 		box.text = tr(def.display_name) if def != null else id
 		box.button_pressed = current.has(id)
-		box.add_theme_color_override("font_color", INK)
 		_list.add_child(box)
 		_boxes[id] = box
 	if _boxes.is_empty():
