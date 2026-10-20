@@ -9,7 +9,8 @@ Mixamo's auto-rigger rejects (arms hanging against a robe). Runs headless:
 centred at height 0.95 m): "top" (head top, under any hat), "chin", "hip" (heights,
 in px rows), "shoulder"/"elbow"/"wrist" ([[x, y] right, [x, y] left], character
 right on screen left), "feet" ([x right, x left]) and optionally "arm_radius"
-([near, far] metres, default 0.09, 0.15: how far cloth beside the arm still follows it). Depth comes from the mesh
+([near, far] metres, default 0.09, 0.15: how far cloth beside the arm still follows it;
+for a T-posed sitter use [0.3, 0.4] or more so sleeves and thumbs stay on the arm). Depth comes from the mesh
 itself (the middle of the slice at each joint). Bones are the standard Mixamo set
 without fingers, so SocialPose and Mixamo clips drive them like the player rigs.
 Skinning is Blender's automatic (heat) weights; vertices it misses go to the
@@ -53,6 +54,13 @@ def main():
         if o is not mesh:
             bpy.data.objects.remove(o)
     verts = [mesh.matrix_world @ v.co for v in mesh.data.vertices]
+    # The upload copies keep only base colour: without their roughness maps the
+    # default 0.5 reads as satin, so cloth and skin get a matte default.
+    for mat in mesh.data.materials:
+        bsdf = next((n for n in mat.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+        if bsdf is not None and not bsdf.inputs["Roughness"].is_linked:
+            bsdf.inputs["Roughness"].default_value = 0.8
+            bsdf.inputs["Metallic"].default_value = 0.0
 
     def x_of(px):
         return (px - 256) / 256
@@ -93,7 +101,13 @@ def main():
         pts[side + "ForeArm"] = at(el[i].x, el[i].z)
         pts[side + "Hand"] = at(wr[i].x, wr[i].z)
         hand_dir = (pts[side + "Hand"] - pts[side + "ForeArm"]).normalized()
-        pts[side + "Hand_End"] = pts[side + "Hand"] + hand_dir * 0.14
+        # The hand bone runs to the fingertips (the farthest point past the wrist), so
+        # the cloth trim below never takes fingers away from it.
+        wrist = pts[side + "Hand"]
+        reach = max((hand_dir.dot(v - wrist) for v in verts
+                     if 0 < hand_dir.dot(v - wrist) < 0.45 and (v - wrist - hand_dir * hand_dir.dot(v - wrist)).length < 0.15),
+                    default=0.14)
+        pts[side + "Hand_End"] = wrist + hand_dir * max(0.1, reach)
         fx = feet[i]
         hip_x = fx * 0.8
         pts[side + "UpLeg"] = at(hip_x, hip - 0.05)

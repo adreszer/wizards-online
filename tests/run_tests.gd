@@ -2594,7 +2594,7 @@ func _test_portraits() -> void:
 		t.check(tp._bubble.visible and tp._bubble.text.contains(p.display_name), "walking up to one makes it speak")
 	castle.queue_free()
 	# Rigged sitters (living portraits): the players' gestures drive them too.
-	for id in ["01", "05", "06", "07"]:
+	for id in ["01", "02", "03", "04", "05", "06", "07"]:
 		var sitter: Node3D = (load("res://assets/models/portraits/sitter_%s.glb" % id) as PackedScene).instantiate()
 		add_child(sitter)
 		var skeleton: Skeleton3D = sitter.find_children("*", "Skeleton3D", true, false)[0]
