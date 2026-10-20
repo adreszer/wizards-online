@@ -125,8 +125,7 @@ func open() -> void:
 			_body.select(i)
 	_refresh_swatches()
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	_frame_player()
 
 
@@ -136,7 +135,7 @@ func close(keep: bool) -> void:
 		return
 	is_open = false
 	_root.visible = false
-	GameSession.ui_input_captured = false
+	UiRouter.closed(self)
 	if _camera != null:
 		_camera.queue_free()
 		_camera = null
@@ -177,7 +176,6 @@ func _frame_player() -> void:
 	_camera.current = true
 
 
-func _input(event: InputEvent) -> void:
-	if is_open and event.is_action_pressed("pause"):
-		close(false)
-		get_viewport().set_input_as_handled()
+## Esc (UiRouter) drops the preview.
+func ui_back() -> void:
+	close(false)

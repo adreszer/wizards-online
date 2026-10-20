@@ -1,7 +1,7 @@
 extends CanvasLayer
 ## Inventory ("satchel") UI. Opens with the `inventory` action, closes with
-## `inventory` or `pause` (Esc). While open it captures keyboard input
-## (GameSession.ui_input_captured) and frees the mouse, like the chat panel.
+## `inventory` or Esc; while open it holds the keyboard and frees the mouse
+## (UiRouter), like every panel.
 ## Clicking an item holds it in the off hand or puts it away (a broom: mounts
 ## it and closes the panel); the panel only asks the player's Inventory and
 ## BroomRider, which own the state.
@@ -49,7 +49,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if is_open and (event.is_action_pressed("pause") or event.is_action_pressed("inventory")):
+	if is_open and event.is_action_pressed("inventory"):
 		close()
 		get_viewport().set_input_as_handled()
 
@@ -60,8 +60,7 @@ func open() -> void:
 	is_open = true
 	UiSounds.play(&"inventory_open")
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	_refresh()
 
 
@@ -71,9 +70,7 @@ func close() -> void:
 	is_open = false
 	UiSounds.play(&"panel_close")
 	_root.visible = false
-	GameSession.ui_input_captured = false
-	if not get_tree().paused:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.closed(self)
 
 
 func _refresh() -> void:

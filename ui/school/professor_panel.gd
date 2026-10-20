@@ -422,7 +422,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if is_open and (event.is_action_pressed("pause") or event.is_action_pressed("lesson_tools")):
+	if is_open and event.is_action_pressed("lesson_tools"):
 		close()
 		get_viewport().set_input_as_handled()
 
@@ -442,8 +442,7 @@ func open() -> void:
 	is_open = true
 	UiSounds.play(&"panel_open")
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	_result_label.text = ""
 	refresh()
 	_load_plans()
@@ -455,9 +454,7 @@ func close() -> void:
 	is_open = false
 	UiSounds.play(&"panel_close")
 	_root.visible = false
-	GameSession.ui_input_captured = false
-	if is_inside_tree() and not get_tree().paused:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.closed(self)
 
 
 func current_zone() -> AreaZone:

@@ -93,7 +93,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if is_open and (event.is_action_pressed("pause") or event.is_action_pressed("journal")):
+	if is_open and event.is_action_pressed("journal"):
 		close()
 		get_viewport().set_input_as_handled()
 
@@ -102,8 +102,7 @@ func open() -> void:
 	is_open = true
 	UiSounds.play(&"panel_open")
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	refresh()
 	if NetworkManager.is_online():
 		var answer: Dictionary = await NetworkManager.school_record()
@@ -120,7 +119,7 @@ func close() -> void:
 	is_open = false
 	UiSounds.play(&"panel_close")
 	_root.visible = false
-	GameSession.ui_input_captured = false
+	UiRouter.closed(self)
 
 
 func refresh() -> void:

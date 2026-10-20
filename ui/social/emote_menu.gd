@@ -73,7 +73,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _input(event: InputEvent) -> void:
 	if not is_open:
 		return
-	if event.is_action_pressed("pause") or event.is_action_pressed("emote_menu"):
+	if event.is_action_pressed("emote_menu"):
 		close()
 		get_viewport().set_input_as_handled()
 		return
@@ -87,8 +87,7 @@ func _input(event: InputEvent) -> void:
 func open() -> void:
 	is_open = true
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self, false)
 
 
 func close() -> void:
@@ -96,7 +95,7 @@ func close() -> void:
 		return
 	is_open = false
 	_root.visible = false
-	GameSession.ui_input_captured = false
+	UiRouter.closed(self)
 
 
 ## Closes the menu, then asks for the gesture (after the keyboard is released).

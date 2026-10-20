@@ -29,6 +29,7 @@ GameEvents="*res://core/game_events.gd"
 GameSession="*res://core/game_session.gd"
 NetworkManager="*res://multiplayer/network_manager.tscn"
 UiSounds="*res://gameplay/audio/ui_sounds.gd"
+UiRouter="*res://ui/components/ui_router.gd"
 
 [debug]
 

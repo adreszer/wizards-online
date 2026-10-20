@@ -272,7 +272,7 @@ Offline, `WorldObjectSync` starts an `OfflineMysteryEngine` with the public `con
 
 ## Input
 
-All gameplay reads InputMap actions through `PlayerInput`; no physical keys anywhere. Joypad bindings already exist for every action. While the chat field has focus, `GameSession.ui_input_captured` is true and `PlayerInput` clears its intent.
+All gameplay reads InputMap actions through `PlayerInput`; no physical keys anywhere. Joypad bindings already exist for every action. While any panel is open (chat included), `UiRouter` keeps `GameSession.ui_input_captured` true and `PlayerInput` clears its intent; panels report opening and closing to `UiRouter`, which also routes Esc to the top panel, frees the cursor, dims the world behind windows and fades the HUD.
 
 ## Debug
 

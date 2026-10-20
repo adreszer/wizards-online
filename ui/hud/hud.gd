@@ -31,6 +31,9 @@ var _slot_selected_style: StyleBox
 var _slot_views: Array[Dictionary] = []
 
 const FRAGMENT_ID := &"arcane_fragment"
+## How visible the HUD panels stay behind an open window (UiRouter); the crosshair and
+## the prompt go entirely.
+const BEHIND_WINDOW := 0.25
 
 var _player: Node
 var _caster: SpellCaster
@@ -65,6 +68,22 @@ func _ready() -> void:
 	_refresh_house()
 	set_house_totals(NetworkManager.get_house_totals())
 	_refresh_coins()
+	UiRouter.changed.connect(_on_windows_changed)
+	_on_windows_changed()
+
+
+## Steps back while a window is open, so the window and the dimmed world read first.
+func _on_windows_changed() -> void:
+	var behind := UiRouter.has_modal()
+	var instant: bool = GameSettings.get_value("reduce_motion")
+	for node: CanvasItem in [$TopLeft, $TopRight, _hotbar_root, _crosshair, _prompt_label]:
+		var alpha := 1.0
+		if behind:
+			alpha = 0.0 if node == _crosshair or node == _prompt_label else BEHIND_WINDOW
+		if instant or not is_inside_tree():
+			node.modulate.a = alpha
+		else:
+			node.create_tween().tween_property(node, "modulate:a", alpha, UiTokens.NORMAL)
 
 
 func _process(delta: float) -> void:

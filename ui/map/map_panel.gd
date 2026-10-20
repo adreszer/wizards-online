@@ -51,7 +51,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _input(event: InputEvent) -> void:
 	if not is_open:
 		return
-	if event.is_action_pressed("pause") or event.is_action_pressed("map"):
+	if event.is_action_pressed("map"):
 		close()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventKey and event.pressed and not event.echo:
@@ -70,8 +70,7 @@ func open() -> void:
 	is_open = true
 	UiSounds.play(&"map_open")
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	_view.pixels_per_metre = OPEN_ZOOM
 	centre_on_player()
 	toggled.emit(true)
@@ -84,7 +83,7 @@ func close() -> void:
 	UiSounds.play(&"panel_close")
 	_dragging = false
 	_root.visible = false
-	GameSession.ui_input_captured = false
+	UiRouter.closed(self)
 	toggled.emit(false)
 
 

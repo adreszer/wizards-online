@@ -1,6 +1,6 @@
 extends CanvasLayer
 ## Text chat UI. Opens with the `chat` action, closes with `pause` (Esc) or
-## after sending. While open it captures keyboard input (GameSession.ui_input_captured).
+## after sending. While open it holds the keyboard (UiRouter, not modal).
 ## Lines starting with "/" are commands (ChatCommands: dev cheats such as
 ## /broom); they work offline too, where the box takes nothing else.
 
@@ -37,20 +37,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-func _input(event: InputEvent) -> void:
-	if is_open and event.is_action_pressed("pause"):
-		close()
-		get_viewport().set_input_as_handled()
-
-
 func open() -> void:
 	is_open = true
 	_panel.visible = true
 	_input_field.visible = true
 	_input_field.text = ""
 	_input_field.grab_focus()
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self, false)
 
 
 func close() -> void:
@@ -59,9 +52,7 @@ func close() -> void:
 	is_open = false
 	_input_field.visible = false
 	_input_field.release_focus()
-	GameSession.ui_input_captured = false
-	if not get_tree().paused:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.closed(self)
 
 
 func _on_submitted(text: String) -> void:

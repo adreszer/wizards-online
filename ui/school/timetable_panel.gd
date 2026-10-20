@@ -25,22 +25,13 @@ func _ready() -> void:
 			refresh())
 
 
-func _input(event: InputEvent) -> void:
-	if not is_open:
-		return
-	if event.is_action_pressed("pause"):
-		close()
-		get_viewport().set_input_as_handled()
-
-
 func open() -> void:
 	if is_open:
 		return
 	is_open = true
 	UiSounds.play(&"panel_open")
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	refresh()
 	toggled.emit(true)
 
@@ -51,7 +42,7 @@ func close() -> void:
 	is_open = false
 	UiSounds.play(&"panel_close")
 	_root.visible = false
-	GameSession.ui_input_captured = false
+	UiRouter.closed(self)
 	toggled.emit(false)
 
 

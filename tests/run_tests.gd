@@ -126,6 +126,49 @@ func _test_ui_window() -> void:
 	t.check(chrome.theme == null and (chrome.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.is_equal_approx(UiTokens.OAK_SOLID), "a chrome window takes the oak frame from the project theme")
 	chrome.queue_free()
 	panel.queue_free()
+	await get_tree().process_frame
+	await _test_ui_router()
+
+
+## UiRouter: one stack of open panels holding the keyboard, Esc closing the top one,
+## the dim behind the top modal panel only, and a freed panel leaving the stack.
+func _test_ui_router() -> void:
+	var lower := RiddlePanel.new()
+	var upper := DecorPanel.new()
+	add_child(lower)
+	add_child(upper)
+	await get_tree().process_frame
+	lower.open_panel()
+	upper.open_panel()
+	t.check(UiRouter.open_count() == 2 and UiRouter.top() == upper and GameSession.ui_input_captured and UiRouter.has_modal(), "two panels stack and hold the keyboard")
+	var dim_upper: ColorRect = upper.get_node_or_null("UiBackdrop")
+	var dim_lower: ColorRect = lower.get_node_or_null("UiBackdrop")
+	t.check(dim_upper != null and dim_upper.visible and upper.get_child(0) == dim_upper and (dim_lower == null or not dim_lower.visible), "only the top window dims the world, from under itself")
+	var esc := InputEventAction.new()
+	esc.action = "pause"
+	esc.pressed = true
+	Input.parse_input_event(esc)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	t.check(not upper.is_open and lower.is_open and GameSession.ui_input_captured and UiRouter.top() == lower, "Esc closes the top panel only")
+	var lower_dim: ColorRect = lower.get_node_or_null("UiBackdrop")
+	t.check(lower_dim != null and lower_dim.visible, "the dim moves to the window underneath")
+	var chat := CanvasLayer.new()
+	add_child(chat)
+	UiRouter.opened(chat, false)
+	t.check(UiRouter.top() == chat and chat.get_node_or_null("UiBackdrop") == null, "a non-modal panel gets no dim")
+	chat.queue_free()
+	await get_tree().process_frame
+	t.check(UiRouter.top() == lower, "a freed panel leaves the stack")
+	lower.close()
+	t.check(UiRouter.open_count() == 0 and not GameSession.ui_input_captured and not UiRouter.has_modal(), "closing the last panel releases the keyboard")
+	var creator := CharacterCreator.new()
+	var quiz := QuizPanel.new()
+	t.check(creator.has_method("ui_back") and quiz.has_method("ui_back"), "the creator and the quiz handle Esc themselves")
+	creator.free()
+	quiz.free()
+	lower.queue_free()
+	upper.queue_free()
 
 
 ## Exported builds hide the server fields; the editor shows them.

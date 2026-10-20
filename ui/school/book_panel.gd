@@ -68,8 +68,7 @@ func open(title_key: String, page_keys: PackedStringArray) -> void:
 	is_open = true
 	UiSounds.play(&"panel_open")
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	_show_page()
 
 
@@ -79,7 +78,7 @@ func close() -> void:
 	is_open = false
 	UiSounds.play(&"panel_close")
 	_root.visible = false
-	GameSession.ui_input_captured = false
+	UiRouter.closed(self)
 
 
 func turn(step: int) -> void:
@@ -95,9 +94,7 @@ func _show_page() -> void:
 func _input(event: InputEvent) -> void:
 	if not is_open:
 		return
-	if event.is_action_pressed("pause"):
-		close()
-	elif event.is_action_pressed("move_right") or event.is_action_pressed("ui_right"):
+	if event.is_action_pressed("move_right") or event.is_action_pressed("ui_right"):
 		turn(1)
 	elif event.is_action_pressed("move_left") or event.is_action_pressed("ui_left"):
 		turn(-1)

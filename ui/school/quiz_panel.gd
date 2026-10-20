@@ -157,10 +157,14 @@ func open() -> void:
 	is_open = true
 	UiSounds.play(&"panel_open")
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	if _entry.get_parent().visible:
 		_entry.grab_focus()
+
+
+## Esc (UiRouter) gives the keyboard back but leaves the question on screen.
+func ui_back() -> void:
+	_release()
 
 
 func _release() -> void:
@@ -169,7 +173,7 @@ func _release() -> void:
 	is_open = false
 	UiSounds.play(&"panel_close")
 	_entry.release_focus()
-	GameSession.ui_input_captured = false
+	UiRouter.closed(self)
 
 
 func _dismiss() -> void:
@@ -195,10 +199,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _input(event: InputEvent) -> void:
 	if not is_open:
-		return
-	if event.is_action_pressed("pause"):
-		_release()
-		get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.pressed and not event.echo and not _entry.has_focus():
 		var n := (event as InputEventKey).physical_keycode - KEY_1

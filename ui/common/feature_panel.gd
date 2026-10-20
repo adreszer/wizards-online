@@ -46,8 +46,7 @@ func open_panel() -> void:
 	UiSounds.play(&"panel_open")
 	card.show_window()
 	status_label.text = ""
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	refresh()
 
 
@@ -57,9 +56,7 @@ func close() -> void:
 	is_open = false
 	UiSounds.play(&"panel_close")
 	card.hide_window()
-	GameSession.ui_input_captured = false
-	if DisplayServer.get_name() != "headless":
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	UiRouter.closed(self)
 
 
 ## Shows the answer to a request in the status line (the refusal, or `ok_key`).
@@ -93,8 +90,3 @@ func clear(container: Node) -> void:
 		container.remove_child(c)
 		c.queue_free()
 
-
-func _input(event: InputEvent) -> void:
-	if is_open and event.is_action_pressed("pause"):
-		close()
-		get_viewport().set_input_as_handled()

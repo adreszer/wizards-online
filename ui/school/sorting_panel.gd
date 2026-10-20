@@ -32,20 +32,13 @@ func _ready() -> void:
 	_close_button.pressed.connect(close)
 
 
-func _input(event: InputEvent) -> void:
-	if is_open and event.is_action_pressed("pause"):
-		close()
-		get_viewport().set_input_as_handled()
-
-
 func open() -> void:
 	if is_open or _player == null:
 		return
 	is_open = true
 	UiSounds.play(&"panel_open")
 	_root.visible = true
-	GameSession.ui_input_captured = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.opened(self)
 	current_question = 0
 	answers.clear()
 	_waiting = false
@@ -61,9 +54,7 @@ func close() -> void:
 	is_open = false
 	UiSounds.play(&"panel_close")
 	_root.visible = false
-	GameSession.ui_input_captured = false
-	if not get_tree().paused:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	UiRouter.closed(self)
 
 
 func _show_question() -> void:
