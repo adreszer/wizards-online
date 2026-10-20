@@ -38,6 +38,7 @@ func _toggle() -> void:
 func _set_paused(paused: bool) -> void:
 	get_tree().paused = paused
 	_root.visible = paused
+	UiSounds.play(&"panel_open" if paused else &"back")
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if paused:
 		_resume.grab_focus()

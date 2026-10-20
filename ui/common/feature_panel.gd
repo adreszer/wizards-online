@@ -44,6 +44,7 @@ func _ready() -> void:
 	head.add_child(title_label)
 	var close_button := Button.new()
 	close_button.text = "✕"
+	close_button.set_meta(&"ui_sound", &"")
 	close_button.pressed.connect(close)
 	head.add_child(close_button)
 	var scroll := ScrollContainer.new()
@@ -74,6 +75,7 @@ func refresh() -> void:
 
 func open_panel() -> void:
 	is_open = true
+	UiSounds.play(&"panel_open")
 	card.visible = true
 	status_label.text = ""
 	GameSession.ui_input_captured = true
@@ -85,6 +87,7 @@ func close() -> void:
 	if not is_open:
 		return
 	is_open = false
+	UiSounds.play(&"panel_close")
 	card.visible = false
 	GameSession.ui_input_captured = false
 	if DisplayServer.get_name() != "headless":
@@ -94,6 +97,8 @@ func close() -> void:
 ## Shows the answer to a request in the status line (the refusal, or `ok_key`).
 func show_result(r: Dictionary, ok_key: String = "") -> void:
 	status_label.text = (tr(ok_key) if ok_key != "" else "") if r.get("ok", false) else NetworkManager.refusal_text(str(r.get("reason", "")))
+	if not r.get("ok", false):
+		UiSounds.play(&"error")
 
 
 ## Helpers for subclasses.

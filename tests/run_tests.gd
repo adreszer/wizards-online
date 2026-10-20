@@ -2023,6 +2023,29 @@ func _test_day_night() -> void:
 		and MusicDirector.track_for(SchoolClock.Phase.DUSK) == &"night" and MusicDirector.track_for(SchoolClock.Phase.NIGHT) == &"night",
 		"day music from dawn, night music from dusk")
 	t.check(AudioServer.get_bus_index(&"Music") > 0, "there is a Music bus")
+
+	# Interface sounds: short, on their own bus, heard from buttons, chat and notifications.
+	t.check(AudioServer.get_bus_index(&"UI") > 0, "there is a UI bus")
+	for id: StringName in UiSounds.SOUNDS:
+		var ui_stream := UiSounds.SOUNDS[id] as AudioStream
+		t.check(ui_stream != null and ui_stream.get_length() > 0.05 and ui_stream.get_length() < 1.5, "ui sound %s is short (%.2f s)" % [id, ui_stream.get_length() if ui_stream else 0.0])
+	UiSounds._last_played.clear()
+	var sound_button := Button.new()
+	castle.add_child(sound_button)
+	sound_button.pressed.emit()
+	t.check(UiSounds.last_sound == &"click", "pressing any button clicks")
+	UiSounds.last_sound = &""
+	sound_button.set_meta(&"ui_sound", &"")
+	sound_button.pressed.emit()
+	t.check(UiSounds.last_sound == &"", "a button can be silenced with the ui_sound meta")
+	sound_button.queue_free()
+	NetworkManager.chat_line_received.emit({"mode": "dm", "name": "Test", "text": "hi", "self": false})
+	t.check(UiSounds.last_sound == &"dm_received", "a direct message chimes")
+	UiSounds.last_sound = &""
+	NetworkManager.chat_line_received.emit({"mode": "say", "name": "Me", "text": "hi", "self": true})
+	t.check(UiSounds.last_sound == &"", "your own chat line makes no sound")
+	GameEvents.notification_requested.emit("test", 0.1)
+	t.check(UiSounds.last_sound == &"notification", "a HUD notification chimes")
 	var music := castle.get_node_or_null("MusicDirector") as MusicDirector
 	t.check(music != null and music.cycle == cycle, "the castle plays music from its day/night cycle")
 	if music != null and cycle != null:

@@ -440,6 +440,7 @@ func open() -> void:
 	if is_open or _player == null:
 		return
 	is_open = true
+	UiSounds.play(&"panel_open")
 	_root.visible = true
 	GameSession.ui_input_captured = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -452,6 +453,7 @@ func close() -> void:
 	if not is_open:
 		return
 	is_open = false
+	UiSounds.play(&"panel_close")
 	_root.visible = false
 	GameSession.ui_input_captured = false
 	if is_inside_tree() and not get_tree().paused:

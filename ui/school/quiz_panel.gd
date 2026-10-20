@@ -153,6 +153,7 @@ func _answer_text(text: String) -> void:
 
 func open() -> void:
 	is_open = true
+	UiSounds.play(&"panel_open")
 	_root.visible = true
 	GameSession.ui_input_captured = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -164,6 +165,7 @@ func _release() -> void:
 	if not is_open:
 		return
 	is_open = false
+	UiSounds.play(&"panel_close")
 	_entry.release_focus()
 	GameSession.ui_input_captured = false
 

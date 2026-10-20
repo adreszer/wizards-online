@@ -58,6 +58,7 @@ func open() -> void:
 	if is_open or _inventory == null:
 		return
 	is_open = true
+	UiSounds.play(&"inventory_open")
 	_root.visible = true
 	GameSession.ui_input_captured = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -68,6 +69,7 @@ func close() -> void:
 	if not is_open:
 		return
 	is_open = false
+	UiSounds.play(&"panel_close")
 	_root.visible = false
 	GameSession.ui_input_captured = false
 	if not get_tree().paused:

@@ -305,12 +305,15 @@ func _physics_process(_delta: float) -> void:
 		return
 	# Runs before the Movement child, so this is where the body starts the tick.
 	_tick_start = global_transform
+	var was_equipped := spell_caster.equipped_spell
 	var slot := player_input.consume_spell_slot()
 	if slot >= 0:
 		spell_caster.select_slot(slot)
 	var cycle := player_input.consume_spell_cycle()
 	if cycle != 0:
 		spell_caster.cycle(cycle)
+	if spell_caster.equipped_spell != was_equipped:
+		UiSounds.play(&"spell_select")
 	if player_input.consume_cast():
 		spell_caster.try_cast()
 	if gestures.is_sitting():

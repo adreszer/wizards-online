@@ -368,6 +368,8 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Flying music: while the local player rides a broom (`PlayerMovement.is_flying`), at any hour, the `flying` track after the same 3 s delay (a short hop changes nothing); a lesson still wins
 - [x] One-shot tracks: `sorting` (ceremony, 1:59) and `house_cup` (fanfare, 0:29) play once as an `event_track`, trailing silence trimmed, and clear themselves when they end so the clock's music returns; the whole music list is now in the game
 - [ ] Set `event_track` from the feast schedule, duelling club, mystery discovery, sorting ceremony and house cup award once those exist; music volume slider in settings
+- [x] UI sounds (list section 9, all 12, ElevenLabs Sound Effects through the MCP, one take each; originals in `assets/audio/ui/source/`): `UiSounds` autoload (`gameplay/audio/ui_sounds.gd`) on a `UI` bus at −8 dB; every button hovers and clicks (meta `ui_sound` overrides or silences: panel close buttons leave it to the panel), panels play open/close (map and satchel their own), others' chat lines tick, DMs chime, HUD notifications ring, refusals in a FeaturePanel knock, switching spells shimmers, pause opens/closes; per-sound minimum gaps and slight pitch jitter; tests
+- [ ] UI volume slider in settings; more takes for hover/click through an `AudioStreamRandomizer` if the repeats grate
 - [ ] Sound effects, ambiences per area, footsteps per surface, reverb per area (the rest of the list)
 
 ### Milestone 39 — Proximity chat, direct messages, speech bubbles
