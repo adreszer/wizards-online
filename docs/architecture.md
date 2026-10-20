@@ -243,7 +243,7 @@ Every validated `OP_WORLD_EVENT` (spell or interaction, including plaque reads, 
 
 Offline, `WorldObjectSync` starts an `OfflineMysteryEngine` with the public `content/offline_mysteries.json` (the server format's spell / interact / enter steps). Objects its solutions set (the secret walls) hand their triggers to it instead of opening on any hit; other objects act locally and only report. The client export presets exclude `nakama/`, `tools/`, `tests/`, `docs/` and dev levels; `tools/check_build.sh` proves it on an exported pack.
 
-### Authority (MVP)
+### Authority
 
 | State | Authority | Notes |
 |-------|-----------|-------|

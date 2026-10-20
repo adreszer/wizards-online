@@ -22,12 +22,12 @@ No port is published on the host. Coolify's proxy terminates TLS on the domain r
 
 ## First deploy
 
-1. DNS: an `A` record for the game domain (e.g. `play.example.com`) to the Coolify server, and optionally one for the console.
+1. DNS: an `A` record for the game domain (e.g. `play.arcane-academy.pl`) to the Coolify server, and optionally one for the console.
 2. Coolify → project → New resource → the GitHub repository, branch `main`, build pack **Docker Compose**, compose file `/docker-compose.coolify.yml`.
-3. Domains for the `nakama` service: `https://play.example.com:7350` (the port is the container port Coolify routes to). Optional console: add `,https://console.example.com:7351`; it logs in as `admin` with `SERVICE_PASSWORD_CONSOLE`. Leave `postgres` without a domain.
+3. Domains for the `nakama` service: `https://play.arcane-academy.pl:7350` (the port is the container port Coolify routes to). Optional console: add `,https://console.arcane-academy.pl:7351`; it logs in as `admin` with `SERVICE_PASSWORD_CONSOLE`. Leave `postgres` without a domain.
 4. Environment: set `NAKAMA_SERVER_KEY`; check that the `SERVICE_PASSWORD_*` values were generated.
 5. Turn **auto deploy off**. Released clients must keep matching the server, so the server is redeployed when a client build is released, not on every push.
-6. Deploy. `curl https://play.example.com/healthcheck` answers `{}`.
+6. Deploy. `curl https://play.arcane-academy.pl/healthcheck` answers `{}`.
 7. Admin: start a release build, connect once, find the account in the console (Accounts) and put its id in `ADMIN_USER_IDS`; restart the resource.
 
 ## Backups

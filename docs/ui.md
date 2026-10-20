@@ -1,6 +1,6 @@
 # Production UI plan
 
-How we take the interface from "working MVP" to a beautiful, coherent, shippable UI. It covers the art direction, the technical foundation, where every asset comes from, and the milestones (65–72) that get us there. `docs/plan.md` tracks progress; this file explains the why and the target.
+How we take the interface from "working prototype" to a beautiful, coherent, shippable UI. It covers the art direction, the technical foundation, where every asset comes from, and the milestones (65–72) that get us there. `docs/plan.md` tracks progress; this file explains the why and the target.
 
 ## Where we are (2026-10-20)
 
@@ -9,7 +9,7 @@ Captured with `tools/capture_ui.tscn` (see "Verification" below). About 30 UI su
 - **Three unrelated visual styles.** Dark navy (satchel, sorting, inventory), brown with a gold border (journal), cream parchment (`FeaturePanel`: shop, friends, clubs, cauldron…), plus Godot's default grey buttons, tabs, dropdowns and scroll bars everywhere.
 - **No theme and no font.** There is no project `Theme`. Every panel styles itself in code (55 `add_theme_*_override` calls, 16 hand-made `StyleBoxFlat`s), so changing the look means editing 30 files. Everything renders in Godot's default font.
 - **The HUD is a debug readout.** Top left is a column of text lines ("Zdrowie", "Fragmenty: 0 / 27", "Czar: —", "W dłoni: —", "Sakiewka", "Dom"), always on; the hotbar has no spell icons; the notification text overlaps the chat box; the minimap is a square with a placeholder look.
-- **The main menu is a dev form.** Name, language, role, server host and port fields in a grey box, "Pionowy wycinek MVP" as the subtitle, the control list as a line of text.
+- **The main menu is a dev form.** Name, language, role, server host and port fields in a grey box, a dev-build subtitle, the control list as a line of text.
 - **No motion, no sound, little controller support.** Panels pop in and out; only 5 places set gamepad focus.
 - **Bugs the gallery already shows:** the shop's title prints a raw key (`AREA_`) offline; the notification overlaps the chat panel; the pause menu shows the HUD and chat undimmed behind it.
 

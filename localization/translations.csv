@@ -1,5 +1,5 @@
 keys,en,pl
-MENU_SUBTITLE,MVP vertical slice,Pionowy wycinek MVP
+MENU_SUBTITLE,An online school of magic,Szkoła magii online
 MENU_DISPLAY_NAME,Display name,Nazwa gracza
 MENU_LANGUAGE,Language,Język
 MENU_LANGUAGE_AUTO,System default,Domyślny systemu
@@ -64,7 +64,7 @@ NOTIFY_TRICK_STEP,A step gives way under your foot! Jump to pull free.,"Stopień
 NOTIFY_CHECKPOINT,Checkpoint reached,Punkt kontrolny
 NOTIFY_STATUES_ALIGNED,The statues' gaze aligns. Something unlocked.,Spojrzenia posągów się zbiegają. Coś się odblokowało.
 NOTIFY_LEVER_STUCK,The lever will not budge while the statues look away.,"Dźwignia ani drgnie, dopóki posągi patrzą w inną stronę."
-NOTIFY_SLICE_COMPLETE,Vertical slice complete! Fragments: %d / %d,Pionowy wycinek ukończony! Fragmenty: %d / %d
+NOTIFY_SLICE_COMPLETE,Path complete! Fragments: %d / %d,Ścieżka ukończona! Fragmenty: %d / %d
 PLAQUE_DEFAULT,An inscription.,Inskrypcja.
 PLAQUE_ENTRANCE,"Welcome, apprentice. The halls reward those who look closely. Purple glimmers answer to magic.","Witaj, uczniu. Te sale nagradzają uważnych. Fioletowe błyski odpowiadają na magię."
 PLAQUE_SECRET,Well found. Curiosity is the first lesson.,Dobrze znalezione. Ciekawość to pierwsza lekcja.
@@ -72,7 +72,7 @@ PLAQUE_TRAINING,Wake both crystals to pass. Aim through the centre of your sight
 PLAQUE_PUZZLE,What is out of reach may still be touched. Weight holds the far door.,"Co poza zasięgiem, wciąż można dotknąć. Ciężar trzyma dalsze drzwi."
 PLAQUE_PLATFORMS,Mind the drop. The crimson floor bites; leap it.,Uważaj na przepaść. Szkarłatna posadzka kąsa; przeskocz ją.
 PLAQUE_FINAL,"Turn every statue to face the far door, then pull the lever.","Zwróć każdy posąg ku dalszym drzwiom, potem pociągnij dźwignię."
-PLAQUE_REWARD,You have reached the end of the vertical slice. Thank you for playing.,To koniec pionowego wycinka. Dziękujemy za grę.
+PLAQUE_REWARD,You have reached the end of this path. Thank you for playing.,To koniec tej ścieżki. Dziękujemy za grę.
 SPELL_ARCANE_PULSE_NAME,Arcane Pulse,Tajemny Impuls
 SPELL_ARCANE_PULSE_DESC,A focused pulse of raw arcane force. Activates magical mechanisms and shoves loose objects.,Skupiony impuls czystej tajemnej mocy. Uruchamia magiczne mechanizmy i odpycha luźne przedmioty.
 COLLECTIBLE_ARCANE_FRAGMENT,Arcane Fragment,Tajemny Fragment

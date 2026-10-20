@@ -10,8 +10,10 @@ config_version=5
 
 [application]
 
-config/name="Arcanum Halls"
-config/description="Multiplayer magical-school adventure MVP (greybox vertical slice)."
+config/name="Arcane Academy"
+config/description="Multiplayer magical-school adventure."
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Arcane Academy"
 run/main_scene="res://core/game.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
@@ -41,9 +43,13 @@ window/stretch/aspect="expand"
 
 debug/enable_debug_overlay=true
 network/host="127.0.0.1"
+network/host.template="play.arcane-academy.pl"
 network/port=7350
+network/port.template=443
 network/server_key="defaultkey"
+network/server_key.template="881eb87daa9c96185fb058656a57be9e"
 network/scheme="http"
+network/scheme.template="https"
 network/state_send_rate=12.0
 
 [gui]

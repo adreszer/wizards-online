@@ -1,6 +1,6 @@
-# Wizards Online — project instructions
+# Arcane Academy (repo: wizards-online) — project instructions
 
-Read this first in every session. It defines where the game is going, so every change should move toward this target state, not just the current MVP.
+Read this first in every session. It defines where the game is going, so every change should move toward this target state, not just the current build.
 
 ## Target state (the game we are building)
 

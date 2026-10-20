@@ -1,4 +1,4 @@
-# Roadmap: from castle MVP to a living school of magic
+# Roadmap: from the first castle to a living school of magic
 
 This is a brainstorm and a roadmap. `docs/plan.md` stays the implementation tracker: when a roadmap item is picked up it moves there as a milestone with checkboxes. Every name below is a **placeholder** (marked *like this*) until the owner picks the final one. The franchise is the design reference only: nothing here may borrow its names, places, creatures or spell names.
 

@@ -14,7 +14,7 @@ Use **Recraft** (recraft.ai, model V3 or newer), on a paid plan so the outputs a
 
 Back-ups: **Ideogram** for the wordmark if Recraft's lettering misbehaves; **Midjourney** (with `--sref` of the approved crest) only for painted, non-vector versions such as a loading screen.
 
-**Recommended for the wordmark:** don't generate the letters. Typeset "Arcanum Halls" in Cormorant SC (the game's display face) and generate only the emblem that sits with it. The lettering then matches the UI exactly and never comes out with a misspelt letter. Claude can typeset the wordmark as SVG from the font file.
+**Recommended for the wordmark:** don't generate the letters. Typeset "Arcane Academy" in Cormorant SC (the game's display face) and generate only the emblem that sits with it. The lettering then matches the UI exactly and never comes out with a misspelt letter. Claude can typeset the wordmark as SVG from the font file.
 
 **Copyright note.** Purely AI-generated images generally can't be protected by copyright, so others could copy them. To strengthen your position, edit the chosen SVGs by hand (simplify, redraw details, fix symmetry) in Recraft's editor, Figma or Inkscape, and register the logo as a **trademark** when you publish: a trademark doesn't depend on copyright.
 
@@ -67,13 +67,13 @@ House colours (from the game; each crest uses its colour plus aged brass `#C8A35
 
 ## School emblem (for the logo)
 
-> Emblem for an original fantasy school of magic called Arcanum Halls, engraved woodcut line art, an open book with a small eight-pointed star rising from its pages, surrounded by a circular ring in which four creatures chase each other around the circle: a dragon, a griffin, a phoenix and a winged sea-horse with a fish tail, each creature in its own colour (emerald green #33AD61, amber gold #EBB840, flame orange #F26B2E, sapphire blue #478CEB), aged brass #C8A35A outlines on dark ink #2B1D10, symmetrical, bold silhouette, flat vector illustration, plain background, no text, no letters, no shield, no castle
+> Emblem for an original fantasy school of magic called Arcane Academy, engraved woodcut line art, an open book with a small eight-pointed star rising from its pages, surrounded by a circular ring in which four creatures chase each other around the circle: a dragon, a griffin, a phoenix and a winged sea-horse with a fish tail, each creature in its own colour (emerald green #33AD61, amber gold #EBB840, flame orange #F26B2E, sapphire blue #478CEB), aged brass #C8A35A outlines on dark ink #2B1D10, symmetrical, bold silhouette, flat vector illustration, plain background, no text, no letters, no shield, no castle
 
 Simpler alternative if the four creatures get muddy:
 > Emblem for an original fantasy school of magic, engraved woodcut line art, an open book with an eight-pointed star rising from it, framed by a ring of laurel-like leaves with four small round medallions at the top, bottom, left and right, aged brass #C8A35A on dark ink #2B1D10, symmetrical, bold silhouette, flat vector illustration, plain background, no text, no letters, no shield
 
 ## Wordmark (only if you want the letters generated)
 
-> Logo wordmark reading exactly "ARCANUM HALLS" in elegant high-contrast classical serif small capitals, wide letter spacing, a thin engraved rule above and below with a tiny eight-pointed star in the centre, aged brass #C8A35A on dark ink #2B1D10, flat vector, plain background, no other text
+> Logo wordmark reading exactly "ARCANE ACADEMY" in elegant high-contrast classical serif small capitals, wide letter spacing, a thin engraved rule above and below with a tiny eight-pointed star in the centre, aged brass #C8A35A on dark ink #2B1D10, flat vector, plain background, no other text
 
 Check the spelling letter by letter. The recommended route is still to typeset the wordmark in Cormorant SC and pair it with the emblem.
