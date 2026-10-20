@@ -2,7 +2,7 @@
 
 Every generated UI image, with where it came from. Steam's AI content disclosure draws on this list.
 
-## House crests (`brand/`)
+## House crests and the school emblem (`brand/`)
 
 Generated with AI by the owner on 2026-10-20, from the prompts in `docs/brand-prompts.md`. No human artwork. The as-generated originals are in `brand/source/`. `tools/prep_crests.py` makes the game copies (1024 px, background removed; mono crests as a white glyph on alpha, tinted in the engine).
 
@@ -17,7 +17,10 @@ Generated with AI by the owner on 2026-10-20, from the prompts in `docs/brand-pr
 | crest_4_hipporys | colour | Złoty hipokamp w heraldycznym medalionie |
 | crest_4_hipporys_mono | single colour | Monochromatyczny emblemat hippocampusa w falach |
 
-Tool: ChatGPT (OpenAI image generation), owner account, 2026-10-20.
+| emblem | colour, the school emblem | (owner's file emblem.png) |
+| emblem_mark | the small mark, for the app icon | (owner's file emblem_mark.png) |
+
+Tool: ChatGPT (OpenAI image generation), owner account, 2026-10-20. `prep_crests.py` also makes `emblem.png` / `emblem_512.png` (main menu, boot splash), `icon.png` (window and app icon) and `icon.ico` (Windows; its 16 and 24 px images are the mark's book and star alone).
 
 ## House banners (`assets/models/environment/modular/banner_hN.glb`)
 

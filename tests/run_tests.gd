@@ -888,6 +888,8 @@ func _test_houses() -> void:
 		for variant in [CharacterProfile.CREST_FULL, CharacterProfile.CREST_CARD, CharacterProfile.CREST_MONO, CharacterProfile.CREST_ICON]:
 			crests_ok = crests_ok and CharacterProfile.crest(h, variant) != null
 	t.check(crests_ok, "every house has its crest in all four variants, the unsorted none")
+	t.check(ResourceLoader.exists(str(ProjectSettings.get_setting("application/config/icon"))) and str(ProjectSettings.get_setting("application/config/icon")).begins_with("res://assets/ui/brand/")
+		and ResourceLoader.exists("res://assets/ui/brand/emblem_512.png") and FileAccess.file_exists("res://assets/ui/brand/icon.ico"), "the school emblem and the app icon are in place")
 
 	var floor_body := TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(40, 1, 40))
 	await _spawn_player(Vector3(0, 0.1, 0))

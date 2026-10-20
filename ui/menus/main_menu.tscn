@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://mainmenu00001"]
+[gd_scene load_steps=3 format=3 uid="uid://mainmenu00001"]
 
 [ext_resource type="Script" path="res://ui/menus/main_menu.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/ui/brand/emblem_512.png" id="2"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -14,7 +15,7 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.08, 0.07, 0.12, 1)
+color = Color(0.165, 0.102, 0.055, 1)
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -35,6 +36,13 @@ theme_override_constants/margin_bottom = 24
 [node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 10
+
+[node name="Emblem" type="TextureRect" parent="Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 230)
+layout_mode = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Title" type="Label" parent="Center/Panel/Margin/VBox"]
 theme_type_variation = &"TitleLabel"

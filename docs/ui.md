@@ -104,7 +104,7 @@ Principle: **tools for volume, CC0 for materials, code for anything that must st
 
 | Asset | How many | Recommended source | Why |
 |---|---|---|---|
-| **Logo** (game title wordmark) and **four house crests** | 5 | **AI, by the owner's decision.** Crests done (2026-10-20, ChatGPT): `assets/ui/brand/`, made game-ready by `tools/prep_crests.py`, loaded with `CharacterProfile.crest()`. Logo still to do (`docs/brand-prompts.md`) | They are the most-seen brand art (menu, Steam capsule, store page, crests on robes and banners). Purely AI-generated images are generally not protected by copyright, so edit them by hand and register the logo as a trademark. |
+| **Logo** (game title wordmark) and **four house crests** | 5 | **AI, by the owner's decision.** Crests done (2026-10-20, ChatGPT): `assets/ui/brand/`, made game-ready by `tools/prep_crests.py`, loaded with `CharacterProfile.crest()`. School emblem and its small mark done too (main menu, boot splash, app icon); the wordmark is the name set in Cormorant SC | They are the most-seen brand art (menu, Steam capsule, store page, crests on robes and banners). Purely AI-generated images are generally not protected by copyright, so edit them by hand and register the logo as a trademark. |
 | **Icons** (spells, items, subjects, HUD symbols, map legend, chat channels, settings tabs) | ~150 | **Recraft** (vector/SVG output with a locked style and colour palette; commercial use on a paid plan) | Godot imports SVG at any scale; one style setting keeps 150 icons consistent; single-colour vectors recolour in the theme. Placeholders until then: **game-icons.net** (SVG, CC BY 3.0, needs a credit line). |
 | **Spell roundels** (painted) | 11 now, grows with spells | **Scenario** (train a style model on the first 3–5 approved roundels, then generate the rest in that style) or Midjourney with a style reference | Painted look, consistent series, cheap to extend when a spell is added. |
 | **Paper, leather, oak, brass, wax textures** | ~10 | **Poly Haven / ambientCG** (CC0) first; generate a seamless parchment in an image model only if none fits | Already the project's texture source; no licence questions. |
@@ -183,7 +183,7 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - [ ] Gallery at 1280×800, 1600×900, 2560×1440, 3440×1440 × PL/EN × scale 0.75/1/1.5, reviewed; native-speaker pass over the Polish copy
 - [ ] Owner playtest sign-off
 
-**Parallel track (owner):** generate the logo emblem and regenerate Phoenara's colour crest (`docs/brand-prompts.md`). Buy one Recraft month for the icon set during Milestone 71–72.
+**Parallel track (owner):** regenerate Phoenara's colour crest to match the set's frame (`docs/brand-prompts.md`). Buy one Recraft month for the icon set during Milestone 71–72.
 
 ## Owner decisions
 
