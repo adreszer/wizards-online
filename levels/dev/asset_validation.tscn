@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://assetvalid001"]
+[gd_scene load_steps=47 format=3 uid="uid://assetvalid001"]
 
 [ext_resource type="PackedScene" path="res://objects/environment/modular/wall_plain.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://objects/greybox/greybox_block.tscn" id="2"]
@@ -34,6 +34,17 @@
 [ext_resource type="PackedScene" path="res://objects/environment/props/statue.tscn" id="32"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/armour.tscn" id="33"]
 [ext_resource type="PackedScene" path="res://objects/environment/props/telescope.tscn" id="34"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/rug.tscn" id="35"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/wardrobe.tscn" id="36"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/pedestal.tscn" id="37"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/high_table.tscn" id="38"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/banner_h1.tscn" id="39"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/banner_h2.tscn" id="40"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/banner_h3.tscn" id="41"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/banner_h4.tscn" id="42"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/portraits/portrait_01.tscn" id="43"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/portraits/portrait_05.tscn" id="44"]
+[ext_resource type="PackedScene" path="res://objects/environment/props/portraits/portrait_09.tscn" id="45"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -382,6 +393,39 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4, 0, 15.5)
 
 [node name="Telescope" parent="E_DeskAndBench" instance=ExtResource("34")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0, 0, 15.5)
+
+[node name="Rug" parent="E_DeskAndBench" instance=ExtResource("35")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 19)
+
+[node name="Wardrobe" parent="E_DeskAndBench" instance=ExtResource("36")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 19)
+
+[node name="Pedestal" parent="E_DeskAndBench" instance=ExtResource("37")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 19)
+
+[node name="HighTable" parent="E_DeskAndBench" instance=ExtResource("38")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 19)
+
+[node name="BannerH1" parent="E_DeskAndBench" instance=ExtResource("39")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 24)
+
+[node name="BannerH2" parent="E_DeskAndBench" instance=ExtResource("40")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 24)
+
+[node name="BannerH3" parent="E_DeskAndBench" instance=ExtResource("41")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 24)
+
+[node name="BannerH4" parent="E_DeskAndBench" instance=ExtResource("42")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 24)
+
+[node name="Portrait01" parent="E_DeskAndBench" instance=ExtResource("43")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 24)
+
+[node name="Portrait05" parent="E_DeskAndBench" instance=ExtResource("44")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 24)
+
+[node name="Portrait09" parent="E_DeskAndBench" instance=ExtResource("45")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 24)
 
 [node name="Label" type="Label3D" parent="E_DeskAndBench"]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4, 2.2, 3)

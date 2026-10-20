@@ -33,8 +33,16 @@ NAME_THEMES = [
 ]
 
 
+# A kit role may list several scenes (portraits): instances take them in turn.
+_turn = {}
+
+
 def prop(kind):
-    return B.KIT.get("props", {}).get(kind) or f"res://objects/environment/placeholders/{kind}.tscn"
+    path = B.KIT.get("props", {}).get(kind)
+    if isinstance(path, list):
+        _turn[kind] = _turn.get(kind, -1) + 1
+        return path[_turn[kind] % len(path)]
+    return path or f"res://objects/environment/placeholders/{kind}.tscn"
 
 
 def on_wall(r, side, along, kind, name="Dress", inset=0.0):
@@ -80,6 +88,7 @@ def themed(r, names):
 
 
 def dress(plan, names):
+    _turn.clear()
     n = 0
     for r in plan.rooms.values():
         if r.get("terrain") or r.kind in ("outdoor", "grounds", "stair_turret") or r.inside is not None and r.kind == "outdoor":

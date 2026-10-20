@@ -7,6 +7,8 @@ extends Node
 ## keeps quiet for a while. castle.gd adds it.
 
 const PORTRAIT := "res://objects/environment/placeholders/portrait.tscn"
+## The painted portraits (one scene per sitter); the castle hangs them in turn.
+const PORTRAIT_DIR := "res://objects/environment/props/portraits/"
 const REACH := 3.2
 const QUIET_SECONDS := 90.0
 const SHOW_SECONDS := 7.0
@@ -19,6 +21,11 @@ var _delivered: Dictionary = {}
 var _bubble: Label3D
 var _bubble_left := 0.0
 var _timer := 0.0
+
+
+
+static func is_portrait(path: String) -> bool:
+	return path == PORTRAIT or path.begins_with(PORTRAIT_DIR)
 
 
 func _ready() -> void:

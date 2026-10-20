@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/portrait_frame.glb" id="1"]
+[ext_resource type="Texture2D" path="res://assets/textures/portraits/portrait_07.jpg" id="2"]
+
+[sub_resource type="StandardMaterial3D" id="Paint"]
+albedo_texture = ExtResource("2")
+roughness = 0.65
+
+[sub_resource type="QuadMesh" id="Canvas"]
+material = SubResource("Paint")
+size = Vector2(0.7057, 0.8992)
+
+[node name="Portrait" type="Node3D"]
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5065, 0.09)
+
+[node name="portrait_frame" parent="Model" index="0"]
+cast_shadow = 0
+
+[node name="Canvas" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0035, 2.2025, 0.0264)
+mesh = SubResource("Canvas")
+cast_shadow = 0
+
+[editable path="Model"]

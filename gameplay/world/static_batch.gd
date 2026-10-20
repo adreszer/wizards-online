@@ -45,6 +45,14 @@ const BATCHABLE := [
 	"res://objects/environment/props/statue.tscn",
 	"res://objects/environment/props/armour.tscn",
 	"res://objects/environment/props/telescope.tscn",
+	"res://objects/environment/props/rug.tscn",
+	"res://objects/environment/props/wardrobe.tscn",
+	"res://objects/environment/props/pedestal.tscn",
+	"res://objects/environment/props/high_table.tscn",
+	"res://objects/environment/props/banner_h1.tscn",
+	"res://objects/environment/props/banner_h2.tscn",
+	"res://objects/environment/props/banner_h3.tscn",
+	"res://objects/environment/props/banner_h4.tscn",
 ]
 ## Group of every batch (Seats looks through them).
 const GROUP := &"static_batch"
@@ -102,7 +110,7 @@ static func can_batch(scene: PackedScene) -> bool:
 
 
 static func can_batch_path(path: String) -> bool:
-	return BATCHABLE.has(path) or path.begins_with(PLACEHOLDERS)
+	return BATCHABLE.has(path) or path.begins_with(PLACEHOLDERS) or path.begins_with(TalkingPortraits.PORTRAIT_DIR)
 
 
 static func prototype(scene: PackedScene) -> Dictionary:
@@ -141,7 +149,7 @@ func add(scene: PackedScene, xform: Transform3D) -> bool:
 		boards.append(xform)
 	elif scene.resource_path == FeastMeals.FEAST_TABLE:
 		feast_tables.append(xform)
-	elif scene.resource_path == TalkingPortraits.PORTRAIT:
+	elif TalkingPortraits.is_portrait(scene.resource_path):
 		portraits.append(xform)
 	elif scene.resource_path == DormitoryCorners.BED:
 		beds.append(xform)
