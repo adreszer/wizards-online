@@ -29,6 +29,7 @@ func _ready() -> void:
 	style.set_corner_radius_all(4)
 	style.set_content_margin_all(26)
 	_root.add_theme_stylebox_override("panel", style)
+	_root.theme = load(UiTokens.PARCHMENT_THEME)
 	var box := VBoxContainer.new()
 	_root.add_child(box)
 	_title = Label.new()

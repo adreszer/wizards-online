@@ -30,7 +30,7 @@ func _build() -> void:
 	tabs.add_child(gfx)
 	var row := HBoxContainer.new()
 	gfx.add_child(row)
-	row.add_child(label(tr("SETTINGS_PRESET"), 15))
+	row.add_child(_row_label("SETTINGS_PRESET"))
 	_preset = OptionButton.new()
 	for p in GameSettings.PRESETS:
 		_preset.add_item(tr("SETTINGS_PRESET_" + p.to_upper()))
@@ -43,7 +43,7 @@ func _build() -> void:
 		_check(gfx, k)
 	var fps_row := HBoxContainer.new()
 	gfx.add_child(fps_row)
-	fps_row.add_child(label(tr("SETTINGS_FPS_CAP"), 15))
+	fps_row.add_child(_row_label("SETTINGS_FPS_CAP"))
 	_fps = SpinBox.new()
 	_fps.max_value = 360
 	_fps.step = 10
@@ -76,12 +76,14 @@ func _build() -> void:
 func _slider(parent: Node, key: String, lo: float, hi: float, setting: String) -> HSlider:
 	var row := HBoxContainer.new()
 	parent.add_child(row)
-	row.add_child(label(tr(key), 15))
+	row.add_child(_row_label(key))
 	var s := HSlider.new()
 	s.min_value = lo
 	s.max_value = hi
 	s.step = 0.05
 	s.custom_minimum_size = Vector2(200, 0)
+	s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	s.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	s.value_changed.connect(func(v: float) -> void:
 		GameSettings.set_value(setting, v)
 		_changed())
@@ -89,10 +91,17 @@ func _slider(parent: Node, key: String, lo: float, hi: float, setting: String) -
 	return s
 
 
+## The caption in front of a row's control; a fixed width keeps it from being squeezed
+## to one letter per line (it word-wraps).
+func _row_label(key: String) -> Label:
+	var l := label(tr(key), 15)
+	l.custom_minimum_size = Vector2(260, 0)
+	return l
+
+
 func _check(parent: Node, setting: String) -> void:
 	var c := CheckBox.new()
 	c.text = tr("SETTINGS_" + setting.to_upper())
-	c.add_theme_color_override("font_color", INK)
 	c.toggled.connect(func(on: bool) -> void:
 		GameSettings.set_value(setting, on)
 		_changed())

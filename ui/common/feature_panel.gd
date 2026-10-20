@@ -33,6 +33,7 @@ func _ready() -> void:
 	style.set_corner_radius_all(4)
 	style.set_content_margin_all(20)
 	card.add_theme_stylebox_override("panel", style)
+	card.theme = load(UiTokens.PARCHMENT_THEME)
 	var outer := VBoxContainer.new()
 	card.add_child(outer)
 	var head := HBoxContainer.new()
@@ -106,6 +107,8 @@ func label(text: String, size: int = 16) -> Label:
 	var l := Label.new()
 	l.text = text
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# A wrapping label has no width of its own; in a row it would shrink to one letter.
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", INK)
 	return l

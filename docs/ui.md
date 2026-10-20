@@ -100,7 +100,7 @@ The look must live in one place so we can iterate on it in hours, not weeks.
 
 ## Where to get the assets
 
-Principle: **tools for volume, people for identity, CC0 for materials, code for anything that must stay consistent.** Every kept file gets a provenance line (tool, model, prompt, date) in `assets/ui/PROVENANCE.md`, as with audio, for Steam's AI content disclosure.
+Principle: **tools for volume, CC0 for materials, code for anything that must stay consistent.** The owner chose AI for the logo and crests too (no commissioned art); tool and prompts are in `docs/brand-prompts.md`. Every kept file gets a provenance line (tool, model, prompt, date) in `assets/ui/PROVENANCE.md`, as with audio, for Steam's AI content disclosure.
 
 | Asset | How many | Recommended source | Why |
 |---|---|---|---|
@@ -126,7 +126,8 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - [ ] `tools/capture_ui.tscn`: the before/after gallery of every main surface (done in this planning step; extend it with resolutions, languages and interface scales)
 - [x] The three fonts (`UiFonts`, `assets/fonts/`, symbol fallbacks), `tools/build_ui_theme.gd` → `ui/theme/arcanum_theme.tres` as the project theme (`gui/theme/custom`) with `TitleLabel`, `BannerLabel`, `BookLabel`, `BookRichText`; window titles, menu titles and book, quiz and sorting text use them
 - [x] Font coverage test (`tests/check_ui.tscn`); chat escapes BBCode with `[lb]`/`[rb]` instead of full-width brackets
-- [ ] `UiTokens`; flat-colour styles from the palette for every control type and state
+- [x] `UiTokens` (palette, spacing, radii, sizes, motion); the oak theme styles every control type in every state (buttons, option/menu buttons, check boxes, fields, popups, tooltips, tabs, lists, trees, scroll bars, sliders, progress bars, separators, focus rings); `ui/theme/parchment_theme.tres` turns everything inside a paper surface into ink (FeaturePanel cards and books use it)
+- [x] Fixed: wrapping labels in a row shrank to one letter per line (settings, cauldron)
 - [ ] `UiRouter`: panel stack, Esc, input capture, mouse mode, modal dim, HUD fade, focus on open; migrate every panel to it
 - [ ] `FeaturePanel` → `UiWindow` (still flat-styled); remove per-panel style overrides (allowlist test, shrinking)
 - [ ] Missing-key test; fix `AREA_`, the notification/chat overlap, the undimmed pause backdrop
@@ -190,7 +191,7 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 |---|---|
 | Art direction | "Candlelit oak and parchment" as above. Confirm before Milestone 66. |
 | Fonts | Decided: Cormorant SC / EB Garamond / Fira Sans. |
-| Logo and crests | Commission a human artist (copyright ownership); AI only for the brief. |
+| Logo and crests | Decided: generated with AI (Recraft), prompts and rules in `docs/brand-prompts.md`; edit by hand and register the logo as a trademark. |
 | Icon tool | Recraft for the final set; game-icons.net placeholders now. |
 | Gamepad / Steam Deck for 1.0 | Yes: Steam players expect it and the Deck is a good fit for this game. Budgeted in Milestone 72. |
 
