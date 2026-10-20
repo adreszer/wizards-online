@@ -10,6 +10,8 @@ Use **Recraft** (recraft.ai, model V3 or newer), on a paid plan so the outputs a
 - **It can lock a style.** Generate the first crest, pick the best one, then create a custom style from it ("Create style" with that image) and generate the other three in it. That is how four crests end up looking like one set.
 - **It renders text well**, which matters for the wordmark.
 
+**Used for the house crests (2026-10-20): ChatGPT image generation**, as PNG. It matched the style well; keep using it for regenerations so the set stays consistent, attaching the approved crests as reference images.
+
 Back-ups: **Ideogram** for the wordmark if Recraft's lettering misbehaves; **Midjourney** (with `--sref` of the approved crest) only for painted, non-vector versions such as a loading screen.
 
 **Recommended for the wordmark:** don't generate the letters. Typeset "Arcanum Halls" in Cormorant SC (the game's display face) and generate only the emblem that sits with it. The lettering then matches the UI exactly and never comes out with a misspelt letter. Claude can typeset the wordmark as SVG from the font file.

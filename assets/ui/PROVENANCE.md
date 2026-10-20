@@ -17,4 +17,4 @@ Generated with AI by the owner on 2026-10-20, from the prompts in `docs/brand-pr
 | crest_4_hipporys | colour | Złoty hipokamp w heraldycznym medalionie |
 | crest_4_hipporys_mono | single colour | Monochromatyczny emblemat hippocampusa w falach |
 
-Tool and model: TODO (owner to fill in).
+Tool: ChatGPT (OpenAI image generation), owner account, 2026-10-20.
