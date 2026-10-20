@@ -12,7 +12,7 @@ Generated with AI by the owner on 2026-10-20, from the prompts in `docs/brand-pr
 | crest_1_drakoryn_mono | single colour | Heraldyczna pieczęć smoka z płomieniem |
 | crest_2_grypheon | colour | Złoty gryf z kluczem w herbowym medalionie |
 | crest_2_grypheon_mono | single colour | Heraldyczny gryf z kluczem w kręgu |
-| crest_3_phoenara | colour | Ornamental feniks w płomieniach |
+| crest_3_phoenara | colour | Ognisty feniks w heraldycznym kręgu (regenerated 2026-10-20 to match the set's frame; the first one was Ornamental feniks w płomieniach) |
 | crest_3_phoenara_mono | single colour | Symetryczny emblemat feniksa w płomieniach |
 | crest_4_hipporys | colour | Złoty hipokamp w heraldycznym medalionie |
 | crest_4_hipporys_mono | single colour | Monochromatyczny emblemat hippocampusa w falach |

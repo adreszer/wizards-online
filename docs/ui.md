@@ -183,7 +183,7 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - [ ] Gallery at 1280×800, 1600×900, 2560×1440, 3440×1440 × PL/EN × scale 0.75/1/1.5, reviewed; native-speaker pass over the Polish copy
 - [ ] Owner playtest sign-off
 
-**Parallel track (owner):** regenerate Phoenara's colour crest to match the set's frame (`docs/brand-prompts.md`). Buy one Recraft month for the icon set during Milestone 71–72.
+**Parallel track (owner):** none open; the crests, emblem and mark are done (`docs/brand-prompts.md`). Buy one Recraft month for the icon set during Milestone 71–72.
 
 ## Owner decisions
 
@@ -191,7 +191,7 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 |---|---|
 | Art direction | "Candlelit oak and parchment" as above. Confirm before Milestone 66. |
 | Fonts | Decided: Cormorant SC / EB Garamond / Fira Sans. |
-| Logo and crests | Decided: generated with AI, prompts and rules in `docs/brand-prompts.md`; crests made with ChatGPT and in the game; edit by hand and register the logo as a trademark. Phoenara's colour crest is due for a regeneration to match the set's frame. |
+| Logo and crests | Decided: generated with AI, prompts and rules in `docs/brand-prompts.md`; crests made with ChatGPT and in the game; edit by hand and register the logo as a trademark. |
 | Icon tool | Recraft for the final set; game-icons.net placeholders now. |
 | Gamepad / Steam Deck for 1.0 | Yes: Steam players expect it and the Deck is a good fit for this game. Budgeted in Milestone 72. |
 
