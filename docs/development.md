@@ -230,6 +230,10 @@ Slots that name an unknown subject, room, day or time are left out and logged (`
 
 Playtesting: `godot --path . -- --all-spells` spawns with every spell on the hotbar. Keys 1–0 select, Q/R cycle, LMB casts.
 
+## Rigging a portrait sitter
+
+Living portraits use Mixamo-named skeletons, like the players, so `SocialPose` gestures drive them. Scale the sitter to 1.8 m with feet on the ground and decimate it to ~30k triangles (Mixamo's upload limit is 10 MB). If its hands stand clear of the body, the Mixamo auto-rigger works: upload, place the markers, download FBX with **Original Pose**, then import it in Blender, apply rotation and scale on the armature (the FBX arrives in centimetres, rotated) and export GLB to `assets/models/portraits/`. Mixamo rejects figures whose hands hang against a robe; rig those with `blender -b --factory-startup --python tools/rig_sitter.py -- --src sitter.fbx --out assets/models/portraits/<id>.glb --joints '{...}'`, reading the landmarks off a front orthographic render (see the script's docstring). Check a raised arm before committing: cloth that is one surface with the arm stretches, and then the sitter needs regenerating with free arms. Add the id to the sitter loop in the Portraits test.
+
 ## Adding a character
 
 1. In Meshy: generate (Standard, 2K) → Remesh **Fixed 15K, Triangle** → Rig (**Mixamo** template, height 1.8 m, markers on the real joints) → add the seven motions (idle, walk, run, jump, fall, land, cast, in place) → Download: glb, Mixamo, **Rigged Character on**, Animation **All Added**, **Single file on**.

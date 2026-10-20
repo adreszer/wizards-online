@@ -2593,6 +2593,25 @@ func _test_portraits() -> void:
 		await _wait(1.2)
 		t.check(tp._bubble.visible and tp._bubble.text.contains(p.display_name), "walking up to one makes it speak")
 	castle.queue_free()
+	# Rigged sitters (living portraits): the players' gestures drive them too.
+	for id in ["01", "05", "06", "07"]:
+		var sitter: Node3D = (load("res://assets/models/portraits/sitter_%s.glb" % id) as PackedScene).instantiate()
+		add_child(sitter)
+		var skeleton: Skeleton3D = sitter.find_children("*", "Skeleton3D", true, false)[0]
+		var pose := SocialPose.new()
+		skeleton.add_child(pose)
+		pose.gesture = &"wave"
+		pose.influence = 1.0
+		# The skeleton drops modifier poses after drawing; read them as they are written.
+		var bones := {}
+		pose.modification_processed.connect(func() -> void:
+			bones.hand = skeleton.get_bone_global_pose(skeleton.find_bone("mixamorig_RightHand")).origin
+			bones.head = skeleton.get_bone_global_pose(skeleton.find_bone("mixamorig_Head")).origin)
+		await _wait(0.2)
+		var hand: Vector3 = bones.get("hand", Vector3.ZERO)
+		var head: Vector3 = bones.get("head", Vector3.ONE * 9.0)
+		t.check(hand.y > head.y and hand.x < 0.0, "sitter %s waves with the right hand (hand %.2f m, head %.2f m)" % [id, hand.y, head.y])
+		sitter.queue_free()
 
 
 ## The feature modules (nakama/modules/features/) and what the castle shows for them.
