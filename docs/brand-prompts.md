@@ -21,7 +21,7 @@ Back-ups: **Ideogram** for the wordmark if Recraft's lettering misbehaves; **Mid
 1. Generate the **school emblem** and one crest (start with **Drakoryn**) with the prompts below, 4–8 images each. Pick the best.
 2. In Recraft, **create a style** from the chosen crest. Generate Grypheon, Phoenara and Hipporys in that style with the same prompt structure.
 3. Ask for **vector / SVG**, square, on a plain background. Download the SVG and a 2048 px PNG.
-4. Check each one against the rules below, then put them in `assets/ui/brand/` (`emblem.svg`, `crest_1_drakoryn.svg` … `crest_4_hipporys.svg`) and write a provenance line in `assets/ui/PROVENANCE.md` (tool, model, prompt, date, chosen image). Steam's AI content disclosure needs it.
+4. Check each one against the rules below, then put the originals in `assets/ui/brand/source/` (`crest_1_drakoryn.png`, `crest_1_drakoryn_mono.png` … `crest_4_hipporys_mono.png`, `emblem.png`) and run `python3 tools/prep_crests.py` to make the game copies in `assets/ui/brand/` and write a provenance line in `assets/ui/PROVENANCE.md` (tool, model, prompt, date, chosen image). Steam's AI content disclosure needs it.
 
 **Reject any image that:**
 - looks like a shield split into four quarters, or any real university, school or film crest;
