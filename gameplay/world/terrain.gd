@@ -190,7 +190,9 @@ func _chunk_mesh(key: Vector2i, step: int) -> ArrayMesh:
 				continue
 			var a := j * row + i
 			indices.append_array([a, a + 1, a + row, a + 1, a + row + 1, a + row])
-	# Skirts: drop the border 6 m so neighbours at another resolution never show a crack.
+	# Skirts: hang the border down so neighbours at another resolution never show a crack,
+	# only as deep as that crack can be (skirt_depth) and never along holes: a deeper skirt
+	# hung through the cellars under the castle as a dark curtain across their corridors.
 	var border: Array[int] = []
 	for i in range(row):
 		border.append(i)
@@ -201,16 +203,24 @@ func _chunk_mesh(key: Vector2i, step: int) -> ArrayMesh:
 	for j in range(cells - 1, 0, -1):
 		border.append(j * row)
 	border.append(0)
-	var base := verts.size()
-	for k in border:
-		verts.append(verts[k] - Vector3(0, 6, 0))
-		normals.append(normals[k])
 	for k in range(border.size() - 1):
 		var t0 := border[k]
 		var t1 := border[k + 1]
-		var b0 := base + k
-		var b1 := base + k + 1
-		indices.append_array([t0, b0, t1, t1, b0, b1])
+		var i0 := t0 % row
+		var j0 := t0 / row
+		var i1 := t1 % row
+		var j1 := t1 / row
+		var bi := mini(mini(i0, i1), cells - 1)
+		var bj := mini(mini(j0, j1), cells - 1)
+		if _block_is_hole(ix0 + bi * step, iz0 + bj * step, step):
+			continue
+		var depth := skirt_depth(ix0 + i0 * step, iz0 + j0 * step, ix0 + i1 * step, iz0 + j1 * step)
+		var b0 := verts.size()
+		verts.append(verts[t0] - Vector3(0, depth, 0))
+		verts.append(verts[t1] - Vector3(0, depth, 0))
+		normals.append(normals[t0])
+		normals.append(normals[t1])
+		indices.append_array([t0, b0, t1, t1, b0, b0 + 1])
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = verts
@@ -219,6 +229,23 @@ func _chunk_mesh(key: Vector2i, step: int) -> ArrayMesh:
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	return mesh
+
+
+## How far a skirt hangs below the border edge from grid point (gx0, gz0) to (gx1, gz1):
+## the widest crack possible there, i.e. how far the full-resolution heights stray from
+## the coarse mesh's straight edge over the coarse segment holding it, plus a margin.
+## Both neighbours compute the same depth for their shared edge.
+func skirt_depth(gx0: int, gz0: int, gx1: int, gz1: int) -> float:
+	var along_x := gz0 == gz1
+	var lo := mini(gx0, gx1) if along_x else mini(gz0, gz1)
+	var c0 := floori(float(lo) / far_step) * far_step
+	var h0 := sample(c0, gz0) if along_x else sample(gx0, c0)
+	var h1 := sample(c0 + far_step, gz0) if along_x else sample(gx0, c0 + far_step)
+	var gap := 0.0
+	for s in range(1, far_step):
+		var h := sample(c0 + s, gz0) if along_x else sample(gx0, c0 + s)
+		gap = maxf(gap, absf(h - lerpf(h0, h1, float(s) / far_step)))
+	return gap + 0.3
 
 
 func _make_mesh_instance(mesh: Mesh, node_name: String) -> MeshInstance3D:

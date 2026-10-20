@@ -1489,6 +1489,25 @@ func _test_castle() -> void:
 	var fell: Array[String] = []
 	var terrain: Terrain = castle.get_node_or_null("Grounds/Terrain")
 	t.check(terrain != null and terrain.size_x > 0, "the castle stands in generated grounds")
+	# Chunk skirts stay out of the cellars: no skirt vertex (one hanging below the ground),
+	# at either resolution, under a cellar's ceiling (a 6 m skirt once hung across the
+	# north wing's cellar corridor).
+	var in_cellars: Array[String] = []
+	for z in zones:
+		# Underground areas: the ground lies over their ceiling (a metre under the zone's top).
+		var top := z.global_position.y + z.size.y / 2.0
+		if terrain == null or terrain.height_at(z.global_position.x, z.global_position.z) < top - 1.0:
+			continue
+		var lo := Vector2(z.global_position.x - z.size.x / 2.0, z.global_position.z - z.size.z / 2.0)
+		var hi := lo + Vector2(z.size.x, z.size.z)
+		var span := terrain.spacing * terrain.chunk_cells
+		for cx in range(floori((lo.x - terrain.origin.x) / span), floori((hi.x - terrain.origin.x) / span) + 1):
+			for cz in range(floori((lo.y - terrain.origin.y) / span), floori((hi.y - terrain.origin.y) / span) + 1):
+				for step in [1, terrain.far_step]:
+					for v: Vector3 in terrain._chunk_mesh(Vector2i(cx, cz), step).surface_get_arrays(0)[Mesh.ARRAY_VERTEX]:
+						if v.x > lo.x + 0.1 and v.x < hi.x - 0.1 and v.z > lo.y + 0.1 and v.z < hi.y - 0.1 and v.y < top - 0.9 and terrain.height_at(v.x, v.z) > v.y + 0.25 and not in_cellars.has(str(z.area_id)):
+							in_cellars.append(str(z.area_id))
+	t.check(in_cellars.is_empty(), "terrain skirts stay out of the cellars (%s)" % ", ".join(in_cellars))
 	for z in zones:
 		var base_y := z.global_position.y - z.size.y / 2.0
 		if z.kind == "grounds" and terrain != null:
