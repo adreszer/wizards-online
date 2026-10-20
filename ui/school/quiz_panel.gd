@@ -53,11 +53,13 @@ func _build() -> void:
 	box.add_theme_constant_override("separation", 8)
 	_root.add_child(box)
 	_title = Label.new()
+	_title.theme_type_variation = &"TitleLabel"
 	_title.add_theme_color_override("font_color", Color(0.94, 0.82, 0.55))
 	box.add_child(_title)
 	_question = Label.new()
 	_question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_question.add_theme_font_size_override("font_size", 20)
+	_question.theme_type_variation = &"BookLabel"
+	_question.add_theme_font_size_override("font_size", 22)
 	box.add_child(_question)
 	_choices = VBoxContainer.new()
 	box.add_child(_choices)

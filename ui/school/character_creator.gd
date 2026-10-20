@@ -51,7 +51,7 @@ func _build() -> void:
 	_root.add_child(box)
 	var title := Label.new()
 	title.text = "CREATOR_TITLE"
-	title.add_theme_font_size_override("font_size", 24)
+	title.theme_type_variation = &"TitleLabel"
 	box.add_child(title)
 	var intro := Label.new()
 	intro.text = "CREATOR_INTRO"

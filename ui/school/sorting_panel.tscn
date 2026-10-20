@@ -52,8 +52,9 @@ layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="Root/Panel/VBox"]
+theme_type_variation = &"TitleLabel"
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 34
 text = "SORT_TITLE"
 horizontal_alignment = 1
 
@@ -64,10 +65,11 @@ theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
 horizontal_alignment = 1
 
 [node name="Question" type="Label" parent="Root/Panel/VBox"]
+theme_type_variation = &"BookLabel"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 autowrap_mode = 3
 

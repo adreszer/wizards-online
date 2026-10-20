@@ -46,6 +46,10 @@ network/server_key="defaultkey"
 network/scheme="http"
 network/state_send_rate=12.0
 
+[gui]
+
+theme/custom="res://ui/theme/arcanum_theme.tres"
+
 [input]
 
 move_forward={

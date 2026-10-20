@@ -98,11 +98,18 @@ Everything after the standalone `--` is a user argument and is ignored by Godot 
 
 ## Automated tests
 
-`tools/check.sh` runs the whole offline set in one go: it regenerates the castle and the server's generated content, fails if either differs from what is committed, then runs the script check and the gameplay tests (logs in `.godot/check/`). To run it before every push: `git config core.hooksPath tools/hooks`.
+`tools/check.sh` runs the whole offline set in one go: it regenerates the castle and the server's generated content, fails if either differs from what is committed, then runs the script check, the UI check and the gameplay tests (logs in `.godot/check/`). To run it before every push: `git config core.hooksPath tools/hooks`.
 
 ```bash
 # load every script/scene (catches parse errors)
 godot --headless --path . tests/check_scripts.tscn
+
+# UI: every character the game shows is in the fonts
+godot --headless --path . tests/check_ui.tscn
+# after changing fonts or theme values: rewrite ui/theme/ (commit the output)
+godot --headless --path . -s tools/build_ui_theme.gd
+# after changing the symbol blocks: rebuild the trimmed symbol fallbacks (pip install fonttools)
+python3 tools/make_symbol_fonts.py
 
 # gameplay tests: movement, camera, health/checkpoints, collectibles, spells (registry, spellbook,
 # effects), school (profile, area tracker, nameplates, lesson tools), inventory, interaction,

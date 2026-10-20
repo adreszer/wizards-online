@@ -1,0 +1,36 @@
+[gd_resource type="Theme" format=3]
+
+[ext_resource type="FontVariation" path="res://ui/theme/fonts/display.tres" id="1_45ka6"]
+[ext_resource type="FontVariation" path="res://ui/theme/fonts/text.tres" id="2_ubvop"]
+[ext_resource type="FontVariation" path="res://ui/theme/fonts/text_bold.tres" id="3_ty4v5"]
+[ext_resource type="FontVariation" path="res://ui/theme/fonts/text_italic.tres" id="4_k12um"]
+[ext_resource type="FontVariation" path="res://ui/theme/fonts/ui_bold.tres" id="5_0p5lx"]
+[ext_resource type="FontVariation" path="res://ui/theme/fonts/ui_italic.tres" id="6_opnki"]
+[ext_resource type="FontVariation" path="res://ui/theme/fonts/ui.tres" id="7_hgiw5"]
+
+[resource]
+default_font = ExtResource("7_hgiw5")
+default_font_size = 16
+BannerLabel/base_type = &"Label"
+BannerLabel/font_sizes/font_size = 64
+BannerLabel/fonts/font = ExtResource("1_45ka6")
+BookLabel/base_type = &"Label"
+BookLabel/font_sizes/font_size = 19
+BookLabel/fonts/font = ExtResource("2_ubvop")
+BookRichText/base_type = &"RichTextLabel"
+BookRichText/font_sizes/bold_font_size = 19
+BookRichText/font_sizes/bold_italics_font_size = 19
+BookRichText/font_sizes/italics_font_size = 19
+BookRichText/font_sizes/normal_font_size = 19
+BookRichText/fonts/bold_font = ExtResource("3_ty4v5")
+BookRichText/fonts/bold_italics_font = ExtResource("3_ty4v5")
+BookRichText/fonts/italics_font = ExtResource("4_k12um")
+BookRichText/fonts/normal_font = ExtResource("2_ubvop")
+Label/constants/line_spacing = 0
+RichTextLabel/constants/line_separation = 0
+RichTextLabel/fonts/bold_font = ExtResource("5_0p5lx")
+RichTextLabel/fonts/bold_italics_font = ExtResource("5_0p5lx")
+RichTextLabel/fonts/italics_font = ExtResource("6_opnki")
+TitleLabel/base_type = &"Label"
+TitleLabel/font_sizes/font_size = 30
+TitleLabel/fonts/font = ExtResource("1_45ka6")

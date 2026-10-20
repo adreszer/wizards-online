@@ -1,0 +1,9 @@
+[gd_resource type="FontVariation" format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/fira_sans/FiraSans-Regular.ttf" id="1_n2wcu"]
+[ext_resource type="FontFile" path="res://assets/fonts/noto_symbols/UiSymbols2.ttf" id="2_n2wcu"]
+[ext_resource type="FontFile" path="res://assets/fonts/noto_symbols/UiSymbols.ttf" id="3_avyia"]
+
+[resource]
+fallbacks = Array[Font]([ExtResource("2_n2wcu"), ExtResource("3_avyia")])
+base_font = ExtResource("1_n2wcu")

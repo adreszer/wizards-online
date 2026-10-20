@@ -39,7 +39,7 @@ func _ready() -> void:
 	outer.add_child(head)
 	title_label = Label.new()
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_label.add_theme_font_size_override("font_size", 22)
+	title_label.theme_type_variation = &"TitleLabel"
 	title_label.add_theme_color_override("font_color", INK)
 	head.add_child(title_label)
 	var close_button := Button.new()

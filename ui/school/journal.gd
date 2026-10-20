@@ -48,7 +48,7 @@ func _build() -> void:
 	var box := VBoxContainer.new()
 	_root.add_child(box)
 	_header = Label.new()
-	_header.add_theme_font_size_override("font_size", 22)
+	_header.theme_type_variation = &"TitleLabel"
 	_header.add_theme_color_override("font_color", Color(0.95, 0.85, 0.6))
 	box.add_child(_header)
 	_tabs = TabContainer.new()

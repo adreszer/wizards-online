@@ -43,6 +43,9 @@ fi
 step "scripts"
 "$GODOT" --headless --path . tests/check_scripts.tscn >"$LOGS/check_scripts.log" 2>&1 || fail "check_scripts" "$LOGS/check_scripts.log"
 
+step "ui"
+"$GODOT" --headless --path . tests/check_ui.tscn >"$LOGS/check_ui.log" 2>&1 || { grep -E "misses" "$LOGS/check_ui.log" | head -10; fail "check_ui" "$LOGS/check_ui.log"; }
+
 step "gameplay tests"
 "$GODOT" --headless --path . tests/run_tests.tscn >"$LOGS/run_tests.log" 2>&1 || { grep -E "FAIL|passed" "$LOGS/run_tests.log" | tail -20; fail "run_tests" "$LOGS/run_tests.log"; }
 grep -E "passed" "$LOGS/run_tests.log" | tail -1

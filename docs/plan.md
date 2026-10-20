@@ -571,7 +571,7 @@ Owner decision (2026-10-20): portraits move, a mix of rigged sitters that can wa
 The plan, art direction, asset sources and per-milestone checklists are in `docs/ui.md`; tick items there and summarise here.
 
 - [x] `tools/capture_ui.tscn`: a PNG gallery of every main UI surface, the before/after reference for the UI work
-- [ ] Milestone 65 — Foundation: tokens, fonts, one theme, the router
+- [~] Milestone 65 — Foundation: tokens, fonts, one theme, the router. Fonts done (owner's choice: Cormorant SC display, EB Garamond text, Fira Sans interface, Noto symbols fallback; `UiFonts`, `tools/build_ui_theme.gd`, `ui/theme/arcanum_theme.tres` as the project theme, coverage test `tests/check_ui.tscn`)
 - [ ] Milestone 66 — Art kit v1 and the UI gallery (owner checkpoint on the look)
 - [ ] Milestone 67 — The HUD
 - [ ] Milestone 68 — Main menu, loading, pause, settings

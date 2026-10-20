@@ -32,14 +32,14 @@ func _ready() -> void:
 	var box := VBoxContainer.new()
 	_root.add_child(box)
 	_title = Label.new()
-	_title.add_theme_font_size_override("font_size", 24)
+	_title.theme_type_variation = &"TitleLabel"
 	_title.add_theme_color_override("font_color", Color(0.3, 0.18, 0.08))
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_title)
 	_text = RichTextLabel.new()
 	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_text.add_theme_color_override("default_color", Color(0.18, 0.12, 0.07))
-	_text.add_theme_font_size_override("normal_font_size", 18)
+	_text.theme_type_variation = &"BookRichText"
 	box.add_child(_text)
 	var row := HBoxContainer.new()
 	box.add_child(row)

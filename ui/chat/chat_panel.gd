@@ -156,5 +156,6 @@ func _append(line: String) -> void:
 		_log.remove_paragraph(0)
 
 
+## Shows brackets literally instead of as BBCode tags.
 static func _escape(text: String) -> String:
-	return text.replace("[", "［").replace("]", "］")
+	return text.replace("[", "\u0001").replace("]", "[rb]").replace("\u0001", "[lb]")

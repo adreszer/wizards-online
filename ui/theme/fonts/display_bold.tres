@@ -1,0 +1,9 @@
+[gd_resource type="FontVariation" format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/cormorant_sc/CormorantSC-Bold.ttf" id="1_dnkyl"]
+[ext_resource type="FontFile" path="res://assets/fonts/noto_symbols/UiSymbols2.ttf" id="2_bn4fj"]
+[ext_resource type="FontFile" path="res://assets/fonts/noto_symbols/UiSymbols.ttf" id="3_ise3d"]
+
+[resource]
+fallbacks = Array[Font]([ExtResource("2_bn4fj"), ExtResource("3_ise3d")])
+base_font = ExtResource("1_dnkyl")

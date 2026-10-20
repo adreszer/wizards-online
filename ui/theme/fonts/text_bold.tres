@@ -1,0 +1,12 @@
+[gd_resource type="FontVariation" format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/eb_garamond/EBGaramond-Variable.ttf" id="1_piqwd"]
+[ext_resource type="FontFile" path="res://assets/fonts/noto_symbols/UiSymbols2.ttf" id="2_piqwd"]
+[ext_resource type="FontFile" path="res://assets/fonts/noto_symbols/UiSymbols.ttf" id="3_3a3yp"]
+
+[resource]
+fallbacks = Array[Font]([ExtResource("2_piqwd"), ExtResource("3_3a3yp")])
+base_font = ExtResource("1_piqwd")
+variation_opentype = {
+2003265652: 700
+}
