@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://wallwindow0001"]
 
 [ext_resource type="Script" path="res://objects/environment/modular/wall_window.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://b70n4t7ob0cuv" path="res://assets/models/environment/modular/wall_plain.glb" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/wall_plain.glb" id="2"]
 [ext_resource type="Material" path="res://objects/environment/modular/wall_stone_opening.tres" id="3"]
 
 [sub_resource type="BoxShape3D" id="WallShape"]

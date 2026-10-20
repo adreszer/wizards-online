@@ -163,7 +163,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Satchel UI (`Tab`, joypad Back): lists items, click to hold / put away; HUD "In hand" line; spawn hint
 - [x] Server-owned inventories: Nakama storage `inventory/items` per user, starting kit created on first join, `OP_INVENTORY` to the joiner, `OP_HELD_ITEM` validated (owned + holdable) and relayed, `held` in roster entries; offline uses the same starting kit locally
 - [x] Headless tests: inventory data/visuals/panel (run_tests), held torch replication + server-issued inventory (two-client test)
-- [ ] Lighting overhaul proper: dim ambient/sun so only placed and carried light sources light the castle; add light sources to every area first
+- [x] Lighting overhaul proper: dim ambient/sun so only placed and carried light sources light the castle (see "Lighting overhaul" below)
 - [x] Ways to obtain items in the world: `item_rack` world objects (server-granted via `OP_WORLD_EVENT`), dev cheats `/give` (`OP_CHEAT`)
 - [ ] Items from professors (granted in lessons, like spells), consumable torches that burn down (`burn_seconds`)
 
@@ -570,6 +570,20 @@ Owner decision (2026-10-20): portraits move, a mix of rigged sitters that can wa
 - [x] Sitters 08–10 (busts: `…c7-7bf0-70f3-8b46-aec82ad3d778`, `…c8-1a3a-706a-a477-6957b07a7a64`, `…c8-b890-7720-88c0-0b2f65165687`): subtle motion (breathing, a slow sway toward the viewer); `assets/models/portraits/sitter_08..10.glb`, 15k triangles
 - [x] `LivePortraits` (castle.gd adds it): the 2 nearest portraits in front of the local player within 7 m turn live (`LivePortrait`): the sitter in its own SubViewport (384×490, the portrait studio's lens and lights, AgX), drawn on a canvas over the painted one through the paintings' varnish (`live_portrait.gdshader`), cross-fading from the painting in 0.8 s and back. `SitterPose` breathes, turns the head toward the player and folds the T-pose sitters' hands; `SocialPose` waves when the portrait speaks (`TalkingPortraits.spoke`) and plays an idle wave/shrug/point/bow every 14–30 s while the player stays within 4.5 m. Each sitter's framing is registered against its painting (`LivePortrait.FRAMING`), so the swap does not jump. `StaticBatch.portrait_sitters` records which sitter hangs where. Two live portraits cost ~0.3 ms a frame. Check them with `tools/capture_live_portraits.tscn` (painted and live side by side, plus a wave)
 - [ ] Later: sitters visit neighbouring frames (portrait messengers, mystery hints)
+
+### Lighting overhaul (roadmap 5.1)
+
+Spike and decisions in `docs/lighting.md`.
+
+- [x] GI spike (`tools/lighting_spike.tscn`): LightmapGI rejected (lights go out, day/night, regenerated castle, runtime batching), VoxelGI rejected (26 s runtime bake per wing), SDFGI chosen; SSIL stays an ultra extra
+- [x] Castle environment (generator): SDFGI, AgX tonemapping, glow for flames and windows; "Global illumination" setting, on from the high preset, only in levels that ask for it
+- [x] Light budget (`LightQuality`): every light fades out 45–55 m away; shadows only from lights authored with one, out to 12/20/30 m (medium/high/ultra), none on low; particles never cast shadows. Bobbing tomes, collectibles, floating candle flames and practice discs no longer cast shadows (each made every light near it re-render every frame). Great hall at night: 6,926 → 1,542 draw calls
+- [x] Darkness is real: GI drops the flat ambient; without GI the ambient falls to 35 % indoors (by area kind); the dungeons get half again and no daylight
+- [x] Daylight indoors: the fill shines straight down; with GI it is 5× stronger plus five shadowless bounce fills (walls, ceilings) and brighter window panes; the shadows setting no longer gives fill lights shadows (that had blocked the old fill at every ceiling)
+- [x] `tools/capture_daynight.tscn` also shoots the dungeon; stale UIDs removed from the wall modules (warnings on every fresh checkout)
+- [x] Tests: presets and shadow distances, light fade and shadows, particles, still props, indoor kinds, the castle's GI/AgX/glow, the overhead fill and the bounce fills with and without GI
+- [ ] Measure SDFGI on a mid laptop at 1080p (this M3 Ultra is CPU-bound; GI cost didn't show)
+- [ ] Windows and light shafts (roadmap 5.1)
 
 ### Next — Production UI (Milestones 65–72)
 

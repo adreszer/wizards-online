@@ -39,7 +39,7 @@ func _build() -> void:
 		_changed())
 	row.add_child(_preset)
 	_scale = _slider(gfx, "SETTINGS_RENDER_SCALE", 0.5, 1.0, "render_scale")
-	for k in ["fsr", "shadows", "ssao", "ssil", "glow", "fog", "vsync"]:
+	for k in ["fsr", "shadows", "ssao", "ssil", "gi", "glow", "fog", "vsync"]:
 		_check(gfx, k)
 	var fps_row := HBoxContainer.new()
 	gfx.add_child(fps_row)

@@ -951,6 +951,9 @@ def emit_placements(path):
     return counts
 
 # --------------------------------------------------------------------------- build
+# AgX tonemapping, glow for flames and lit windows, SDFGI (the "Global illumination"
+# setting; GameSettings turns it off on low and medium). The lighting spike behind these
+# choices is in docs/lighting.md.
 SCENE_ENV = '''
 [sub_resource type="ProceduralSkyMaterial" id="NightSkyMat"]
 sky_top_color = Color(0.015, 0.02, 0.045, 1)
@@ -971,11 +974,19 @@ sky = SubResource("NightSky")
 ambient_light_source = 2
 ambient_light_color = Color(0.5, 0.5, 0.56, 1)
 ambient_light_energy = 0.22
-tonemap_mode = 2
+tonemap_mode = 4
+glow_enabled = true
+glow_intensity = 0.5
+glow_bloom = 0.04
+glow_hdr_threshold = 1.2
 fog_enabled = true
 fog_light_color = Color(0.09, 0.1, 0.13, 1)
 fog_density = 0.0016
 fog_sky_affect = 0.35
+sdfgi_enabled = true
+sdfgi_use_occlusion = true
+sdfgi_bounce_feedback = 0.5
+sdfgi_min_cell_size = 0.25
 '''
 # Render layer 11 ("outdoor"): terrain, water, flora and exteriors. Only the moon lights it,
 # so moonlight never reaches the castle's interiors.
@@ -1050,7 +1061,7 @@ script = ExtResource("{level_script}")
 environment = SubResource("Env")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 20, 0)
 light_color = Color(0.85, 0.86, 0.95, 1)
 light_energy = 0.06
 shadow_enabled = false

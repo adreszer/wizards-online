@@ -1082,7 +1082,8 @@ SETTINGS_RENDER_SCALE,Render scale,Skala renderowania
 SETTINGS_FSR,Upscale with FSR,Skalowanie FSR
 SETTINGS_SHADOWS,Shadows,Cienie
 SETTINGS_SSAO,Ambient occlusion,Okluzja otoczenia
-SETTINGS_SSIL,Indirect light,Światło pośrednie
+SETTINGS_SSIL,Screen-space light bounce,Odbicia światła (ekranowe)
+SETTINGS_GI,Global illumination,Oświetlenie globalne
 SETTINGS_GLOW,Glow,Poświata
 SETTINGS_FOG,Fog,Mgła
 SETTINGS_VSYNC,VSync,Synchronizacja pionowa

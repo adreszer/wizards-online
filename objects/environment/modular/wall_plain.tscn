@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://wallplain0001"]
 
-[ext_resource type="PackedScene" uid="uid://b70n4t7ob0cuv" path="res://assets/models/environment/modular/wall_plain.glb" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/wall_plain.glb" id="1"]
 
 [ext_resource type="Material" path="res://objects/environment/modular/wall_stone.tres" id="2"]
 

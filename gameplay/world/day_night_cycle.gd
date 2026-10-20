@@ -10,7 +10,13 @@ extends Node
 ##         the sun by day and the moon by night; the switch happens while the body
 ##         is at the horizon and the light has faded to nothing.
 ##   Sun   the faint fill that lights interiors through the windows (all layers);
-##         a little brighter and warmer by day.
+##         a little brighter and warmer by day. It shines straight down, so daylight in
+##         a room comes from above and no wall is lit more than the one facing it; with
+##         global illumination on it is stronger (FILL_GI) and the bounce spreads it.
+##         GI also drops the flat ambient light, so with GI on four weak horizontal
+##         fills and one shining up (BOUNCE_FILLS, interiors only, no highlights) stand
+##         in for the light walls and ceilings would get from the whole room; they are
+##         created here and off without GI.
 ## Looks between the key hours in KEYS are blended linearly.
 
 signal phase_changed(phase: SchoolClock.Phase)
@@ -22,6 +28,13 @@ const MOON_ENERGY := 0.38
 const SUN_LOW := Color(1.0, 0.58, 0.32)
 const SUN_HIGH := Color(1.0, 0.96, 0.9)
 const MOON_COLOR := Color(0.55, 0.64, 0.95)
+## The fill's energy multiplier with global illumination on: GI drops the flat ambient,
+## so the overhead fill and its bounce carry the daylight in rooms.
+const FILL_GI := 5.0
+## The bounce fills (GI only): direction the light travels → share of the overhead fill.
+const BOUNCE_FILLS := {Vector3.LEFT: 0.35, Vector3.RIGHT: 0.35, Vector3.FORWARD: 0.35, Vector3.BACK: 0.35, Vector3.UP: 0.25}
+## Every render layer but the outdoor one (11): the wall fills light interiors only.
+const INTERIOR_LAYERS := 0xFFFFF & ~(1 << 10)
 
 ## Key looks by school hour. day: how much daylight (0–1) drives windows and glows.
 const KEYS := [
@@ -58,6 +71,7 @@ var environment: Environment
 var sky_material: ProceduralSkyMaterial
 var sky_light: DirectionalLight3D
 var fill_light: DirectionalLight3D
+var bounce_fills: Array[DirectionalLight3D] = []
 var hours := 0.0
 var phase := SchoolClock.Phase.NIGHT
 var daylight := 0.0
@@ -82,6 +96,22 @@ func _ready() -> void:
 	fill_light = level.get_node_or_null("Sun") as DirectionalLight3D
 	if fill_light != null:
 		fill_light.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY   # no second disc in the sky
+		fill_light.light_specular = 0.2   # sky light: no sharp highlight on the floors
+		fill_light.shadow_enabled = false   # it shines through the ceilings (the shadows setting skips it)
+		fill_light.set_meta(GameSettings.NO_SHADOWS, true)
+		for dir: Vector3 in BOUNCE_FILLS:
+			var bounce := DirectionalLight3D.new()
+			bounce.name = "BounceFill"
+			bounce.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY
+			bounce.light_cull_mask = INTERIOR_LAYERS
+			bounce.light_specular = 0.0
+			bounce.shadow_enabled = false
+			bounce.set_meta(GameSettings.NO_SHADOWS, true)
+			bounce.visible = false
+			bounce.basis = Basis.looking_at(dir, Vector3.FORWARD if absf(dir.y) > 0.5 else Vector3.UP)
+			bounce.set_meta(&"share", BOUNCE_FILLS[dir])
+			level.add_child.call_deferred(bounce)
+			bounce_fills.append(bounce)
 	for type in ["CastleExterior", "Village"]:
 		_exteriors.append_array(level.find_children("*", type, true, false))
 	NetworkManager.school_clock_changed.connect(func(_by: String) -> void: refresh())
@@ -147,9 +177,10 @@ static func look_at_hour(h: float) -> Dictionary:
 
 ## Per-area atmosphere over the hour's look: cold blue dungeons, a green greenhouse, a
 ## warm hazy great hall, a golden library, starlit towers. Where the local player stands
-## picks it; it fades in and out over a second or two.
+## picks it; it fades in and out over a second or two. fill_k scales the daylight fill
+## (no daylight reaches the dungeons).
 const ATMOSPHERES := {
-	"dungeon": {"amb": Color(0.45, 0.55, 0.78), "amb_k": 0.8, "fog": Color(0.12, 0.17, 0.28), "fog_k": 3.0},
+	"dungeon": {"amb": Color(0.45, 0.55, 0.78), "amb_k": 0.45, "fog": Color(0.12, 0.17, 0.28), "fog_k": 3.0, "fill_k": 0.0},
 	"greenhouse": {"amb": Color(0.55, 0.82, 0.5), "amb_k": 1.1, "fog": Color(0.28, 0.42, 0.26), "fog_k": 2.0},
 	"great_hall": {"amb": Color(0.95, 0.72, 0.5), "amb_k": 1.15, "fog": Color(0.45, 0.33, 0.22), "fog_k": 2.4},
 	"library": {"amb": Color(0.9, 0.75, 0.55), "amb_k": 1.0, "fog": Color(0.34, 0.28, 0.2), "fog_k": 1.5},
@@ -157,6 +188,14 @@ const ATMOSPHERES := {
 }
 var atmosphere := ""
 var _atmosphere_weight := 0.0
+## Area kinds under the open sky; everywhere else is indoors.
+const OPEN_AIR_KINDS := ["outdoor", "grounds", "bridge", "station"]
+## Indoors the flat ambient light falls to this share: rooms are lit by their candles and
+## torches, and by what you carry. (With global illumination on, light that really comes
+## in through windows and doors replaces the flat ambient anyway.)
+const INDOOR_AMBIENT := 0.35
+## 0 outdoors … 1 indoors, eased like the atmosphere.
+var indoors := 0.0
 
 
 ## Which atmosphere an area has ("" for none).
@@ -175,11 +214,20 @@ static func atmosphere_for(area_id: String, kind: String) -> String:
 
 
 func _current_atmosphere() -> String:
-	var me := get_tree().get_first_node_in_group(&"local_player") if is_inside_tree() else null
-	var tracker: AreaTracker = me.get("area_tracker") if me != null else null
+	var tracker := _tracker()
 	if tracker == null:
 		return ""
 	return atmosphere_for(str(tracker.current_area_id()), tracker.current_kind())
+
+
+## Whether an area of `kind` is indoors ("" is no area: the open grounds).
+static func is_indoor_kind(kind: String) -> bool:
+	return kind != "" and not OPEN_AIR_KINDS.has(kind)
+
+
+func _tracker() -> AreaTracker:
+	var me := get_tree().get_first_node_in_group(&"local_player") if is_inside_tree() else null
+	return me.get("area_tracker") if me != null else null
 
 
 func apply_hours(h: float) -> void:
@@ -192,11 +240,14 @@ func apply_hours(h: float) -> void:
 			atmosphere = target
 	elif atmosphere != "":
 		_atmosphere_weight = minf(1.0, _atmosphere_weight + 0.2)
+	var tracker := _tracker()
+	var want_indoors := 1.0 if tracker != null and is_indoor_kind(tracker.current_kind()) else 0.0
+	indoors = move_toward(indoors, want_indoors, 0.2)
 	if environment != null:
 		var atm: Dictionary = ATMOSPHERES.get(atmosphere, {})
 		var w := _atmosphere_weight if not atm.is_empty() else 0.0
 		environment.ambient_light_color = (look.amb as Color).lerp(atm.get("amb", look.amb), w * 0.6)
-		environment.ambient_light_energy = float(look.amb_e) * lerpf(1.0, float(atm.get("amb_k", 1.0)), w)
+		environment.ambient_light_energy = float(look.amb_e) * lerpf(1.0, float(atm.get("amb_k", 1.0)), w) * lerpf(1.0, INDOOR_AMBIENT, indoors)
 		environment.fog_light_color = (look.fog as Color).lerp(atm.get("fog", look.fog), w * 0.7)
 		environment.fog_density = float(look.fog_d) * lerpf(1.0, float(atm.get("fog_k", 1.0)), w) * morning_mist(h) * (Seasons.RAIN_FOG if Seasons.rain_today else 1.0)
 	if sky_material != null:
@@ -204,12 +255,18 @@ func apply_hours(h: float) -> void:
 		sky_material.sky_horizon_color = look.hor
 		sky_material.ground_horizon_color = look.gnd
 		sky_material.sky_cover_modulate = Color(1, 1, 1, look.stars)
+	var gi := environment != null and environment.sdfgi_enabled
 	if fill_light != null:
+		var atm_fill := float(ATMOSPHERES.get(atmosphere, {}).get("fill_k", 1.0))
 		fill_light.light_color = look.fill
-		fill_light.light_energy = look.fill_e
+		fill_light.light_energy = float(look.fill_e) * (FILL_GI if gi else 1.0) * lerpf(1.0, atm_fill, _atmosphere_weight)
+		for bounce in bounce_fills:
+			bounce.visible = gi
+			bounce.light_color = look.fill
+			bounce.light_energy = fill_light.light_energy * float(bounce.get_meta(&"share"))
 	if sky_light != null:
 		_place_sky_light(sun_direction(h))
-	WallWindow.set_daylight(daylight)
+	WallWindow.set_daylight(daylight, gi)
 	if is_inside_tree():
 		Lamplighter.apply(get_tree(), h)
 	for exterior in _exteriors:

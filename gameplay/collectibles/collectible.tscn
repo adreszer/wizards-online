@@ -33,6 +33,7 @@ shape = SubResource("Shape")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 
 [node name="Mesh" type="MeshInstance3D" parent="Visual"]
+cast_shadow = 0
 mesh = SubResource("Mesh")
 surface_material_override/0 = SubResource("Mat")
 

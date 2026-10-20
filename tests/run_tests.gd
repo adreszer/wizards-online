@@ -2069,6 +2069,25 @@ func _test_day_night() -> void:
 		cycle.time_override = 6.75
 		cycle.refresh()
 		t.check(cycle.sky_light.light_energy > e1 and cycle.sky_light.light_color.r > cycle.sky_light.light_color.b, "the low morning sun is warm and rising")
+		# Lighting overhaul: global illumination, AgX, glow; daylight from above, bounce fills with GI.
+		var env := cycle.environment
+		t.check(env.get_meta("level_effects", {}).get("sdfgi", env.sdfgi_enabled) and env.tonemap_mode == Environment.TONE_MAPPER_AGX and env.get_meta("level_effects", {}).get("glow", env.glow_enabled),
+			"the castle asks for global illumination, AgX and glow")
+		t.check((-cycle.fill_light.global_basis.z).y < -0.99, "the daylight fill shines straight down")
+		var saved_gi := env.sdfgi_enabled
+		env.sdfgi_enabled = true
+		cycle.time_override = 12.0
+		cycle.refresh()
+		var gi_fill := cycle.fill_light.light_energy
+		var bounce_ok := cycle.bounce_fills.size() == 5
+		for b in cycle.bounce_fills:
+			bounce_ok = bounce_ok and b.visible and b.light_energy > 0.0 and b.light_specular == 0.0 and b.light_cull_mask & (1 << 10) == 0
+		t.check(bounce_ok, "with GI, five bounce fills light the interiors at noon (not the grounds)")
+		env.sdfgi_enabled = false
+		cycle.refresh()
+		t.check(cycle.bounce_fills.all(func(b: DirectionalLight3D) -> bool: return not b.visible) and cycle.fill_light.light_energy < gi_fill,
+			"without GI the bounce fills are off and the fill is weaker (flat ambient does their work)")
+		env.sdfgi_enabled = saved_gi
 
 	# Music follows the time of day.
 	t.check(MusicDirector.track_for(SchoolClock.Phase.DAWN) == &"day" and MusicDirector.track_for(SchoolClock.Phase.DAY) == &"day"
@@ -2789,11 +2808,55 @@ func _test_school_life() -> void:
 	t.check(CharacterProfile.house_name(2).begins_with(GameSettings.HOUSE_SYMBOLS[2]), "houses can carry a symbol beside their colour (%s)" % CharacterProfile.house_name(2))
 	GameSettings.values["house_symbols"] = saved_symbols
 	t.check(GameSettings.PRESET_VALUES.has("low") and GameSettings.PRESET_VALUES["low"]["render_scale"] < 1.0 and GameSettings.BINDABLE.all(func(a: String) -> bool: return InputMap.has_action(a)), "graphics presets, and every bindable action exists")
+	await _test_light_budget()
 	var lc := LanternChase.layout_for(Vector3(0, 0, 0), Vector3(200, 20, 100))
 	t.check(is_equal_approx((lc.rings["a"] as Vector3).x, 80.0) and is_equal_approx((lc.homes["a"] as Vector3).x, -60.0), "Lantern Chase rings and homes match the server's layout")
 	var due := EventReminders.due({"events": [{"id": "e1", "title": "Feast", "at": 1000.0 + 200.0, "area": "great_hall"}, {"id": "e2", "title": "Later", "at": 1000.0 + 900.0}]}, {}, "Ola", 1000.0)
 	t.check(due.size() == 1 and due[0].title == "Feast", "reminders come five minutes ahead")
 	t.check(GameSettings.HOUSE_SYMBOLS.size() == 5 and RequestText.ladder_text({"top": [{"name": "Ola", "rating": 1012, "wins": 1, "losses": 0}]}).contains("Ola"), "the ladder reads as a list")
+
+
+## The lighting overhaul's budget: lights fade with distance, shadows only near the camera
+## and per preset, particles and per-frame animated props cast no shadows.
+func _test_light_budget() -> void:
+	t.check(not GameSettings.PRESET_VALUES["low"]["gi"] and not GameSettings.PRESET_VALUES["medium"]["gi"] and GameSettings.PRESET_VALUES["high"]["gi"] and GameSettings.PRESET_VALUES["ultra"]["gi"],
+		"global illumination from the high preset up")
+	t.check(LightQuality.distance_for("low", true) == 0.0 and LightQuality.distance_for("ultra", false) == 0.0
+		and LightQuality.distance_for("medium", true) < LightQuality.distance_for("high", true) and LightQuality.distance_for("high", true) < LightQuality.distance_for("ultra", true),
+		"light shadows reach farther with each preset, nowhere without shadows")
+	var saved := LightQuality.shadow_distance
+	LightQuality.shadow_distance = 20.0
+	LightQuality.watch(get_tree())
+	var torch := OmniLight3D.new()
+	torch.shadow_enabled = true
+	var plain := OmniLight3D.new()
+	var sparks := CPUParticles3D.new()
+	add_child(torch)
+	add_child(plain)
+	add_child(sparks)
+	t.check(torch.distance_fade_enabled and plain.distance_fade_enabled and torch.distance_fade_begin == LightQuality.FADE_BEGIN, "every light fades out with distance")
+	t.check(torch.shadow_enabled and is_equal_approx(torch.distance_fade_shadow + torch.distance_fade_length, 20.0) and not plain.shadow_enabled,
+		"a shadowed light keeps its shadow to the shadow distance; a plain one gets none (%.1f)" % torch.distance_fade_shadow)
+	t.check(sparks.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF, "particles cast no shadows")
+	LightQuality.shadow_distance = 0.0
+	LightQuality.configure(torch)
+	t.check(not torch.shadow_enabled, "no light shadows when the preset has none")
+	LightQuality.shadow_distance = 20.0
+	LightQuality.configure(torch)
+	t.check(torch.shadow_enabled, "the shadow comes back with the setting")
+	LightQuality.shadow_distance = saved
+	for n: Node in [torch, plain, sparks]:
+		n.queue_free()
+	# Props that move every frame would make every shadowed light near them re-render.
+	for check: Array in [["res://gameplay/collectibles/collectible.tscn", "Visual/Mesh"], ["res://objects/interactables/spell_tome.tscn", "Book/Mesh"],
+			["res://objects/school/practice_target.tscn", "Disc"]]:
+		var inst: Node = (load(check[0]) as PackedScene).instantiate()
+		var mesh := inst.get_node_or_null(check[1]) as GeometryInstance3D
+		t.check(mesh != null and mesh.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF, "%s: the moving part casts no shadow" % check[0].get_file())
+		inst.free()
+	t.check(DayNightCycle.is_indoor_kind("classroom") and DayNightCycle.is_indoor_kind("corridor") and not DayNightCycle.is_indoor_kind("grounds")
+		and not DayNightCycle.is_indoor_kind("outdoor") and not DayNightCycle.is_indoor_kind(""), "indoors and out by area kind")
+	await get_tree().process_frame
 
 
 func _test_timetable() -> void:

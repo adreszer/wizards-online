@@ -48,6 +48,7 @@ surface_material_override/0 = SubResource("StoneMat")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
 
 [node name="Mesh" type="MeshInstance3D" parent="Book"]
+cast_shadow = 0
 mesh = SubResource("BookMesh")
 surface_material_override/0 = SubResource("BookMat")
 

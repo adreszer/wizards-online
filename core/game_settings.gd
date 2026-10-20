@@ -1,7 +1,8 @@
 class_name GameSettings
 extends RefCounted
 ## Player settings beyond name and language: graphics (a preset plus render scale, FSR,
-## shadows, ambient occlusion, indirect light, glow, fog, VSync, an FPS cap),
+## shadows, ambient occlusion, indirect light, global illumination, glow, fog, VSync, an
+## FPS cap; the preset also sets how far light shadows reach, see LightQuality),
 ## accessibility (interface size, reduced motion, house symbols beside house colours,
 ## captions for sounds) and key bindings. Stored in user://settings.cfg next to
 ## GameSession's own keys; applied at start and whenever changed (SettingsPanel).
@@ -10,13 +11,13 @@ const PATH := GameSession.SETTINGS_PATH
 const PRESETS := ["low", "medium", "high", "ultra"]
 ## What each preset sets; individual settings override afterwards.
 const PRESET_VALUES := {
-	"low": {"render_scale": 0.67, "fsr": true, "shadows": false, "ssao": false, "ssil": false, "glow": false, "fog": false},
-	"medium": {"render_scale": 0.85, "fsr": true, "shadows": true, "ssao": false, "ssil": false, "glow": true, "fog": true},
-	"high": {"render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": false, "glow": true, "fog": true},
-	"ultra": {"render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": true, "glow": true, "fog": true},
+	"low": {"render_scale": 0.67, "fsr": true, "shadows": false, "ssao": false, "ssil": false, "gi": false, "glow": false, "fog": false},
+	"medium": {"render_scale": 0.85, "fsr": true, "shadows": true, "ssao": false, "ssil": false, "gi": false, "glow": true, "fog": true},
+	"high": {"render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": false, "gi": true, "glow": true, "fog": true},
+	"ultra": {"render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": true, "gi": true, "glow": true, "fog": true},
 }
 const DEFAULTS := {
-	"preset": "high", "render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": false, "glow": true, "fog": true,
+	"preset": "high", "render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": false, "gi": true, "glow": true, "fog": true,
 	"vsync": true, "fps_cap": 0,
 	"ui_scale": 1.0, "reduce_motion": false, "house_symbols": false, "captions": false,
 }
@@ -25,6 +26,9 @@ const BINDABLE := ["move_forward", "move_backward", "move_left", "move_right", "
 	"journal", "emote_menu", "raise_hand", "chat", "map"]
 ## House symbols shown beside house colours when house_symbols is on.
 const HOUSE_SYMBOLS := ["", "▲", "◆", "●", "■"]
+
+## Meta on a DirectionalLight3D that the shadows setting must leave without shadows.
+const NO_SHADOWS := &"no_shadows"
 
 static var values: Dictionary = DEFAULTS.duplicate()
 static var bindings: Dictionary = {}
@@ -128,15 +132,21 @@ static func apply(tree: SceneTree) -> void:
 		# A setting only turns off what the level has; turning it on gives back the level's own choice.
 		if not env.has_meta("level_effects"):
 			env.set_meta("level_effects", {"ssao": env.ssao_enabled, "ssil": env.ssil_enabled, "glow": env.glow_enabled,
-				"fog": env.fog_enabled, "vfog": env.volumetric_fog_enabled})
+				"fog": env.fog_enabled, "vfog": env.volumetric_fog_enabled, "sdfgi": env.sdfgi_enabled})
 		var own: Dictionary = env.get_meta("level_effects")
 		env.ssao_enabled = bool(get_value("ssao"))
 		env.ssil_enabled = bool(get_value("ssil"))
+		# SDFGI only where the level asks for it (the castle), never in portrait studios and the like.
+		env.sdfgi_enabled = bool(get_value("gi")) and own.get("sdfgi", false)
 		env.glow_enabled = bool(get_value("glow")) and own.glow
 		env.fog_enabled = bool(get_value("fog")) and own.fog
 		env.volumetric_fog_enabled = bool(get_value("fog")) and own.vfog
 	for node in tree.root.find_children("*", "DirectionalLight3D", true, false):
-		(node as DirectionalLight3D).shadow_enabled = bool(get_value("shadows"))
+		# Fill lights (DayNightCycle's) stand in for sky light and never cast shadows.
+		if not node.has_meta(NO_SHADOWS):
+			(node as DirectionalLight3D).shadow_enabled = bool(get_value("shadows"))
+	LightQuality.shadow_distance = LightQuality.distance_for(str(get_value("preset")), bool(get_value("shadows")))
+	LightQuality.watch(tree)
 
 
 ## A house's name with its symbol when the player asked for symbols beside colours.

@@ -181,7 +181,7 @@ What that needs:
 - **Batching.** Repeated modules (wall faces, floor tiles, pillars, roof tiles) are drawn as one `MultiMeshInstance3D` per module type per sector instead of one node each. Collision is merged into per-sector static bodies. The occluders on wall runs and floors stay.
 - **Far view (HLOD).** A merged low-detail mesh of the whole exterior with lit-window emissive cards, shown beyond about 150 m. The detailed exterior of a sector is shown near it.
 - **Terrain (decided in Milestone 26: our own, no GDExtension).** `gameplay/world/terrain.gd` builds 64 m chunks from the generated heightmap: a coarse mesh for every chunk, full resolution within 240 m of the player, skirts against cracks, collision (`HeightMapShape3D`, triangle collision where the castle cuts holes) and tree trunks only within 120 m of a local player. Flora is one MultiMesh per kind per 128 m cell with visibility ranges. The Python generator samples the same heights, which Terrain3D would not have given us.
-- **Lights.** About 350 omni lights today, roughly 2,000 at target scale. They're loaded per sector and capped per room (B2). Baked or SDFGI lighting is decided in the lighting overhaul (roadmap 5.1).
+- **Lights.** About 350 omni lights today, roughly 2,000 at target scale. They're loaded per sector and capped per room (B2). The lighting overhaul chose SDFGI over baking, and `LightQuality` fades lights with distance and limits shadows to nearby lights (`docs/lighting.md`).
 
 ---
 

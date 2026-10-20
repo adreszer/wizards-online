@@ -35,6 +35,8 @@ const BACKING_CLEARANCE := 0.03
 
 const GLASS_NIGHT_EMISSION := Color(0.14, 0.19, 0.28)
 const GLASS_DAY_EMISSION := Color(0.62, 0.68, 0.74)
+## Daylit panes' emission energy with global illumination on (1.5 without).
+const GLASS_DAY_ENERGY_GI := 3.0
 
 static var _reveal_material: StandardMaterial3D
 static var _glass_material: StandardMaterial3D
@@ -240,11 +242,13 @@ static func _get_reveal_material() -> StandardMaterial3D:
 ## Daylight through the panes: 0 = night (the material as built below), 1 = noon,
 ## when the glass glows pale with the sky behind it. Driven by DayNightCycle; every
 ## window shares the one material, so this is a single property change.
-static func set_daylight(amount: float) -> void:
+## With global illumination on (`gi`), daylit panes shine brighter: SDFGI takes emissive
+## geometry as a light source, so the windows light the walls around them.
+static func set_daylight(amount: float, gi: bool = false) -> void:
 	var glass := _get_glass_material()
 	var t := clampf(amount, 0.0, 1.0)
 	glass.emission = GLASS_NIGHT_EMISSION.lerp(GLASS_DAY_EMISSION, t)
-	glass.emission_energy_multiplier = lerpf(0.6, 1.5, t)
+	glass.emission_energy_multiplier = lerpf(0.6, GLASS_DAY_ENERGY_GI if gi else 1.5, t)
 
 
 ## Leaded glass at night: dark grey-blue, glossy, with a faint cool glow so the

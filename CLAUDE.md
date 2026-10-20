@@ -52,6 +52,7 @@ A multiplayer **open-world magical school**: one large castle (plus grounds) tha
 - `docs/plan.md` — implementation tracker (keep it current).
 - `docs/roadmap.md` — feature roadmap and idea bank (what to build next and why).
 - `docs/castle-generation.md` — how the castle and grounds are generated: rules (anchors, stairs, circulation, moving pieces, grounds), set pieces, scale plan, Milestones 24–32.
+- `docs/lighting.md` — how the castle is lit (SDFGI, the light budget, daylight indoors), the GI spike and the rules for content.
 - `docs/ui.md` — production UI plan: art direction, theme and components, where UI assets come from, Milestones 65–72.
 - `docs/brand-prompts.md` — logo and house crest generation (Recraft), prompts and rejection rules.
 - `docs/architecture.md` — code structure; `docs/development.md` — how to run and test; `docs/deploy.md` — hosting the server on Coolify.

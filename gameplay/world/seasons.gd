@@ -284,6 +284,7 @@ static func build_candles(center: Vector3, size: Vector3, count: int = 36) -> No
 		tip.mesh = s
 		tip.material_override = flame
 		tip.position = Vector3(0, 0.17, 0)
+		tip.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		c.add_child(tip)
 		if i % 6 == 0:
 			var l := OmniLight3D.new()

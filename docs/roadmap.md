@@ -163,8 +163,8 @@ Ordered by "biggest change on screen per day of work".
 
 ### 5.1 Lighting (the single biggest win)
 
-- **Bake the static castle.** `LightmapGI` for walls, floors and furniture lit by the fixed torches and chandeliers, then turn most of the 353 omni lights into baked-only or very short-range dynamic lights with distance fade. Keep dynamic light for the held torch, spells and a few hero lights. Better quality and far better performance. Alternative to evaluate first: SDFGI or VoxelGI per wing (no bake step, works with the generator, cost on GPU). Recommendation: spike both on two rooms, pick by look and frame time. (M ★★★)
-- **Finish the lighting overhaul** already in `plan.md`: dim ambient so darkness is real, carried light matters, and night in the dungeons is scary. (S ★★★)
+- ~~**GI for the castle.**~~ (built: lighting overhaul) Spiked LightmapGI, VoxelGI, SSIL and SDFGI; SDFGI won (no bake, works with the generator, the day/night cycle and lights that spells put out). Every light fades with distance and only nearby lights cast shadows, per preset. Findings and rules in `docs/lighting.md`. Still to do: measure SDFGI on a mid laptop. (M ★★★)
+- ~~**Finish the lighting overhaul**~~ (built): darkness is real (GI or, without it, a dim indoor ambient), carried light matters, the dungeons are dark at any hour. (S ★★★)
 - **Windows and light shafts.** Real window modules with stained glass; volumetric fog with light shafts from windows by day and moonlight at night; colour cast from the glass on the floor. (M ★★★)
 - ~~**Per-area atmosphere.**~~ (built: Milestone 64) `AreaZone` blends a WorldEnvironment profile per area: warm and hazy great hall, cold blue dungeons, green greenhouse, starry tower. Fog density, exposure, colour grading LUT. (S–M ★★)
 - **Light flicker and life.** Candle and torch flicker already exists; add wind gusts that dim torches in corridors, magical floating candles in the great hall, glowing runes in the Ancient Runes classroom. (S ★★)
@@ -285,7 +285,7 @@ World
 
 ## 9. Recommended next steps (the next ~6 milestones)
 
-1. **Lighting overhaul + GI spike** (5.1). Biggest visual jump, unblocks performance, and every later screenshot depends on it.
+1. ~~**Lighting overhaul + GI spike**~~ (5.1, built: `docs/lighting.md`). Next in lighting: windows and light shafts.
 2. **School clock, day/night and bells** (Term A 1–2). Gives the castle a rhythm with almost no new art.
 3. **Writing on the board + quizzes + raised hands + sitting** (Term B 1–2, Term A 4). Makes the live lessons that already work feel like real lessons; mostly code and UI, props exist.
 4. **Player character v1 with house robes** (Term A 3). Replaces the capsule; ties identity to the house.

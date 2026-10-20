@@ -23,7 +23,7 @@ func _run() -> void:
 	await _frames(60)
 	var cycle := get_tree().root.find_child("DayNightCycle", true, false) as DayNightCycle
 	var player := get_tree().get_first_node_in_group("local_player") as Node3D
-	for view in [["grounds", player.global_position], ["hall", Vector3(0, 0.2, 36)]]:
+	for view in [["grounds", player.global_position], ["hall", Vector3(0, 0.2, 36)], ["dungeon", Vector3(-16, -8.8, 15)]]:
 		player.global_position = view[1]
 		await _frames(30)
 		for h: float in HOURS:
