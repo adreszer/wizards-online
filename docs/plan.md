@@ -279,7 +279,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Offline practice mysteries (`content/offline_mysteries.json`, `OfflineMysteryEngine`): the secret walls get their own public offline solutions; the online ones stay server-only
 - [ ] Run `tools/check_build.sh` in CI once there is CI
 - [x] Hosted server for Coolify (`docker-compose.coolify.yml`, `deploy/nakama/`: image with modules and content baked in, secrets from the environment, cheats off through `school_rules.local.json`); `docs/deploy.md`
-- [x] Release client points at the hosted server: exported builds (feature `template`) use `play.arcane-academy.pl`, 443, https and the production server key (`.template` overrides of `game/network/*`); the editor keeps the local server
+- [x] Release client points at the hosted server: exported builds (feature `template`) use `play.arcane-academy.pl`, 443, https and the production server key (`.template` overrides of `game/network/*`); the editor keeps the local server. Exported builds cannot change it (`GameSession.server_address_locked`: no host/port fields in the menu, saved settings and `--host`/`--port` ignored)
 - [x] Game name Arcane Academy (window, menu, export names, bundle id `pl.arcane-academy.client`); fixed user data folder `Arcane Academy` so a later rename never orphans settings or the device id
 - [ ] Client/server version check on join; release script (tests, leak check, exports, butler push to itch.io)
 

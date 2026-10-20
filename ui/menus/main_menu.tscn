@@ -89,6 +89,7 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [node name="HostLabel" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "MENU_HOST"
 
@@ -97,6 +98,7 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [node name="PortLabel" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "MENU_PORT"
 

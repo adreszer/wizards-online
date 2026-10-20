@@ -97,6 +97,7 @@ func _run() -> void:
 	await _test_portraits()
 	await _test_school_life()
 	_test_localization()
+	_test_server_address_lock()
 	await _test_characters()
 	_test_server_content()
 	await _test_world_objects()
@@ -104,6 +105,22 @@ func _run() -> void:
 	print(t.summary())
 	get_tree().quit(1 if t.failed > 0 else 0)
 
+
+
+## Exported builds hide the server fields; the editor shows them.
+func _test_server_address_lock() -> void:
+	t.section("Server address lock")
+	var was_locked: bool = GameSession.server_address_locked
+	for locked: bool in [false, true]:
+		GameSession.server_address_locked = locked
+		var menu: Control = load("res://ui/menus/main_menu.tscn").instantiate()
+		add_child(menu)
+		var shown: bool = menu.get_node("%HostEdit").visible and menu.get_node("%PortLabel").visible
+		t.check(shown != locked, "server fields %s" % ("hidden in an exported build" if locked else "shown in the editor"))
+		menu.free()
+	GameSession.server_address_locked = was_locked
+	t.check(not GameSession.server_address_locked, "the editor is not locked")
+	t.check(str(ProjectSettings.get_setting("game/network/host.template", "")) == "play.arcane-academy.pl", "exported builds ship the hosted server's address")
 
 func _wait(seconds: float) -> void:
 	var frames := int(ceil(seconds * Engine.physics_ticks_per_second))

@@ -24,6 +24,10 @@ var trace_casting: bool = false
 var look: Dictionary = {"body": CharacterRegistry.DEFAULT, "skin": 0, "robe": 0, "set": false}
 var nakama_host: String = ProjectSettings.get_setting("game/network/host", "127.0.0.1")
 var nakama_port: int = int(ProjectSettings.get_setting("game/network/port", 7350))
+## Exported builds connect only to the server they ship with (`game/network/*.template`
+## in project.godot); the menu fields, saved settings and --host/--port are for
+## development in the editor.
+var server_address_locked: bool = OS.has_feature("template")
 
 ## collectible_id -> collected count
 var _collected: Dictionary = {}
@@ -155,8 +159,9 @@ func _load_settings() -> void:
 	look = CharacterLook.sanitize(cfg.get_value("player", "look", {}))
 	trace_casting = cfg.get_value("player", "trace_casting", false) == true
 	look["body"] = character_id
-	nakama_host = str(cfg.get_value("network", "host", nakama_host))
-	nakama_port = int(cfg.get_value("network", "port", nakama_port))
+	if not server_address_locked:
+		nakama_host = str(cfg.get_value("network", "host", nakama_host))
+		nakama_port = int(cfg.get_value("network", "port", nakama_port))
 
 
 func _save_settings() -> void:
@@ -166,14 +171,15 @@ func _save_settings() -> void:
 	cfg.set_value("player", "character", character_id)
 	cfg.set_value("player", "look", look)
 	cfg.set_value("player", "trace_casting", trace_casting)
-	cfg.set_value("network", "host", nakama_host)
-	cfg.set_value("network", "port", nakama_port)
+	if not server_address_locked:
+		cfg.set_value("network", "host", nakama_host)
+		cfg.set_value("network", "port", nakama_port)
 	cfg.save(SETTINGS_PATH)
 
 
 ## Supports launching two clients on one machine:
 ##   --name=Elara   sets the display name for this run only
-##   --host=..., --port=...
+##   --host=..., --port=...   (editor only, see server_address_locked)
 ##   --lang=pl|en   forces the language for this run (see Localization)
 ##   --character=apprentice_m|placeholder   body for this run
 func _apply_command_line_overrides() -> void:
@@ -182,7 +188,7 @@ func _apply_command_line_overrides() -> void:
 			character_id = CharacterRegistry.sanitize(arg.trim_prefix("--character="))
 		if arg.begins_with("--name="):
 			display_name = sanitize_display_name(arg.trim_prefix("--name="))
-		elif arg.begins_with("--host="):
+		elif arg.begins_with("--host=") and not server_address_locked:
 			nakama_host = arg.trim_prefix("--host=")
-		elif arg.begins_with("--port="):
+		elif arg.begins_with("--port=") and not server_address_locked:
 			nakama_port = int(arg.trim_prefix("--port="))

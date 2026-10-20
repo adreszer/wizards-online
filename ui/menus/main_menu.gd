@@ -1,5 +1,6 @@
 extends Control
-## Startup screen: display name, language, server address, OFFLINE / ONLINE choice.
+## Startup screen: display name, language, OFFLINE / ONLINE choice; the server
+## address fields only in the editor (GameSession.server_address_locked).
 
 signal start_requested()
 
@@ -20,6 +21,8 @@ func _ready() -> void:
 	_build_character_picker()
 	_host_edit.text = GameSession.nakama_host
 	_port_edit.text = str(GameSession.nakama_port)
+	for field: Control in [_host_edit, _port_edit, %HostLabel, %PortLabel]:
+		field.visible = not GameSession.server_address_locked
 	_offline_button.pressed.connect(_on_offline)
 	_online_button.pressed.connect(_on_online)
 	_quit_button.pressed.connect(get_tree().quit)
@@ -35,8 +38,9 @@ func _ready() -> void:
 
 func _apply_fields() -> void:
 	GameSession.set_display_name(_name_edit.text)
-	GameSession.nakama_host = _host_edit.text.strip_edges()
-	GameSession.nakama_port = int(_port_edit.text)
+	if not GameSession.server_address_locked:
+		GameSession.nakama_host = _host_edit.text.strip_edges()
+		GameSession.nakama_port = int(_port_edit.text)
 	_name_edit.text = GameSession.display_name
 
 
