@@ -756,6 +756,18 @@ func _test_spell_effects() -> void:
 	t.check(hud_crest.visible and hud_crest.texture == CharacterProfile.crest(4, CharacterProfile.CREST_ICON) and hud_crest.modulate == CharacterProfile.house_color(4), "the HUD shows the player's house crest in the house colour")
 	player.set_profile(str(player.role), 0)
 	t.check(not hud_crest.visible, "the unsorted have no crest on the HUD")
+	# The robe crest needs a real (rigged) body; the test player wears the placeholder.
+	var body: Node3D = CharacterRegistry.load_scene("apprentice_m").instantiate()
+	add_child(body)
+	CharacterLook.apply(body, {}, 4)
+	for i in 3:   # the patch is placed on the posed body a couple of frames in
+		await get_tree().process_frame
+	var robe_mount := body.find_child("CrestMount", true, false)
+	var robe_crest := robe_mount.get_node_or_null("Crest") as Decal if robe_mount != null else null
+	t.check(robe_mount is BoneAttachment3D and robe_crest != null and robe_crest.visible and robe_crest.texture_albedo == CharacterProfile.crest(4, CharacterProfile.CREST_CARD), "the robe carries the house crest on the chest")
+	CharacterLook.apply(body, {}, 0)
+	t.check(robe_crest != null and not robe_crest.visible, "the unsorted wear no crest")
+	body.queue_free()
 	player.set_profile(str(player.role), old_house)
 	hud.set_house_totals(PackedInt32Array([5, 10, 15, 20]))
 	t.check(hud.house_tally_text() == "5 10 15 20" and hud.get_node("%HouseTally").get_child(0).get_child(0) is TextureRect, "the HUD tally pairs each crest with its points")
@@ -2620,6 +2632,8 @@ func _test_house_cup() -> void:
 	if display != null:
 		display.show_cup({"winner": 3, "term": "autumn_2026"})
 		t.check(display.visible and display.winner == 3, "the holder's cup and banner stand in the great hall")
+		var hung := display.get_node("Banner").get_child(0) as Node3D
+		t.check(hung != null and hung.scene_file_path.ends_with("banner_h3.tscn"), "the cup hangs the holder's house banner")
 	castle.queue_free()
 
 

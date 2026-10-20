@@ -8,7 +8,7 @@ const HALL := &"great_hall"
 
 var winner := 0
 var _cup: MeshInstance3D
-var _banner: MeshInstance3D
+var _banner: Node3D
 var _label: Label3D
 
 
@@ -45,11 +45,9 @@ func _build() -> void:
 	gold.roughness = 0.25
 	_cup.material_override = gold
 	add_child(_cup)
-	_banner = MeshInstance3D.new()
-	var quad := QuadMesh.new()
-	quad.size = Vector2(2.4, 4.0)
-	_banner.mesh = quad
-	_banner.position = Vector3(0, 4.2, -0.6)
+	_banner = Node3D.new()
+	_banner.name = "Banner"
+	_banner.position = Vector3(0, 0, -0.6)
 	add_child(_banner)
 	_label = Label3D.new()
 	_label.position = Vector3(0, 2.3, 0)
@@ -66,10 +64,9 @@ func show_cup(cup: Dictionary) -> void:
 	visible = winner > 0
 	if winner <= 0:
 		return
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = CharacterProfile.house_color(winner)
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	_banner.material_override = mat
+	for child in _banner.get_children():
+		child.queue_free()
+	_banner.add_child(CharacterProfile.banner(winner, Vector3(0, 6.2, 0), 1.35))
 	_label.text = tr("HOUSE_CUP_HOLDER") % CharacterProfile.house_name(winner)
 	_label.modulate = CharacterProfile.house_color(winner).lightened(0.3)
 	if cup.get("fresh", false):
@@ -88,20 +85,8 @@ func ceremony(house: int) -> void:
 		ceremony_decor.queue_free()
 	ceremony_decor = Node3D.new()
 	ceremony_decor.name = "CeremonyBanners"
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = CharacterProfile.house_color(house)
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mat.emission_enabled = true
-	mat.emission = CharacterProfile.house_color(house)
-	mat.emission_energy_multiplier = 0.3
 	for i in 8:
-		var banner := MeshInstance3D.new()
-		var q := QuadMesh.new()
-		q.size = Vector2(1.4, 3.6)
-		banner.mesh = q
-		banner.material_override = mat
-		banner.position = Vector3((i - 3.5) * 2.4, 5.0, 0.3)
-		ceremony_decor.add_child(banner)
+		ceremony_decor.add_child(CharacterProfile.banner(house, Vector3((i - 3.5) * 2.4, 6.8, 0.3), 1.2))
 	add_child(ceremony_decor)
 	var decor := ceremony_decor
 	get_tree().create_timer(CEREMONY_SECONDS).timeout.connect(func() -> void:

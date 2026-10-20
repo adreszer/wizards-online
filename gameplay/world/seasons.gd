@@ -224,16 +224,7 @@ static func build_decor(h: String, center: Vector3, size: Vector3) -> Node3D:
 			root.add_child(star)
 		"year_end":
 			for hse in range(1, 5):
-				var banner := MeshInstance3D.new()
-				var q := QuadMesh.new()
-				q.size = Vector2(1.6, 3.2)
-				banner.mesh = q
-				var m := StandardMaterial3D.new()
-				m.albedo_color = CharacterProfile.house_color(hse)
-				m.cull_mode = BaseMaterial3D.CULL_DISABLED
-				banner.material_override = m
-				banner.position = Vector3(center.x + (hse - 2.5) * size.x * 0.2, top - 1.8, center.z - size.z / 2.0 + 0.2)
-				root.add_child(banner)
+				root.add_child(CharacterProfile.banner(hse, Vector3(center.x + (hse - 2.5) * size.x * 0.2, top - 0.2, center.z - size.z / 2.0 + 0.2), 1.07))
 	return root
 
 

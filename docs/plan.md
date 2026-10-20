@@ -222,7 +222,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Sorting into houses: the Choosing Stone in the great hall opens a four-question ceremony; the server tallies (`OP_SORT`), balances ties by house population, stores the house once, updates nameplates/HUD/roster; offline runs the same rule locally; houses Drakoryn / Grypheon / Phoenara / Hipporys with emblem animals and colours
 - [x] House-gated common rooms: `HouseDoor` on every doorway into a house area (dungeon and kitchen-side common rooms, the two tower landings that now own the stairs up), members open by interacting, others refused; server drops area reports for another house's area
 - [x] House columns (`HouseTally`, placement kind `house_tally`) at the head of the great hall: four glass columns that fill with light in house colours from the server tally (`house_totals_changed`), against whole hundreds above the leader; rank numerals I–IV above (ties share a rank, the leader glows brightest), house name and points on the plinth, a spark burst up the column on a gain and down it on a loss; empty and unranked offline. `tools/capture_model.tscn -- --house-totals=a,b,c,d` previews a tally
-- [~] House crests (dragon, griffin, phoenix, hippocampus): on the house doors, the house columns, the HUD and the sorting reveal; banners still to do; a visible ceremony (others watching in the great hall); house cup at term end
+- [~] House crests (dragon, griffin, phoenix, hippocampus): on the house doors, the house columns, the HUD, the sorting reveal, the profile card, the house banners (repainted by `tools/make_banners.py`: house-colour damask, brass border, the crest; the house cup, its ceremony and the year-end hall hang the same banners) and the robes (a decal on the chest bone, `CharacterLook`); still to come: a visible ceremony (others watching in the great hall); house cup at term end
 - [ ] Server-side position sanity for area reports (today the area id is client-reported, validated only against the map)
 - [ ] In-game admin UI for `admin_set_profile` (today: script/console)
 
@@ -412,7 +412,7 @@ One school currency, server-authoritative, placeholder name "korony" / "crowns" 
 - [x] Stored on the server: `appearance` {body, skin, robe, set} in the profile (`OP_APPEARANCE`), the body decides the join character once chosen, roster entries and `OP_ROSTER_UPDATE` carry `char` and `look` so everyone sees it; offline in the settings
 - [x] `CharacterCreator` (live preview with its own camera): opens on the first join of a character without a chosen look (offline: the first game), and with `/look` (`/wyglad`)
 - [x] Tests: clamping, body swap, shader parameters, house trim, profile; two clients: a look is stored and reaches the other player. `tools/capture_looks.tscn` renders every house, tone and robe
-- [ ] Faces and hairstyles need more character models (asset-drop workflow); a crest on the robe (Term C1)
+- [ ] Faces and hairstyles need more character models (asset-drop workflow); the crest on the robe is in (a decal on the chest bone)
 
 ### Milestone 43 — Meals in the great hall
 - [x] `FeastMeals` (added by `castle.gd`): breakfast 7:00–8:30, lunch 12:00–13:30, dinner 18:30–20:00 on the school clock (no server traffic, every client agrees); plates, food, goblets, platters, roasts, bread and fruit appear on every feast table (MultiMeshes over the positions `StaticBatch` records), "Dinner is served" notification
@@ -576,7 +576,7 @@ Owner decision (2026-10-20): portraits move, a mix of rigged sitters that can wa
 The plan, art direction, asset sources and per-milestone checklists are in `docs/ui.md`; tick items there and summarise here.
 
 - [x] `tools/capture_ui.tscn`: a PNG gallery of every main UI surface, the before/after reference for the UI work
-- [~] Milestone 65 — Foundation: tokens, fonts, one theme, the router. Fonts done (owner's choice: Cormorant SC display, EB Garamond text, Fira Sans interface, Noto symbols fallback; `UiFonts`, `tools/build_ui_theme.gd`, `ui/theme/arcanum_theme.tres` as the project theme, coverage test `tests/check_ui.tscn`); step 1 done: `UiTokens`, every control styled in oak and brass, a parchment sub-theme for paper surfaces. Logo and crest prompts: `docs/brand-prompts.md`. House crests (owner, ChatGPT) are in the game: HUD house line and tally, the sorting reveal, the profile card, the house doors and the house columns (`CharacterProfile.crest()`, `assets/ui/brand/`, `tools/prep_crests.py`)
+- [~] Milestone 65 — Foundation: tokens, fonts, one theme, the router. Fonts done (owner's choice: Cormorant SC display, EB Garamond text, Fira Sans interface, Noto symbols fallback; `UiFonts`, `tools/build_ui_theme.gd`, `ui/theme/arcanum_theme.tres` as the project theme, coverage test `tests/check_ui.tscn`); step 1 done: `UiTokens`, every control styled in oak and brass, a parchment sub-theme for paper surfaces. Logo and crest prompts: `docs/brand-prompts.md`. House crests (owner, ChatGPT) are in the game: HUD house line and tally, the sorting reveal, the profile card, the house doors, the house columns, the banners and the robes (`CharacterProfile.crest()`, `assets/ui/brand/`, `tools/prep_crests.py`)
 - [ ] Milestone 66 — Art kit v1 and the UI gallery (owner checkpoint on the look)
 - [ ] Milestone 67 — The HUD
 - [ ] Milestone 68 — Main menu, loading, pause, settings

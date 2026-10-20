@@ -101,6 +101,23 @@ static func crest(house: int, variant: String = CREST_FULL) -> Texture2D:
 	return load(path) as Texture2D if path != "" else null
 
 
+## Height of a house banner's rod above the banner scene's origin (the cloth
+## hangs 3 m below it), for hanging one from a given point.
+const BANNER_TOP := 4.95
+
+
+## A house banner (cloth in the house colour with the crest, on a brass rod;
+## painted by tools/make_banners.py), or null for the unsorted. Scaled by
+## `scale`, with its rod at `top` in the parent's space.
+static func banner(house: int, top: Vector3, scale: float = 1.0) -> Node3D:
+	if house < 1 or house > MAX_HOUSE:
+		return null
+	var node: Node3D = (load("res://objects/environment/props/banner_h%d.tscn" % house) as PackedScene).instantiate()
+	node.scale = Vector3.ONE * scale
+	node.position = top - Vector3(0, BANNER_TOP * scale, 0)
+	return node
+
+
 ## Translation key for a role's title shown next to a name ("" for students).
 static func title_key(role: String) -> String:
 	match role:

@@ -18,3 +18,7 @@ Generated with AI by the owner on 2026-10-20, from the prompts in `docs/brand-pr
 | crest_4_hipporys_mono | single colour | Monochromatyczny emblemat hippocampusa w falach |
 
 Tool: ChatGPT (OpenAI image generation), owner account, 2026-10-20.
+
+## House banners (`assets/models/environment/modular/banner_hN.glb`)
+
+Repainted 2026-10-20 by `tools/make_banners.py`: the damask weave from the first banner batch (`brand/source/banner_damask.jpg`, the Hipporys banner of that batch; see the third props batch in `docs/plan.md`), tinted in the house colour, with a brass border and the colour crest above. No new generated art beyond the crests.

@@ -110,6 +110,10 @@ godot --headless --path . tests/check_ui.tscn
 godot --headless --path . -s tools/build_ui_theme.gd
 # after changing the symbol blocks: rebuild the trimmed symbol fallbacks (pip install fonttools)
 python3 tools/make_symbol_fonts.py
+# house crests: after replacing an original in assets/ui/brand/source/ (pip install pillow)
+python3 tools/prep_crests.py
+# then repaint the house banners from the crests (writes into the banner_hN.glb models)
+python3 tools/make_banners.py
 
 # gameplay tests: movement, camera, health/checkpoints, collectibles, spells (registry, spellbook,
 # effects), school (profile, area tracker, nameplates, lesson tools), inventory, interaction,
