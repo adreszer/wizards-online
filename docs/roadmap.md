@@ -203,6 +203,8 @@ Ordered by "biggest change on screen per day of work".
 
 ### 5.7 UI art direction
 
+The full plan (art direction, asset sources, Milestones 65–72) is in `docs/ui.md`.
+
 - A coherent look: parchment panels, ink-style headings, wax seals for house crests, a dedicated UI font with full Polish diacritics (already a `plan.md` item). (M ★★★)
 - The journal as a real book with pages and tabs (timetable, spellbook, grades, map, inbox). (M ★★★)
 - Spell icons for the hotbar, radial spell wheel for gamepad (already planned). (S–M ★★)

@@ -151,6 +151,8 @@ godot --path . tools/capture_model.tscn -- --scene=res://assets/models/environme
 godot --path . tools/capture_model.tscn -- --scene=res://levels/castle/castle.tscn --eye=-22,4.5,-3 --target=-36,0.8,0 --out=/absolute/output/dir
 # the village and the station (street, square, shop and inn interiors, platform, portal, aerial) by day and night
 godot --path . tools/capture_village.tscn -- --out=/absolute/output/dir [--hours=12,0]
+# every main UI surface (menu, HUD, satchel, journal, map, chat, panels, pause) for before/after comparison
+godot --path . tools/capture_ui.tscn -- --out=/absolute/output/dir
 ```
 
 Placed gameplay objects (practice tomes, plaques, fragments, checkpoints, guardians, the sorting stone, puzzle pieces) live in `content/placements.json`, keyed by area id; the header of the placement section in `tools/castle/build.py` documents the position modes (`slot: centre`, `at`, `wall`/`along`, `corner`/`inset`, `door`/`along`/`inset`, `beside_lectern`; every position must land inside its room) and `KINDS` lists the scenes. Each entry becomes a node with the stable object id `"<area>/<id>"` (`object_id` on the instance, `world_objects` group); secret walls are `"<hidden room>/secret_wall"`, house gates `"<area>/house_door"`, torches `"<room>/torch_<n>"` (counted per room, so don't build mysteries on them). The generator refuses duplicate ids, unknown areas, kinds or spells. After regenerating, re-run the exporter: `generated/world_objects.lua` (id → kind, areas, position, accepted effect types) is read from the built castle.

@@ -1,0 +1,86 @@
+extends Node
+## Dev tool: saves a PNG of every main UI surface (main menu, HUD, pause, settings,
+## satchel, journal, map, chat, sorting, timetable, character creator and the feature
+## panels) so UI work can be compared before and after (needs a window; not --headless).
+##   godot --path . tools/capture_ui.tscn -- --out=/absolute/dir
+
+const MENU := preload("res://ui/menus/main_menu.tscn")
+const WORLD := preload("res://core/world.tscn")
+const FEATURE_PANELS := ["settings", "friends", "clubs", "profile", "shop", "cauldron", "decor"]
+
+var _out: String = "user://captures/ui"
+
+
+func _ready() -> void:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--out="):
+			_out = arg.trim_prefix("--out=")
+	DirAccess.make_dir_recursive_absolute(_out)
+	await _run()
+
+
+func _run() -> void:
+	var menu := MENU.instantiate()
+	add_child(menu)
+	await _frames(30)
+	_save("main_menu")
+	menu.queue_free()
+	await _frames(2)
+	var world := WORLD.instantiate()
+	add_child(world)
+	await _frames(90)
+	_save("hud")
+	for path in ["InventoryPanel", "Journal", "MapPanel", "ChatPanel"]:
+		var panel := world.get_node_or_null(path)
+		if panel == null or not panel.has_method("open"):
+			continue
+		panel.open()
+		await _frames(10)
+		_save(path.to_snake_case())
+		panel.close()
+		await _frames(2)
+	GameEvents.timetable_requested.emit()
+	await _frames(10)
+	_save("timetable")
+	_press_escape()
+	await _frames(4)
+	GameEvents.sorting_requested.emit()
+	await _frames(10)
+	_save("sorting")
+	_press_escape()
+	await _frames(4)
+	GameEvents.character_creator_requested.emit()
+	await _frames(10)
+	_save("character_creator")
+	_press_escape()
+	await _frames(4)
+	for p in FEATURE_PANELS:
+		GameEvents.panel_requested.emit(p, {"name": "Tester"})
+		await _frames(10)
+		_save("panel_" + p)
+		_press_escape()
+		await _frames(4)
+	var pause := world.get_node_or_null("PauseMenu")
+	if pause != null:
+		pause._set_paused(true)
+		await _frames(10)
+		_save("pause")
+	get_tree().quit()
+
+
+func _press_escape() -> void:
+	var ev := InputEventAction.new()
+	ev.action = "pause"
+	ev.pressed = true
+	Input.parse_input_event(ev)
+
+
+func _frames(n: int) -> void:
+	for i in range(n):
+		await get_tree().process_frame
+
+
+func _save(file_name: String) -> void:
+	var path := _out.path_join(file_name + ".png")
+	get_viewport().get_texture().get_image().save_png(path)
+	print("saved ", path)

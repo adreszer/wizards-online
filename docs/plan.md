@@ -564,6 +564,20 @@ Owner decision (2026-10-20): portraits move, a mix of rigged sitters that can wa
 - [x] `LivePortraits` (castle.gd adds it): the 2 nearest portraits in front of the local player within 7 m turn live (`LivePortrait`): the sitter in its own SubViewport (384×490, the portrait studio's lens and lights, AgX), drawn on a canvas over the painted one through the paintings' varnish (`live_portrait.gdshader`), cross-fading from the painting in 0.8 s and back. `SitterPose` breathes, turns the head toward the player and folds the T-pose sitters' hands; `SocialPose` waves when the portrait speaks (`TalkingPortraits.spoke`) and plays an idle wave/shrug/point/bow every 14–30 s while the player stays within 4.5 m. Each sitter's framing is registered against its painting (`LivePortrait.FRAMING`), so the swap does not jump. `StaticBatch.portrait_sitters` records which sitter hangs where. Two live portraits cost ~0.3 ms a frame. Check them with `tools/capture_live_portraits.tscn` (painted and live side by side, plus a wave)
 - [ ] Later: sitters visit neighbouring frames (portrait messengers, mystery hints)
 
+### Next — Production UI (Milestones 65–72)
+
+The plan, art direction, asset sources and per-milestone checklists are in `docs/ui.md`; tick items there and summarise here.
+
+- [x] `tools/capture_ui.tscn`: a PNG gallery of every main UI surface, the before/after reference for the UI work
+- [ ] Milestone 65 — Foundation: tokens, fonts, one theme, the router
+- [ ] Milestone 66 — Art kit v1 and the UI gallery (owner checkpoint on the look)
+- [ ] Milestone 67 — The HUD
+- [ ] Milestone 68 — Main menu, loading, pause, settings
+- [ ] Milestone 69 — Journal, books, satchel, map
+- [ ] Milestone 70 — School life screens
+- [ ] Milestone 71 — Chat, bubbles, nameplates, profiles
+- [ ] Milestone 72 — Polish and ship check
+
 ## Production environment asset pipeline (in validation)
 
 **Pattern.** Every imported model stays a clean source asset under `assets/models/…` with Godot's default import settings (no manual texture resizing, mesh edits or material regeneration). A wrapper `.tscn` under `objects/environment/…` instances the model and owns everything engine/gameplay-specific: the fitting transform, collision, physics layers, and later LODs, occluders and metadata. Levels only ever instance the wrapper. Re-exporting the model from the art tool replaces the GLB and nothing else changes.

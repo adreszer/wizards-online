@@ -52,6 +52,7 @@ A multiplayer **open-world magical school**: one large castle (plus grounds) tha
 - `docs/plan.md` — implementation tracker (keep it current).
 - `docs/roadmap.md` — feature roadmap and idea bank (what to build next and why).
 - `docs/castle-generation.md` — how the castle and grounds are generated: rules (anchors, stairs, circulation, moving pieces, grounds), set pieces, scale plan, Milestones 24–32.
+- `docs/ui.md` — production UI plan: art direction, theme and components, where UI assets come from, Milestones 65–72.
 - `docs/architecture.md` — code structure; `docs/development.md` — how to run and test.
 - `README.md` — quick start.
 
