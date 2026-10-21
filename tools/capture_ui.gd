@@ -1,5 +1,5 @@
 extends Node
-## Dev tool: saves a PNG of every main UI surface (main menu, HUD, pause, settings,
+## Dev tool: saves a PNG of every main UI surface (the UI gallery's pages, main menu, HUD, pause, settings,
 ## satchel, journal, map, chat, sorting, timetable, character creator and the feature
 ## panels) so UI work can be compared before and after (needs a window; not --headless).
 ##   godot --path . tools/capture_ui.tscn -- --out=/absolute/dir [--size=1280x800] [--lang=en] [--scale=1.5]
@@ -8,6 +8,8 @@ extends Node
 ## every combination the ship check reviews (docs/ui.md, Milestone 72).
 
 const MENU := preload("res://ui/menus/main_menu.tscn")
+const GALLERY := preload("res://levels/dev/ui_gallery.tscn")
+const GALLERY_PAGES := ["windows", "play", "icons"]
 const WORLD := preload("res://core/world.tscn")
 const FEATURE_PANELS := ["settings", "friends", "clubs", "profile", "shop", "cauldron", "decor"]
 
@@ -33,6 +35,22 @@ func _ready() -> void:
 
 
 func _run() -> void:
+	var gallery := GALLERY.instantiate()
+	add_child(gallery)
+	for i in GALLERY_PAGES.size():
+		gallery.show_page(i)
+		await _frames(20)
+		_save("gallery_" + GALLERY_PAGES[i])
+	gallery.show_page(3)
+	gallery.show_dialog(false)
+	await _frames(20)
+	_save("gallery_question")
+	gallery.show_dialog(true)
+	await _frames(20)
+	_save("gallery_error")
+	gallery.queue_free()
+	UiRouter.close_all()
+	await _frames(2)
 	var menu := MENU.instantiate()
 	add_child(menu)
 	await _frames(30)

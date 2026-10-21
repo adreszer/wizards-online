@@ -1138,3 +1138,51 @@ JOURNAL_TAB_POST,Post,Poczta
 JOURNAL_POST_EMPTY,No paper birds yet. Write to someone with /msg name text.,Jeszcze żadnych papierowych ptaków. Napisz do kogoś: /pw imię tekst.
 JOURNAL_POST_TO,to %s,do: %s
 UI_CLOSE,Close,Zamknij
+UI_YES,Yes,Tak
+UI_NO,No,Nie
+UI_RETRY,Try again,Spróbuj ponownie
+UI_LOADING,Loading…,Wczytywanie…
+UI_MOUSE_LEFT,LMB,LPM
+UI_MOUSE_RIGHT,RMB,PPM
+UI_MOUSE_MIDDLE,MMB,ŚPM
+UI_MOUSE_WHEEL,Wheel,Kółko
+GALLERY_PAGE_WINDOWS,Windows and controls,Okna i kontrolki
+GALLERY_PAGE_PLAY,Play surfaces,Elementy rozgrywki
+GALLERY_PAGE_ICONS,Icons and houses,Ikony i domy
+GALLERY_PAGE_DIALOGS,Dialogs,Okna dialogowe
+GALLERY_PARCHMENT,A letter from the school,List ze szkoły
+GALLERY_CHROME,Oak and brass,Dąb i mosiądz
+GALLERY_STATUS,The answer or refusal line sits here.,Tu pojawia się odpowiedź albo odmowa.
+GALLERY_CHOOSE,choose,wybierz
+GALLERY_SAMPLE_TEXT,"Dear student, the new term begins at the first bell. Bring your quill, your satchel and a curious mind: the castle keeps more doors than any map shows.","Droga uczennico, drogi uczniu, nowy semestr zaczyna się z pierwszym dzwonem. Zabierz pióro, sakwę i ciekawość: zamek skrywa więcej drzwi, niż pokazuje jakakolwiek mapa."
+GALLERY_BUTTON,Send the letter,Wyślij list
+GALLERY_PRESSED,Pressed,Wciśnięty
+GALLERY_DISABLED,Unavailable,Niedostępne
+GALLERY_OPTION_1,First year,Pierwszy rok
+GALLERY_OPTION_2,Second year,Drugi rok
+GALLERY_FIELD_HINT,Type here…,Wpisz tutaj…
+GALLERY_FIELD_TEXT,Zażółć gęślą jaźń,Zażółć gęślą jaźń
+GALLERY_CHECK_ON,Remember me,Zapamiętaj mnie
+GALLERY_CHECK_OFF,Show hints,Pokazuj podpowiedzi
+GALLERY_TOGGLE,Captions,Napisy
+GALLERY_TAB_1,Spells,Czary
+GALLERY_TAB_2,Lessons,Lekcje
+GALLERY_TAB_3,Notes,Notatki
+GALLERY_LIST_ITEM,Entry %d,Wpis %d
+GALLERY_TOAST_1,The bell rings: lessons begin in five minutes.,Dzwon: lekcje zaczynają się za pięć minut.
+GALLERY_TOAST_2,+10 points for Phoenara,+10 punktów dla domu Phoenara
+GALLERY_TOAST_3,A new spell is written in your spellbook.,W twojej księdze czarów pojawia się nowy czar.
+GALLERY_TOAST_4,You found a hidden passage!,Odkrywasz ukryte przejście!
+GALLERY_TOAST_5,The connection to the school was lost.,Utracono połączenie ze szkołą.
+GALLERY_RIBBON,The House Cup,Puchar Domów
+GALLERY_TIP_TITLE,Healing draught,Wywar leczniczy
+GALLERY_TIP_TEXT,Restores 40 health. Brewed in Potions class.,Przywraca 40 punktów zdrowia. Warzony na Eliksirach.
+GALLERY_TIP_VERB,drink,wypij
+GALLERY_PAPER_NOTE,A note on paper,Notatka na papierze
+GALLERY_SHOW_QUESTION,Show a question,Pokaż pytanie
+GALLERY_SHOW_ERROR,Show an error,Pokaż błąd
+GALLERY_DIALOG_TITLE,Leave the lesson?,Opuścić lekcję?
+GALLERY_DIALOG_TEXT,The professor is still teaching. If you leave now you miss the rest of the lesson.,"Profesor wciąż prowadzi zajęcia. Jeśli wyjdziesz teraz, ominie cię reszta lekcji."
+GALLERY_ERROR_TITLE,Connection lost,Utracono połączenie
+GALLERY_ERROR_TEXT,The school's server does not answer. Check your connection and try again.,Serwer szkoły nie odpowiada. Sprawdź połączenie i spróbuj ponownie.
+UI_KEY_SPACE,Space,Spacja

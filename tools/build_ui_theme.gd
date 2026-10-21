@@ -4,15 +4,22 @@ extends SceneTree
 ## - ui/theme/arcanum_theme.tres: the project theme (gui/theme/custom), oak and brass;
 ## - ui/theme/parchment_theme.tres: set on a parchment surface's root control, it turns
 ##   everything inside into ink on paper (labels, buttons, fields, lists, tabs).
-## Run from the project root after changing fonts or tokens, and commit the output:
+## The materials are the nine-slice textures in assets/ui/frames/ (tools/make_ui_frames.py,
+## whose frames.json gives each piece's margins, shadow and tiling); flat styles remain
+## for the small parts (scroll bars, sliders, focus rings). Every textured style carries
+## its piece's name as "frame" metadata, so UiFrames can swap in the 2x copies.
+## Run from the project root after changing fonts, tokens or frames, and commit the output:
 ##   godot --headless --path . -s tools/build_ui_theme.gd
 
 const T := preload("res://ui/theme/ui_tokens.gd")
 const THEME_PATH := "res://ui/theme/arcanum_theme.tres"
 
+var _frames: Dictionary = {}
+
 
 func _init() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://ui/theme/fonts"))
+	_frames = JSON.parse_string(FileAccess.get_file_as_string(UiFrames.DIR + "frames.json"))
 	for path: String in UiFonts.SOURCES:
 		_save(_font(UiFonts.SOURCES[path]), path)
 	_save(_oak_theme(), THEME_PATH)
@@ -43,10 +50,10 @@ func _oak_theme() -> Theme:
 	var focus := _focus(T.BRASS_BRIGHT)
 
 	# Buttons and everything that looks like one.
-	var normal := _box(T.OAK_RAISED, T.OAK_LINE, 1, T.RADIUS_SMALL, Vector2(14, 6))
-	var hover := _box(T.OAK_HOVER, T.BRASS_DIM, 1, T.RADIUS_SMALL, Vector2(14, 6))
-	var pressed := _box(T.OAK_PRESSED, T.BRASS, 1, T.RADIUS_SMALL, Vector2(14, 6))
-	var disabled := _box(Color(T.OAK_RAISED, 0.5), Color(T.OAK_LINE, 0.5), 1, T.RADIUS_SMALL, Vector2(14, 6))
+	var normal := _frame("oak_button_normal", Vector2(14, 6))
+	var hover := _frame("oak_button_hover", Vector2(14, 6))
+	var pressed := _frame("oak_button_pressed", Vector2(14, 7), Vector2(14, 5))
+	var disabled := _frame("oak_button_disabled", Vector2(14, 6))
 	for type in ["Button", "OptionButton", "MenuButton"]:
 		_button_styles(t, type, normal, hover, pressed, disabled, focus)
 		_button_colors(t, type, T.CANDLE, T.BRASS_BRIGHT, T.BRASS_BRIGHT, T.CANDLE_DIM)
@@ -60,9 +67,9 @@ func _oak_theme() -> Theme:
 	t.set_color("font_pressed_color", "LinkButton", T.BRASS_BRIGHT)
 
 	# Text fields.
-	var field := _box(T.OAK_INSET, T.OAK_LINE, 1, T.RADIUS_SMALL, Vector2(8, 5))
-	var field_focus := _box(T.OAK_INSET, T.BRASS, 1, T.RADIUS_SMALL, Vector2(8, 5))
-	var field_read_only := _box(Color(T.OAK_INSET, 0.5), Color(T.OAK_LINE, 0.5), 1, T.RADIUS_SMALL, Vector2(8, 5))
+	var field := _frame("oak_field_normal", Vector2(8, 5))
+	var field_focus := _frame("oak_field_focus", Vector2(8, 5))
+	var field_read_only := _frame("oak_field_read_only", Vector2(8, 5))
 	for type in ["LineEdit", "TextEdit"]:
 		t.set_stylebox("normal", type, field)
 		t.set_stylebox("focus", type, field_focus)
@@ -70,28 +77,22 @@ func _oak_theme() -> Theme:
 		_field_colors(t, type, T.CANDLE, T.CANDLE_SOFT, T.BRASS_BRIGHT, Color(T.BRASS, 0.35), T.CANDLE_DIM)
 
 	# Panels, popups, tooltips.
-	t.set_stylebox("panel", "Panel", _box(T.OAK, T.OAK_LINE, 1, T.RADIUS, Vector2.ZERO))
-	t.set_stylebox("panel", "PanelContainer", _box(T.OAK, T.OAK_LINE, 1, T.RADIUS, Vector2.ZERO))
-	var popup := _box(T.OAK_SOLID, T.BRASS_DIM, 1, T.RADIUS, Vector2(6, 6))
-	popup.shadow_color = T.SHADOW
-	popup.shadow_size = 8
+	t.set_stylebox("panel", "Panel", _frame("oak_panel", Vector2(2, 2)))
+	t.set_stylebox("panel", "PanelContainer", _frame("oak_panel", Vector2(2, 2)))
+	var popup := _frame("oak_tooltip", Vector2(6, 6))
 	_popup(t, popup, _box(T.OAK_HOVER, Color(0, 0, 0, 0), 0, T.RADIUS_SMALL, Vector2(8, 4)), T.CANDLE, T.BRASS_BRIGHT, T.CANDLE_DIM, T.OAK_LINE)
-	var tip := _box(T.OAK_SOLID, T.BRASS_DIM, 1, T.RADIUS_SMALL, Vector2(10, 6))
-	tip.shadow_color = T.SHADOW
-	tip.shadow_size = 6
-	t.set_stylebox("panel", "TooltipPanel", tip)
+	t.set_stylebox("panel", "TooltipPanel", _frame("oak_tooltip", Vector2(10, 6)))
 	t.set_color("font_color", "TooltipLabel", T.CANDLE)
 	t.set_font_size("font_size", "TooltipLabel", T.SIZE_HINT)
 
 	# Tabs.
-	_tabs(t, _box(T.OAK_RAISED, T.BRASS, 0, T.RADIUS_SMALL, Vector2(12, 5), [0, 2, 0, 0]),
-		_box(Color(T.OAK_SOLID, 0.7), T.OAK_LINE, 0, T.RADIUS_SMALL, Vector2(12, 5)),
-		_box(T.OAK_HOVER, T.BRASS_DIM, 0, T.RADIUS_SMALL, Vector2(12, 5), [0, 1, 0, 0]),
+	_tabs(t, _frame("oak_tab_selected", Vector2(14, 6)), _frame("oak_tab_unselected", Vector2(14, 6)),
+		_frame("oak_tab_hovered", Vector2(14, 6)),
 		_box(Color(T.OAK_SOLID, 0.6), T.OAK_LINE, 1, T.RADIUS, Vector2(8, 8)),
 		T.BRASS_BRIGHT, T.CANDLE_SOFT, T.CANDLE, T.CANDLE_DIM, focus)
 
 	# Lists and trees.
-	_lists(t, _box(T.OAK_INSET, T.OAK_LINE, 1, T.RADIUS_SMALL, Vector2(4, 4)),
+	_lists(t, _frame("oak_field_normal", Vector2(4, 4)),
 		_box(Color(T.BRASS, 0.22), T.BRASS_DIM, 1, T.RADIUS_SMALL, Vector2(4, 2)),
 		_box(Color(T.OAK_HOVER, 0.8), Color(0, 0, 0, 0), 0, T.RADIUS_SMALL, Vector2(4, 2)),
 		T.CANDLE, T.BRASS_BRIGHT, T.OAK_LINE, focus)
@@ -99,13 +100,14 @@ func _oak_theme() -> Theme:
 	# Scroll bars, sliders, progress bars, separators.
 	_scroll(t, Color(0, 0, 0, 0.25), T.BRASS_DIM, T.BRASS, T.BRASS_BRIGHT)
 	_sliders(t, T.OAK_LINE, T.BRASS, T.BRASS_BRIGHT, focus)
-	t.set_stylebox("background", "ProgressBar", _box(Color(0, 0, 0, 0.35), T.OAK_LINE, 1, T.RADIUS_SMALL, Vector2(0, 4)))
+	t.set_stylebox("background", "ProgressBar", _frame("oak_field_normal", Vector2(0, 4)))
 	t.set_stylebox("fill", "ProgressBar", _box(T.BRASS, Color(0, 0, 0, 0), 0, T.RADIUS_SMALL, Vector2(0, 4)))
 	t.set_color("font_color", "ProgressBar", T.CANDLE)
 	t.set_color("font_outline_color", "ProgressBar", T.OAK_SOLID)
 	t.set_constant("outline_size", "ProgressBar", 3)
-	_separators(t, T.OAK_LINE)
-	_windows(t, "ChromeWindow", T.OAK_SOLID, T.BRASS_DIM, T.CANDLE_SOFT, T.BRASS_BRIGHT, T.DANGER)
+	_separators(t, T.OAK_LINE, "brass_separator")
+	_windows(t, "ChromeWindow", "oak_window", T.CANDLE_SOFT, T.BRASS_BRIGHT, T.DANGER)
+	_kit(t)
 	return t
 
 
@@ -115,10 +117,10 @@ func _parchment_theme() -> Theme:
 	var t := Theme.new()
 	_text_colors(t, T.INK, T.INK_SOFT)
 	var focus := _focus(T.RUBRIC)
-	var normal := _box(Color(T.INK, 0.06), Color(T.INK_SOFT, 0.55), 1, T.RADIUS_SMALL, Vector2(14, 6))
-	var hover := _box(Color(T.INK, 0.12), T.INK_SOFT, 1, T.RADIUS_SMALL, Vector2(14, 6))
-	var pressed := _box(Color(T.INK, 0.2), T.INK, 1, T.RADIUS_SMALL, Vector2(14, 6))
-	var disabled := _box(Color(T.INK, 0.03), Color(T.INK_SOFT, 0.25), 1, T.RADIUS_SMALL, Vector2(14, 6))
+	var normal := _frame("parchment_button_normal", Vector2(14, 6))
+	var hover := _frame("parchment_button_hover", Vector2(14, 6))
+	var pressed := _frame("parchment_button_pressed", Vector2(14, 7), Vector2(14, 5))
+	var disabled := _frame("parchment_button_disabled", Vector2(14, 6))
 	for type in ["Button", "OptionButton", "MenuButton"]:
 		_button_styles(t, type, normal, hover, pressed, disabled, focus)
 		_button_colors(t, type, T.INK, T.RUBRIC, T.RUBRIC, Color(T.INK_SOFT, 0.55))
@@ -132,21 +134,18 @@ func _parchment_theme() -> Theme:
 		t.set_color("checkbox_unchecked_color", type, T.INK_SOFT)
 	t.set_color("font_color", "LinkButton", T.RUBRIC)
 	t.set_color("font_hover_color", "LinkButton", T.INK)
-	var field := _box(Color(T.PARCHMENT_EDGE, 0.12), Color(T.INK_SOFT, 0.45), 1, T.RADIUS_SMALL, Vector2(8, 5), [0, 0, 0, 2])
-	var field_focus := _box(Color(T.PARCHMENT_EDGE, 0.16), T.RUBRIC, 1, T.RADIUS_SMALL, Vector2(8, 5), [0, 0, 0, 2])
-	var field_read_only := _box(Color(T.PARCHMENT_EDGE, 0.06), Color(T.INK_SOFT, 0.25), 1, T.RADIUS_SMALL, Vector2(8, 5))
+	var field := _frame("parchment_field_normal", Vector2(8, 5))
+	var field_focus := _frame("parchment_field_focus", Vector2(8, 5))
+	var field_read_only := _frame("parchment_field_read_only", Vector2(8, 5))
 	for type in ["LineEdit", "TextEdit"]:
 		t.set_stylebox("normal", type, field)
 		t.set_stylebox("focus", type, field_focus)
 		t.set_stylebox("read_only", type, field_read_only)
 		_field_colors(t, type, T.INK, Color(T.INK_SOFT, 0.75), T.RUBRIC, Color(T.RUBRIC, 0.25), Color(T.INK_SOFT, 0.6))
-	var popup := _box(T.PARCHMENT, T.PARCHMENT_EDGE, 1, T.RADIUS, Vector2(6, 6))
-	popup.shadow_color = Color(0, 0, 0, 0.35)
-	popup.shadow_size = 8
+	var popup := _frame("parchment_panel", Vector2(6, 6))
 	_popup(t, popup, _box(Color(T.INK, 0.1), Color(0, 0, 0, 0), 0, T.RADIUS_SMALL, Vector2(8, 4)), T.INK, T.RUBRIC, Color(T.INK_SOFT, 0.55), Color(T.INK_SOFT, 0.35))
-	_tabs(t, _box(Color(T.INK, 0.1), T.RUBRIC, 0, T.RADIUS_SMALL, Vector2(12, 5), [0, 2, 0, 0]),
-		_box(Color(T.INK, 0.03), Color(0, 0, 0, 0), 0, T.RADIUS_SMALL, Vector2(12, 5)),
-		_box(Color(T.INK, 0.07), T.INK_SOFT, 0, T.RADIUS_SMALL, Vector2(12, 5), [0, 1, 0, 0]),
+	_tabs(t, _frame("parchment_tab_selected", Vector2(16, 6)), _frame("parchment_tab_unselected", Vector2(16, 6)),
+		_frame("parchment_tab_hovered", Vector2(16, 6)),
 		_box(Color(T.INK, 0.04), Color(T.INK_SOFT, 0.3), 1, T.RADIUS, Vector2(8, 8)),
 		T.RUBRIC, T.INK_SOFT, T.INK, Color(T.INK_SOFT, 0.5), focus)
 	_lists(t, _box(Color(T.PARCHMENT_EDGE, 0.08), Color(T.INK_SOFT, 0.35), 1, T.RADIUS_SMALL, Vector2(4, 4)),
@@ -159,8 +158,13 @@ func _parchment_theme() -> Theme:
 	t.set_stylebox("fill", "ProgressBar", _box(T.RUBRIC, Color(0, 0, 0, 0), 0, T.RADIUS_SMALL, Vector2(0, 4)))
 	t.set_color("font_color", "ProgressBar", T.INK)
 	t.set_constant("outline_size", "ProgressBar", 0)
-	_separators(t, Color(T.INK_SOFT, 0.35))
-	_windows(t, "ParchmentWindow", T.PARCHMENT, T.PARCHMENT_EDGE, T.INK_SOFT, T.RUBRIC, T.RUBRIC)
+	_separators(t, Color(T.INK_SOFT, 0.35), "ink_separator")
+	_windows(t, "ParchmentWindow", "parchment_window", T.INK_SOFT, T.RUBRIC, T.RUBRIC)
+	# Key caps stay oak on paper too, so their lettering stays candle.
+	t.set_type_variation("KeyChip", "Label")
+	t.set_color("font_color", "KeyChip", T.CANDLE)
+	t.set_type_variation("ParchmentPanel", "PanelContainer")
+	t.set_stylebox("panel", "ParchmentPanel", _frame("parchment_panel", Vector2(12, 10)))
 	return t
 
 
@@ -169,19 +173,17 @@ func _parchment_theme() -> Theme:
 ## The UiWindow frame (`window`, a PanelContainer variation) and its parts, defined in
 ## both themes so a window and everything in it resolve from the theme it carries:
 ## WindowClose (the close control), WindowStatus (the line under the body, for answers
-## and refusals) and WindowFooter (key hints).
-func _windows(t: Theme, window: String, bg: Color, edge: Color, soft: Color, lit: Color, status: Color) -> void:
+## and refusals) and WindowFooter (key hints). The close control is a wax seal in both.
+func _windows(t: Theme, window: String, piece: String, soft: Color, lit: Color, status: Color) -> void:
 	t.set_type_variation(window, "PanelContainer")
-	var frame := _box(bg, edge, 3, T.RADIUS, Vector2(T.SPACE_5, T.SPACE_4))
-	frame.shadow_color = T.SHADOW
-	frame.shadow_size = 14
-	frame.shadow_offset = Vector2(0, 4)
-	t.set_stylebox("panel", window, frame)
+	t.set_stylebox("panel", window, _frame(piece, Vector2(T.SPACE_5 + 4, T.SPACE_4 + 6)))
 	t.set_type_variation("WindowClose", "Button")
-	var bare := _empty(Vector2(T.SPACE_2, T.SPACE_1))
-	_button_styles(t, "WindowClose", bare, bare, bare, bare, _focus(lit))
+	var seal := _frame("wax_seal_normal", Vector2(18, 18))
+	var focus := _focus(lit)
+	focus.set_corner_radius_all(18)
+	_button_styles(t, "WindowClose", seal, _frame("wax_seal_hover", Vector2(18, 18)),
+		_frame("wax_seal_pressed", Vector2(18, 18)), seal, focus)
 	_button_colors(t, "WindowClose", soft, lit, lit, Color(soft, 0.4))
-	t.set_font_size("font_size", "WindowClose", T.SIZE_LARGE)
 	t.set_type_variation("WindowStatus", "Label")
 	t.set_color("font_color", "WindowStatus", status)
 	t.set_type_variation("WindowFooter", "Label")
@@ -319,13 +321,52 @@ func _sliders(t: Theme, track: Color, fill: Color, fill_hover: Color, focus: Sty
 		t.set_stylebox("focus", type, focus)
 
 
-func _separators(t: Theme, color: Color) -> void:
-	for type in ["HSeparator", "VSeparator"]:
-		var line := StyleBoxLine.new()
-		line.color = color
-		line.thickness = 1
-		line.vertical = type == "VSeparator"
-		t.set_stylebox("separator", type, line)
+## Horizontal rules use the family's ornamental line (`piece`); vertical ones stay a
+## hairline.
+func _separators(t: Theme, color: Color, piece: String) -> void:
+	var line := StyleBoxLine.new()
+	line.color = color
+	line.thickness = 1
+	line.vertical = true
+	t.set_stylebox("separator", "VSeparator", line)
+	var rule := _frame(piece, Vector2(0, 4.5))
+	t.set_stylebox("separator", "HSeparator", rule)
+	t.set_constant("separation", "HSeparator", 9)
+
+
+## The kit's own variations (oak theme; paper surfaces inherit them): KeyChip (a key
+## cap behind a key name), Toast (a notification), ChromePanel, ItemSlot (a satchel
+## square), Ribbon (a cloth banner behind a title) and RibbonLabel, its lettering.
+func _kit(t: Theme) -> void:
+	t.set_type_variation("KeyChip", "Label")
+	t.set_stylebox("normal", "KeyChip", _frame("key_chip", Vector2(7, 3), Vector2(7, 6)))
+	t.set_color("font_color", "KeyChip", T.CANDLE)
+	t.set_font("font", "KeyChip", load(UiFonts.UI_BOLD))
+	t.set_font_size("font_size", "KeyChip", T.SIZE_SMALL)
+	t.set_type_variation("Toast", "PanelContainer")
+	t.set_stylebox("panel", "Toast", _frame("toast", Vector2(T.SPACE_4, T.SPACE_3)))
+	t.set_type_variation("ChromePanel", "PanelContainer")
+	t.set_stylebox("panel", "ChromePanel", _frame("oak_panel", Vector2(T.SPACE_3, T.SPACE_2)))
+	t.set_type_variation("ItemSlot", "PanelContainer")
+	t.set_stylebox("panel", "ItemSlot", _frame("item_slot_normal", Vector2(6, 6)))
+	t.set_type_variation("ItemSlotSelected", "PanelContainer")
+	t.set_stylebox("panel", "ItemSlotSelected", _frame("item_slot_selected", Vector2(6, 6)))
+	t.set_type_variation("Ribbon", "PanelContainer")
+	var m: Array = _frames["ribbon"]["content"]
+	t.set_stylebox("panel", "Ribbon", _frame("ribbon", Vector2(m[0], m[1]), Vector2(m[2], m[3])))
+	_variation(t, "RibbonLabel", "Label", {"font": UiFonts.DISPLAY}, {"font_size": T.SIZE_LARGE + 4})
+	t.set_color("font_color", "RibbonLabel", T.CANDLE)
+	t.set_color("font_shadow_color", "RibbonLabel", Color(0, 0, 0, 0.5))
+	t.set_constant("shadow_offset_y", "RibbonLabel", 1)
+	# Area banners stand over the world: a soft shadow keeps them legible on any scene.
+	t.set_color("font_shadow_color", "BannerLabel", Color(0, 0, 0, 0.7))
+	t.set_constant("shadow_offset_y", "BannerLabel", 2)
+	t.set_constant("shadow_outline_size", "BannerLabel", 6)
+	_variation(t, "BannerSubLabel", "Label", {"font": UiFonts.DISPLAY}, {"font_size": T.SIZE_LARGE + 6})
+	t.set_color("font_color", "BannerSubLabel", T.BRASS_BRIGHT)
+	t.set_color("font_shadow_color", "BannerSubLabel", Color(0, 0, 0, 0.7))
+	t.set_constant("shadow_offset_y", "BannerSubLabel", 1)
+	t.set_constant("shadow_outline_size", "BannerSubLabel", 4)
 
 
 func _variation(t: Theme, name: String, base: String, fonts: Dictionary, sizes: Dictionary) -> void:
@@ -334,6 +375,35 @@ func _variation(t: Theme, name: String, base: String, fonts: Dictionary, sizes: 
 		t.set_font(key, name, load(fonts[key]))
 	for key: String in sizes:
 		t.set_font_size(key, name, sizes[key])
+
+
+## A textured style from the frame kit: nine-slice margins, the shadow drawn outside
+## the control and tiling from frames.json; `margin` is the content margin (x left and
+## right, y top), `bottom` overrides the right and bottom ones when given.
+func _frame(piece: String, margin: Vector2, bottom := Vector2(-1, -1)) -> StyleBoxTexture:
+	var info: Dictionary = _frames[piece]
+	var s := StyleBoxTexture.new()
+	s.texture = load(UiFrames.path(piece))
+	var m: Array = info["margin"]
+	s.texture_margin_left = m[0]
+	s.texture_margin_top = m[1]
+	s.texture_margin_right = m[2]
+	s.texture_margin_bottom = m[3]
+	var sh: Array = info["shadow"]
+	s.expand_margin_left = sh[0]
+	s.expand_margin_top = sh[1]
+	s.expand_margin_right = sh[2]
+	s.expand_margin_bottom = sh[3]
+	if info["tile"]:
+		s.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
+		s.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
+	var b := bottom if bottom.x >= 0 else margin
+	s.content_margin_left = margin.x
+	s.content_margin_top = margin.y
+	s.content_margin_right = b.x
+	s.content_margin_bottom = b.y
+	s.set_meta(&"frame", piece)
+	return s
 
 
 ## A flat box; `margin` is the content margin (x left/right, y top/bottom); `widths`

@@ -16,6 +16,8 @@ extends Node
 ## (Esc resumes), so it dims and fades the HUD like any window.
 
 signal changed
+## The last input switched between gamepad and keyboard/mouse (key hints follow it).
+signal device_changed(pad: bool)
 
 const DIM := Color(0, 0, 0, 0.45)
 ## How visible the HUD stays behind a modal window.
@@ -85,13 +87,24 @@ func close_all() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
-		_pad = true
+	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) > 0.5):
+		_set_pad(true)
 	elif event is InputEventKey or event is InputEventMouseButton:
-		_pad = false
+		_set_pad(false)
 	if not _stack.is_empty() and event.is_action_pressed("pause"):
 		_back(top())
 		get_viewport().set_input_as_handled()
+
+
+## True when the last input came from a gamepad.
+func using_pad() -> bool:
+	return _pad
+
+
+func _set_pad(pad: bool) -> void:
+	if pad != _pad:
+		_pad = pad
+		device_changed.emit(pad)
 
 
 func _back(panel: Node) -> void:

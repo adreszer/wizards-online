@@ -47,7 +47,7 @@ func _init(window_family: Family = Family.PARCHMENT, scrolls: bool = true) -> vo
 	head.add_child(title_label)
 	close_button = Button.new()
 	close_button.name = "Close"
-	close_button.text = "✕"
+	# A wax seal (the theme's WindowClose styles); no text.
 	close_button.theme_type_variation = &"WindowClose"
 	close_button.focus_mode = Control.FOCUS_NONE
 	close_button.tooltip_text = "UI_CLOSE"
@@ -98,6 +98,20 @@ func add_hint(text: String) -> Label:
 	footer.add_child(l)
 	footer.visible = true
 	return l
+
+
+## Adds a key hint to the footer: the action's key chip and what it does ("[Esc] close").
+func add_key_hint(action: StringName, verb: String) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", UiTokens.SPACE_1 + 2)
+	row.add_child(KeyChip.new(action))
+	var l := Label.new()
+	l.text = verb
+	l.theme_type_variation = &"WindowFooter"
+	row.add_child(l)
+	footer.add_child(row)
+	footer.visible = true
+	return row
 
 
 ## Shows the window with a short fade and settle (instant under reduced motion).

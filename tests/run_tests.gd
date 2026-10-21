@@ -123,18 +123,134 @@ func _test_ui_window() -> void:
 	await get_tree().process_frame
 	var card := panel.card
 	t.check(card is UiWindow and card.theme_type_variation == &"ParchmentWindow" and card.theme != null, "feature panels sit in a parchment UiWindow")
-	t.check(card.get_theme_stylebox("panel") is StyleBoxFlat and (card.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.is_equal_approx(UiTokens.PARCHMENT), "the window frame comes from the theme")
+	t.check(card.get_theme_stylebox("panel") is StyleBoxTexture and card.get_theme_stylebox("panel").get_meta(&"frame", "") == "parchment_window", "the window frame comes from the theme (the parchment piece)")
 	panel.open_panel()
 	t.check(card.visible and panel.is_open and GameSession.ui_input_captured, "opening shows the window")
 	card.close_button.pressed.emit()
 	t.check(not card.visible and not panel.is_open and not GameSession.ui_input_captured, "the close control closes the panel")
 	var chrome := UiWindow.new(UiWindow.Family.CHROME)
 	add_child(chrome)
-	t.check(chrome.theme == null and (chrome.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.is_equal_approx(UiTokens.OAK_SOLID), "a chrome window takes the oak frame from the project theme")
+	t.check(chrome.theme == null and chrome.get_theme_stylebox("panel").get_meta(&"frame", "") == "oak_window", "a chrome window takes the oak frame from the project theme")
 	chrome.queue_free()
 	panel.queue_free()
 	await get_tree().process_frame
 	await _test_ui_router()
+	await _test_ui_kit()
+
+
+## Milestone 66: the frame kit behind the themes, the 2x swap, the icon registry and
+## the components.
+func _test_ui_kit() -> void:
+	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(UiFrames.DIR + "frames.json"))
+	var bad: Array = []
+	for piece: String in manifest:
+		var one: Texture2D = load(UiFrames.path(piece))
+		var two: Texture2D = load(UiFrames.path(piece, true))
+		var m: Array = manifest[piece]["margin"]
+		if one == null or two == null or two.get_size() != one.get_size() * 2.0:
+			bad.append(piece + " (files)")
+		elif m[0] + m[2] >= one.get_width() or m[1] + m[3] > one.get_height():
+			bad.append(piece + " (margins)")
+	t.check(manifest.size() >= 30 and bad.is_empty(), "every frame piece has a 1x and a 2x file and fits its margins (%s)" % str(bad))
+	var button := Button.new()
+	add_child(button)
+	var sb := button.get_theme_stylebox("normal")
+	t.check(sb is StyleBoxTexture and sb.get_meta(&"frame", "") == "oak_button_normal", "buttons are drawn from the oak frame")
+	var size_1x := (sb as StyleBoxTexture).texture.get_size()
+	UiFrames.use_density(2.0)
+	var swapped := (sb as StyleBoxTexture).texture
+	t.check(UiFrames.hidpi and swapped.get_size() == size_1x, "at a large drawing scale the 2x frames come in at the same size")
+	UiFrames.use_density(1.0)
+	t.check(not UiFrames.hidpi and (sb as StyleBoxTexture).texture.resource_path == UiFrames.path("oak_button_normal"), "back at 1:1 the 1x frames return")
+	button.queue_free()
+
+	var ids := UiIcons.ids()
+	var credits := FileAccess.get_file_as_string(UiIcons.DIR + "CREDITS.md")
+	var missing: Array = []
+	for id in ids:
+		var tex := UiIcons.icon(id, 24)
+		if tex == null or tex.get_size() != Vector2(24, 24) or not credits.contains("| %s |" % id):
+			missing.append(id)
+	t.check(ids.size() >= 50 and missing.is_empty(), "every icon loads at the asked size and is credited (%s)" % str(missing))
+
+	InputMap.add_action(&"test_chip")
+	var key := InputEventKey.new()
+	key.keycode = KEY_K
+	InputMap.action_add_event(&"test_chip", key)
+	var pad := InputEventJoypadButton.new()
+	pad.button_index = JOY_BUTTON_A
+	InputMap.action_add_event(&"test_chip", pad)
+	t.check(KeyChip.label_for(&"test_chip", false) == "K" and KeyChip.label_for(&"test_chip", true) == "A", "a key chip shows the bound key, or the pad button after pad input")
+	InputMap.action_erase_events(&"test_chip")
+	var esc := InputEventKey.new()
+	esc.keycode = KEY_ESCAPE
+	InputMap.action_add_event(&"test_chip", esc)
+	var mouse := InputEventMouseButton.new()
+	mouse.button_index = MOUSE_BUTTON_LEFT
+	t.check(KeyChip.label_for(&"test_chip", false) == "Esc", "long key names are shortened for the cap")
+	InputMap.action_erase_events(&"test_chip")
+	InputMap.action_add_event(&"test_chip", mouse)
+	t.check(KeyChip.label_for(&"test_chip", false) == tr("UI_MOUSE_LEFT"), "mouse buttons show their translated name")
+	InputMap.erase_action(&"test_chip")
+	t.check(KeyChip.label_for(&"no_such_action", false) == "—", "an unbound action shows a dash")
+
+	var stack := ToastStack.new()
+	add_child(stack)
+	for i in 6:
+		stack.push("toast %d" % i, ToastStack.Kind.REWARD)
+	t.check(stack.get_child_count() == ToastStack.MAX_SHOWN, "the toast stack keeps the newest %d" % ToastStack.MAX_SHOWN)
+	var last := stack.get_child(stack.get_child_count() - 1)
+	t.check(last.find_children("*", "Label", true, false)[0].text == "toast 5" and last.find_children("*", "TextureRect", true, false)[0].modulate == ToastStack.ACCENTS[ToastStack.Kind.REWARD], "a toast shows its text and its kind's colour")
+	stack.queue_free()
+	var banner := AreaBanner.new()
+	add_child(banner)
+	banner.show_area("Wielka Sala", "Parter", 0.0)
+	await get_tree().create_timer(UiTokens.SLOW + 0.1).timeout
+	t.check(banner.is_showing() and banner.title_label.text == "Wielka Sala" and banner.subtitle_label.visible, "the area banner shows the area and its line")
+	banner.queue_free()
+
+	var slot := SpellSlot.new()
+	slot.cooldown = 3.0
+	t.check(slot.cooldown == 1.0 and slot.empty, "a spell slot starts empty and clamps its cooldown")
+	slot.free()
+	var badge := HouseBadge.new(3, HouseBadge.Size.MEDIUM)
+	var unsorted := HouseBadge.new(0, HouseBadge.Size.SMALL)
+	t.check(badge.crest_rect.texture == CharacterProfile.crest(3, CharacterProfile.CREST_CARD) and badge.name_label.text == CharacterProfile.house_name(3), "a house badge shows the house's crest and name")
+	t.check(unsorted.crest_rect.texture != null and unsorted.name_label.text == tr("PROFILE_UNSORTED"), "the unsorted get the school emblem")
+	badge.free()
+	unsorted.free()
+	var vial := ProgressVial.new()
+	vial.max_value = 80.0
+	vial.value = 20.0
+	t.check(is_equal_approx(vial.fraction(), 0.25), "a vial fills by value over max")
+	vial.free()
+
+	var answers: Array = []
+	var dialog := UiDialog.confirm(self, "?", "?")
+	dialog.answered.connect(func(yes: bool) -> void: answers.append(yes))
+	t.check(UiRouter.top() == dialog and UiRouter.has_modal() and GameSession.ui_input_captured, "a dialog opens on the window stack, modal")
+	var ev := InputEventAction.new()
+	ev.action = &"pause"
+	ev.pressed = true
+	Input.parse_input_event(ev)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	t.check(answers == [false] and UiRouter.open_count() == 0, "Esc answers a dialog no")
+	var error := UiDialog.error(self, "!", "!")
+	error.answered.connect(func(yes: bool) -> void: answers.append(yes))
+	error.yes_button.pressed.emit()
+	t.check(answers == [false, true] and UiRouter.open_count() == 0, "an error dialog's Retry answers yes")
+	await get_tree().process_frame
+
+	var gallery: Control = load("res://levels/dev/ui_gallery.tscn").instantiate()
+	add_child(gallery)
+	await get_tree().process_frame
+	t.check(gallery.tabs.get_tab_count() == gallery.PAGES.size(), "the UI gallery builds all its pages")
+	gallery.show_dialog(true)
+	t.check(UiRouter.open_count() == 1, "the gallery shows a sample dialog")
+	UiRouter.close_all()
+	gallery.queue_free()
+	await get_tree().process_frame
 
 
 ## Keys built at run time ("ACTION_" + action, "GESTURE_" + id, "AREA_" + shop…) all

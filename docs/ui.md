@@ -87,7 +87,7 @@ The look must live in one place so we can iterate on it in hours, not weeks.
 | `SpellSlot`, `ItemSlot` | Icon, key chip, radial cooldown sweep (shader), mastery pips, count, tooltip. |
 | `HouseBadge` | Crest + symbol + colour, sizes S/M/L; the only way a house is shown. |
 | `UiTooltip` | Rich tooltip: title, body, key hint. |
-| `ConfirmDialog`, `ErrorDialog` | Modal yes/no and connection errors (with retry). |
+| `UiDialog` | Modal yes/no (`confirm()`) and connection errors with retry (`error()`). |
 | `UiSounds` | Hover, click, open, close, page turn, tab, error, reward; from `docs/audio-list.md` (UI group). |
 | `ProgressVial`, `UiSpinner` | Health/fill bar and loading indicator. |
 
@@ -134,11 +134,12 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - **Result:** the whole game in one consistent style and real fonts, with no new art yet.
 
 ### Milestone 66 — Art kit v1 and the UI gallery
-- [ ] CC0 textures chosen; `tools/make_ui_frames.py` makes parchment and oak frames, corners, ribbons, tabs, wax-seal close button, slot rings, separators (@1x/@2x)
-- [ ] Theme switches from flat styles to textured nine-slice styles
-- [ ] Components: `KeyChip`, `ToastStack`, `AreaBanner`, `SpellSlot`, `ItemSlot`, `HouseBadge` (on the crests in `assets/ui/brand/`), `UiTooltip`, dialogs, `ProgressVial`, `UiSpinner`
-- [ ] Placeholder icon set (game-icons.net) wired through an `UiIcons` registry, so swapping in the final Recraft set is a file replacement
-- [ ] `levels/dev/ui_gallery.tscn`; owner reviews the style frames here and signs off the direction
+- [x] CC0 textures chosen (ambientCG Paper001 fibre and Paper003 mottling for the paper, Poly Haven black_oak_veneer for the grain, all tinted to the palette); `tools/make_ui_frames.py` draws 38 pieces at 4x and saves them at 1x and 2x into `assets/ui/frames/` with `frames.json` (nine-slice margins, the shadow outside the control, tiling): deckled parchment window with a ruled frame, oak window with a brass band and corner brackets, paper and oak panels, buttons (normal, hover, pressed, disabled), fields, tabs, a cloth ribbon, ink and brass rules, the wax-seal close control, key cap, toast, tooltip, slot rings and item slots. Every texture and noise repeats with the piece's period, so frames of any size have no seams
+- [x] Theme switches from flat styles to textured nine-slice styles (`tools/build_ui_theme.gd` reads `frames.json`); small parts (scroll bars, sliders, focus rings) stay flat. `UiFrames` swaps the 2x pieces in, shown at 1x size, when the interface is drawn larger than 1:1 (interface scale times the window's stretch), so frames stay sharp at 1.5 and on 1440p
+- [x] Components (`ui/components/`): `KeyChip` (bound key from the InputMap, pad button after pad input, follows rebinding), `ToastStack` (info, reward, learned, discovery, warning; newest four), `AreaBanner`, `SpellSlot` (ring, roundel in the spell's colour, key chip, cooldown sweep, mastery pips, selected and disabled), `ItemSlot`, `HouseBadge` (crest + name in house colour with its symbol, S/M/L; the emblem for the unsorted), `UiTooltip` (title, body, key hint), `UiDialog` (`confirm()` and `error()` with Retry, on the router stack), `ProgressVial`, `UiSpinner`; `UiWindow.add_key_hint()`; `UiRouter.device_changed`
+- [x] Placeholder icon set: 54 game-icons.net icons (HUD, toasts, chat channels, the twelve subjects) as DPITextures (sharp at any size) behind `UiIcons.icon(id, px)`; `tools/make_ui_icons.py` writes them and `assets/ui/icons/CREDITS.md`. The final set replaces the files under the same ids
+- [x] `levels/dev/ui_gallery.tscn`: four pages (windows and controls in both families, play surfaces, icons and houses, dialogs); `tools/capture_ui.gd` captures them first
+- [ ] Owner reviews the style frames and signs off the direction
 - **Owner checkpoint:** approve the look before the screens are rebuilt.
 
 ### Milestone 67 — The HUD
@@ -189,7 +190,7 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 
 | Decision | Recommendation |
 |---|---|
-| Art direction | "Candlelit oak and parchment" as above. Confirm before Milestone 66. |
+| Art direction | Decided (owner, 2026-10-21): "candlelit oak and parchment" as above. |
 | Fonts | Decided: Cormorant SC / EB Garamond / Fira Sans. |
 | Logo and crests | Decided: generated with AI, prompts and rules in `docs/brand-prompts.md`; crests made with ChatGPT and in the game; edit by hand and register the logo as a trademark. |
 | Icon tool | Recraft for the final set; game-icons.net placeholders now. |

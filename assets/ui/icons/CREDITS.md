@@ -1,0 +1,60 @@
+# Placeholder icons
+
+From game-icons.net (https://game-icons.net), licensed CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). The black backgrounds were removed; the glyphs are tinted in the engine. Written by `tools/make_ui_icons.py`.
+
+| Id | Icon | Author |
+|---|---|---|
+| bell | ringing-bell | Lorc |
+| book | book-cover | Delapouite |
+| broom | broom | Delapouite |
+| candle | candle-light | Lorc |
+| castle | castle | Lorc |
+| cauldron | cauldron | Lorc |
+| chat | chat-bubble | Delapouite |
+| chat_dm | envelope | Lorc |
+| chat_house | family-house | Delapouite |
+| chat_say | conversation | Lorc |
+| chat_shout | megaphone | Delapouite |
+| chat_whisper | lips | Lorc |
+| check | check-mark | Delapouite |
+| coins | coins | Delapouite |
+| compass | compass | Lorc |
+| cooldown | hourglass | Lorc |
+| day | sun | Lorc |
+| discovery | magnifying-glass | Lorc |
+| exit | exit-door | Delapouite |
+| fragment | crystal-growth | Lorc |
+| health | heart-bottle | Lorc |
+| homework | scroll-quill | Delapouite |
+| house_points | trophy-cup | Delapouite |
+| info | info | Delapouite |
+| journal | open-book | Lorc |
+| lantern | lantern | Lorc |
+| learned | sparkles | Delapouite |
+| locked | padlock | Lorc |
+| map | treasure-map | Lorc |
+| night | moon | Lorc |
+| person | person | Delapouite |
+| professor | pointy-hat | Lorc |
+| quest | scroll-unfurled | Lorc |
+| satchel | knapsack | Lorc |
+| secret | key | Lorc |
+| settings | cog | Lorc |
+| shop | chest | Delapouite |
+| spell | magic-swirl | Lorc |
+| subject_arithmancy | abacus | Delapouite |
+| subject_astronomy | telescope | Delapouite |
+| subject_charms | magic-palm | Lorc |
+| subject_creatures | owl | Lorc |
+| subject_defence | checked-shield | Lorc |
+| subject_divination | crystal-ball | Lorc |
+| subject_flying | feather | Lorc |
+| subject_herbology | plant-roots | Delapouite |
+| subject_history | tied-scroll | Lorc |
+| subject_potions | potion-ball | Lorc |
+| subject_runes | rune-stone | Lorc |
+| subject_transfiguration | star-swirl | Lorc |
+| time | sundial | Lorc |
+| timetable | calendar | Delapouite |
+| wand | fairy-wand | Lorc |
+| warning | hazard-sign | Lorc |

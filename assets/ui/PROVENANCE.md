@@ -26,3 +26,11 @@ Tool: ChatGPT (OpenAI image generation), owner account, 2026-10-20. `prep_crests
 ## House banners (`assets/models/environment/modular/banner_hN.glb`)
 
 Repainted 2026-10-20 by `tools/make_banners.py`: the damask weave from the first banner batch (`brand/source/banner_damask.jpg`, the Hipporys banner of that batch; see the third props batch in `docs/plan.md`), tinted in the house colour, with a brass border and the colour crest above. No new generated art beyond the crests.
+
+## Frames (`frames/`)
+
+Drawn by `tools/make_ui_frames.py` (2026-10-21): vector shapes and procedural noise over CC0 photo textures, tinted to the palette. Sources: ambientCG Paper001 and Paper003 (CC0, https://ambientcg.com), Poly Haven black_oak_veneer (CC0, https://polyhaven.com). No AI-generated images.
+
+## Icons (`icons/`)
+
+Placeholders from game-icons.net (CC BY 3.0, authors Lorc and Delapouite; the per-icon list is in `icons/CREDITS.md`, which the credits screen must show). Fetched and cleaned by `tools/make_ui_icons.py`. No AI-generated images.

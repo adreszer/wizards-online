@@ -108,7 +108,12 @@ godot --headless --path . tests/check_scripts.tscn
 # beyond its STYLE_ALLOWLIST entry (the list only shrinks: lower an entry when you remove one)
 godot --headless --path . tests/check_ui.tscn
 # (it also fails on a key-shaped string literal that no table under localization/ has)
-# after changing fonts or theme values: rewrite ui/theme/ (commit the output)
+# the UI art kit: frames, buttons, fields, tabs, ribbon, slot rings, wax seal at 1x and 2x into
+# assets/ui/frames/ (pip install pillow numpy; --fetch downloads the CC0 textures into .godot/ui_src/ first)
+python3 tools/make_ui_frames.py --fetch
+# the placeholder icons (game-icons.net, CC BY 3.0) as DPITextures in assets/ui/icons/, with CREDITS.md
+python3 tools/make_ui_icons.py
+# after changing fonts, theme values or frames: rewrite ui/theme/ (commit the output)
 godot --headless --path . -s tools/build_ui_theme.gd
 # after changing the symbol blocks: rebuild the trimmed symbol fallbacks (pip install fonttools)
 python3 tools/make_symbol_fonts.py
@@ -168,7 +173,9 @@ godot --path . tools/capture_model.tscn -- --scene=res://assets/models/environme
 godot --path . tools/capture_model.tscn -- --scene=res://levels/castle/castle.tscn --eye=-22,4.5,-3 --target=-36,0.8,0 --out=/absolute/output/dir
 # the village and the station (street, square, shop and inn interiors, platform, portal, aerial) by day and night
 godot --path . tools/capture_village.tscn -- --out=/absolute/output/dir [--hours=12,0]
-# every main UI surface (menu, HUD, satchel, journal, map, chat, panels, pause) for before/after comparison
+# the UI style guide: every component in its states, both families (pages: windows, play, icons, dialogs)
+godot --path . levels/dev/ui_gallery.tscn -- --page=1
+# every main UI surface (the gallery's pages, menu, HUD, satchel, journal, map, chat, panels, pause) for before/after comparison
 godot --path . tools/capture_ui.tscn -- --out=/absolute/output/dir
 # one size, language and interface scale: add --size=1280x800 --lang=en --scale=1.5
 # every combination the ship check reviews (24 runs, about a minute each):

@@ -121,6 +121,10 @@ static func apply(tree: SceneTree) -> void:
 	vp.scaling_3d_scale = scale
 	vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR2 if get_value("fsr") and scale < 1.0 else Viewport.SCALING_3D_MODE_BILINEAR
 	vp.content_scale_factor = clampf(float(get_value("ui_scale")), 0.75, 1.75)
+	_update_frames(vp)
+	if not vp.has_meta(&"ui_frames_hooked"):
+		vp.set_meta(&"ui_frames_hooked", true)
+		vp.size_changed.connect(_update_frames.bind(vp))
 	Engine.max_fps = int(get_value("fps_cap"))
 	if DisplayServer.get_name() != "headless":
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if get_value("vsync") else DisplayServer.VSYNC_DISABLED)
@@ -147,6 +151,11 @@ static func apply(tree: SceneTree) -> void:
 			(node as DirectionalLight3D).shadow_enabled = bool(get_value("shadows"))
 	LightQuality.shadow_distance = LightQuality.distance_for(str(get_value("preset")), bool(get_value("shadows")))
 	LightQuality.watch(tree)
+
+
+## Sharp UI frames when the interface is drawn larger than 1:1 (UiFrames).
+static func _update_frames(vp: Window) -> void:
+	UiFrames.use_density(UiFrames.draw_scale(vp, vp.content_scale_factor))
 
 
 ## A house's name with its symbol when the player asked for symbols beside colours.
