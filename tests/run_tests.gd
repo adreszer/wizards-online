@@ -3719,6 +3719,7 @@ func _test_real_models() -> void:
 			return (m as MeshInstance3D).mesh is PrimitiveMesh and not glows.has(m.name))
 		t.check(shapes.is_empty(), "%s is built from models (%s)" % [path.get_file(), ", ".join(shapes.map(func(m: Node) -> String: return m.name))])
 		node.free()
+	var orphans_before := Node.get_orphan_node_ids().size()
 	var corner := DormitoryCorners.build_corner(Transform3D(), "Ola", ["brass_lantern", "potted_moonpetal", "music_box", "trophy_small", "game_set"], 1)
 	var trinkets := 0
 	for id in ["brass_lantern", "potted_moonpetal", "music_box", "trophy_small", "game_set"]:
@@ -3727,6 +3728,7 @@ func _test_real_models() -> void:
 			trinkets += 1
 	corner.free()
 	t.check(trinkets == 5, "every dorm shelf decoration is a model (%d of 5)" % trinkets)
+	t.check(Node.get_orphan_node_ids().size() == orphans_before, "building a dorm corner leaves no stray nodes behind")
 
 
 func _test_characters() -> void:

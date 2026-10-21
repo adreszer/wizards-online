@@ -121,6 +121,29 @@ const DECOR_MODELS := {
 static func decor_mesh(id: String, house: int) -> Node3D:
 	var root := Node3D.new()
 	root.name = id
+	if DECOR_MODELS.has(id):
+		var shelf := BoxMesh.new()
+		shelf.size = Vector3(0.4, 0.03, 0.18)
+		var s := MeshInstance3D.new()
+		s.mesh = shelf
+		s.position = Vector3(0, -0.14, 0.09)
+		var wood := StandardMaterial3D.new()
+		wood.albedo_color = Color(0.3, 0.19, 0.11)
+		wood.roughness = 0.7
+		s.material_override = wood
+		root.add_child(s)
+		var piece := (load(DECOR_MODELS[id][0]) as PackedScene).instantiate() as Node3D
+		fit_height(piece, DECOR_MODELS[id][1])
+		piece.position = Vector3(0, -0.125, 0.09)
+		root.add_child(piece)
+		if id == "brass_lantern":
+			var light := OmniLight3D.new()
+			light.position = Vector3(0, -0.02, 0.09)
+			light.omni_range = 2.5
+			light.light_energy = 0.7
+			light.light_color = Color(1.0, 0.75, 0.45)
+			root.add_child(light)
+		return root
 	var mi := MeshInstance3D.new()
 	var mat := StandardMaterial3D.new()
 	match id:
@@ -138,29 +161,6 @@ static func decor_mesh(id: String, house: int) -> Node3D:
 			mat.emission_enabled = true
 			mat.emission = Color(0.5, 0.6, 1.0)
 			mat.emission_energy_multiplier = 0.3
-		"brass_lantern", "potted_moonpetal", "music_box", "trophy_small", "game_set":
-			var shelf := BoxMesh.new()
-			shelf.size = Vector3(0.4, 0.03, 0.18)
-			var s := MeshInstance3D.new()
-			s.mesh = shelf
-			s.position = Vector3(0, -0.14, 0.09)
-			var wood := StandardMaterial3D.new()
-			wood.albedo_color = Color(0.3, 0.19, 0.11)
-			wood.roughness = 0.7
-			s.material_override = wood
-			root.add_child(s)
-			var piece := (load(DECOR_MODELS[id][0]) as PackedScene).instantiate() as Node3D
-			fit_height(piece, DECOR_MODELS[id][1])
-			piece.position = Vector3(0, -0.125, 0.09)
-			root.add_child(piece)
-			if id == "brass_lantern":
-				var light := OmniLight3D.new()
-				light.position = Vector3(0, -0.02, 0.09)
-				light.omni_range = 2.5
-				light.light_energy = 0.7
-				light.light_color = Color(1.0, 0.75, 0.45)
-				root.add_child(light)
-			return root
 		_:
 			var b := BoxMesh.new()
 			b.size = Vector3(0.2, 0.2, 0.05)
