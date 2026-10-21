@@ -83,7 +83,8 @@ func _on_windows_changed() -> void:
 		if instant or not is_inside_tree():
 			node.modulate.a = alpha
 		else:
-			node.create_tween().tween_property(node, "modulate:a", alpha, UiTokens.NORMAL)
+			# Runs while the game is paused too (the pause menu is a window).
+			node.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).tween_property(node, "modulate:a", alpha, UiTokens.NORMAL)
 
 
 func _process(delta: float) -> void:

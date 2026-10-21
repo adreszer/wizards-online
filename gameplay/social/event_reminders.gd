@@ -19,7 +19,7 @@ func _process(delta: float) -> void:
 	for r in due(NetworkManager.feature("events"), NetworkManager.feature("clubs"), NetworkManager.local_display_name, NetworkManager.server_time()):
 		if not _reminded.has(r.key):
 			_reminded[r.key] = true
-			GameEvents.notification_requested.emit(tr("EVENT_REMINDER") % [r.title, tr("AREA_" + r.area.to_upper()) if r.area != "" else tr("EVENT_ANYWHERE")], 8.0)
+			GameEvents.notification_requested.emit(tr("EVENT_REMINDER") % [r.title, Localization.area_name(r.area) if r.area != "" else tr("EVENT_ANYWHERE")], 8.0)
 
 
 ## Everything starting within AHEAD seconds of `now`: [{key, title, area}].
@@ -50,11 +50,11 @@ static func calendar_bbcode(timetable: Timetable, events: Dictionary, clubs: Dic
 		rows.append([float(e.t0), Timetable.title_of(e)])
 	for e: Variant in (events.get("events", []) if events.get("events", []) is Array else []):
 		var d: Dictionary = e
-		var where: String = TranslationServer.translate("AREA_" + str(d.get("area", "")).to_upper()) if str(d.get("area", "")) != "" else ""
+		var where: String = Localization.area_name(str(d.get("area", "")))
 		rows.append([float(d.get("at", 0)), "[b]%s[/b]%s" % [str(d.get("title", "")), (" · " + where) if where != "" else ""]])
 	for b: Variant in (events.get("clubs", []) if events.get("clubs", []) is Array else []):
 		var bd: Dictionary = b
-		rows.append([float(bd.get("at", 0)), TranslationServer.translate("CALENDAR_CLUB") % [str(bd.get("club", "")), TranslationServer.translate("AREA_" + str(bd.get("area", "")).to_upper())]])
+		rows.append([float(bd.get("at", 0)), TranslationServer.translate("CALENDAR_CLUB") % [str(bd.get("club", "")), Localization.area_name(str(bd.get("area", "")))]])
 	rows.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	var lines := PackedStringArray()
 	if not timetable.calendar_line().is_empty():

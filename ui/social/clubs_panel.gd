@@ -81,7 +81,7 @@ func refresh() -> void:
 		_list.add_child(row)
 		for b: Variant in (d.get("bookings", []) if d.get("bookings", []) is Array else []):
 			var bd: Dictionary = b
-			_list.add_child(label("    " + tr("CLUBS_MEETING") % [_when(float(bd.get("at", 0))), tr("AREA_" + str(bd.get("area", "")).to_upper())], 13))
+			_list.add_child(label("    " + tr("CLUBS_MEETING") % [_when(float(bd.get("at", 0))), Localization.area_name(str(bd.get("area", "")))], 13))
 	if _list.get_child_count() == 0:
 		_list.add_child(label(tr("CLUBS_NONE"), 14))
 

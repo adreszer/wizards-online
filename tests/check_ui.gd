@@ -3,7 +3,8 @@ extends Node
 ## non-ASCII literals in scripts) is drawn by the interface font, and every letter of
 ## the translations by the display and text fonts; and no screen under ui/ styles
 ## itself (style boxes, theme overrides, colour literals) outside ui/theme/ and
-## ui/components/, except the files still waiting for their migration. Run:
+## ui/components/, except the files still waiting for their migration; and every
+## translation key written as a literal in a script or scene exists. Run:
 ##   godot --headless --path . tests/check_ui.tscn
 
 ## Symbols only ever drawn in the interface font (bullets, arrows, marks); the display
@@ -26,7 +27,7 @@ const STYLE_ALLOWLIST := {
 	"res://ui/map/map_view.gd": 28,
 	"res://ui/map/minimap.tscn": 5,
 	"res://ui/menus/main_menu.tscn": 8,
-	"res://ui/menus/pause_menu.tscn": 3,
+	"res://ui/menus/pause_menu.tscn": 2,
 	"res://ui/school/book_panel.gd": 7,
 	"res://ui/school/character_creator.gd": 13,
 	"res://ui/school/duel_hud.gd": 3,
@@ -59,6 +60,7 @@ func _ready() -> void:
 	for path: String in [UiFonts.DISPLAY, UiFonts.DISPLAY_BOLD, UiFonts.TEXT, UiFonts.TEXT_ITALIC, UiFonts.TEXT_BOLD]:
 		_check(path, letters)
 	_check_styles()
+	_check_keys()
 	if _failures == 0:
 		print("UI_CHECK_OK: %d characters covered" % everything.size())
 		get_tree().quit(0)
@@ -75,6 +77,34 @@ func _check(path: String, chars: Dictionary) -> void:
 			missing.append("%s (U+%04X)" % [String.chr(c), c])
 	if not missing.is_empty():
 		push_error("%s misses: %s" % [path, ", ".join(missing)])
+		_failures += 1
+
+
+## Every string literal shaped like a key (WORD_WORD…) in the game's scripts and scenes
+## is a row of a translation table, so no screen can show a raw key. Keys built at run
+## time ("ACTION_" + action) are checked by tests/run_tests.gd.
+func _check_keys() -> void:
+	var keys := {}
+	for file in DirAccess.get_files_at("res://localization"):
+		if file.ends_with(".csv"):
+			var f := FileAccess.open("res://localization".path_join(file), FileAccess.READ)
+			while not f.eof_reached():
+				var row := f.get_csv_line()
+				if not row.is_empty():
+					keys[row[0]] = true
+	var pattern := RegEx.create_from_string("\"([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)\"")
+	var missing := {}
+	for path in _scripts("res://"):
+		if path.begins_with("res://tests/") or path.begins_with("res://tools/") or path.begins_with("res://nakama/"):
+			continue
+		var lines := FileAccess.get_file_as_string(path).split("\n")
+		for i in lines.size():
+			for m in pattern.search_all(lines[i]):
+				if not keys.has(m.get_string(1)):
+					missing[m.get_string(1)] = "%s:%d" % [path, i + 1]
+	for key: String in missing:
+		push_error("translation key %s (%s) is in no table under localization/" % [key, missing[key]])
+	if not missing.is_empty():
 		_failures += 1
 
 

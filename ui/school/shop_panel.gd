@@ -29,7 +29,7 @@ func _build() -> void:
 
 
 func refresh() -> void:
-	title_label.text = tr("AREA_" + shop.to_upper())
+	title_label.text = Localization.area_name(shop) if shop != "" else tr("SHOP_TITLE")
 	_purse.text = tr("SHOP_PURSE") % NetworkManager.get_coins()
 	clear(_list)
 	var f := NetworkManager.feature("shops")

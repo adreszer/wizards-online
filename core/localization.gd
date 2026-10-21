@@ -21,6 +21,20 @@ const STEAM_LANGUAGES := {"polish": "pl", "english": "en"}
 const NATIVE_NAMES := {"pl": "Polski", "en": "English"}
 
 
+## The translated name of an area id: AREA_<ID> (castle rooms, grounds), else
+## AREA_VILLAGE_<ID> (village buildings, tools/grounds/village.py: "apothecary" ->
+## AREA_VILLAGE_APOTHECARY). Empty for no area; an id without a translation shows as
+## readable words, never as a raw key.
+static func area_name(id: String) -> String:
+	if id == "":
+		return ""
+	for key: String in ["AREA_" + id.to_upper(), "AREA_VILLAGE_" + id.to_upper()]:
+		var text := TranslationServer.translate(key)
+		if text != key:
+			return text
+	return id.capitalize()
+
+
 ## Picks the locale for a setting value ("auto", "pl", "en" or anything else,
 ## which is treated as auto). Always returns a supported locale.
 static func resolve(setting: String) -> String:

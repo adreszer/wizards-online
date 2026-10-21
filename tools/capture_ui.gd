@@ -2,7 +2,10 @@ extends Node
 ## Dev tool: saves a PNG of every main UI surface (main menu, HUD, pause, settings,
 ## satchel, journal, map, chat, sorting, timetable, character creator and the feature
 ## panels) so UI work can be compared before and after (needs a window; not --headless).
-##   godot --path . tools/capture_ui.tscn -- --out=/absolute/dir
+##   godot --path . tools/capture_ui.tscn -- --out=/absolute/dir [--size=1280x800] [--lang=en] [--scale=1.5]
+## --size sets the window, --lang the language, --scale the interface scale, for this run
+## only (the player's saved settings are left alone). tools/capture_ui_matrix.sh runs
+## every combination the ship check reviews (docs/ui.md, Milestone 72).
 
 const MENU := preload("res://ui/menus/main_menu.tscn")
 const WORLD := preload("res://core/world.tscn")
@@ -15,7 +18,17 @@ func _ready() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):
 			_out = arg.trim_prefix("--out=")
+		elif arg.begins_with("--size="):
+			var wh := arg.trim_prefix("--size=").split("x")
+			if wh.size() == 2:
+				get_window().size = Vector2i(int(wh[0]), int(wh[1]))
+		elif arg.begins_with("--lang="):
+			TranslationServer.set_locale(arg.trim_prefix("--lang="))
+		elif arg.begins_with("--scale="):
+			GameSettings.values["ui_scale"] = float(arg.trim_prefix("--scale="))
+	GameSettings.apply(get_tree())
 	DirAccess.make_dir_recursive_absolute(_out)
+	await _frames(5)
 	await _run()
 
 

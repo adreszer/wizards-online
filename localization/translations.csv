@@ -1001,6 +1001,7 @@ REFUSED_BOND_TOO_WEAK,It does not trust you enough yet.,Jeszcze nie ufa ci doś�
 OK_CREATURE_ADOPT,It follows you home.,Idzie za tobą do domu.
 OK_FAMILIAR_SET,Your familiar comes along.,Twój chowaniec idzie z tobą.
 INTERACT_SHOP,Browse the shop,Obejrzyj towary
+SHOP_TITLE,Shop,Sklep
 SHOP_PURSE,Your purse: %d coins,Sakiewka: %d koron
 SHOP_CLOSED,The village is open at weekends.,Wioska jest otwarta w weekendy.
 SHOP_BUY,Buy,Kup

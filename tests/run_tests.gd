@@ -100,6 +100,7 @@ func _run() -> void:
 	_test_localization()
 	_test_server_address_lock()
 	await _test_ui_window()
+	await _test_runtime_keys()
 	await _test_characters()
 	_test_server_content()
 	await _test_world_objects()
@@ -129,6 +130,55 @@ func _test_ui_window() -> void:
 	panel.queue_free()
 	await get_tree().process_frame
 	await _test_ui_router()
+
+
+## Keys built at run time ("ACTION_" + action, "GESTURE_" + id, "AREA_" + shop…) all
+## exist: the settings window and the gesture wheel show no raw key, every shop and
+## creature has a name, and a missing area falls back to words.
+func _test_runtime_keys() -> void:
+	var raw := RegEx.create_from_string("^[A-Z][A-Z0-9]*(_[A-Z0-9]+)+$")
+	var found: Array = []
+	for panel: Node in [SettingsPanel.new(), EmoteMenu.new()]:
+		add_child(panel)
+		await get_tree().process_frame
+		_collect_raw_keys(panel, raw, found)
+		panel.queue_free()
+	for id: String in GroundsLife.SHOPS:
+		if Localization.area_name(id) == id.capitalize():
+			found.append("area name of " + id)
+	for kind: String in GroundsLife.CREATURES:
+		if tr("CREATURE_" + kind.to_upper()) == "CREATURE_" + kind.to_upper():
+			found.append("CREATURE_" + kind.to_upper())
+	t.check(found.is_empty(), "no screen shows a raw translation key (%s)" % str(found))
+	t.check(Localization.area_name("no_such_place") == "No Such Place" and Localization.area_name("") == "", "an area without a name shows as words, never as AREA_")
+	t.check(Localization.area_name("apothecary") == tr("AREA_VILLAGE_APOTHECARY"), "village buildings take their AREA_VILLAGE_ name")
+	# Notifications sit above the chat box at any width (the chat is bottom left).
+	var hud: Node = (load("res://ui/hud/hud.tscn") as PackedScene).instantiate()
+	var chat: Node = (load("res://ui/chat/chat_panel.tscn") as PackedScene).instantiate()
+	add_child(hud)
+	add_child(chat)
+	await get_tree().process_frame
+	var note: Control = hud.get_node("%NotificationLabel")
+	var box: Control = chat.get_node("%Panel")
+	t.check(note.offset_bottom < box.offset_top and note.grow_vertical == Control.GROW_DIRECTION_BEGIN, "notifications sit above the chat box and grow upward")
+	hud.queue_free()
+	chat.queue_free()
+
+
+func _collect_raw_keys(node: Node, raw: RegEx, out: Array) -> void:
+	var texts: Array = []
+	if node is Label or node is Button:
+		texts.append(tr(str(node.get("text"))))
+	if node is OptionButton:
+		for i in (node as OptionButton).item_count:
+			texts.append((node as OptionButton).get_item_text(i))
+	if node.get_parent() is TabContainer:
+		texts.append(String(node.name))
+	for text: String in texts:
+		if raw.search(text) != null:
+			out.append(text)
+	for child in node.get_children():
+		_collect_raw_keys(child, raw, out)
 
 
 ## UiRouter: one stack of open panels holding the keyboard, Esc closing the top one,
@@ -168,6 +218,24 @@ func _test_ui_router() -> void:
 	t.check(creator.has_method("ui_back") and quiz.has_method("ui_back"), "the creator and the quiz handle Esc themselves")
 	creator.free()
 	quiz.free()
+	var pause: Node = (load("res://ui/menus/pause_menu.tscn") as PackedScene).instantiate()
+	add_child(pause)
+	await get_tree().process_frame
+	pause._set_paused(true)
+	var hud: Node = (load("res://ui/hud/hud.tscn") as PackedScene).instantiate()
+	add_child(hud)
+	await get_tree().process_frame
+	hud._on_windows_changed()
+	await get_tree().create_timer(UiTokens.NORMAL + 0.15).timeout
+	t.check(get_tree().paused and UiRouter.top() == pause and UiRouter.has_modal() and pause.get_node_or_null("UiBackdrop") != null, "the pause menu joins the stack and dims the world")
+	t.check(is_equal_approx((hud.get_node("TopLeft") as CanvasItem).modulate.a, hud.BEHIND_WINDOW), "the HUD steps back behind it, though the game is paused (%.2f)" % (hud.get_node("TopLeft") as CanvasItem).modulate.a)
+	hud.queue_free()
+	Input.parse_input_event(esc)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	t.check(not get_tree().paused and UiRouter.open_count() == 0, "Esc resumes from the pause menu")
+	get_tree().paused = false
+	pause.queue_free()
 	lower.queue_free()
 	upper.queue_free()
 

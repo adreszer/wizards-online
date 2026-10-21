@@ -167,7 +167,7 @@ func _refresh_who() -> void:
 	for p: Variant in (r.data.get("players", []) if r.data.get("players", []) is Array else []):
 		var d: Dictionary = p
 		lines.append("[b]%s[/b] · %s · %s · %s · %s" % [str(d.get("name", "")), str(d.get("role", "")), CharacterProfile.house_name(int(d.get("house", 0))) if int(d.get("house", 0)) > 0 else "-",
-			tr("YEAR_%d" % int(d.get("year", 1))), tr("AREA_" + str(d.get("area", "")).to_upper()) if str(d.get("area", "")) != "" else "-"])
+			tr("YEAR_%d" % int(d.get("year", 1))), Localization.area_name(str(d.get("area", ""))) if str(d.get("area", "")) != "" else "-"])
 	_who_list.text = "\n".join(lines)
 
 

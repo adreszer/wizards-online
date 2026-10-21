@@ -12,7 +12,8 @@ extends Node
 ## - when the last input came from a gamepad, the panel's first focusable control takes
 ##   focus.
 ## Panels keep their own open()/close() (content, sounds); they no longer touch input
-## capture, the mouse or Esc themselves.
+## capture, the mouse or Esc themselves. The pause menu joins the stack while open
+## (Esc resumes), so it dims and fades the HUD like any window.
 
 signal changed
 
@@ -127,7 +128,7 @@ func _update() -> void:
 		backdrop.visible = panel == modal
 		if backdrop.visible and not was_shown and not GameSettings.get_value("reduce_motion"):
 			backdrop.modulate.a = 0.0
-			backdrop.create_tween().tween_property(backdrop, "modulate:a", 1.0, UiTokens.NORMAL)
+			backdrop.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).tween_property(backdrop, "modulate:a", 1.0, UiTokens.NORMAL)
 	changed.emit()
 
 

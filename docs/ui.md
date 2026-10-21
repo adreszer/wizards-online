@@ -11,7 +11,7 @@ Captured with `tools/capture_ui.tscn` (see "Verification" below). About 30 UI su
 - **The HUD is a debug readout.** Top left is a column of text lines ("Zdrowie", "Fragmenty: 0 / 27", "Czar: —", "W dłoni: —", "Sakiewka", "Dom"), always on; the hotbar has no spell icons; the notification text overlaps the chat box; the minimap is a square with a placeholder look.
 - **The main menu is a dev form.** Name, language, role, server host and port fields in a grey box, a dev-build subtitle, the control list as a line of text.
 - **No motion, no sound, little controller support.** Panels pop in and out; only 5 places set gamepad focus.
-- **Bugs the gallery already shows:** the shop's title prints a raw key (`AREA_`) offline; the notification overlaps the chat panel; the pause menu shows the HUD and chat undimmed behind it.
+- **Bugs the gallery showed** (fixed in Milestone 65): the shop's title printed a raw key (`AREA_`); the notification overlapped the chat panel; the pause menu showed the HUD undimmed behind it.
 
 What is already good and stays: the map relief shader, interface scale, reduced motion, house symbols beside colours, captions, rebindable keys (Milestone 63), and the fact that all text goes through translations.
 
@@ -123,14 +123,14 @@ Principle: **tools for volume, CC0 for materials, code for anything that must st
 Each milestone ends with a captured gallery the owner can look at and a playable build. The order is chosen so the whole game looks better after the first one, before any new art arrives.
 
 ### Milestone 65 — Foundation: tokens, fonts, one theme, the router
-- [ ] `tools/capture_ui.tscn`: the before/after gallery of every main surface (done in this planning step; extend it with resolutions, languages and interface scales)
+- [x] `tools/capture_ui.tscn`: the before/after gallery of every main surface, with `--size`, `--lang` and `--scale` for one run; `tools/capture_ui_matrix.sh` captures every size × language × scale the ship check reviews
 - [x] The three fonts (`UiFonts`, `assets/fonts/`, symbol fallbacks), `tools/build_ui_theme.gd` → `ui/theme/arcanum_theme.tres` as the project theme (`gui/theme/custom`) with `TitleLabel`, `BannerLabel`, `BookLabel`, `BookRichText`; window titles, menu titles and book, quiz and sorting text use them
 - [x] Font coverage test (`tests/check_ui.tscn`); chat escapes BBCode with `[lb]`/`[rb]` instead of full-width brackets
 - [x] `UiTokens` (palette, spacing, radii, sizes, motion); the oak theme styles every control type in every state (buttons, option/menu buttons, check boxes, fields, popups, tooltips, tabs, lists, trees, scroll bars, sliders, progress bars, separators, focus rings); `ui/theme/parchment_theme.tres` turns everything inside a paper surface into ink (FeaturePanel cards and books use it)
 - [x] Fixed: wrapping labels in a row shrank to one letter per line (settings, cauldron)
 - [x] `UiRouter` (autoload, `ui/components/ui_router.gd`): panel stack, Esc to the top panel (its `ui_back()` or `close()`), input capture, freeing the cursor, the dim behind the top modal panel, HUD fade, gamepad focus on open; every panel (feature panels, chat, gesture wheel, map, satchel, book, timetable, lesson tools, quiz, character creator, journal, sorting) reports to it and no longer sets `GameSession.ui_input_captured` or handles Esc itself. The pause menu stays outside the stack (it pauses the tree)
 - [~] `FeaturePanel` → `UiWindow` (still flat-styled): done, `ui/components/ui_window.gd` (parchment and chrome families from the theme's `ParchmentWindow`/`ChromeWindow` and `Window*` variations, title row, close control, status line, footer hints, open fade); every FeaturePanel uses it. Per-panel style overrides: `tests/check_ui.gd` fails on hand styling under `ui/` outside `ui/theme/` and `ui/components/` beyond a per-file allowlist that only shrinks; the remaining screens (HUD, journal, map, sorting, timetable, professor, quiz, satchel, chat, menus) move onto `UiWindow` and off the list
-- [ ] Missing-key test; fix `AREA_`, the notification/chat overlap, the undimmed pause backdrop
+- [x] Missing-key test (`tests/check_ui.gd`: every key-shaped literal in a script or scene is in a table under `localization/`; `tests/run_tests.gd`: keys built at run time, and the settings window and gesture wheel show no raw key); `AREA_` fixed (`Localization.area_name()`: castle and grounds `AREA_<ID>`, village buildings `AREA_VILLAGE_<ID>`, else readable words; every shop window had shown a raw key); notifications above the chat box at any size; the pause menu on the `UiRouter` stack (dim, HUD fade, Esc resumes)
 - **Result:** the whole game in one consistent style and real fonts, with no new art yet.
 
 ### Milestone 66 — Art kit v1 and the UI gallery
@@ -199,6 +199,9 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 
 ```
 godot --path . tools/capture_ui.tscn -- --out=/absolute/output/dir
+# one size, language and interface scale: add --size=1280x800 --lang=en --scale=1.5
+# every combination the ship check reviews (24 runs, about a minute each):
+tools/capture_ui_matrix.sh /absolute/output/dir
 ```
 
 Saves a PNG of the main menu, HUD, satchel, journal, map, chat, timetable, sorting, character creator, settings, friends, clubs, profile, shop, cauldron, decor and pause (needs a window, not `--headless`). Every UI milestone ends by capturing the gallery and comparing it with the previous one; the headless tests (`tests/run_tests.tscn`) and the UI lint stay green.

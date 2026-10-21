@@ -107,6 +107,7 @@ godot --headless --path . tests/check_scripts.tscn
 # UI: every character the game shows is in the fonts, and no screen styles itself by hand
 # beyond its STYLE_ALLOWLIST entry (the list only shrinks: lower an entry when you remove one)
 godot --headless --path . tests/check_ui.tscn
+# (it also fails on a key-shaped string literal that no table under localization/ has)
 # after changing fonts or theme values: rewrite ui/theme/ (commit the output)
 godot --headless --path . -s tools/build_ui_theme.gd
 # after changing the symbol blocks: rebuild the trimmed symbol fallbacks (pip install fonttools)
@@ -169,6 +170,9 @@ godot --path . tools/capture_model.tscn -- --scene=res://levels/castle/castle.ts
 godot --path . tools/capture_village.tscn -- --out=/absolute/output/dir [--hours=12,0]
 # every main UI surface (menu, HUD, satchel, journal, map, chat, panels, pause) for before/after comparison
 godot --path . tools/capture_ui.tscn -- --out=/absolute/output/dir
+# one size, language and interface scale: add --size=1280x800 --lang=en --scale=1.5
+# every combination the ship check reviews (24 runs, about a minute each):
+tools/capture_ui_matrix.sh /absolute/output/dir
 ```
 
 Placed gameplay objects (practice tomes, plaques, fragments, checkpoints, guardians, the sorting stone, puzzle pieces) live in `content/placements.json`, keyed by area id; the header of the placement section in `tools/castle/build.py` documents the position modes (`slot: centre`, `at`, `wall`/`along`, `corner`/`inset`, `door`/`along`/`inset`, `beside_lectern`; every position must land inside its room) and `KINDS` lists the scenes. Each entry becomes a node with the stable object id `"<area>/<id>"` (`object_id` on the instance, `world_objects` group); secret walls are `"<hidden room>/secret_wall"`, house gates `"<area>/house_door"`, torches `"<room>/torch_<n>"` (counted per room, so don't build mysteries on them). The generator refuses duplicate ids, unknown areas, kinds or spells. After regenerating, re-run the exporter: `generated/world_objects.lua` (id → kind, areas, position, accepted effect types) is read from the built castle.

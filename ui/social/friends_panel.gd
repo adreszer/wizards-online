@@ -43,7 +43,7 @@ func refresh() -> void:
 	for e: Variant in _arr(f.get("friends")):
 		var d: Dictionary = e
 		var row := HBoxContainer.new()
-		var where := (tr("FRIENDS_ONLINE_IN") % tr("AREA_" + str(d.get("area", "")).to_upper())) if d.get("online", false) and str(d.get("area", "")) != "" \
+		var where := (tr("FRIENDS_ONLINE_IN") % Localization.area_name(str(d.get("area", "")))) if d.get("online", false) and str(d.get("area", "")) != "" \
 			else (tr("FRIENDS_ONLINE") if d.get("online", false) else tr("FRIENDS_OFFLINE"))
 		var l := label("%s — %s" % [str(d.get("name", "")), where], 15)
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
