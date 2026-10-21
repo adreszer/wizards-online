@@ -153,7 +153,32 @@ func _familiar(body: Node3D, n: String, kind: String) -> void:
 		pet.name = "Familiar_" + kind
 		pet.get_node("Care").queue_free()
 		pet.scale = Vector3.ONE * 0.55
+		if pet is Creature:
+			(pet as Creature).perched = kind != "glimmerwing"
+			(pet as Creature).face_motion = kind == "glimmerwing"
 		body.add_child(pet)
 		_pets[n] = pet
 	var t := Time.get_ticks_msec() / 1000.0
-	pet.position = Vector3(0.35, 1.65 + sin(t * 2.5) * 0.04, 0.05) if kind != "glimmerwing" else Vector3(cos(t) * 0.6, 2.1 + sin(t * 3.0) * 0.1, sin(t) * 0.6)
+	if kind == "glimmerwing":
+		pet.position = Vector3(cos(t) * 0.6, 2.1 + sin(t * 3.0) * 0.1, sin(t) * 0.6)
+		return
+	# Walkers sit on the left shoulder (the wand hand is the right), riding its animation.
+	var shoulder := shoulder_of(body)
+	if shoulder != Vector3.INF:
+		pet.global_position = shoulder
+		pet.global_rotation.y = body.global_rotation.y
+	else:
+		pet.position = Vector3(0.2, 1.5, 0.0)
+
+
+## Where a familiar sits on `body`: the top of its left shoulder (just above the upper
+## arm's joint), or INF if the body has no such bone.
+static func shoulder_of(body: Node3D) -> Vector3:
+	var sk := body.find_child("Skeleton3D", true, false) as Skeleton3D
+	if sk == null:
+		return Vector3.INF
+	var bone := sk.find_bone("mixamorig_LeftArm")
+	if bone < 0:
+		return Vector3.INF
+	var at := sk.global_transform * sk.get_bone_global_pose(bone).origin
+	return at + Vector3.UP * 0.06 - (at - body.global_position) * Vector3(0.25, 0.0, 0.25)

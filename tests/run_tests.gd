@@ -3013,6 +3013,19 @@ func _test_school_life() -> void:
 	t.check(garden != null and garden.beds.size() == GardenBeds.PLOTS, "the greenhouse has its beds")
 	var life := castle.get_node_or_null("GroundsLife") as GroundsLife
 	t.check(life != null and life.cauldrons.size() == 2 and life.creatures.size() == 3 and life.counters.size() >= 8, "cauldrons, paddock creatures and shop counters are in place")
+	if life != null:
+		t.check(life.creatures.values().all(func(c: Node) -> bool: return c is Creature and c.get_node_or_null("Model") != null and c.get_node_or_null("Care") != null),
+			"the paddock creatures are real models with a care spot")
+		var wing_count := (life.creatures["glimmerwing"] as Node).find_children("wing_*", "", true, false).size()
+		t.check(wing_count == 2, "the glimmerwing has two wings to beat (%d)" % wing_count)
+		var hopper: Creature = life.creatures["mossling"]
+		var start := hopper.global_position
+		var heights: Array[float] = []
+		for i in 30:
+			hopper.global_position = start + Vector3(0.05 * i, 0, 0)
+			await get_tree().process_frame
+			heights.append(hopper.get_node("Model").position.y)
+		t.check(heights.max() > 0.03 and hopper.moving > 0.5, "a moving mossling hops (%.2f m)" % heights.max())
 	var seasons := castle.get_node_or_null("Seasons") as Seasons
 	t.check(seasons != null and seasons.candles != null and seasons.candles.get_child_count() >= 20, "candles float in the great hall")
 	castle.queue_free()
@@ -3395,6 +3408,8 @@ func _test_characters() -> void:
 		t.check(wand.mesh != null and across < 0.5, "%s: wand is held across the palm, not as part of the hand" % id)
 		var origin := wand.global_transform.affine_inverse() * player.cast_origin.global_position
 		t.check(Vector2(origin.x, origin.z).length() < 0.01 and origin.y > WandMesh.TIP and origin.y < WandMesh.TIP + 0.04, "%s: spells leave from the wand's tip" % id)
+		var perch := PotionEffects.shoulder_of(player) - player.global_position
+		t.check(perch.y > 1.2 and perch.y < 1.7 and Vector2(perch.x, perch.z).length() < 0.3, "%s: a familiar perches on the shoulder (%s)" % [id, perch])
 		player.inventory.load_state(ItemRegistry.default_state())
 		player.inventory.hold_id(&"torch")
 		t.check(_find_light(player) != null and _find_light(player).is_inside_tree(), "%s: held torch lights up in the off hand" % id)

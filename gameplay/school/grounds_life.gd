@@ -48,7 +48,16 @@ func _ready() -> void:
 		counters[shop] = counter
 
 
+## A creature with its Care spot: the real model (Creature) when there is one, else a
+## placeholder of spheres in its colour.
 static func build_creature(kind: String, color: Color) -> Node3D:
+	var real := Creature.create(kind)
+	if real != null:
+		var care := InteractSpot.create("INTERACT_CREATURE", color, 0.25)
+		care.name = "Care"
+		care.position = Vector3(0, 0.95 if kind == "glimmerwing" else 0.9, 0)
+		real.add_child(care)
+		return real
 	var root := Node3D.new()
 	root.name = "Creature_" + kind
 	var mat := StandardMaterial3D.new()
