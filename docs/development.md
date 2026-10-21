@@ -15,7 +15,7 @@ godot --headless --path . --import   # one-time: builds the import cache + class
 godot --path .                       # or open project.godot in the editor and press F5
 ```
 
-`tools/run.sh` does both steps (import only when needed) and finds the macOS app bundle automatically:
+`tools/run.sh` does both steps (it imports again whenever a file changed since the last import, e.g. after a pull) and finds the macOS app bundle automatically:
 
 ```bash
 tools/run.sh                                  # play
