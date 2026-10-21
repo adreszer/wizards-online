@@ -27,6 +27,7 @@ FLOOR_THICK = 0.5       # bottom of a floor slab below its top (upper storeys)
 LANDING_THICK = 1.0
 RAIL_HEIGHT = 1.0
 RAIL_T = 0.25
+RAIL_SINK = 0.3         # a parapet's collision reaches this far below its base (Railing.sink)
 SPIRAL_STEPS = 30       # sectors per storey: a level landing in front of the doorway, then the steps
 SPIRAL_LANDING = 5      # sectors of that landing (60 degrees: wider than a doorway seen from the newel)
 SPIRAL_WALK_LINE = 2.3  # where S4 measures a spiral's treads (m from the centre)
@@ -152,6 +153,9 @@ def flight_railings(plan, st):
             add_edge_railing(plan, side, c, a, b, yp, f"hole {st['hi']}")
 
 
+OPPOSITE_SIDE = {"n": "s", "s": "n", "w": "e", "e": "w"}
+
+
 def add_edge_railing(plan, side, coord, a, b, y, why):
     """A level parapet on the edge line `coord` (x for w/e, z for n/s) from a to b,
     standing on the walkable side (inside the edge)."""
@@ -206,7 +210,10 @@ def landing_railings(plan):
                    (side == "w" and coord == r.x0) or (side == "e" and coord == r.x1):
                     continue
                 for a, b in open_segments(plan, side, coord, lo, hi, y, ends):
-                    add_edge_railing(plan, side, coord, a, b, y, f"landing {r.id}")
+                    # add_edge_railing insets toward the outside of a hole's edge; a landing's
+                    # walkable side is the inside of its own edge, so name the opposite side
+                    # (otherwise the parapet overhangs the drop, over a flight below it).
+                    add_edge_railing(plan, OPPOSITE_SIDE[side], coord, a, b, y, f"landing {r.id}")
 
 
 def open_segments(plan, side, coord, lo, hi, y, ends, step=0.5):

@@ -585,6 +585,17 @@ Spike and decisions in `docs/lighting.md`.
 - [ ] Measure SDFGI on a mid laptop at 1080p (this M3 Ultra is CPU-bound; GI cost didn't show)
 - [ ] Windows and light shafts (roadmap 5.1)
 
+### Walking and stairs overhaul
+
+Owner playtest: going down stairs stuttered, the character sometimes sped up, and next to a wall it could not get up a flight.
+
+- [x] Causes found by a new measuring harness (`tests/run_stairs_test.tscn`): a rounded capsule only fits onto a tread once its centre is well past the edge, so the old step code teleported the body up to 0.45 m forward and froze it to "pay back" the distance (27 m/s for a tick, then 0); its forward probe hit side walls; and `move_and_slide` (floor_block_on_wall) cancels a move pushed into a wall and snaps the body back down, undoing any lift
+- [x] Collision is a narrow flat-bottomed foot (r 0.2) under a full-width body cylinder that starts at step height: treads only meet the foot, walls and furniture still meet the body
+- [x] Step-up replaces the tick's move: up, this tick's own motion (sliding along a wall it hugs), down onto the tread; the foot must land on its flat sole, with at most 3 cm extra travel repaid over the next ticks. Step-down is floor snap, with a fallback when the foot's rim catches an edge. No horizontal teleports, no stalls
+- [x] Mesh and camera move evenly on a flight: the player learns the flight's step spacing and moves the mesh at its average rate (rise per step over the spacing), pulled gently toward half a step behind, instead of closing each step and pausing (owner: "going down slowly it still stutters"; the harness saw 0 / 6 m/s alternating, now within ±10 %). Off a flight it climbs at up to 1.4× the walking speed. Eased per physics tick and drawn interpolated (a slow frame no longer closes the gap at once); it also carries the not-yet-repaid step travel
+- [x] Level bugs it found: landing parapets stood just outside their landing, over the drop (and 30 cm under its level), so heads hit them walking up the side of the flight below (Hall of Turning Stairs, the grand staircase's top landing); ground-floor plinths reached into stair holes under shared walls (dungeon flight). Rule S3 now samples headroom at the flights' edges and counts parapets; a generator test keeps plinths out of stair holes
+- [x] `tests/run_stairs_test.tscn` (`-- --castle` walks every castle flight at three lateral positions both ways): steady pace, no surges or stalls, grounded throughout, smooth mesh, an even vertical pace mid-flight, up/down/diagonal/hugging a wall/angled into it/running, a spiral at three radii, ledges 0.15–0.9 m, a real drop, a skirting step
+
 ### Next — Production UI (Milestones 65–72)
 
 The plan, art direction, asset sources and per-milestone checklists are in `docs/ui.md`; tick items there and summarise here.

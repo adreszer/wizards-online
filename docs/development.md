@@ -121,6 +121,10 @@ python3 tools/make_banners.py
 # moving platform, level wiring, castle
 godot --headless --path . tests/run_tests.tscn
 
+# walking and stairs: pace, smoothness and getting there on stairs, spirals and ledges
+# (`-- --castle` also walks every castle flight; `-- --trace=<case>` prints each tick)
+godot --headless --path . tests/run_stairs_test.tscn -- --castle
+
 # two headless clients against a running Nakama (docker compose up -d first)
 godot --headless --path . tests/run_multiplayer_test.tscn -- --instance=1 --name=ClientA &
 sleep 4

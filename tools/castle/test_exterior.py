@@ -47,6 +47,16 @@ class ExteriorTest(unittest.TestCase):
                               and q[4] <= y0 + 0.01 and q[5] >= y0 + 3.99 for q in quads)
                     self.assertTrue(hit, f"wall unit {key} row {row} side {sign} has no facade")
 
+    def test_foundations_leave_stair_holes_open(self):
+        # A plinth reaching into a stair hole is a ceiling over the flight's edge (headroom).
+        for f in self.data["foundations"]:
+            for r in self.plan.rooms.values():
+                for h in r.holes:
+                    if abs(r.y - (f[5] + 0.03)) > 0.05:
+                        continue
+                    overlap = min(f[1], h[1]) - max(f[0], h[0]) > 0.01 and min(f[3], h[3]) - max(f[2], h[2]) > 0.01
+                    self.assertFalse(overlap, f"foundation {f} covers the stair hole {h} in {r.id}")
+
     def test_budgets_hold(self):
         from castle import budgets
         self.assertEqual([str(v) for v in budgets.check(self.plan, build.units, build.placed_nodes)], [])

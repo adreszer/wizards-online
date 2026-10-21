@@ -14,10 +14,9 @@ const STATE_NAMES: PackedStringArray = ["idle", "walk", "run", "jump", "fall", "
 signal state_changed(new_state: State, old_state: State)
 signal jumped()
 signal landed(impact_speed: float)
-## The body was moved onto another tread in one tick; `displacement` is the world-space
-## jump. The body then stands still for `duration` seconds (the time it would have taken
-## to walk that distance), so visuals subtract the jump and close it at constant speed.
-signal stepped(displacement: Vector3, duration: float)
+## The body went up or down a step in one tick (`rise` metres, negative going down);
+## the body is only ever moved vertically, so visuals ease out just that jump.
+signal stepped(rise: float)
 ## Flight on a broom started or ended (see [method set_flying]).
 signal flying_changed(is_flying: bool)
 
@@ -29,12 +28,13 @@ signal flying_changed(is_flying: bool)
 @export var rotation_speed: float = 14.0
 @export var max_slope_angle_degrees: float = 46.0
 ## Must exceed step_height so walking down a stair snaps to the lower tread instead of falling.
-@export var floor_snap_length: float = 0.55
+@export var floor_snap_length: float = 0.5
+## Tallest ledge walked up without jumping. The body's collision is a narrow, flat-bottomed
+## foot under a full-width cylinder that starts at this height (player.tscn), so steps
+## only ever meet the foot and anything taller meets the body like a wall.
 @export var step_height: float = 0.42
-## A drop bigger than this in one grounded tick counts as a step down (slopes move far less).
-@export var step_down_threshold: float = 0.12
-## How far past the ledge edge the step probe lands (must exceed the capsule radius).
-@export var step_forward_distance: float = 0.45
+## Smallest height change counted as a step (smaller ones are slopes and seams).
+@export var min_step_rise: float = 0.03
 
 @export_group("Air")
 @export var jump_velocity: float = 8.0
@@ -99,10 +99,10 @@ var _external_jump_hold: float = 0.0
 var _external_move: Vector3 = Vector3.ZERO
 var _held: float = 0.0
 var _external_sprint: bool = false
-## Seconds the body still owes for the last step teleport (horizontal motion is held).
-var _step_stall: float = 0.0
-## Horizontal speed the body would have had during the stall (keeps the walk state alive).
-var _stall_speed: float = 0.0
+## Metres a step travelled beyond the tick's own motion (to set the foot fully on a
+## tread), along _step_debt_dir; paid back a little per tick so the pace never changes.
+var _step_debt: float = 0.0
+var _step_debt_dir: Vector3 = Vector3.ZERO
 ## Scripted climb (+1) / sink (-1) in flight (tests).
 var _external_vertical: float = 0.0
 var _land_hold: float = 0.0
@@ -112,7 +112,7 @@ func setup(p_body: CharacterBody3D, p_input: PlayerInput) -> void:
 	body = p_body
 	input = p_input
 	body.floor_max_angle = deg_to_rad(max_slope_angle_degrees)
-	body.floor_snap_length = maxf(floor_snap_length, step_height + 0.1)
+	body.floor_snap_length = maxf(floor_snap_length, step_height + 0.05)
 	body.floor_stop_on_slope = true
 	body.floor_constant_speed = true
 	body.floor_block_on_wall = true
@@ -147,7 +147,6 @@ func set_flying(value: bool) -> void:
 	if value == is_flying:
 		return
 	is_flying = value
-	_step_stall = 0.0
 	_held = 0.0
 	_land_hold = 0.0
 	if body != null:
@@ -166,6 +165,12 @@ func request_jump(hold_seconds: float = 0.35) -> void:
 
 func get_horizontal_speed() -> float:
 	return Vector2(body.velocity.x, body.velocity.z).length()
+
+
+## Where the body is ahead of its even pace because of a step's extra travel (world
+## space, pointing back); the mesh adds it so it moves at the walking speed throughout.
+func step_lag() -> Vector3:
+	return -_step_debt_dir * _step_debt
 
 
 func get_state_name() -> String:
@@ -208,14 +213,7 @@ func _physics_process(delta: float) -> void:
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 	var target_speed := run_speed if sprint else walk_speed
 	var desired := move_dir * target_speed
-	if _step_stall > 0.0:
-		# Pay back the distance a step teleport gave for free: hold the body still.
-		_step_stall -= delta
-		horizontal = Vector3.ZERO
-		if _step_stall <= 0.0:
-			_step_stall = 0.0
-			horizontal = move_dir * _stall_speed
-	elif is_grounded:
+	if is_grounded:
 		var accel := acceleration if move_dir.length_squared() > 0.0001 else deceleration
 		horizontal = horizontal.move_toward(desired, accel * delta)
 	else:
@@ -256,20 +254,40 @@ func _physics_process(delta: float) -> void:
 		facing_yaw = lerp_angle(facing_yaw, target_yaw, minf(1.0, rotation_speed * delta))
 		body.rotation.y = facing_yaw
 
-	if is_grounded and not did_jump:
-		if not _try_step_down(move_dir):
-			_try_step_up(move_dir, delta)
-
 	var y_before_move := body.global_position.y
-	body.move_and_slide()
+	var floor_angle := body.get_floor_angle() if is_grounded else 0.0
+	if is_grounded and not did_jump and _try_step_up(move_dir, delta):
+		# The step already moved the body this tick's distance: slide with no horizontal
+		# motion (floor state, moving platforms) and keep the velocity for the next tick.
+		var kept := body.velocity
+		body.velocity = Vector3.ZERO
+		body.move_and_slide()
+		body.velocity = Vector3(kept.x, 0.0, kept.z)
+	elif _step_debt > 0.0 and is_grounded and get_horizontal_speed() > 0.5 and move_dir.dot(_step_debt_dir) > 0.5:
+		# Pay back a step's extra travel: this tick's move is a little shorter.
+		var flat_speed := get_horizontal_speed()
+		var repay := minf(_step_debt, minf(0.012, flat_speed * delta * 0.25))
+		_step_debt -= repay
+		var scale := 1.0 - repay / (flat_speed * delta)
+		body.velocity.x *= scale
+		body.velocity.z *= scale
+		body.move_and_slide()
+		body.velocity.x /= scale
+		body.velocity.z /= scale
+	else:
+		# Stopped, turned or airborne: forget the debt, but let the mesh close the gap gently.
+		_step_debt = maxf(0.0, _step_debt - 0.3 * delta)
+		body.move_and_slide()
+	var grounded_now := body.is_on_floor()
+	if is_grounded and not grounded_now and not did_jump:
+		grounded_now = _try_step_down()
 
 	# Landing detection after the move -----------------------------------------
-	var grounded_now := body.is_on_floor()
 	# Floor snap pulled us down a stair in one tick: let the visuals ease down too.
 	if is_grounded and grounded_now and not did_jump:
 		var drop := body.global_position.y - y_before_move
-		if drop < -step_down_threshold:
-			stepped.emit(Vector3(0.0, drop, 0.0), 0.1)
+		if drop < -min_step_rise - get_horizontal_speed() * delta * tan(floor_angle):
+			stepped.emit(drop)
 	if grounded_now and not _was_grounded and not did_jump:
 		landed.emit(_peak_fall_speed)
 		if _peak_fall_speed > 3.0:
@@ -308,7 +326,7 @@ func _update_state(sprint: bool, did_jump: bool) -> void:
 	elif _land_timer > 0.0:
 		new_state = State.LAND
 	else:
-		var speed := maxf(get_horizontal_speed(), _stall_speed if _step_stall > 0.0 else 0.0)
+		var speed := get_horizontal_speed()
 		if speed < 0.3:
 			new_state = State.IDLE
 		elif sprint and speed > walk_speed + 0.5:
@@ -386,108 +404,167 @@ func _physics_fly(delta: float) -> void:
 	_update_state(boost, false)
 
 
-## Stair descent: a rounded capsule rolls over a tread edge and briefly "falls" to the
-## next step. When the floor directly under the centre drops away by up to step_height,
-## probe forward until the lowered capsule fits and place it on the lower tread instead.
+## Step-up, instead of the move: when this tick's own motion would run into a ledge no
+## taller than step_height with a walkable top, the body goes up, travels this tick's
+## motion (sliding along a wall it is hugging) and comes down on the ledge. It travels
+## exactly what move_and_slide would have, so a step never changes the walking speed;
+## only the rise is a jump, which the mesh eases out (see [signal stepped]).
+## (Lifting the body and leaving the travel to move_and_slide does not work: pushed into
+## a wall on the floor, move_and_slide cancels the move and snaps the body back down.)
 ## Returns true when the body was moved.
-func _try_step_down(move_dir: Vector3) -> bool:
-	if step_height <= 0.0 or move_dir.length_squared() < 0.0001 or body.velocity.y > 0.01:
-		return false
-	var space := body.get_world_3d().direct_space_state
-	var from := body.global_transform
-	var query := PhysicsRayQueryParameters3D.create(
-		from.origin + Vector3.UP * 0.05, from.origin - Vector3.UP * (step_height + 0.2), body.collision_mask, [body.get_rid()])
-	var hit := space.intersect_ray(query)
-	if hit.is_empty():
-		return false # Real ledge: fall.
-	var drop: float = from.origin.y - float(hit["position"].y)
-	if drop < step_down_threshold:
-		return false # Still standing on this tread.
-	if Vector3(hit["normal"]).angle_to(Vector3.UP) > body.floor_max_angle:
-		return false
-	var forward := move_dir.normalized()
-	var down := -Vector3.UP * (drop + 0.1)
-	var params := PhysicsTestMotionParameters3D.new()
-	var result := PhysicsTestMotionResult3D.new()
-	var d := 0.05
-	while d <= step_forward_distance + 0.001:
-		var probe := forward * d
-		if body.test_move(from, probe):
-			return false # Something ahead; let the wall/step-up logic deal with it.
-		var ahead := from
-		ahead.origin += probe
-		params.from = ahead
-		params.motion = down
-		if PhysicsServer3D.body_test_motion(body.get_rid(), params, result):
-			var travel := result.get_travel()
-			var walkable := result.get_collision_normal().angle_to(Vector3.UP) <= body.floor_max_angle
-			# Landed on the lower tread (not caught on the riser or the edge we came from).
-			if walkable and travel.y <= -(drop - 0.05):
-				var destination := ahead.origin + travel + Vector3.UP * 0.01
-				var displacement := destination - from.origin
-				body.global_position = destination
-				body.velocity.y = 0.0
-				if debug_step: print("step down: OK ", displacement)
-				_begin_step(displacement)
-				return true
-		d += 0.05
-	if debug_step: print("step down: no fit")
-	return false
-
-
-## Forgiving stair handling: when walking into a low ledge, lift the body onto it.
-func _try_step_up(move_dir: Vector3, delta: float) -> void:
+func _try_step_up(move_dir: Vector3, delta: float) -> bool:
 	if step_height <= 0.0 or move_dir.length_squared() < 0.0001:
-		return
-	# Use the intended direction: velocity is already zeroed when we're pressed against the ledge.
-	var forward := move_dir.normalized()
-	var motion := forward * maxf(get_horizontal_speed(), walk_speed) * delta
+		return false
+	var horizontal := Vector3(body.velocity.x, 0.0, body.velocity.z)
+	var motion := horizontal * delta
+	# Pressed against a ledge the velocity into it is already gone: probe with the intent,
+	# and travel just far enough to stand on the ledge.
+	var probe := motion
+	var intent := move_dir.normalized()
+	if probe.length() < walk_speed * 0.5 * delta:
+		probe = intent * walk_speed * delta
+	var along := motion.dot(intent)
+	if along < 0.02:
+		motion += intent * (0.02 - along)
 	var from := body.global_transform
-	# Must be blocked at current height...
-	if not body.test_move(from, motion):
-		if debug_step: print("step: not blocked")
-		return
-	var up := Vector3.UP * step_height
-	if body.test_move(from, up):
-		if debug_step: print("step: ceiling")
-		return
-	var raised := from
-	raised.origin += up
-	# ...and free at the raised height, far enough to land past the edge.
-	var probe := forward * maxf(step_forward_distance, motion.length())
-	if body.test_move(raised, probe):
-		if debug_step: print("step: blocked when raised")
-		return
-	raised.origin += probe
-	var params := PhysicsTestMotionParameters3D.new()
-	params.from = raised
-	params.motion = -up
 	var result := PhysicsTestMotionResult3D.new()
-	if not PhysicsServer3D.body_test_motion(body.get_rid(), params, result):
-		if debug_step: print("step: no floor below")
+	if not _cast(from, probe, result, 4):
+		return false
+	# The sweep also reports the floor it slides on: look for a face the foot runs into.
+	var blocked := false
+	for k in result.get_collision_count():
+		if result.get_collision_normal(k).angle_to(Vector3.UP) > body.floor_max_angle:
+			blocked = true
+	if not blocked:
+		return false # A slope (or the floor): move_and_slide walks it.
+	var raised := from
+	_cast(from, Vector3.UP * step_height, result)
+	var lift := result.get_travel().y
+	if lift < min_step_rise:
+		if debug_step: print("step: ceiling")
+		return false
+	raised.origin.y += lift
+	var top := raised
+	raised.origin += _slide_cast(top, motion)
+	if not _cast(raised, Vector3.DOWN * (lift + 0.02), result):
+		return false
+	var extra := 0.0
+	if not _sole_contact(result) and _edge_has_level_top(result, intent):
+		# Only the foot's rounded rim reached the tread: go on until the flat sole is on it.
+		extra = 0.03
+		raised = top
+		raised.origin += _slide_cast(top, motion + intent * extra)
+		if not _cast(raised, Vector3.DOWN * (lift + 0.02), result):
+			return false
+	var rise := raised.origin.y + result.get_travel().y - from.origin.y
+	# The foot has to land on it: the body cylinder's bottom resting on a taller block is no step.
+	if result.get_collision_point().y > from.origin.y + rise + 0.05:
+		if debug_step: print("step: landed on the body, not the foot")
+		return false
+	if rise < min_step_rise or rise > step_height:
+		if debug_step: print("step: no ledge (rise %.3f, lift %.3f, moved %s)" % [rise, lift, raised.origin - top.origin])
+		return false
+	if not _sole_contact(result):
+		if debug_step: print("step: not standing on it ", result.get_collision_normal())
+		return false
+	if debug_step: print("step up %.3f (extra %.2f)" % [rise, extra])
+	_add_step_debt(intent * extra)
+	body.global_position = raised.origin + result.get_travel() + Vector3.UP * 0.002
+	stepped.emit(rise)
+	return true
+
+
+## Step-down fallback, after the move: walking off a tread the foot's rounded rim can
+## catch on the edge for a tick, which floor snap reads as a wall. When a floor lies
+## within step_height straight below, put the body on it instead of falling.
+func _try_step_down() -> bool:
+	if body.velocity.y > 0.01:
+		return false
+	var result := PhysicsTestMotionResult3D.new()
+	var from := body.global_transform
+	# Nudge 2 cm along the motion so the rim clears the edge it is resting on.
+	var flat := Vector3(body.velocity.x, 0.0, body.velocity.z)
+	var nudge := Vector3.ZERO
+	if flat.length_squared() > 0.0001:
+		nudge = flat.normalized() * 0.02
+		from.origin += nudge
+		if body.test_move(body.global_transform, nudge):
+			from = body.global_transform
+			nudge = Vector3.ZERO
+	if not _cast(from, Vector3.DOWN * (step_height + 0.05), result):
+		return false
+	if not _walkable_contact(result):
+		return false
+	body.global_position = from.origin + result.get_travel()
+	body.velocity.y = 0.0
+	_add_step_debt(nudge)
+	body.apply_floor_snap()
+	if debug_step: print("step down fallback ", result.get_travel())
+	return true
+
+
+func _add_step_debt(extra: Vector3) -> void:
+	if extra.length_squared() < 0.000001:
 		return
+	var total := _step_debt_dir * _step_debt + extra
+	_step_debt = total.length()
+	_step_debt_dir = total / _step_debt
+
+
+## Whether a downward sweep came to rest on walkable ground.
+func _walkable_contact(result: PhysicsTestMotionResult3D) -> bool:
+	return result.get_collision_normal().angle_to(Vector3.UP) <= body.floor_max_angle
+
+
+## Whether a step landing rests on the foot's flat sole: a ledge's top, or a slope of it,
+## not the rounded rim on its edge (which leaves the body bobbing on the corner).
+func _sole_contact(result: PhysicsTestMotionResult3D) -> bool:
+	var normal := result.get_collision_normal()
+	if normal.angle_to(Vector3.UP) <= deg_to_rad(20.0):
+		return true
+	if not _walkable_contact(result):
+		return false
+	# A sloped contact: fine on a real slope, not on an edge (the surface there is level).
+	var point := result.get_collision_point()
+	var query := PhysicsRayQueryParameters3D.create(point + normal * 0.05, point - normal * 0.05, body.collision_mask, [body.get_rid()])
+	var hit := body.get_world_3d().direct_space_state.intersect_ray(query)
+	return not hit.is_empty() and Vector3(hit["normal"]).angle_to(normal) < deg_to_rad(8.0)
+
+
+## A contact on the foot's rounded rim at a ledge's edge reports a slanted normal even
+## when the ledge is level: a short ray just past the edge, along `toward`, tells.
+func _edge_has_level_top(result: PhysicsTestMotionResult3D, toward: Vector3) -> bool:
+	if toward.length_squared() < 0.000001:
+		return false
+	var point := result.get_collision_point() + toward.normalized() * 0.03
+	var query := PhysicsRayQueryParameters3D.create(point + Vector3.UP * 0.05, point - Vector3.UP * 0.05, body.collision_mask, [body.get_rid()])
+	var hit := body.get_world_3d().direct_space_state.intersect_ray(query)
+	return not hit.is_empty() and Vector3(hit["normal"]).angle_to(Vector3.UP) <= body.floor_max_angle
+
+
+## Sweeps the body from `from` by `motion`; true on a hit (result holds travel and normal).
+func _cast(from: Transform3D, motion: Vector3, result: PhysicsTestMotionResult3D, max_collisions: int = 1) -> bool:
+	var params := PhysicsTestMotionParameters3D.new()
+	params.from = from
+	params.motion = motion
+	params.margin = body.safe_margin
+	params.max_collisions = max_collisions
+	return PhysicsServer3D.body_test_motion(body.get_rid(), params, result)
+
+
+## The travel of `motion` from `from` sliding once along whatever it hits.
+func _slide_cast(from: Transform3D, motion: Vector3) -> Vector3:
+	var result := PhysicsTestMotionResult3D.new()
+	if not _cast(from, motion, result):
+		return motion
 	var travel := result.get_travel()
-	# Require an actual ledge (not just the floor we're already on) and a walkable surface.
-	if travel.length() > step_height - 0.04:
-		if debug_step: print("step: travel too long ", travel.length())
-		return
-	if result.get_collision_normal().angle_to(Vector3.UP) > body.floor_max_angle:
-		if debug_step: print("step: too steep ", result.get_collision_normal())
-		return
-	if debug_step: print("step: OK ", travel)
-	var destination := raised.origin + travel + Vector3.UP * 0.01
-	var displacement := destination - from.origin
-	body.global_position = destination
-	_begin_step(displacement)
-
-
-## After a step teleport: stop the body for as long as walking the horizontal part
-## would have taken, remember the speed for the animation state, and tell listeners.
-func _begin_step(displacement: Vector3) -> void:
-	var intended := maxf(get_horizontal_speed(), walk_speed)
-	var flat := Vector3(displacement.x, 0.0, displacement.z).length()
-	_stall_speed = intended
-	_step_stall = flat / intended
-	body.velocity.x = 0.0
-	body.velocity.z = 0.0
-	stepped.emit(displacement, maxf(_step_stall, 0.05))
+	var normal := result.get_collision_normal()
+	normal.y = 0.0
+	if normal.length_squared() < 0.0001:
+		return travel
+	var rest := (motion - travel).slide(normal.normalized())
+	var moved := from
+	moved.origin += travel
+	if not _cast(moved, rest, result):
+		return travel + rest
+	return travel + result.get_travel()

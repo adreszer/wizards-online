@@ -41,8 +41,16 @@ const RENDER_LAYER_CHARACTER := 1 << 1
 @onready var interaction_controller: InteractionController = $LocalPlayer/InteractionController
 @onready var area_tracker: AreaTracker = $LocalPlayer/AreaTracker
 
-## Mesh catch-up speed after a step is set per step (distance / stall time); this is the floor.
-@export var min_step_catchup_speed: float = 2.0
+## After a step the mesh moves onto the body's new height instead of popping. On a
+## flight it learns the spacing of the steps and closes each gap at the even rate that
+## finishes as the next step comes, so mesh and camera rise or sink steadily (no drop,
+## pause, drop). Off a flight (or the first step) it climbs at up to this many metres
+## per metre walked (a steep stair is about 0.7).
+@export var step_climb_ratio: float = 1.4
+## The climb is never slower than this (m/s), so it finishes when you stop on a step.
+@export var min_step_catchup_speed: float = 1.5
+## Big gaps (a long snap down) close at least this fast: the gap over this many seconds.
+@export var step_ease_time: float = 0.15
 ## A body jump longer than this in one tick is a teleport (respawn, spawn): drawn without interpolation.
 @export var teleport_distance: float = 2.0
 
@@ -52,9 +60,18 @@ var look: Dictionary = CharacterLook.sanitize({})
 ## Server-decided role (CharacterProfile.ROLE_*); students by default.
 var role: String = CharacterProfile.ROLE_STUDENT
 var house: int = 0
-## World-space offset applied to the mesh so a one-tick step-up reads as a smooth climb.
+## World-space offset applied to the mesh so a one-tick step reads as a smooth climb.
+## It eases out per physics tick (frame-rate independent) and is drawn interpolated
+## from the previous tick's value, like the body.
 var _visual_offset: Vector3 = Vector3.ZERO
-var _visual_catchup_speed: float = 0.0
+var _prev_visual_offset: Vector3 = Vector3.ZERO
+## PlayerMovement.step_lag() at the start of the tick (interpolated like the offset).
+var _prev_step_lag: Vector3 = Vector3.ZERO
+## Horizontal distance walked since the last step, the spacing between the last two
+## steps, and the last step's rise (its sign tells up from down).
+var _walked_since_step: float = INF
+var _step_spacing: float = 0.0
+var _last_rise: float = 0.0
 ## Body transform at the start of the current physics tick. Physics runs at a fixed
 ## 60 Hz while frames render at the display rate, so between ticks the mesh and the
 ## camera are drawn at the position interpolated from here to the body's current
@@ -271,20 +288,25 @@ func _add_profile_target() -> void:
 	add_child(area)
 
 
-func _on_stepped(displacement: Vector3, duration: float) -> void:
-	_visual_offset -= displacement
+func _on_stepped(rise: float) -> void:
+	# The same way as the step before and a plausible tread apart: that is the flight's spacing.
+	# Averaged: steps land on whole physics ticks, so one spacing alone jitters when running.
+	if signf(rise) == signf(_last_rise) and _walked_since_step > 0.15 and _walked_since_step < 1.5:
+		_step_spacing = lerpf(_step_spacing, _walked_since_step, 0.35)
+	else:
+		_step_spacing = absf(rise) / 0.7
+	_last_rise = rise
+	_walked_since_step = 0.0
+	_visual_offset.y -= rise
+	_prev_visual_offset.y -= rise
 	# The step offset already eases the mesh across the jump; don't interpolate it as well.
-	_tick_start.origin += displacement
-	# Constant speed so the mesh walks a straight diagonal onto the tread at walking pace.
-	_visual_catchup_speed = maxf(_visual_offset.length() / maxf(duration, 0.01), min_step_catchup_speed)
+	_tick_start.origin.y += rise
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if not is_local:
 		visual.transform = broom_rider.pose * _visual_base
 		return
-	if _visual_offset != Vector3.ZERO:
-		_visual_offset = _visual_offset.move_toward(Vector3.ZERO, _visual_catchup_speed * delta)
 	var fraction := Engine.get_physics_interpolation_fraction()
 	var lag := Vector3.ZERO
 	var yaw_lag := 0.0
@@ -292,7 +314,7 @@ func _process(delta: float) -> void:
 		lag = _tick_start.origin.lerp(global_position, fraction) - global_position
 		var start_yaw := _tick_start.basis.get_euler().y
 		yaw_lag = angle_difference(rotation.y, lerp_angle(start_yaw, rotation.y, fraction))
-	var offset := _visual_offset + lag
+	var offset := _prev_visual_offset.lerp(_visual_offset, fraction) + _prev_step_lag.lerp(movement.step_lag(), fraction) + lag
 	# The body yaws with facing, so convert the world offset into its local frame.
 	visual.transform = Transform3D(Basis(Vector3.UP, yaw_lag), global_basis.inverse() * offset) * broom_rider.pose * _visual_base
 	camera_rig.follow_offset = offset
@@ -300,11 +322,28 @@ func _process(delta: float) -> void:
 	nameplate.position = Vector3(0.0, 2.25, 0.0) + visual.position
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if not is_local:
 		return
 	# Runs before the Movement child, so this is where the body starts the tick.
 	_tick_start = global_transform
+	_prev_visual_offset = _visual_offset
+	_prev_step_lag = movement.step_lag()
+	var speed := movement.get_horizontal_speed()
+	_walked_since_step += speed * delta
+	if _visual_offset != Vector3.ZERO:
+		var fast := maxf(maxf(speed * step_climb_ratio, min_step_catchup_speed), _visual_offset.length() / step_ease_time)
+		if speed > 0.3 and _last_rise != 0.0 and _walked_since_step < _step_spacing * 1.3:
+			# On a flight: move at the flight's average rate (rise per step over the step
+			# spacing), pulled gently toward half a step behind, never stopping in between.
+			# Steps land on whole ticks, so closing each gap exactly would leave a still tick.
+			var sense := signf(_last_rise)
+			var lag := -_visual_offset.y * sense
+			var rate := absf(_last_rise) * speed / _step_spacing + 1.0 * (lag - absf(_last_rise) / 2.0)
+			lag = maxf(lag - clampf(rate, 0.0, fast) * delta, -0.06)
+			_visual_offset.y = -lag * sense
+		else:
+			_visual_offset = _visual_offset.move_toward(Vector3.ZERO, fast * delta)
 	var was_equipped := spell_caster.equipped_spell
 	var slot := player_input.consume_spell_slot()
 	if slot >= 0:

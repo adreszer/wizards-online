@@ -1638,7 +1638,8 @@ func _test_castle() -> void:
 			if not player.movement.is_grounded or absf(player.global_position.y - base_y) > 0.6:
 				fell.append("%s (y %.2f vs ground %.2f)" % [z.area_id, player.global_position.y, base_y])
 			continue
-		await _spawn_player(Vector3(z.global_position.x, base_y + 0.2, z.global_position.z))
+		var at := _clear_floor_near(z.global_position, base_y)
+		await _spawn_player(Vector3(at.x, base_y + 0.2, at.z))
 		await _wait(0.4)
 		if not player.movement.is_grounded or absf(player.global_position.y - base_y) > 0.3:
 			fell.append("%s (y %.2f vs %.2f)" % [z.area_id, player.global_position.y, base_y])
@@ -3049,6 +3050,24 @@ func _test_timetable() -> void:
 
 
 ## A dry point of an outdoor area with nothing built on it, or INF.
+## The centre, or the nearest point around it (up to 3 m) where no furniture stands on
+## the floor at `base_y`, so a spawn there is not inside a table.
+func _clear_floor_near(centre: Vector3, base_y: float) -> Vector3:
+	var space := get_viewport().world_3d.direct_space_state
+	for radius: float in [0.0, 0.8, 1.6, 2.4, 3.0]:
+		for k in range(1 if radius == 0.0 else 8):
+			var p := centre + Vector3(cos(k * TAU / 8.0), 0, sin(k * TAU / 8.0)) * radius
+			var clear := true
+			for d: Vector3 in [Vector3.ZERO, Vector3(0.4, 0, 0), Vector3(-0.4, 0, 0), Vector3(0, 0, 0.4), Vector3(0, 0, -0.4)]:
+				var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(
+					Vector3(p.x + d.x, base_y + 2.0, p.z + d.z), Vector3(p.x + d.x, base_y - 0.5, p.z + d.z), 1))
+				if not hit.is_empty() and (hit["position"] as Vector3).y > base_y + 0.05:
+					clear = false
+			if clear:
+				return p
+	return centre
+
+
 func _open_ground(terrain: Terrain, z: AreaZone) -> Vector3:
 	var half := Vector2(minf(z.size.x / 2.0 - 5.0, 60.0), minf(z.size.z / 2.0 - 5.0, 60.0))
 	var c := z.global_position

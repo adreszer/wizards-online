@@ -288,7 +288,8 @@ def headroom(plan):
         for k in range(1, 60):
             lx = st["run"] * k / 60
             h = st["y0"] + _c.tread_height(st, lx)
-            for lz in (-st["width"] / 2 + 0.2, 0.0, st["width"] / 2 - 0.2):
+            # Right at the edges too: a player walks up a flight hugging its wall or balustrade.
+            for lz in (-st["width"] / 2 + 0.05, -st["width"] / 2 + 0.2, 0.0, st["width"] / 2 - 0.2, st["width"] / 2 - 0.05):
                 px, pz = _c.local_to_world(st["x"], st["z"], st["rot"], (lx, lz))
                 over = _overhead(plan, st, px, pz, h)
                 if over is not None and over - h < _c.HEADROOM - 1e-3:
@@ -314,6 +315,14 @@ def _overhead(plan, st, x, z, h):
         for rect, y in r.extra_floors:
             if y > h and _c.inside(rect, x, z, 0.01):
                 take(y - _c.LANDING_THICK)
+    for rl in plan.railings:
+        if rl["rise"] or rl["pos"][1] <= h:
+            continue
+        x0, z0 = rl["pos"][0], rl["pos"][2]
+        t = _c.RAIL_T / 2
+        rect = (x0 - t, x0 + t, z0 - rl["length"], z0) if abs(rl["rot"] - 90.0) < 0.1 else (x0, x0 + rl["length"], z0 - t, z0 + t)
+        if _c.inside(rect, x, z, 0.01):
+            take(rl["pos"][1] - _c.RAIL_SINK)
     return best
 
 
