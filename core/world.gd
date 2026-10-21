@@ -37,6 +37,9 @@ func _ready() -> void:
 	var effects := PotionEffects.new()
 	effects.name = "PotionEffects"
 	add_child(effects)
+	var fires := FireAmbience.new()
+	fires.name = "FireAmbience"
+	add_child(fires)
 	var reminders := EventReminders.new()
 	reminders.name = "EventReminders"
 	add_child(reminders)

@@ -5,7 +5,8 @@ extends Node
 ## (set the meta `ui_sound` on a button to another id, or to &"" for silence:
 ## a panel's close button leaves the sound to the panel's own close). Panels call
 ## play(&"panel_open") / play(&"panel_close") (or their own id) from open()/close();
-## chat lines, direct messages and HUD notifications are heard from their signals.
+## chat lines, direct messages and HUD notifications are heard from their signals;
+## a mystery's clue or solve chimes instead of the notification that carries its text.
 ## Plays on the UI bus (default_bus_layout.tres), not positional, and keeps
 ## working while the game is paused.
 
@@ -22,6 +23,8 @@ const SOUNDS := {
 	&"notification": preload("res://assets/audio/ui/ui_notification.wav"),
 	&"error": preload("res://assets/audio/ui/ui_error.wav"),
 	&"spell_select": preload("res://assets/audio/ui/ui_spell_select.wav"),
+	&"clue_found": preload("res://assets/audio/ui/ui_clue_found.wav"),
+	&"mystery_solved": preload("res://assets/audio/ui/ui_mystery_solved.wav"),
 }
 ## Seconds before the same sound may play again (a burst of hovers or chat lines
 ## plays once).
@@ -47,6 +50,7 @@ func _ready() -> void:
 	get_tree().node_added.connect(_on_node_added)
 	NetworkManager.chat_line_received.connect(_on_chat_line)
 	GameEvents.notification_requested.connect(func(_text: String, _seconds: float) -> void: play(&"notification"))
+	GameEvents.mystery_cue.connect(_on_mystery_cue)
 
 
 func play(id: StringName) -> void:
@@ -73,6 +77,12 @@ func _on_node_added(node: Node) -> void:
 		if not button.disabled:
 			play(&"hover"))
 	button.pressed.connect(func() -> void: play(button.get_meta(&"ui_sound", &"click")))
+
+
+func _on_mystery_cue(cue: String) -> void:
+	play(&"mystery_solved" if cue == "solved" else &"clue_found")
+	# The notification with the clue's text follows; the chime stands for it.
+	_last_played[&"notification"] = Time.get_ticks_msec() / 1000.0
 
 
 func _on_chat_line(line: Dictionary) -> void:

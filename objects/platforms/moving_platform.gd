@@ -3,7 +3,9 @@ extends AnimatableBody3D
 ## Reusable moving platform. Travels through [member points] (local offsets
 ## from its start position) at [member speed], optionally looping or
 ## ping-ponging, and can wait for [method activate]. `sync_to_physics` lets
-## CharacterBody3D riders be carried by the physics engine.
+## CharacterBody3D riders be carried by the physics engine. It hums while active.
+
+const HUM := preload("res://assets/audio/world/platform_move_loop.wav")
 
 enum LoopMode { PING_PONG, LOOP, ONCE }
 
@@ -25,6 +27,7 @@ var _index: int = 0
 var _direction: int = 1
 var _wait: float = 0.0
 var _origin: Vector3
+var _hum: AudioStreamPlayer3D
 
 @onready var _mesh: MeshInstance3D = $Mesh
 @onready var _shape: CollisionShape3D = $Shape
@@ -37,6 +40,7 @@ func _ready() -> void:
 	for p in points:
 		_path.append(p)
 	_apply_size()
+	_hum = Sfx.loop_player(self, "Hum", HUM, -8.0, 25.0)
 
 
 func activate() -> void:
@@ -49,7 +53,10 @@ func deactivate() -> void:
 
 func _physics_process(delta: float) -> void:
 	if not active or _path.size() < 2:
+		if _hum.playing:
+			_hum.stop()
 		return
+	Sfx.start_loop(_hum)
 	if _wait > 0.0:
 		_wait -= delta
 		return

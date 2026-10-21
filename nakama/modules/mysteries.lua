@@ -225,7 +225,7 @@ end
 -- effect_type?, state?, sid, uid, house, held, now }. `ctx` = { players_in(area)
 -- -> list of {sid, uid, house}, player_progress(uid) -> table, progress_changed(uid) }.
 -- Returns a list of actions:
---   { "text", sid, key }  { "set_state", oid, value }  { "discovery", sid, id, mystery id, coins? }
+--   { "text", sid, key?, cue? } (cue "clue" or "solved")  { "set_state", oid, value }  { "discovery", sid, id, mystery id, coins? }
 --   { "house_points", house, delta, reason }
 function M.on_event(engine, mstate, ev, ctx)
   local actions = {}
@@ -250,7 +250,7 @@ function M.on_event(engine, mstate, ev, ctx)
           end
         end
         if step.text then
-          table.insert(actions, { "text", ev.sid, step.text })
+          table.insert(actions, { "text", ev.sid, step.text, record.step < #m.steps and "clue" or nil })
         end
         if record.step == #m.steps then
           record.solved, record.solved_at = true, ev.now
@@ -259,7 +259,7 @@ function M.on_event(engine, mstate, ev, ctx)
             table.insert(actions, { "set_state", oid, value })
           end
           for _, sid in pairs(record.players) do
-            if solved.text then table.insert(actions, { "text", sid, solved.text }) end
+            table.insert(actions, { "text", sid, solved.text, "solved" })
             if solved.discovery then table.insert(actions, { "discovery", sid, solved.discovery, m.id, solved.coins }) end
           end
           if solved.house_points and (ev.house or 0) > 0 then

@@ -16,6 +16,7 @@ signal unlocked()
 
 ## Kind name in the server's world-object map (generated/world_objects.lua).
 const WORLD_KIND := "castle_door"
+const UNLOCKED := preload("res://assets/audio/world/lock_unlocked.wav")
 
 ## Stable id ("<area>/<name>") the server uses to refer to this object; set
 ## by the castle generator. Empty for doors outside the castle.
@@ -101,7 +102,7 @@ func unlock() -> void:
 	if not is_locked:
 		return
 	is_locked = false
-	_audio.play()
+	Sfx.play_at(self, UNLOCKED, -2.0, 20.0, Vector3(0, 1.2, 0))
 	_update_prompt()
 	unlocked.emit()
 

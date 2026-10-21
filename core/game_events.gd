@@ -26,6 +26,8 @@ signal spell_learned(definition: Resource)
 
 ## Short informational message for the HUD (e.g. plaque text, "Learned Arcane Pulse").
 signal notification_requested(text: String, duration: float)
+## A mystery moved on for the local player: "clue" (a step with a hint) or "solved".
+signal mystery_cue(cue: String)
 
 ## Emitted by UI when it takes over keyboard input (chat open) and releases it.
 signal ui_input_capture_changed(captured: bool)

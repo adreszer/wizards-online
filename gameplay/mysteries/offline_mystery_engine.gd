@@ -83,6 +83,8 @@ func on_event(ev: Dictionary) -> void:
 			record["step"] += 1
 			record["at"] = now
 			if step.has("text"):
+				if record["step"] < steps.size():
+					GameEvents.mystery_cue.emit("clue")
 				GameEvents.notification_requested.emit(tr(str(step["text"])), 6.0)
 			if record["step"] >= steps.size():
 				record["solved"] = true
@@ -113,6 +115,7 @@ func _touches(m: Dictionary, ev: Dictionary) -> bool:
 
 
 func _solve(m: Dictionary) -> void:
+	GameEvents.mystery_cue.emit("solved")
 	var solved: Dictionary = m.get("on_solved", {})
 	for oid: String in solved.get("set_state", {}):
 		var node: Node = objects.get(oid)

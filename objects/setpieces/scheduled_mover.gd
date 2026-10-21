@@ -14,6 +14,8 @@ extends AnimatableBody3D
 enum Mode { STOPS, SPIN, BOB }
 
 signal stop_reached(index: int)
+## It left a stop and is swinging to the next (never on the first frame).
+signal swing_started()
 
 @export var mode: Mode = Mode.STOPS
 @export var stops: PackedFloat32Array = PackedFloat32Array([0.0, 90.0])
@@ -93,6 +95,9 @@ func _physics_process(_delta: float) -> void:
 	transform = xf
 	var s := stop_at(t)
 	if s != _last_stop:
+		var first := _last_stop == -2
 		_last_stop = s
 		if s >= 0:
 			stop_reached.emit(s)
+		elif not first:
+			swing_started.emit()

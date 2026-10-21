@@ -1,6 +1,9 @@
 class_name Gear
 extends ScheduledMover
-## A spinning clockwork platform (a toothed bronze disc) to jump across.
+## A spinning clockwork platform (a toothed bronze disc) to jump across. Its teeth
+## creak and tick as it turns.
+
+const TURN_SOUND := preload("res://assets/audio/world/gear_loop.wav")
 
 @export var radius: float = 1.8
 
@@ -35,4 +38,5 @@ func _ready() -> void:
 	shape.height = 0.35
 	cs.shape = shape
 	add_child(cs)
+	Sfx.start_loop(Sfx.loop_player(self, "Turning", TURN_SOUND, -8.0, 18.0))
 	super._ready()

@@ -8,6 +8,8 @@ signal closed()
 
 ## Kind name in the server's world-object map (generated/world_objects.lua).
 const WORLD_KIND := "magic_door"
+const OPEN_SOUND := preload("res://assets/audio/world/magic_door_open.wav")
+const CLOSE_SOUND := preload("res://assets/audio/world/magic_door_close.wav")
 
 ## Stable id ("<area>/<name>") the server uses to refer to this object; set
 ## by the castle generator. Empty for objects outside the castle.
@@ -53,6 +55,7 @@ func set_open(value: bool) -> void:
 		_tween.kill()
 	_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	_tween.tween_property(_panel, "position", target, open_duration)
+	_audio.stream = OPEN_SOUND if is_open else CLOSE_SOUND
 	_audio.play()
 	if is_open:
 		opened.emit()

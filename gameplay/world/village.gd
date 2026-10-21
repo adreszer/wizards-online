@@ -844,6 +844,11 @@ func _hearth(wall_point: Vector3, facing: float) -> void:
 	_box(_i("ember", Color(1.0, 0.45, 0.12)), Vector3(0, 0.45, 0.82), Vector3(1.4, 0.7, 0.04))
 	_box(_i("stone", STONE_DARK), Vector3(0, 2.45, 0.55), Vector3(3.1, 0.2, 1.1))
 	_light(Vector3(0, 1.0, 1.4), Color(1.0, 0.55, 0.25), 1.4, 6.0)
+	# Where FireAmbience hears the fire crackle.
+	var fire := Marker3D.new()
+	fire.position = _xf * Vector3(0, 0.45, 0.9)
+	fire.add_to_group(FireAmbience.HEARTH_GROUP)
+	add_child(fire)
 	_xf = base
 
 

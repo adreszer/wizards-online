@@ -9,6 +9,8 @@ signal toggled(is_on: bool)
 
 ## Kind name in the server's world-object map (generated/world_objects.lua).
 const WORLD_KIND := "magic_switch"
+const ON_SOUND := preload("res://assets/audio/world/magic_switch_on.wav")
+const OFF_SOUND := preload("res://assets/audio/world/magic_switch_off.wav")
 
 ## Stable id ("<area>/<name>") the server uses to refer to this object; set
 ## by the castle generator. Empty for objects outside the castle.
@@ -45,6 +47,7 @@ func set_on(value: bool, quiet: bool = false) -> void:
 	is_on = value
 	_apply_visual()
 	if not quiet:
+		_audio.stream = ON_SOUND if is_on else OFF_SOUND
 		_audio.play()
 	toggled.emit(is_on)
 	if is_on:

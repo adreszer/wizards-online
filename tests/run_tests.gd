@@ -6,6 +6,7 @@ extends Node
 
 const PLAYER_SCENE := preload("res://characters/player/player.tscn")
 const SPELL_PROJECTILE_SCENE := preload("res://gameplay/spells/spell_projectile.tscn")
+const SHIFTING_STAIR_SCENE := preload("res://objects/setpieces/shifting_stair.tscn")
 const SWITCH_SCENE := preload("res://objects/puzzles/magic_switch.tscn")
 const LEVER_SCENE := preload("res://objects/interactables/lever.tscn")
 const COLLECTIBLE_SCENE := preload("res://gameplay/collectibles/collectible.tscn")
@@ -81,6 +82,7 @@ func _run() -> void:
 	await _test_day_night()
 	await _test_player_sounds()
 	await _test_spell_sounds()
+	await _test_world_sounds()
 	await _test_timetable()
 	await _test_chat()
 	await _test_gestures()
@@ -2173,7 +2175,7 @@ func _test_player_sounds() -> void:
 	for s: StringName in PlayerSounds.SURFACES:
 		var r := PlayerSounds.step_stream(s)
 		t.check(r.streams_count == int(PlayerSounds.STEP_COUNTS[s]) and r.streams_count > 1 and r.get_stream(0) != null, "%s has %d footsteps" % [s, r.streams_count])
-	var crackle := SoundLoops.looped(HeldTorch.CRACKLE)
+	var crackle := Sfx.looped(HeldTorch.CRACKLE)
 	t.check(crackle.loop_mode == AudioStreamWAV.LOOP_FORWARD and crackle.loop_end > crackle.mix_rate, "the torch crackle loops")
 	var castle := CASTLE_SCENE.instantiate()
 	add_child(castle)
@@ -2291,6 +2293,90 @@ func _test_spell_sounds() -> void:
 	player = null
 	await get_tree().process_frame
 
+## The sounds a node played through Sfx.play_at (its AudioStreamPlayer3D children's streams).
+func _sounds_under(node: Node) -> Array:
+	return node.find_children("*", "AudioStreamPlayer3D", true, false).map(func(p: AudioStreamPlayer3D) -> AudioStream: return p.stream)
+
+
+func _test_world_sounds() -> void:
+	t.section("World and puzzle sounds")
+	var fixtures: Array = []
+	var floor_body := TestHelpers.make_floor(self, Vector3(0, -0.5, 0), Vector3(40, 1, 40))
+	fixtures.append(floor_body)
+	# Torches: water hisses, frost puffs, fire catches; a snapshot is silent.
+	var torch: WallTorch = WALL_TORCH_SCENE.instantiate()
+	add_child(torch)
+	fixtures.append(torch)
+	torch._on_spell_received(SpellEffect.create(SpellRegistry.load_definition("wellspring"), null, "", Vector3.ZERO, Vector3.FORWARD))
+	t.check(not torch.lit and _sounds_under(torch).has(WallTorch.DOUSED), "water on a torch hisses")
+	torch._on_spell_received(SpellEffect.create(SpellRegistry.load_definition("emberkindle"), null, "", Vector3.ZERO, Vector3.FORWARD))
+	t.check(torch.lit and _sounds_under(torch).has(WallTorch.IGNITE), "fire on a torch catches")
+	var before := _sounds_under(torch).size()
+	torch.apply_world_state(false, true)
+	t.check(not torch.lit and _sounds_under(torch).size() == before, "a late joiner's snapshot puts a torch out silently")
+	# The fire ambience picks the nearest burning torches within range.
+	var near: Array = []
+	for i in 6:
+		var tt: WallTorch = WALL_TORCH_SCENE.instantiate()
+		add_child(tt)
+		tt.global_position = Vector3(i * 2.0, 2, 0)
+		near.append(tt)
+		fixtures.append(tt)
+	var ambience := FireAmbience.new()
+	add_child(ambience)
+	fixtures.append(ambience)
+	var picked := FireAmbience.nearest(near, Vector3(-1, 2, 0), FireAmbience.TORCH_RANGE, FireAmbience.TORCH_VOICES)
+	t.check(picked.size() == 4 and picked[0] == near[0] and not picked.has(near[4]) and not picked.has(near[5]), "the fire ambience hears the four nearest torches in range")
+	ambience.assign(ambience._torch_voices, picked.duplicate())
+	var placed := ambience._torch_voices.all(func(v: AudioStreamPlayer3D) -> bool: return picked.has(ambience.source_of(v)) and v.playing)
+	t.check(placed, "a crackle plays at each of them")
+	ambience.assign(ambience._torch_voices, [near[0]])
+	t.check(ambience._torch_voices.filter(func(v: AudioStreamPlayer3D) -> bool: return v.playing).size() == 1, "voices leave torches that drop out of range")
+	# A dropped block thuds.
+	var block: PushableBlock = BLOCK_SCENE.instantiate()
+	add_child(block)
+	fixtures.append(block)
+	block.global_position = Vector3(10, 3, 10)
+	await _wait(1.2)
+	t.check(block.drops >= 1, "a block dropping onto the floor thuds (%d)" % block.drops)
+	# Crystal switch on and off.
+	var switch: MagicSwitch = SWITCH_SCENE.instantiate()
+	add_child(switch)
+	fixtures.append(switch)
+	switch.set_on(true)
+	var on_stream: AudioStream = switch._audio.stream
+	switch.set_on(false)
+	t.check(on_stream == MagicSwitch.ON_SOUND and switch._audio.stream == MagicSwitch.OFF_SOUND, "a crystal switch chimes on and dims off")
+	# A secret wall grinds open and the discovery rings out.
+	var wall: SecretWall = SECRET_WALL_SCENE.instantiate()
+	add_child(wall)
+	fixtures.append(wall)
+	wall.reveal()
+	t.check(_sounds_under(wall).has(SecretWall.REVEALED), "a hidden passage opening rings out")
+	# A shifting stair grinds while it swings and booms when it locks into place.
+	var stair: ShiftingStair = SHIFTING_STAIR_SCENE.instantiate()
+	stair.stops = PackedFloat32Array([0.0, 90.0])
+	stair.hold = 20.0
+	stair.move = 6.0
+	stair.phase = 0.0
+	stair.time_override = 10.0
+	add_child(stair)
+	fixtures.append(stair)
+	stair._physics_process(0.0)
+	stair.time_override = 23.0
+	stair._physics_process(0.0)
+	var swinging := stair._swing.playing
+	stair.time_override = 27.0
+	stair._physics_process(0.0)
+	t.check(swinging and not stair._swing.playing and _sounds_under(stair).has(ShiftingStair.SETTLE_SOUND), "a shifting stair grinds while it swings and settles with a boom")
+	# Mysteries: a clue and a solve chime instead of the plain notification.
+	GameEvents.mystery_cue.emit("clue")
+	GameEvents.notification_requested.emit("clue text", 1.0)
+	var after_clue := UiSounds.last_sound
+	GameEvents.mystery_cue.emit("solved")
+	t.check(after_clue == &"clue_found" and UiSounds.last_sound == &"mystery_solved", "a clue chimes and a solved mystery rings (%s, %s)" % [after_clue, UiSounds.last_sound])
+	await _clear(fixtures)
+
 func _test_day_night() -> void:
 	t.section("Day and night")
 	var clock := SchoolClock.new()
@@ -2381,7 +2467,9 @@ func _test_day_night() -> void:
 	t.check(AudioServer.get_bus_index(&"UI") > 0, "there is a UI bus")
 	for id: StringName in UiSounds.SOUNDS:
 		var ui_stream := UiSounds.SOUNDS[id] as AudioStream
-		t.check(ui_stream != null and ui_stream.get_length() > 0.05 and ui_stream.get_length() < 1.5, "ui sound %s is short (%.2f s)" % [id, ui_stream.get_length() if ui_stream else 0.0])
+		# The mystery chimes are small fanfares; everything else is a blip.
+		var longest := 4.0 if id in [&"clue_found", &"mystery_solved"] else 1.5
+		t.check(ui_stream != null and ui_stream.get_length() > 0.05 and ui_stream.get_length() < longest, "ui sound %s is short (%.2f s)" % [id, ui_stream.get_length() if ui_stream else 0.0])
 	UiSounds._last_played.clear()
 	var sound_button := Button.new()
 	castle.add_child(sound_button)

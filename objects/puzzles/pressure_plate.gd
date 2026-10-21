@@ -7,6 +7,8 @@ signal deactivated()
 
 ## Kind name in the server's world-object map (generated/world_objects.lua).
 const WORLD_KIND := "pressure_plate"
+const DOWN_SOUND := preload("res://assets/audio/world/pressure_plate_down.wav")
+const UP_SOUND := preload("res://assets/audio/world/pressure_plate_up.wav")
 
 ## Stable id ("<area>/<name>") the server uses to refer to this object; set
 ## by the castle generator. Empty for objects outside the castle.
@@ -42,6 +44,7 @@ func _update() -> void:
 	is_active = active
 	# The slab (its base at the origin) sinks flush with the floor while pressed.
 	_plate.position.y = -0.04 if is_active else 0.02
+	Sfx.play_at(self, DOWN_SOUND if is_active else UP_SOUND, -4.0, 20.0)
 	if is_active:
 		activated.emit()
 	else:

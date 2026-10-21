@@ -26,7 +26,7 @@ extends Resource
 @export var strength: float = 6.0
 @export var aim_assist_angle_degrees: float = 7.0
 @export var cast_sound: AudioStream
-## Loops on the projectile while it flies (SoundLoops sets the loop points).
+## Loops on the projectile while it flies (Sfx sets the loop points).
 @export var travel_sound: AudioStreamWAV
 @export var impact_sound: AudioStream
 @export var color: Color = Color(0.65, 0.5, 1.0)

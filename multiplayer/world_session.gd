@@ -147,6 +147,8 @@ func _on_match_state(data: NakamaRTAPI.MatchData) -> void:
 		NetworkProtocol.OP_OBJECT_STATE:
 			object_state_received.emit(str(payload.get("o", "")), payload.get("s"))
 		NetworkProtocol.OP_SERVER_TEXT:
+			if payload.has("cue"):
+				GameEvents.mystery_cue.emit(str(payload["cue"]))
 			server_text_received.emit(str(payload.get("text", "")), float(payload.get("seconds", 5.0)))
 		NetworkProtocol.OP_LESSON_STATE:
 			var lessons: Variant = payload.get("lessons", {})

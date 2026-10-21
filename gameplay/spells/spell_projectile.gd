@@ -83,7 +83,7 @@ func _ready() -> void:
 		if definition.travel_sound != null:
 			_travel_audio = AudioStreamPlayer3D.new()
 			_travel_audio.name = "TravelAudio"
-			_travel_audio.stream = SoundLoops.looped(definition.travel_sound)
+			_travel_audio.stream = Sfx.looped(definition.travel_sound)
 			_travel_audio.volume_db = -8.0
 			_travel_audio.unit_size = 4.0
 			_travel_audio.max_distance = 30.0

@@ -5,6 +5,9 @@ extends Node
 signal solved()
 signal unsolved()
 
+## The old mechanism giving way, heard at the first statue.
+const SOLVED_SOUND := preload("res://assets/audio/world/statue_puzzle_solved.wav")
+
 @export var statues: Array[RotatingStatue] = []
 @export var required_states: Array[int] = []
 @export var lock_when_solved: bool = true
@@ -33,6 +36,7 @@ func _evaluate() -> void:
 	is_solved = ok
 	if ok:
 		solved.emit()
+		Sfx.play_at(statues[0], SOLVED_SOUND, 0.0, 35.0)
 		if lock_when_solved:
 			for statue in statues:
 				var receiver := statue.get_node_or_null("SpellReceiver") as SpellReceiver

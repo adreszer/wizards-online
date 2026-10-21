@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://objects/interactables/lever.gd" id="1"]
 [ext_resource type="Script" path="res://gameplay/interaction/interactable.gd" id="2"]
-[ext_resource type="AudioStream" path="res://assets/audio/switch.wav" id="3"]
+[ext_resource type="AudioStream" path="res://assets/audio/world/lever_pull.wav" id="3"]
 [ext_resource type="PackedScene" path="res://assets/models/environment/props5/lever_base.glb" id="base"]
 [ext_resource type="PackedScene" path="res://assets/models/environment/props5/lever_handle.glb" id="arm"]
 

@@ -44,7 +44,7 @@ func _ready() -> void:
 	_align()
 	var crackle := AudioStreamPlayer3D.new()
 	crackle.name = "Crackle"
-	crackle.stream = SoundLoops.looped(CRACKLE)
+	crackle.stream = Sfx.looped(CRACKLE)
 	crackle.volume_db = -8.0
 	crackle.max_distance = 14.0
 	_light.add_child(crackle)

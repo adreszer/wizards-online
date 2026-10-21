@@ -7,6 +7,9 @@ signal revealed()
 
 ## Kind name in the server's world-object map (generated/world_objects.lua).
 const WORLD_KIND := "secret_wall"
+## Heard by everyone near when the passage opens (the grinding wall is the Audio node).
+const REVEALED := preload("res://assets/audio/world/secret_revealed.wav")
+const CLOSE_SOUND := preload("res://assets/audio/world/secret_wall_close.wav")
 
 ## Stable id ("<area>/<name>") the server uses to refer to this object; set
 ## by the castle generator. Empty for objects outside the castle.
@@ -48,6 +51,7 @@ func reveal(instant: bool = false) -> void:
 		_ornament.position += slide_offset
 		return
 	_audio.play()
+	Sfx.play_at(self, REVEALED, -2.0, 40.0, Vector3(0, 1.5, 0))
 	var tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(_wall, "position", _wall.position + slide_offset, slide_duration)
 	tween.parallel().tween_property(_ornament, "position", _ornament.position + slide_offset, slide_duration)
@@ -60,6 +64,8 @@ func apply_world_state(state: Variant, instant: bool) -> void:
 		reveal(instant)
 	elif is_revealed:
 		is_revealed = false
+		if not instant:
+			Sfx.play_at(self, CLOSE_SOUND, 0.0, 30.0, Vector3(0, 1.5, 0))
 		_receiver.enabled = true
 		_wall.position -= slide_offset
 		_ornament.position -= slide_offset

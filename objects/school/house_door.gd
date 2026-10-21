@@ -19,6 +19,8 @@ signal refused(interactor: Node)
 
 ## Kind name in the server's world-object map (generated/world_objects.lua).
 const WORLD_KIND := "house_door"
+## A warded gate turning someone away.
+const REFUSE := preload("res://assets/audio/world/magic_door_refuse.wav")
 
 ## Stable id ("<area>/<name>") the server uses to refer to this object; set
 ## by the castle generator. Empty for objects outside the castle.
@@ -171,6 +173,7 @@ func _on_interacted(interactor: Node) -> void:
 		open()
 	else:
 		refused.emit(interactor)
+		Sfx.play_at(self, REFUSE, -4.0, 18.0, Vector3(0, 1.4, 0))
 		if interactor.is_in_group("local_player"):
 			GameEvents.notification_requested.emit(tr("NOTIFY_HOUSE_DOOR_LOCKED") % CharacterProfile.house_name(house), 4.0)
 

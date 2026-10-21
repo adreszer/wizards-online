@@ -22,6 +22,8 @@ var sort_results: Array = []
 ## [object id, state] for every OP_OBJECT_STATE received
 var object_events: Array = []
 var server_texts: Array[String] = []
+## Mystery chimes the server asked for ("clue", "solved").
+var mystery_cues: Array[String] = []
 var lesson_results: Array = []
 var points_results: Array = []
 var lectures: Array[String] = []
@@ -61,6 +63,7 @@ func _ready() -> void:
 	NetworkManager.object_state_changed.connect(func(oid: String, s: Variant) -> void: object_events.append([oid, s]))
 	NetworkManager.wallet_changed.connect(func(c: int, d: int, s: String, x: String) -> void: wallets.append([c, d, s, x]))
 	NetworkManager.server_text_received.connect(func(text: String, _s: float) -> void: server_texts.append(text))
+	GameEvents.mystery_cue.connect(func(cue: String) -> void: mystery_cues.append(cue))
 	NetworkManager.lesson_result_received.connect(func(ok: bool, action: String, reason: String) -> void: lesson_results.append({"ok": ok, "action": action, "reason": reason}))
 	NetworkManager.house_points_result_received.connect(func(ok: bool, house: int, delta: int, reason: String) -> void: points_results.append({"ok": ok, "house": house, "delta": delta, "reason": reason}))
 	NetworkManager.lecture_received.connect(func(by: String, text: String) -> void: lectures.append("%s: %s" % [by, text]))
@@ -638,6 +641,7 @@ func _run_actor(spawner: PlayerSpawner) -> void:
 			t.check(ok and player.speech_bubble.visible and player.speech_bubble.text == "anyone in the library?", "the speaker hears themselves and shows a speech bubble")
 	ok = await _wait_until(func() -> bool: return NetworkManager.get_local_profile().get("discoveries", []).has("founders_tale"), 10.0)
 	t.check(ok, "solving a mystery records a discovery on the profile")
+	t.check(mystery_cues.has("clue") and mystery_cues.has("solved"), "the server cues a chime for a clue and for the solve (%s)" % str(mystery_cues))
 	# A graded homework pays too (when the professor grades it), so count the mystery payments.
 	var mystery_pay := func() -> Array: return wallets.filter(func(w: Array) -> bool: return w[2] == "mystery")
 	ok = await _wait_until(func() -> bool: return mystery_pay.call().size() >= 1, 10.0)

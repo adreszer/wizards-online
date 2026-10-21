@@ -4,7 +4,8 @@ extends Node3D
 ## greenhouse, each showing what grows there, whose it is, and when it is ripe.
 ## Interact with a bed: plant your first seed in an empty bed, water a planted one,
 ## speed a growing one with Quicksprout (if you know it), harvest a ripe one.
-## castle.gd adds this.
+## castle.gd adds this. Watering splashes and Quicksprout bursts the plant up (heard
+## by the gardener).
 
 const AREA := &"greenhouse"
 const PLOTS := 12
@@ -12,6 +13,8 @@ const COLOR_EMPTY := Color(0.45, 0.33, 0.2)
 const COLOR_GROWING := Color(0.35, 0.7, 0.3)
 const COLOR_RIPE := Color(0.95, 0.85, 0.3)
 const GROWTH_SPELL := "quicksprout"
+const WATER_SOUND := preload("res://assets/audio/world/garden_water.wav")
+const GROW_SOUND := preload("res://assets/audio/world/plant_grow_large.wav")
 
 var beds: Array[InteractSpot] = []
 var _view: Dictionary = {}
@@ -82,6 +85,7 @@ func _process(_delta: float) -> void:
 func use_bed(n: int) -> void:
 	var p := plot(n)
 	var r: Dictionary
+	var sound: AudioStream = null
 	if p.is_empty():
 		var seed := first_seed()
 		if seed == "":
@@ -90,10 +94,14 @@ func use_bed(n: int) -> void:
 		r = await NetworkManager.request("garden_plant", {"plot": n, "seed": seed})
 	elif not p.get("watered", false):
 		r = await NetworkManager.request("garden_water", {"plot": n})
+		sound = WATER_SOUND
 	elif p.get("ready", false) or NetworkManager.server_time() >= float(p.get("ready_at", 0)):
 		r = await NetworkManager.request("garden_harvest", {"plot": n})
 	else:
 		r = await NetworkManager.request("garden_spell", {"plot": n, "spell": GROWTH_SPELL})
+		sound = GROW_SOUND
+	if r.ok and sound != null and n <= beds.size():
+		Sfx.play_at(beds[n - 1], sound, -2.0, 20.0)
 	GameEvents.notification_requested.emit(NetworkManager.refusal_text(r.reason) if not r.ok else tr("GARDEN_DONE"), 3.0)
 
 

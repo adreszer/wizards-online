@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://magicdoor0001"]
 
 [ext_resource type="Script" path="res://objects/puzzles/magic_door.gd" id="1"]
-[ext_resource type="AudioStream" path="res://assets/audio/door.wav" id="2"]
+[ext_resource type="AudioStream" path="res://assets/audio/world/magic_door_open.wav" id="2"]
 [ext_resource type="PackedScene" path="res://assets/models/environment/modular/door_magical_sliding.glb" id="3"]
 [ext_resource type="PackedScene" path="res://assets/models/environment/props5/door_jamb.glb" id="jamb"]
 

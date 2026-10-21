@@ -293,11 +293,13 @@ local function save_progress(uid, progress)
   })
 end
 
-local function send_text(dispatcher, state, sid, key)
+-- cue (optional): "clue" or "solved", a mystery's moment the client plays a chime for;
+-- key may then be nil (a solve without text still chimes).
+local function send_text(dispatcher, state, sid, key, cue)
   local p = state.presences[sid]
   if p then
-    local text = Mysteries.text(state.engine, key, state.locales[sid])
-    dispatcher.broadcast_message(OP_SERVER_TEXT, nk.json_encode({ text = text, seconds = TEXT_SECONDS }), { p }, nil, true)
+    local text = key and Mysteries.text(state.engine, key, state.locales[sid]) or ""
+    dispatcher.broadcast_message(OP_SERVER_TEXT, nk.json_encode({ text = text, seconds = TEXT_SECONDS, cue = cue }), { p }, nil, true)
   end
 end
 
@@ -792,7 +794,7 @@ local function run_actions(dispatcher, state, actions)
   for _, a in ipairs(actions) do
     local kind = a[1]
     if kind == "text" then
-      send_text(dispatcher, state, a[2], a[3])
+      send_text(dispatcher, state, a[2], a[3], a[4])
     elseif kind == "set_state" then
       if Objects.set(state.world, a[2], a[3], now) then
         broadcast_object(dispatcher, a[2], a[3] == nil and Objects.state_of(state.world, a[2]) or a[3])

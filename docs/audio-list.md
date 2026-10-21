@@ -140,6 +140,8 @@ What objects do when a spell reaches them. Positional, played by `spell_receiver
 | object_mended | Gen | 1.5 s | | 3 | A torn page or broken object made whole by magic: a soft papery rustle and a gentle clear chime |
 | lock_unlocked | Gen | 1 s | | 3 | An old iron lock springing open by itself: a crisp clack of iron and a tiny magical glint |
 
+Built (2026-10-21): all but `water_freeze`, `basin_fill` and `object_mended`, which wait for objects to play on. `brazier_loop` became `hearth_loop` (the village hearths), `basin_fill` gave way to `garden_water` (the greenhouse beds); `torch_loop` and `hearth_loop` are played by `FireAmbience` at the nearest fires only.
+
 ## 3. Puzzles, secrets and set pieces
 
 `objects/puzzles/*` and `objects/setpieces/*`, plus the mystery system. Secrets are a core pillar, so these are hero sounds; budget extra takes.
@@ -169,6 +171,8 @@ What objects do when a spell reaches them. Positional, played by `spell_receiver
 | platform_move_loop | Gen | 4 s | Loop | 3 | A floating stone platform drifting through the air by magic: a low stone rumble mixed with a soft steady magical hum, seamless |
 | clue_found | Gen | 2 s | | 4 | Finding a clue: a soft intriguing shimmer and two gentle chimes, curious and quiet |
 | mystery_solved | Gen | 4 s | | 4 | A great secret solved: a rising swell of shimmering chimes, a deep warm resonant boom and a long glowing ring-out |
+
+Built (2026-10-21): all of them. `shifting_stair_move` is a loop (`shifting_stair_move_loop`) that runs for the whole 7 s swing; `clue_found` and `mystery_solved` live with the UI sounds (`ui_clue_found`, `ui_mystery_solved`); `magic_door_refuse` is heard at a house door turning someone away.
 
 ## 4. Doors and furniture
 
