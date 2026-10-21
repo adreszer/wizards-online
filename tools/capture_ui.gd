@@ -61,6 +61,27 @@ func _run() -> void:
 	add_child(world)
 	await _frames(90)
 	_save("hud")
+	# The HUD with everything showing at once: hurt, a prompt, toasts, a banner, the houses.
+	var hud := world.get_node_or_null("HUD")
+	var me := get_tree().get_first_node_in_group("local_player")
+	if hud != null and me != null:
+		for id in ["arcane_pulse", "emberkindle", "frostbind", "glowmote", "unbolt"]:
+			me.spell_caster.learn_spell(load("res://resources/spells/%s.tres" % id))
+		me.spell_caster.select_slot(1)
+		me.spell_caster.try_cast()
+		hud.set_house_totals(PackedInt32Array([120, 95, 140, 60]))
+		hud._on_health_changed(62, 100)
+		hud._show_prompt("PROMPT_SIT")
+		hud.banner.show_area(tr("AREA_LIBRARY"), tr("MAP_FLOOR_GROUND"), 0.0)
+		GameEvents.notify(tr("NOTIFY_SPELL_LEARNED") % tr("SPELL_ARCANE_PULSE_NAME"), 30.0, ToastStack.Kind.LEARNED)
+		GameEvents.notify(tr("NOTIFY_DOOR_LOCKED"), 30.0, ToastStack.Kind.WARNING, "locked")
+		await _frames(30)
+		hud._show_prompt("PROMPT_SIT")
+		await _frames(2)
+		_save("hud_busy")
+		hud.toasts.clear()
+		hud._on_health_changed(100, 100)
+		hud._show_prompt("")
 	for path in ["InventoryPanel", "Journal", "MapPanel", "ChatPanel"]:
 		var panel := world.get_node_or_null(path)
 		if panel == null or not panel.has_method("open"):

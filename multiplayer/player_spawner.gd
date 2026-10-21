@@ -99,7 +99,7 @@ func _on_practical(view: Dictionary) -> void:
 		# A granted spell is ours now (its own notification names the professor).
 		if view.get("granted", false):
 			_practice_spell = &""
-		GameEvents.notification_requested.emit(tr("PRACTICAL_DONE"), 6.0)
+		GameEvents.notify(tr("PRACTICAL_DONE"), 6.0, ToastStack.Kind.REWARD, "check")
 	elif int(view.get("progress", 0)) > 0:
 		GameEvents.notification_requested.emit(tr("PRACTICAL_PROGRESS") % [int(view.progress), int(view.get("hits", 1))], 2.0)
 
@@ -122,7 +122,7 @@ func _on_server_message(op_code: int, payload: Dictionary) -> void:
 		caster.mastery[id] = points
 		var def := SpellRegistry.load_definition(id)
 		if def != null and SpellMastery.level_of(points) > SpellMastery.level_of(before):
-			GameEvents.notification_requested.emit(tr("MASTERY_LEVEL_UP") % [tr(def.display_name), tr(SpellMastery.level_key(points))], 6.0)
+			GameEvents.notify(tr("MASTERY_LEVEL_UP") % [tr(def.display_name), tr(SpellMastery.level_key(points))], 6.0, ToastStack.Kind.LEARNED)
 	if op_code == NetworkProtocol.OP_LECTURE_TEXT:
 		var sid := str(payload.get("sid", ""))
 		var speaker: Node = remote_players.get(sid, local_player if sid == NetworkManager.world_session.self_session_id else null)
@@ -264,9 +264,9 @@ func _on_spell_granted(spell_id: String, by_name: String) -> void:
 	if definition == null:
 		return
 	if by_name.is_empty():
-		GameEvents.notification_requested.emit(tr("NOTIFY_SPELL_LEARNED") % tr(definition.display_name), 6.0)
+		GameEvents.notify(tr("NOTIFY_SPELL_LEARNED") % tr(definition.display_name), 6.0, ToastStack.Kind.LEARNED)
 	else:
-		GameEvents.notification_requested.emit(tr("NOTIFY_SPELL_TAUGHT") % [by_name, tr(definition.display_name)], 6.0)
+		GameEvents.notify(tr("NOTIFY_SPELL_TAUGHT") % [by_name, tr(definition.display_name)], 6.0, ToastStack.Kind.LEARNED)
 
 
 func _on_disconnected(_reason: String) -> void:

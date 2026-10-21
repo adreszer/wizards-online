@@ -224,7 +224,7 @@ static func hud_text(v: Dictionary) -> String:
 ## Interact with a lantern: take your team's lit lantern, or relight it with fire.
 func use_lantern(t: String) -> void:
 	if my_team() != t:
-		GameEvents.notification_requested.emit(tr("CHASE_NOT_YOUR_LANTERN"), 3.0)
+		GameEvents.notify(tr("CHASE_NOT_YOUR_LANTERN"), 3.0, ToastStack.Kind.WARNING)
 		return
 	var info: Dictionary = (_view.get("lanterns", {}) as Dictionary).get(t, {}) if _view.get("lanterns", {}) is Dictionary else {}
 	var r: Dictionary
@@ -233,7 +233,7 @@ func use_lantern(t: String) -> void:
 	else:
 		r = await NetworkManager.request("chase_relight", {"spell": "emberkindle"})
 	if not r.ok:
-		GameEvents.notification_requested.emit(NetworkManager.refusal_text(r.reason), 3.0)
+		GameEvents.notify(NetworkManager.refusal_text(r.reason), 3.0, ToastStack.Kind.WARNING)
 
 
 func _on_spell_hit_player(peer_id: String, spell_id: StringName) -> void:

@@ -666,6 +666,49 @@ def tooltip():
     oak_panel("oak_tooltip", P=6, border=BRASS_DIM, alpha=0.97)
 
 
+def minimap_ring():
+    """The round minimap's bezel: a brass ring with engraved ticks every 15 degrees, a
+    north pointer on top, and a soft shadow falling inward onto the map, which shows
+    through the open middle (the map is clipped to MAP_R)."""
+    S = 232
+    cv = Canvas(S, S)
+    c = S / 2
+    ro, ri = 112.0, 101.0
+    r = np.hypot(cv.X - c, cv.Y - c)
+    ang = np.arctan2(cv.Y - c, cv.X - c)
+    # Shadow inward over the map and outward on the world.
+    cv.over(BLACK, np.clip(1 - (ri - r) / 10, 0, 1) * (r < ri + 1) * 0.55)
+    cv.over(BLACK, np.clip(1 - (r - ro) / 5, 0, 1) * (r > ro - 1) * 0.45)
+    ring = lambda X, Y: np.abs(np.hypot(X - c, Y - c) - (ro + ri) / 2) - (ro - ri) / 2
+    cv.over(BLACK, cov(ring(cv.X - 0.8, cv.Y - 1.6) - 0.4) * 0.5)
+    cv.over(brass(cv, ring, BRASS, 2.2), cov(ring(cv.X, cv.Y)))
+    # Engraved ticks: long at the four quarters and the diagonals, short between.
+    step = math.pi / 12
+    k = np.round(ang / step)
+    off = np.abs(ang - k * step) * r
+    major = (np.mod(k, 3) == 0)
+    length = np.where(major, 6.5, 3.5)
+    tick = (off < 0.55) & (r > ro - 1.5 - length) & (r < ro - 1.5)
+    cv.over(BRASS_DIM * 0.45, cov(off - 0.55) * tick * 0.9)
+    # Inner bead.
+    bead = lambda X, Y: np.abs(np.hypot(X - c, Y - c) - (ri + 0.6)) - 0.6
+    cv.over(BRASS_BRIGHT, cov(bead(cv.X, cv.Y)) * 0.6)
+    # North pointer: a brass arrowhead over the ring at the top.
+    def arrow(X, Y):
+        u, v = X - c, Y - (c - ro + 2)
+        tri = np.maximum(np.abs(u) * 1.6 + v - 16, -v - 3)
+        return np.maximum(tri, np.abs(u) - 9)
+    cv.over(BLACK, cov(arrow(cv.X - 0.8, cv.Y - 1.6)) * 0.5)
+    cv.over(brass(cv, arrow, BRASS_BRIGHT, 1.6), cov(arrow(cv.X, cv.Y)))
+    cv.over(WAX, cov(sd_circle(cv.X, cv.Y, c, c - ro + 6.5, 2.4)))
+    # Studs at the other three quarters.
+    for a in (0.0, math.pi / 2, math.pi):
+        sx, sy = c + math.cos(a) * (ro + ri) / 2, c + math.sin(a) * (ro + ri) / 2
+        stud = lambda X, Y, sx=sx, sy=sy: sd_circle(X, Y, sx, sy, 2.6)
+        cv.over(brass(cv, stud, BRASS_BRIGHT, 1.6), cov(stud(cv.X, cv.Y)))
+    cv.save("minimap_ring", tile=False)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fetch", action="store_true", help="download the CC0 source textures first")
@@ -698,6 +741,7 @@ def main():
     for s in ("normal", "selected"):
         item_slot(s)
     brass_separator()
+    minimap_ring()
     with open(os.path.join(OUT, "frames.json"), "w") as f:
         json.dump(MANIFEST, f, indent=1, sort_keys=True)
         f.write("\n")

@@ -232,9 +232,9 @@ SPELL_QUICKSPROUT_INCANTATION,Germina Cito,Germina Cito
 HUD_HOTBAR_HINT,Spells: 1–0 select · Q/R cycle · LMB cast,Czary: 1–0 wybór · Q/R zmiana · LPM rzucanie
 ROLE_PROFESSOR_TITLE,Prof.,prof.
 ROLE_ADMIN_TITLE,Steward,Zarządca
-HUD_ROLE_PROFESSOR,Role: Professor,Rola: Profesor
-HUD_ROLE_ADMIN,Role: Steward (admin),Rola: Zarządca (admin)
-HUD_LESSON_HINT,[L] Lesson tools,[L] Narzędzia lekcji
+HUD_ROLE_PROFESSOR,Professor,Profesor
+HUD_ROLE_ADMIN,Steward,Zarządca
+HUD_LESSON_HINT,Lesson tools,Narzędzia lekcji
 LESSON_TITLE,Lesson tools,Narzędzia lekcji
 LESSON_AREA,Room: %s,Sala: %s
 LESSON_NOT_CLASSROOM,You must stand in a classroom to teach.,"Aby uczyć, musisz stać w sali lekcyjnej."
@@ -1186,3 +1186,5 @@ GALLERY_DIALOG_TEXT,The professor is still teaching. If you leave now you miss t
 GALLERY_ERROR_TITLE,Connection lost,Utracono połączenie
 GALLERY_ERROR_TEXT,The school's server does not answer. Check your connection and try again.,Serwer szkoły nie odpowiada. Sprawdź połączenie i spróbuj ponownie.
 UI_KEY_SPACE,Space,Spacja
+HUD_SPELL_LINE,%s — “%s”,%s — „%s”
+ACTION_TOGGLE_HUD,Hide interface,Ukryj interfejs

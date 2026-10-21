@@ -29,7 +29,7 @@ func send_bird(from_name: String) -> Node3D:
 	var bird := build_bird()
 	add_child(bird)
 	if GameSettings.get_value("captions"):
-		GameEvents.notification_requested.emit(tr("CAPTION_PAPER_BIRD"), 3.0)
+		GameEvents.notify(tr("CAPTION_PAPER_BIRD"), 3.0, ToastStack.Kind.INFO, "chat_dm")
 	bird.global_position = start
 	birds.append(bird)
 	var tween := create_tween()

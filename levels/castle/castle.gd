@@ -81,7 +81,7 @@ func _ready() -> void:
 	add_child(meals)
 	for wall in get_tree().get_nodes_in_group("secret_walls"):
 		if wall is SecretWall:
-			(wall as SecretWall).revealed.connect(func() -> void: GameEvents.notification_requested.emit(tr("NOTIFY_SECRET_PASSAGE"), 4.0))
+			(wall as SecretWall).revealed.connect(func() -> void: GameEvents.notify(tr("NOTIFY_SECRET_PASSAGE"), 4.0, ToastStack.Kind.DISCOVERY, "secret"))
 	GameEvents.checkpoint_activated.connect(func(_c: Node) -> void: GameEvents.notification_requested.emit(tr("NOTIFY_CHECKPOINT"), 2.0))
 
 

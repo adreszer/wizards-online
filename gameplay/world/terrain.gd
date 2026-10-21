@@ -415,7 +415,7 @@ func _guard(body: CharacterBody3D) -> void:
 	elif in_water and _safe.has(id):
 		body.velocity = Vector3.ZERO
 		body.global_position = _safe[id] + Vector3(0, 0.3, 0)
-		GameEvents.notification_requested.emit(tr("NOTIFY_DEEP_WATER"), 3.0)
+		GameEvents.notify(tr("NOTIFY_DEEP_WATER"), 3.0, ToastStack.Kind.WARNING)
 
 
 # --- water --------------------------------------------------------------------------------

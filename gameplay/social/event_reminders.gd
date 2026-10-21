@@ -19,7 +19,7 @@ func _process(delta: float) -> void:
 	for r in due(NetworkManager.feature("events"), NetworkManager.feature("clubs"), NetworkManager.local_display_name, NetworkManager.server_time()):
 		if not _reminded.has(r.key):
 			_reminded[r.key] = true
-			GameEvents.notification_requested.emit(tr("EVENT_REMINDER") % [r.title, Localization.area_name(r.area) if r.area != "" else tr("EVENT_ANYWHERE")], 8.0)
+			GameEvents.notify(tr("EVENT_REMINDER") % [r.title, Localization.area_name(r.area) if r.area != "" else tr("EVENT_ANYWHERE")], 8.0, ToastStack.Kind.INFO, "time")
 
 
 ## Everything starting within AHEAD seconds of `now`: [{key, title, area}].

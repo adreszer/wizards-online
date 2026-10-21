@@ -78,9 +78,21 @@ ICONS = {
     "subject_divination": "lorc/crystal-ball",
     "subject_arithmancy": "delapouite/abacus",
     "subject_runes": "lorc/rune-stone",
+    # Spells, by effect (SpellSlot picks "spell_<effect_type>")
+    "spell_force": "lorc/energy-arrow",
+    "spell_fire": "lorc/burning-embers",
+    "spell_frost": "lorc/snowflake-1",
+    "spell_light": "lorc/sun-radiations",
+    "spell_wind": "lorc/whirlwind",
+    "spell_water": "sbed/water-drop",
+    "spell_growth": "lorc/sprout",
+    "spell_mend": "delapouite/healing",
+    "spell_unlock": "delapouite/padlock-open",
+    "spell_levitate": "lorc/lift",
+    "spell_dark": "lorc/evil-moon",
 }
 
-AUTHORS = {"lorc": "Lorc", "delapouite": "Delapouite"}
+AUTHORS = {"lorc": "Lorc", "delapouite": "Delapouite", "sbed": "Sbed"}
 
 
 def fetch(path):

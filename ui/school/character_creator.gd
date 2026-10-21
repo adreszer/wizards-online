@@ -144,7 +144,7 @@ func close(keep: bool) -> void:
 	if keep:
 		NetworkManager.save_look(_look)
 		_player.set_look(CharacterLook.sanitize(_look))
-		GameEvents.notification_requested.emit(tr("CREATOR_SAVED"), 4.0)
+		GameEvents.notify(tr("CREATOR_SAVED"), 4.0, ToastStack.Kind.INFO, "check")
 	else:
 		_player.set_look(_before)
 

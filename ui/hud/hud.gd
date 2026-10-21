@@ -1,417 +1,458 @@
 extends CanvasLayer
-## Minimal in-game HUD: health, collectibles, equipped spell, interaction
-## prompt, notifications, connection status. Reads player components via the
+## The in-game HUD (docs/ui.md, Milestone 67), built from the UI components. Top left:
+## who you are (crest, name, house and year), the health vial only while hurt or in a
+## duel, the lesson-tools key for staff. Top right: the day dial with the time and the
+## next lesson, the house crystals. Centre: the crosshair and the interaction prompt as
+## a key chip and a verb. Bottom: the spell roundels with the held item beside them.
+## Notifications are toasts at the top, area names and lesson starts a banner. The
+## minimap is its own layer (ui/map/minimap.gd). Behind a window the HUD fades out;
+## toggle_hud hides all of it for screenshots. Reads player components via the
 ## local_player_spawned event; never drives gameplay.
 
-@onready var _health_bar: ProgressBar = %HealthBar
-@onready var _health_label: Label = %HealthLabel
-@onready var _fragments_label: Label = %FragmentsLabel
-@onready var _spell_label: Label = %SpellLabel
-@onready var _cooldown_bar: ProgressBar = %CooldownBar
-@onready var _held_label: Label = %HeldLabel
-@onready var _role_label: Label = %RoleLabel
-@onready var _house_label: Label = %HouseLabel
-@onready var _house_crest: TextureRect = %HouseCrest
-@onready var _coins_label: Label = %CoinsLabel
-@onready var _prompt_label: Label = %PromptLabel
-@onready var _notification_label: Label = %NotificationLabel
-@onready var _status_label: Label = %StatusLabel
-@onready var _clock_label: Label = %ClockLabel
-@onready var _schedule_label: Label = %ScheduleLabel
-@onready var _crosshair: Control = %Crosshair
-@onready var _hotbar_root: Control = %HotbarRoot
-@onready var _hotbar: HBoxContainer = %Hotbar
-@onready var _house_tally: HBoxContainer = %HouseTally
-
-const SLOT_KEY_LABELS := ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
-
-var _slot_style: StyleBox
-var _slot_selected_style: StyleBox
-## One entry per quick slot: {panel, key, name, cooldown}.
-var _slot_views: Array[Dictionary] = []
-
 const FRAGMENT_ID := &"arcane_fragment"
-## How visible the HUD panels stay behind an open window (UiRouter); the crosshair and
-## the prompt go entirely.
-const BEHIND_WINDOW := 0.25
+## How visible the HUD stays behind an open window (UiRouter).
+const BEHIND_WINDOW := 0.0
+## Seconds before walking back into the same area shows its banner again.
+const AREA_REPEAT := 30.0
+## Seconds the health vial stays after healing back to full.
+const HEALTH_LINGER := 3.0
+## Below this share of health the vial pulses.
+const HEALTH_LOW := 0.3
 
+## Everything but the toasts, faded behind windows.
+var hud_root: Control
+var plate: PlayerPlate
+var health_vial: ProgressVial
+var staff_hint: HBoxContainer
+var dial: DayDial
+var clock_label: Label
+var lesson_label: Label
+var status_label: Label
+var house_tally: HouseCrystals
+var crosshair: HudCrosshair
+var prompt_row: HBoxContainer
+var prompt_label: Label
+var banner: AreaBanner
+var hotbar_root: VBoxContainer
+var hotbar: HBoxContainer
+var spell_label: Label
+var held_slot: ItemSlot
+var toasts: ToastStack
+## False while the player has hidden the interface (toggle_hud).
+var shown := true
+
+var _toast_layer: CanvasLayer
+var _slots: Array[SpellSlot] = []
 var _player: Node
 var _caster: SpellCaster
 var _inventory: Inventory
-var _notification_timer: float = 0.0
-var _clock_timer: float = 0.0
+var _health: Health
+var _clock_timer := 0.0
+var _health_full_for := 0.0
+var _in_duel := false
 var _focused: Interactable
 var _status: int = NetworkManager.Status.OFFLINE
-var _status_message: String = ""
+var _status_message := ""
+var _last_area := ""
+var _last_area_at := -1000.0
 
 
 func _ready() -> void:
+	_build()
 	GameEvents.local_player_spawned.connect(_bind_player)
 	GameEvents.collectible_collected.connect(_on_collectible_collected)
-	GameEvents.collectible_total_changed.connect(_on_total_changed)
 	GameEvents.notification_requested.connect(show_notification)
 	GameEvents.spell_learned.connect(_on_spell_learned)
 	GameEvents.area_entered.connect(_on_area_entered)
+	GameEvents.school_bell_rang.connect(_on_bell)
+	GameEvents.house_changed.connect(func(_h: int) -> void: _refresh_plate())
 	NetworkManager.status_changed.connect(_on_status_changed)
-	NetworkManager.profile_received.connect(_on_profile_received)
+	NetworkManager.profile_received.connect(func(_p: Dictionary) -> void: _refresh_plate())
 	NetworkManager.house_totals_changed.connect(set_house_totals)
 	NetworkManager.wallet_changed.connect(_on_wallet_changed)
-	GameEvents.house_changed.connect(func(_h: int) -> void: _refresh_house())
-	_prompt_label.visible = false
-	_notification_label.visible = false
-	_build_hotbar()
-	_update_fragments()
+	NetworkManager.server_message.connect(_on_server_message)
+	UiRouter.changed.connect(_on_windows_changed)
 	_on_status_changed(NetworkManager.status, "")
 	_on_spell_learned(null)
 	_on_held_item_changed(null)
-	_refresh_role()
-	_refresh_house()
+	_refresh_plate()
 	set_house_totals(NetworkManager.get_house_totals())
-	_refresh_coins()
-	UiRouter.changed.connect(_on_windows_changed)
+	_refresh_clock()
 	_on_windows_changed()
 
 
-## Steps back while a window is open, so the window and the dimmed world read first.
+func _build() -> void:
+	hud_root = Control.new()
+	hud_root.name = "HudRoot"
+	hud_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	hud_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(hud_root)
+	# Top left: who you are.
+	var top_left := UiBox.v()
+	top_left.name = "TopLeft"
+	top_left.position = Vector2(UiTokens.SPACE_5, UiTokens.SPACE_4)
+	hud_root.add_child(top_left)
+	plate = PlayerPlate.new()
+	top_left.add_child(plate)
+	health_vial = ProgressVial.new()
+	health_vial.custom_minimum_size = Vector2(200, 18)
+	health_vial.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	health_vial.low = HEALTH_LOW
+	health_vial.show_value = true
+	health_vial.visible = false
+	top_left.add_child(health_vial)
+	staff_hint = KeyChip.hint_row(&"lesson_tools", tr("HUD_LESSON_HINT"), &"HudMeta")
+	staff_hint.visible = false
+	top_left.add_child(staff_hint)
+	# Top right: the time of day and the houses.
+	var top_right := UiBox.v()
+	top_right.name = "TopRight"
+	top_right.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	top_right.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	top_right.offset_right = -UiTokens.SPACE_5
+	top_right.offset_top = UiTokens.SPACE_4
+	hud_root.add_child(top_right)
+	var time_row := UiBox.h(UiTokens.SPACE_3, BoxContainer.ALIGNMENT_END)
+	top_right.add_child(time_row)
+	var time_lines := UiBox.v(-2)
+	time_lines.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	time_row.add_child(time_lines)
+	clock_label = _label(&"HudClock", HORIZONTAL_ALIGNMENT_RIGHT)
+	time_lines.add_child(clock_label)
+	lesson_label = _label(&"HudLesson", HORIZONTAL_ALIGNMENT_RIGHT)
+	time_lines.add_child(lesson_label)
+	status_label = _label(&"HudStatus", HORIZONTAL_ALIGNMENT_RIGHT)
+	status_label.visible = false
+	time_lines.add_child(status_label)
+	dial = DayDial.new()
+	time_row.add_child(dial)
+	house_tally = HouseCrystals.new()
+	house_tally.size_flags_horizontal = Control.SIZE_SHRINK_END
+	house_tally.visible = false
+	top_right.add_child(house_tally)
+	# Centre: the aim and what you can do with what is in front of you.
+	crosshair = HudCrosshair.new()
+	crosshair.set_anchors_preset(Control.PRESET_CENTER)
+	crosshair.position = -crosshair.custom_minimum_size / 2.0
+	crosshair.visible = false
+	hud_root.add_child(crosshair)
+	prompt_row = KeyChip.hint_row(&"interact", "", &"HudPrompt")
+	prompt_row.name = "Prompt"
+	prompt_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	prompt_row.set_anchors_preset(Control.PRESET_CENTER)
+	prompt_row.offset_left = -360
+	prompt_row.offset_right = 360
+	prompt_row.offset_top = 36
+	prompt_row.offset_bottom = 70
+	prompt_row.visible = false
+	prompt_label = prompt_row.get_child(1)
+	hud_root.add_child(prompt_row)
+	# Upper middle: area names and lesson starts.
+	banner = AreaBanner.new()
+	banner.anchor_left = 0.5
+	banner.anchor_right = 0.5
+	# Below where four toasts reach.
+	banner.anchor_top = 0.34
+	banner.anchor_bottom = 0.34
+	banner.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	hud_root.add_child(banner)
+	# Bottom: the spell roundels and the item in hand.
+	hotbar_root = UiBox.v(UiTokens.SPACE_1)
+	hotbar_root.name = "HotbarRoot"
+	hotbar_root.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	hotbar_root.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	hotbar_root.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	hotbar_root.offset_bottom = -UiTokens.SPACE_3
+	hud_root.add_child(hotbar_root)
+	spell_label = _label(&"HudSpell", HORIZONTAL_ALIGNMENT_CENTER)
+	hotbar_root.add_child(spell_label)
+	var bottom := UiBox.h(UiTokens.SPACE_4, BoxContainer.ALIGNMENT_CENTER)
+	hotbar_root.add_child(bottom)
+	hotbar = UiBox.h(0)
+	hotbar.name = "Hotbar"
+	bottom.add_child(hotbar)
+	for i in SpellCaster.QUICK_SLOT_COUNT:
+		var slot := SpellSlot.new()
+		slot.key_chip.action = StringName("spell_slot_%d" % (i + 1))
+		hotbar.add_child(slot)
+		_slots.append(slot)
+	held_slot = ItemSlot.new()
+	held_slot.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	held_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	held_slot.visible = false
+	bottom.add_child(held_slot)
+	hotbar.visible = false
+	# Toasts on their own layer, above windows, so a "saved" or a refusal still reads.
+	_toast_layer = CanvasLayer.new()
+	_toast_layer.name = "Toasts"
+	_toast_layer.layer = 70
+	add_child(_toast_layer)
+	toasts = ToastStack.new()
+	toasts.anchor_left = 0.5
+	toasts.anchor_right = 0.5
+	toasts.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	toasts.offset_top = UiTokens.SPACE_4
+	_toast_layer.add_child(toasts)
+
+
+func _label(variation: StringName, align: HorizontalAlignment) -> Label:
+	var label := Label.new()
+	label.theme_type_variation = variation
+	label.horizontal_alignment = align
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	return label
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("toggle_hud"):
+		set_shown(not shown)
+		get_viewport().set_input_as_handled()
+
+
+## Hides or shows the whole interface (the minimap listens to hud_toggled).
+func set_shown(value: bool) -> void:
+	shown = value
+	visible = value
+	_toast_layer.visible = value
+	GameEvents.hud_toggled.emit(value)
+
+
+## Fades out while a window is open, so the window and the dimmed world read first.
 func _on_windows_changed() -> void:
-	var behind := UiRouter.has_modal()
-	var instant: bool = GameSettings.get_value("reduce_motion")
-	for node: CanvasItem in [$TopLeft, $TopRight, _hotbar_root, _crosshair, _prompt_label]:
-		var alpha := 1.0
-		if behind:
-			alpha = 0.0 if node == _crosshair or node == _prompt_label else BEHIND_WINDOW
-		if instant or not is_inside_tree():
-			node.modulate.a = alpha
-		else:
-			# Runs while the game is paused too (the pause menu is a window).
-			node.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).tween_property(node, "modulate:a", alpha, UiTokens.NORMAL)
+	var alpha := BEHIND_WINDOW if UiRouter.has_modal() else 1.0
+	if GameSettings.get_value("reduce_motion") or not is_inside_tree():
+		hud_root.modulate.a = alpha
+	else:
+		# Runs while the game is paused too (the pause menu is a window).
+		hud_root.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).tween_property(hud_root, "modulate:a", alpha, UiTokens.NORMAL)
 
 
 func _process(delta: float) -> void:
-	if _caster != null and _caster.equipped_spell != null:
-		var cd := _caster.equipped_spell.cooldown
-		_cooldown_bar.value = 1.0 - (_caster.cooldown_remaining / cd if cd > 0.0 else 0.0)
-	_update_hotbar_cooldowns()
+	_update_cooldowns()
+	if _health_full_for > 0.0:
+		_health_full_for -= delta
+		if _health_full_for <= 0.0:
+			_refresh_health_visibility()
 	_clock_timer -= delta
 	if _clock_timer <= 0.0:
 		_clock_timer = 0.5
 		_refresh_clock()
 		_refresh_seat_prompt()
-	if _notification_timer > 0.0:
-		_notification_timer -= delta
-		if _notification_timer <= 0.0:
-			_notification_label.visible = false
 
 
-## School time and phase, e.g. "14:05 · day".
+## The time, the lesson running or next (else the part of the day) and the dial.
 func _refresh_clock() -> void:
 	var hours := NetworkManager.school_hours()
-	_clock_label.text = tr("HUD_CLOCK") % [SchoolClock.format(hours), tr(SchoolClock.phase_key(SchoolClock.phase_of(hours)))]
+	clock_label.text = SchoolClock.format(hours)
 	var line := NetworkManager.timetable.status_line(NetworkManager.server_time())
-	_schedule_label.text = line
-	_schedule_label.visible = line != ""
-
+	lesson_label.text = line if line != "" else tr(SchoolClock.phase_key(SchoolClock.phase_of(hours)))
+	dial.hours = hours
 
 
 func _bind_player(player: Node) -> void:
 	_player = player
-	var health: Health = player.health
-	health.health_changed.connect(_on_health_changed)
-	_on_health_changed(health.current, health.max_health)
+	_health = player.health
+	_health.health_changed.connect(_on_health_changed)
+	_on_health_changed(_health.current, _health.max_health)
 	_caster = player.spell_caster
 	_caster.spell_changed.connect(_on_spell_learned)
 	_caster.spells_changed.connect(_refresh_hotbar)
 	_on_spell_learned(_caster.equipped_spell)
-	_refresh_hotbar()
 	var interaction: InteractionController = player.interaction_controller
 	interaction.focus_changed.connect(_on_focus_changed)
 	_inventory = player.inventory
 	_inventory.held_item_changed.connect(_on_held_item_changed)
 	_on_held_item_changed(_inventory.held_item)
-	_refresh_house()
+	_refresh_plate()
+
+
+# --- Who you are -------------------------------------------------------------------------
+
+func _refresh_plate() -> void:
+	var house: int = int(_player.get("house")) if _player != null else 0
+	var profile := NetworkManager.get_local_profile()
+	var role := NetworkManager.get_local_role()
+	plate.show_player(GameSession.display_name, house, int(profile.get("year", 1)), role)
+	staff_hint.visible = CharacterProfile.is_staff(role)
 
 
 func _on_health_changed(current: int, maximum: int) -> void:
-	_health_bar.max_value = maximum
-	_health_bar.value = current
-	_health_label.text = "%d / %d" % [current, maximum]
+	health_vial.max_value = maximum
+	health_vial.value = current
+	if current >= maximum and health_vial.visible:
+		_health_full_for = HEALTH_LINGER
+	_refresh_health_visibility()
 
 
-func _on_collectible_collected(_definition: Resource, _total: int, _max_total: int) -> void:
-	_update_fragments()
+## The vial shows while hurt, a little after healing and all through a duel.
+func _refresh_health_visibility() -> void:
+	var hurt := health_vial.value < health_vial.max_value
+	health_vial.visible = hurt or _in_duel or _health_full_for > 0.0
 
 
-func _on_total_changed(_id: StringName, _max_total: int) -> void:
-	_update_fragments()
+func _on_server_message(op: int, payload: Dictionary) -> void:
+	if op != NetworkProtocol.OP_DUEL_STATE:
+		return
+	var me := NetworkManager.world_session.self_session_id
+	var state := str(payload.get("state", ""))
+	_in_duel = (state == "countdown" or state == "fighting") and me in [payload.get("a", ""), payload.get("b", "")]
+	_refresh_health_visibility()
 
 
-func _update_fragments() -> void:
-	_fragments_label.text = tr("HUD_FRAGMENTS") % [GameSession.get_collected(FRAGMENT_ID), GameSession.get_total(FRAGMENT_ID)]
-
+# --- Spells and the hand ------------------------------------------------------------------
 
 func _on_spell_learned(definition: Resource) -> void:
-	if definition == null:
-		_spell_label.text = tr("HUD_SPELL_NONE")
-		_cooldown_bar.visible = false
-		_crosshair.visible = false
+	var def := definition as SpellDefinition
+	crosshair.visible = def != null
+	if def == null:
+		spell_label.text = ""
+	elif def.incantation.is_empty():
+		spell_label.text = tr(def.display_name)
 	else:
-		var incantation := (definition as SpellDefinition).incantation if definition is SpellDefinition else ""
-		if incantation.is_empty():
-			_spell_label.text = tr("HUD_SPELL") % tr(definition.display_name)
-		else:
-			_spell_label.text = tr("HUD_SPELL_INCANTATION") % [tr(definition.display_name), tr(incantation)]
-		_cooldown_bar.visible = true
-		_crosshair.visible = true
+		spell_label.text = tr("HUD_SPELL_LINE") % [tr(def.display_name), tr(def.incantation)]
 	_refresh_hotbar()
 
 
-# --- Hotbar ---------------------------------------------------------------------------
-
-## Ten fixed slots (keys 1–0). Built once; refreshed from the caster's quick_slots.
-## Purely display: selection happens through PlayerInput → SpellCaster so the
-## HUD never swallows mouse clicks meant for casting.
-func _build_hotbar() -> void:
-	_slot_style = _make_slot_style(false)
-	_slot_selected_style = _make_slot_style(true)
-	for i in SpellCaster.QUICK_SLOT_COUNT:
-		var panel := PanelContainer.new()
-		panel.custom_minimum_size = Vector2(68, 56)
-		panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		panel.add_theme_stylebox_override("panel", _slot_style)
-		var vbox := VBoxContainer.new()
-		vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		vbox.add_theme_constant_override("separation", 0)
-		panel.add_child(vbox)
-		var key := Label.new()
-		key.text = SLOT_KEY_LABELS[i]
-		key.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		key.add_theme_font_size_override("font_size", 12)
-		key.add_theme_color_override("font_color", Color(0.75, 0.72, 0.8))
-		vbox.add_child(key)
-		var name_label := Label.new()
-		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		name_label.add_theme_font_size_override("font_size", 13)
-		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_label.clip_text = true
-		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		name_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		vbox.add_child(name_label)
-		var cooldown := ProgressBar.new()
-		cooldown.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		cooldown.custom_minimum_size = Vector2(0, 4)
-		cooldown.max_value = 1.0
-		cooldown.value = 1.0
-		cooldown.show_percentage = false
-		vbox.add_child(cooldown)
-		_hotbar.add_child(panel)
-		_slot_views.append({"panel": panel, "key": key, "name": name_label, "cooldown": cooldown})
-	_hotbar_root.visible = false
-
-
-func _make_slot_style(selected: bool) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.25, 0.18, 0.4, 0.75) if selected else Color(0, 0, 0, 0.5)
-	style.set_border_width_all(2 if selected else 1)
-	style.border_color = Color(1, 0.85, 0.5) if selected else Color(0.45, 0.4, 0.5, 0.7)
-	style.set_corner_radius_all(5)
-	style.content_margin_left = 6
-	style.content_margin_right = 6
-	style.content_margin_top = 4
-	style.content_margin_bottom = 4
-	return style
-
-
+## Ten fixed roundels (keys 1–0), refreshed from the caster's quick_slots. Display
+## only: selection happens through PlayerInput → SpellCaster.
 func _refresh_hotbar() -> void:
-	if _caster == null or _slot_views.is_empty():
+	if _caster == null:
 		return
 	var any := false
 	var selected := _caster.equipped_slot()
-	for i in _slot_views.size():
-		var view := _slot_views[i]
+	for i in _slots.size():
 		var def: SpellDefinition = _caster.quick_slots[i] if i < _caster.quick_slots.size() else null
-		var name_label: Label = view["name"]
-		var key: Label = view["key"]
-		var panel: PanelContainer = view["panel"]
-		if def == null:
-			name_label.text = ""
-			key.modulate = Color(1, 1, 1, 0.5)
-		else:
-			any = true
-			name_label.text = tr(def.display_name)
-			name_label.add_theme_color_override("font_color", def.color.lightened(0.35))
-			key.modulate = Color.WHITE
-		panel.add_theme_stylebox_override("panel", _slot_selected_style if i == selected else _slot_style)
-		(view["cooldown"] as ProgressBar).visible = def != null
-	_hotbar_root.visible = any
+		var slot := _slots[i]
+		slot.set_spell(def)
+		slot.selected = i == selected and def != null
+		slot.mastery_max = SpellMastery.THRESHOLDS.size() - 1 if def != null else 0
+		slot.mastery = _caster.mastery_level(def) if def != null else 0
+		any = any or def != null
+	hotbar.visible = any
+	spell_label.visible = any
 
 
-func _update_hotbar_cooldowns() -> void:
-	if _caster == null or not _hotbar_root.visible:
+func _update_cooldowns() -> void:
+	if _caster == null or not hotbar.visible:
 		return
-	for i in _slot_views.size():
+	for i in _slots.size():
 		var def: SpellDefinition = _caster.quick_slots[i] if i < _caster.quick_slots.size() else null
-		if def == null:
-			continue
-		var bar: ProgressBar = _slot_views[i]["cooldown"]
-		var remaining := _caster.get_cooldown_remaining(def)
-		bar.value = 1.0 - (remaining / def.cooldown if def.cooldown > 0.0 else 0.0)
+		if def != null:
+			_slots[i].cooldown = _caster.get_cooldown_remaining(def) / def.cooldown if def.cooldown > 0.0 else 0.0
 
 
 ## Slot index shown as selected (tests, debug); -1 when nothing is equipped.
 func hotbar_selected_index() -> int:
-	return _caster.equipped_slot() if _caster != null else -1
+	for i in _slots.size():
+		if _slots[i].selected:
+			return i
+	return -1
 
 
 func _on_held_item_changed(definition: ItemDefinition) -> void:
-	if definition == null:
-		_held_label.text = tr("HUD_HELD_NONE")
-	else:
-		_held_label.text = tr("HUD_HELD") % tr(definition.display_name)
+	held_slot.visible = definition != null
+	if definition != null:
+		held_slot.set_texture(definition.icon)
+		held_slot.tooltip_text = tr(definition.display_name)
 
 
-func _on_profile_received(_profile: Dictionary) -> void:
-	_refresh_role()
-
-
-## House points tally (index 0 = house 1): each house's crest in its colour
-## and its points; hidden while there is none (offline).
-func set_house_totals(totals: PackedInt32Array) -> void:
-	for child in _house_tally.get_children():
-		child.queue_free()
-	_house_tally.visible = totals.size() >= CharacterProfile.MAX_HOUSE
-	if not _house_tally.visible:
-		return
-	for h in range(1, CharacterProfile.MAX_HOUSE + 1):
-		var entry := HBoxContainer.new()
-		entry.add_theme_constant_override("separation", 3)
-		entry.tooltip_text = tr("HUD_HOUSE_POINTS") % [CharacterProfile.house_name(h), totals[h - 1]]
-		var crest := _crest_icon(h)
-		crest.custom_minimum_size = Vector2(20, 20)
-		entry.add_child(crest)
-		var label := Label.new()
-		label.text = str(totals[h - 1])
-		label.add_theme_color_override("font_color", CharacterProfile.HOUSE_COLORS[h])
-		entry.add_child(label)
-		_house_tally.add_child(entry)
-
-
-## Text of the tally labels, for tests.
-func house_tally_text() -> String:
-	var parts := PackedStringArray()
-	for entry in _house_tally.get_children():
-		if entry.is_queued_for_deletion():
-			continue
-		for child in entry.get_children():
-			if child is Label:
-				parts.append((child as Label).text)
-	return " ".join(parts)
-
-
-## A house's crest as a small glyph in the house colour.
-static func _crest_icon(house: int) -> TextureRect:
-	var icon := TextureRect.new()
-	icon.texture = CharacterProfile.crest(house, CharacterProfile.CREST_ICON)
-	icon.modulate = CharacterProfile.house_color(house)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	return icon
-
-
-## The purse line; a gain or loss also shows as a notification.
-func _on_wallet_changed(_coins: int, delta: int, source: String, detail: String) -> void:
-	_refresh_coins()
-	var line := Currency.change_line(delta, source, detail)
-	if line != "":
-		GameEvents.notification_requested.emit(line, 5.0)
-
-
-func _refresh_coins() -> void:
-	_coins_label.text = tr("HUD_COINS") % Currency.format(NetworkManager.get_coins())
-
-
-func _refresh_house() -> void:
-	var house: int = int(_player.get("house")) if _player != null else 0
-	if house == 0:
-		_house_label.text = tr("HUD_HOUSE_NONE")
-		_house_label.remove_theme_color_override("font_color")
-		_house_crest.visible = false
-	else:
-		_house_label.text = tr("HUD_HOUSE") % CharacterProfile.house_name(house)
-		_house_label.add_theme_color_override("font_color", CharacterProfile.house_color(house))
-		_house_crest.texture = CharacterProfile.crest(house, CharacterProfile.CREST_ICON)
-		_house_crest.modulate = CharacterProfile.house_color(house)
-		_house_crest.visible = true
-
-
-## Students see nothing; staff see their role and the lesson-tools key.
-func _refresh_role() -> void:
-	var role := NetworkManager.get_local_role()
-	match role:
-		CharacterProfile.ROLE_PROFESSOR:
-			_role_label.text = tr("HUD_ROLE_PROFESSOR") + "  " + tr("HUD_LESSON_HINT")
-		CharacterProfile.ROLE_ADMIN:
-			_role_label.text = tr("HUD_ROLE_ADMIN") + "  " + tr("HUD_LESSON_HINT")
-	_role_label.visible = CharacterProfile.is_staff(role)
-
+# --- The world around you ---------------------------------------------------------------
 
 ## With nothing in focus, interacting sits down at a nearby seat (or stands up).
 func _refresh_seat_prompt() -> void:
 	if _focused != null or _player == null or not is_instance_valid(_player):
 		return
-	var text := ""
+	var verb := ""
 	if _player.gestures.is_sitting():
-		text = tr("HUD_PROMPT") % tr("PROMPT_STAND")
+		verb = "PROMPT_STAND"
 	elif _player.seat_nearby():
-		text = tr("HUD_PROMPT") % tr("PROMPT_SIT")
-	_prompt_label.text = text
-	_prompt_label.visible = text != ""
+		verb = "PROMPT_SIT"
+	_show_prompt(verb)
 
 
 func _on_focus_changed(interactable: Interactable) -> void:
 	_focused = interactable
-	if interactable == null:
-		_prompt_label.visible = false
-	else:
-		_prompt_label.text = tr("HUD_PROMPT") % tr(interactable.prompt_text)
-		_prompt_label.visible = true
+	_show_prompt(interactable.prompt_text if interactable != null else "")
 
 
-## Area name toast when the player walks into a named part of the castle.
+## The prompt under the crosshair: the interact key and `verb` (a translation key).
+func _show_prompt(verb: String) -> void:
+	prompt_label.text = tr(verb) if verb != "" else ""
+	prompt_row.visible = verb != ""
+
+
+## The area's name as a banner when the player walks into a named part of the castle.
 func _on_area_entered(_area_id: StringName, zone: Node) -> void:
-	if zone.has_method("display_name"):
-		show_notification(zone.display_name(), 2.5)
+	if not zone.has_method("display_name"):
+		return
+	var title: String = zone.display_name()
+	var now := Time.get_ticks_msec() / 1000.0
+	if title == "" or (title == _last_area and now - _last_area_at < AREA_REPEAT):
+		return
+	_last_area = title
+	_last_area_at = now
+	banner.show_area(title)
 
 
+## A lesson starting rings in a banner: the subject and the room.
+func _on_bell(event: String, entry: Dictionary) -> void:
+	if event == "start":
+		banner.show_area(Timetable.title_of(entry), Timetable.room_name(get_tree(), str(entry.get("area", ""))), 4.0)
+
+
+# --- Notices -----------------------------------------------------------------------------
+
+## Shows a toast; GameEvents.notify() sets its kind and icon while it is sent.
 func show_notification(text: String, duration: float = 3.0) -> void:
-	_notification_label.text = text
-	_notification_label.visible = true
-	_notification_timer = duration
+	toasts.push(text, GameEvents.notice_kind as ToastStack.Kind, GameEvents.notice_icon, maxf(duration, ToastStack.hold_for(text)))
 
 
+func _on_collectible_collected(definition: Resource, _total: int, _max_total: int) -> void:
+	if definition != null and definition.get("id") == FRAGMENT_ID:
+		GameEvents.notify(tr("HUD_FRAGMENTS") % [GameSession.get_collected(FRAGMENT_ID), GameSession.get_total(FRAGMENT_ID)], 3.0,
+			ToastStack.Kind.REWARD, "fragment")
+
+
+## A gain or loss of coins shows as a toast.
+func _on_wallet_changed(_coins: int, delta: int, source: String, detail: String) -> void:
+	var line := Currency.change_line(delta, source, detail)
+	if line != "":
+		GameEvents.notify(line, 5.0, ToastStack.Kind.REWARD if delta > 0 else ToastStack.Kind.INFO, "coins")
+
+
+## House points (index 0 = house 1) in the crystals; hidden while there are none (offline).
+func set_house_totals(totals: PackedInt32Array) -> void:
+	house_tally.visible = totals.size() >= CharacterProfile.MAX_HOUSE
+	house_tally.set_totals(totals)
+
+
+## Text of the tally, for tests.
+func house_tally_text() -> String:
+	return house_tally.text()
+
+
+## Only trouble with the connection shows; online and offline play need no line.
 func _on_status_changed(status: int, message: String) -> void:
 	_status = status
 	_status_message = message
 	match status:
-		NetworkManager.Status.ONLINE:
-			_status_label.text = tr("HUD_STATUS_ONLINE") % GameSession.display_name
 		NetworkManager.Status.CONNECTING:
-			_status_label.text = message if not message.is_empty() else tr("HUD_STATUS_CONNECTING")
+			status_label.text = message if not message.is_empty() else tr("HUD_STATUS_CONNECTING")
 		NetworkManager.Status.ERROR:
-			_status_label.text = tr("HUD_STATUS_OFFLINE_REASON") % message
+			status_label.text = tr("HUD_STATUS_OFFLINE_REASON") % message
 		_:
-			_status_label.text = tr("HUD_STATUS_OFFLINE")
+			status_label.text = ""
+	status_label.visible = status_label.text != ""
 
 
 ## Re-render the code-formatted labels when the language changes at runtime.
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
-		_update_fragments()
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready() and hud_root != null:
 		_on_spell_learned(_caster.equipped_spell if _caster != null else null)
-		_refresh_hotbar()
-		_refresh_role()
-		_refresh_house()
+		_refresh_plate()
+		_refresh_clock()
 		_on_held_item_changed(_inventory.held_item if _inventory != null else null)
-		if is_instance_valid(_focused):
-			_on_focus_changed(_focused)
+		_show_prompt(_focused.prompt_text if is_instance_valid(_focused) else "")
+		set_house_totals(NetworkManager.get_house_totals())
 		_on_status_changed(_status, _status_message)

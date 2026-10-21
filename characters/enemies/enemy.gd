@@ -467,7 +467,7 @@ func _on_died(_source: Node) -> void:
 		spell_receiver.enabled = false
 	if _animation_player != null:
 		_animation_player.pause()
-	GameEvents.notification_requested.emit(tr("NOTIFY_ENEMY_DEFEATED") % tr(name_key), 3.0)
+	GameEvents.notify(tr("NOTIFY_ENEMY_DEFEATED") % tr(name_key), 3.0, ToastStack.Kind.REWARD)
 	var tween := create_tween()
 	if model != null:
 		tween.tween_property(model, "scale", Vector3(0.05, 0.05, 0.05), 0.7).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)

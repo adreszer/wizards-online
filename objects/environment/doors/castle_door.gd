@@ -83,7 +83,7 @@ static func _ensure_normals(mi: MeshInstance3D) -> void:
 func _on_interacted(interactor: Node) -> void:
 	if is_locked:
 		if interactor != null and interactor.is_in_group("local_player"):
-			GameEvents.notification_requested.emit(tr("NOTIFY_DOOR_LOCKED"), 3.0)
+			GameEvents.notify(tr("NOTIFY_DOOR_LOCKED"), 3.0, ToastStack.Kind.WARNING, "locked")
 		if WorldObjectSync.is_synced(self):
 			WorldObjectSync.report(self, "interact")
 		return

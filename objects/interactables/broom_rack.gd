@@ -41,7 +41,7 @@ func _on_interacted(interactor: Node) -> void:
 		NetworkManager.send_world_event(object_id, "interact")
 	else:
 		inventory.add(definition)
-	GameEvents.notification_requested.emit(tr("NOTIFY_BROOM_TAKEN"), 8.0)
+	GameEvents.notify(tr("NOTIFY_BROOM_TAKEN"), 8.0, ToastStack.Kind.REWARD, "broom")
 	_audio.play()
 	taken.emit(interactor)
 

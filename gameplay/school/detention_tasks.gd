@@ -62,4 +62,4 @@ func show_detention(view: Dictionary) -> void:
 func work(index: int) -> void:
 	var r: Dictionary = await NetworkManager.request("detention_step", {"spot": index})
 	if not r.ok:
-		GameEvents.notification_requested.emit(NetworkManager.refusal_text(r.reason), 3.0)
+		GameEvents.notify(NetworkManager.refusal_text(r.reason), 3.0, ToastStack.Kind.WARNING)

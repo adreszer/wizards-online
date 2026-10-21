@@ -41,7 +41,7 @@ func submit() -> void:
 	var r: Dictionary = await NetworkManager.request("riddle_answer", {"answer": _answer.text})
 	if r.ok:
 		close()
-		GameEvents.notification_requested.emit(tr("RIDDLE_RIGHT"), 4.0)
+		GameEvents.notify(tr("RIDDLE_RIGHT"), 4.0, ToastStack.Kind.DISCOVERY)
 		if is_instance_valid(door) and door.has_method("open"):
 			door.open()
 	else:

@@ -178,7 +178,7 @@ func _on_interacted(interactor: Node) -> void:
 		refused.emit(interactor)
 		Sfx.play_at(self, REFUSE, -4.0, 18.0, Vector3(0, 1.4, 0))
 		if interactor.is_in_group("local_player"):
-			GameEvents.notification_requested.emit(tr("NOTIFY_HOUSE_DOOR_LOCKED") % CharacterProfile.house_name(house), 4.0)
+			GameEvents.notify(tr("NOTIFY_HOUSE_DOOR_LOCKED") % CharacterProfile.house_name(house), 4.0, ToastStack.Kind.WARNING, "locked")
 
 
 func open() -> void:

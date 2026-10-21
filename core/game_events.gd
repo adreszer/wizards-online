@@ -25,7 +25,10 @@ signal player_respawned(player: Node)
 signal spell_learned(definition: Resource)
 
 ## Short informational message for the HUD (e.g. plaque text, "Learned Arcane Pulse").
+## notify() sends one with a kind and an icon (a learned spell, a reward, a warning).
 signal notification_requested(text: String, duration: float)
+## The player hid or showed the interface (toggle_hud, for screenshots).
+signal hud_toggled(shown: bool)
 ## A mystery moved on for the local player: "clue" (a step with a hint) or "solved".
 signal mystery_cue(cue: String)
 
@@ -66,3 +69,19 @@ signal panel_requested(panel: String, args: Dictionary)
 
 ## The local player's spell hit another player (only a duel makes that count).
 signal spell_hit_player(peer_id: String, spell_id: StringName)
+
+
+## The kind (ToastStack.Kind) and icon id of the notification being sent; the HUD reads
+## them while notification_requested runs, so plain listeners keep the two-argument
+## signal.
+var notice_kind: int = 0
+var notice_icon: String = ""
+
+
+## Sends a notification with a kind (ToastStack.Kind) and optionally its own icon.
+func notify(text: String, duration: float, kind: int = 0, icon_id := "") -> void:
+	notice_kind = kind
+	notice_icon = icon_id
+	notification_requested.emit(text, duration)
+	notice_kind = 0
+	notice_icon = ""

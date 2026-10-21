@@ -367,6 +367,30 @@ func _kit(t: Theme) -> void:
 	t.set_color("font_shadow_color", "BannerSubLabel", Color(0, 0, 0, 0.7))
 	t.set_constant("shadow_offset_y", "BannerSubLabel", 1)
 	t.set_constant("shadow_outline_size", "BannerSubLabel", 4)
+	_hud(t)
+
+
+## HUD text stands straight over the world, so every style carries a soft dark halo.
+func _hud(t: Theme) -> void:
+	var styles := {
+		"HudName": [UiFonts.DISPLAY_BOLD, T.SIZE_LARGE + 4, T.CANDLE],
+		"HudMeta": [UiFonts.UI_MEDIUM, T.SIZE_SMALL, T.CANDLE_SOFT],
+		"HudClock": [UiFonts.DISPLAY_BOLD, T.SIZE_LARGE + 6, T.CANDLE],
+		"HudLesson": [UiFonts.UI_MEDIUM, T.SIZE_SMALL, T.BRASS_BRIGHT],
+		"HudStatus": [UiFonts.UI_MEDIUM, T.SIZE_SMALL, T.DANGER.lightened(0.25)],
+		"HudPrompt": [UiFonts.UI_MEDIUM, T.SIZE_LARGE, T.CANDLE],
+		"HudSpell": [UiFonts.DISPLAY, T.SIZE_LARGE, T.CANDLE],
+		"HudPlace": [UiFonts.DISPLAY_BOLD, T.SIZE_BODY, T.CANDLE],
+		"HudCount": [UiFonts.UI_BOLD, T.SIZE_SMALL, T.CANDLE],
+	}
+	for name: String in styles:
+		var st: Array = styles[name]
+		_variation(t, name, "Label", {"font": st[0]}, {"font_size": st[1]})
+		t.set_color("font_color", name, st[2])
+		t.set_color("font_shadow_color", name, Color(0, 0, 0, 0.75))
+		t.set_constant("shadow_offset_x", name, 0)
+		t.set_constant("shadow_offset_y", name, 1)
+		t.set_constant("shadow_outline_size", name, 5)
 
 
 func _variation(t: Theme, name: String, base: String, fonts: Dictionary, sizes: Dictionary) -> void:

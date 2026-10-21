@@ -137,9 +137,9 @@ func refresh() -> void:
 		phase_changed.emit(phase)
 		GameEvents.time_phase_changed.emit(phase)
 		if announce and phase == SchoolClock.Phase.DAWN:
-			GameEvents.notification_requested.emit(tr("NOTIFY_DAWN"), 4.0)
+			GameEvents.notify(tr("NOTIFY_DAWN"), 4.0, ToastStack.Kind.INFO, "day")
 		elif announce and phase == SchoolClock.Phase.NIGHT:
-			GameEvents.notification_requested.emit(tr("NOTIFY_NIGHTFALL"), 4.0)
+			GameEvents.notify(tr("NOTIFY_NIGHTFALL"), 4.0, ToastStack.Kind.INFO, "night")
 
 
 ## Direction toward the sun (unit vector) at `h` school hours: it rises in the east

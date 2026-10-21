@@ -26,7 +26,7 @@ func _ready() -> void:
 	puzzle_plate.deactivated.connect(puzzle_door.close)
 	statue_puzzle.solved.connect(_on_statues_solved)
 	final_lever.toggled.connect(_on_final_lever)
-	secret_wall.revealed.connect(func() -> void: GameEvents.notification_requested.emit(tr("NOTIFY_SECRET_PASSAGE"), 4.0))
+	secret_wall.revealed.connect(func() -> void: GameEvents.notify(tr("NOTIFY_SECRET_PASSAGE"), 4.0, ToastStack.Kind.DISCOVERY, "secret"))
 	GameEvents.checkpoint_activated.connect(func(_c: Node) -> void: GameEvents.notification_requested.emit(tr("NOTIFY_CHECKPOINT"), 2.0))
 
 
@@ -36,12 +36,12 @@ func _on_training_switch(_is_on: bool) -> void:
 
 
 func _on_statues_solved() -> void:
-	GameEvents.notification_requested.emit(tr("NOTIFY_STATUES_ALIGNED"), 4.0)
+	GameEvents.notify(tr("NOTIFY_STATUES_ALIGNED"), 4.0, ToastStack.Kind.DISCOVERY)
 
 
 func _on_final_lever(is_on: bool) -> void:
 	if not statue_puzzle.is_solved:
-		GameEvents.notification_requested.emit(tr("NOTIFY_LEVER_STUCK"), 4.0)
+		GameEvents.notify(tr("NOTIFY_LEVER_STUCK"), 4.0, ToastStack.Kind.WARNING)
 		final_lever.reset()
 		return
 	final_door.set_open(is_on)

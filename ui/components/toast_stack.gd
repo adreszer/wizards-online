@@ -25,6 +25,11 @@ func _init() -> void:
 	add_theme_constant_override("separation", UiTokens.SPACE_2)
 
 
+## How long a toast with `text` stays by default.
+static func hold_for(text: String) -> float:
+	return minf(HOLD + text.length() * HOLD_PER_CHAR, HOLD_MAX)
+
+
 ## Shows `text` (already translated); `icon_id` overrides the kind's icon. `hold` 0
 ## keeps the toast until it is dismissed (the gallery). Returns the toast.
 func push(text: String, kind: Kind = Kind.INFO, icon_id := "", hold := -1.0) -> PanelContainer:
@@ -55,7 +60,7 @@ func push(text: String, kind: Kind = Kind.INFO, icon_id := "", hold := -1.0) -> 
 	row.add_child(label)
 	add_child(toast)
 	var instant: bool = GameSettings.get_value("reduce_motion")
-	var stay := hold if hold >= 0.0 else minf(HOLD + text.length() * HOLD_PER_CHAR, HOLD_MAX)
+	var stay := hold if hold >= 0.0 else hold_for(text)
 	var tween := toast.create_tween()
 	if not instant:
 		toast.modulate.a = 0.0

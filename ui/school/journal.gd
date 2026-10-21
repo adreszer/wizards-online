@@ -150,7 +150,7 @@ func _hand_in() -> void:
 	if _hw_pick.selected < 0 or _hw_pick.selected >= _open_ids.size() or _hw_text.text.strip_edges() == "":
 		return
 	var answer: Dictionary = await NetworkManager.homework_submit(_open_ids[_hw_pick.selected], _hw_text.text.strip_edges())
-	GameEvents.notification_requested.emit(tr("HOMEWORK_HANDED_IN") if not answer.has("error") else tr("HOMEWORK_REFUSED") % str(answer.error), 4.0)
+	GameEvents.notify(tr("HOMEWORK_HANDED_IN") if not answer.has("error") else tr("HOMEWORK_REFUSED") % str(answer.error), 4.0, ToastStack.Kind.INFO, "homework")
 	if not answer.has("error"):
 		_hw_text.text = ""
 		var hw: Dictionary = await NetworkManager.homework_list()

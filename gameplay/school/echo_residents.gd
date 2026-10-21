@@ -127,7 +127,7 @@ func _process(_delta: float) -> void:
 func talk(id: String) -> void:
 	var r: Dictionary = await NetworkManager.request("echo_talk", {"echo": id})
 	if not r.ok:
-		GameEvents.notification_requested.emit(NetworkManager.refusal_text(r.reason), 3.0)
+		GameEvents.notify(NetworkManager.refusal_text(r.reason), 3.0, ToastStack.Kind.WARNING)
 		return
 	var line := tr(str(r.data.get("line", "")))
 	say(id, line)

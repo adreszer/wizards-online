@@ -11,6 +11,7 @@ extends CanvasLayer
 @onready var _empty_label: Label = %EmptyLabel
 @onready var _description: Label = %Description
 @onready var _held_label: Label = %HeldLabel
+@onready var _purse_label: Label = %PurseLabel
 
 var is_open: bool = false
 var _inventory: Inventory
@@ -125,6 +126,7 @@ func _update_details() -> void:
 		_held_label.text = tr("HUD_HELD") % tr(_inventory.held_item.display_name)
 	else:
 		_held_label.text = tr("HUD_HELD_NONE")
+	_purse_label.text = tr("HUD_COINS") % Currency.format(NetworkManager.get_coins())
 	if _selected == null:
 		_description.text = tr("INVENTORY_HINT")
 	else:

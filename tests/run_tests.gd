@@ -137,10 +137,79 @@ func _test_ui_window() -> void:
 	await get_tree().process_frame
 	await _test_ui_router()
 	await _test_ui_kit()
+	await _test_hud()
 
 
 ## Milestone 66: the frame kit behind the themes, the 2x swap, the icon registry and
 ## the components.
+## The HUD (docs/ui.md, Milestone 67): toasts by kind, the prompt as a key chip, the
+## health vial only while hurt, area banners, hiding for screenshots, the dial and the
+## round minimap.
+func _test_hud() -> void:
+	var hud: Node = HUD_SCENE.instantiate()
+	add_child(hud)
+	await get_tree().process_frame
+	hud.toasts.clear()
+	GameEvents.notification_requested.emit("plain", 1.0)
+	GameEvents.notify("careful", 1.0, ToastStack.Kind.WARNING, "locked")
+	var last: Node = hud.toasts.get_child(hud.toasts.get_child_count() - 1)
+	t.check(hud.toasts.get_child_count() == 2 and int(hud.toasts.get_child(0).get_meta(&"kind")) == ToastStack.Kind.INFO and int(last.get_meta(&"kind")) == ToastStack.Kind.WARNING, "a plain notification is an info toast, notify() gives it its kind")
+	t.check(GameEvents.notice_kind == 0 and GameEvents.notice_icon == "", "the kind is cleared once the notification is sent")
+	hud._show_prompt("PROMPT_SIT")
+	var chip: KeyChip = hud.prompt_row.get_child(0)
+	t.check(hud.prompt_row.visible and hud.prompt_label.text == tr("PROMPT_SIT") and chip.text == KeyChip.label_for(&"interact", false), "the prompt is the interact key and a verb")
+	hud._show_prompt("")
+	t.check(not hud.prompt_row.visible, "nothing in front of you, no prompt")
+	t.check(not hud.health_vial.visible, "full health shows no vial")
+	hud._on_health_changed(40, 100)
+	t.check(hud.health_vial.visible and is_equal_approx(hud.health_vial.fraction(), 0.4), "a hurt player sees the health vial")
+	hud._on_health_changed(100, 100)
+	t.check(hud.health_vial.visible and hud._health_full_for > 0.0, "the vial lingers a moment after healing")
+	hud._health_full_for = 0.0
+	hud._refresh_health_visibility()
+	t.check(not hud.health_vial.visible, "and then goes")
+	var zone_script := GDScript.new()
+	zone_script.source_code = "extends Node\nfunc display_name() -> String:\n\treturn \"Biblioteka\"\n"
+	zone_script.reload()
+	var zone := Node.new()
+	zone.set_script(zone_script)
+	hud._on_area_entered(&"library", zone)
+	await get_tree().process_frame
+	t.check(hud.banner.title_label.text == "Biblioteka" and hud.banner.is_showing(), "entering a named area shows its banner")
+	hud.banner.title_label.text = ""
+	hud._on_area_entered(&"library", zone)
+	t.check(hud.banner.title_label.text == "", "walking straight back in does not repeat it")
+	zone.free()
+	var told: Array[bool] = []
+	var on_toggle := func(shown: bool) -> void: told.append(shown)
+	GameEvents.hud_toggled.connect(on_toggle)
+	hud._unhandled_input(_action_press("toggle_hud"))
+	t.check(not hud.visible and not hud._toast_layer.visible and told == [false], "toggle_hud hides the whole interface and says so")
+	hud._unhandled_input(_action_press("toggle_hud"))
+	t.check(hud.visible and hud._toast_layer.visible and told == [false, true], "and brings it back")
+	GameEvents.hud_toggled.disconnect(on_toggle)
+	t.check(GameSettings.BINDABLE.has("toggle_hud") and KeyChip.label_for(&"toggle_hud", false) == "F2", "hiding the interface is on F2 and can be rebound")
+	hud._refresh_clock()
+	t.check(hud.clock_label.text == SchoolClock.format(NetworkManager.school_hours()) and hud.lesson_label.text != "", "the clock shows the time and a line under it")
+	hud.queue_free()
+	t.check(DayDial.sky_at(0.0) == DayDial.NIGHT_SKY and DayDial.sky_at(12.0) == DayDial.DAY_SKY and DayDial.sky_at(6.0) != DayDial.NIGHT_SKY, "the dial's sky follows the day")
+	var noon: Array = DayDial.body_at(12.0)
+	var midnight: Array = DayDial.body_at(0.0)
+	t.check(noon[1] == true and float(noon[0]) > 0.3 and float(noon[0]) < 0.7 and midnight[1] == false, "the sun climbs by day, the moon by night")
+	var ember: SpellDefinition = load("res://resources/spells/emberkindle.tres")
+	t.check(SpellSlot.icon_for(ember) == "spell_fire" and UiIcons.has("spell_fire"), "a spell's roundel takes its effect's icon")
+	var minimap: Minimap = MINIMAP_SCENE.instantiate()
+	add_child(minimap)
+	await get_tree().process_frame
+	var clip: Control = minimap.get_node("%Clip")
+	t.check((minimap.get_node("%Ring") as TextureRect).texture != null and clip.clip_children == CanvasItem.CLIP_CHILDREN_ONLY and minimap.get_node("%View").get_parent() == clip, "the minimap is a round window in the brass ring")
+	GameEvents.hud_toggled.emit(false)
+	await get_tree().create_timer(UiTokens.NORMAL + 0.1).timeout
+	t.check(is_zero_approx((minimap.get_node("%Root") as Control).modulate.a), "the minimap goes with the hidden interface")
+	GameEvents.hud_toggled.emit(true)
+	minimap.queue_free()
+
+
 func _test_ui_kit() -> void:
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(UiFrames.DIR + "frames.json"))
 	var bad: Array = []
@@ -216,7 +285,7 @@ func _test_ui_kit() -> void:
 	slot.free()
 	var badge := HouseBadge.new(3, HouseBadge.Size.MEDIUM)
 	var unsorted := HouseBadge.new(0, HouseBadge.Size.SMALL)
-	t.check(badge.crest_rect.texture == CharacterProfile.crest(3, CharacterProfile.CREST_CARD) and badge.name_label.text == CharacterProfile.house_name(3), "a house badge shows the house's crest and name")
+	t.check(badge.crest_rect.texture == HouseBadge.sized(CharacterProfile.crest(3, CharacterProfile.CREST_CARD), HouseBadge.Size.MEDIUM) and badge.crest_rect.texture.get_size() == Vector2(48, 48) and badge.name_label.text == CharacterProfile.house_name(3), "a house badge shows the house's crest and name")
 	t.check(unsorted.crest_rect.texture != null and unsorted.name_label.text == tr("PROFILE_UNSORTED"), "the unsorted get the school emblem")
 	badge.free()
 	unsorted.free()
@@ -274,15 +343,15 @@ func _test_runtime_keys() -> void:
 	t.check(found.is_empty(), "no screen shows a raw translation key (%s)" % str(found))
 	t.check(Localization.area_name("no_such_place") == "No Such Place" and Localization.area_name("") == "", "an area without a name shows as words, never as AREA_")
 	t.check(Localization.area_name("apothecary") == tr("AREA_VILLAGE_APOTHECARY"), "village buildings take their AREA_VILLAGE_ name")
-	# Notifications sit above the chat box at any width (the chat is bottom left).
+	# Notifications stand at the top centre, clear of the chat box (bottom left).
 	var hud: Node = (load("res://ui/hud/hud.tscn") as PackedScene).instantiate()
 	var chat: Node = (load("res://ui/chat/chat_panel.tscn") as PackedScene).instantiate()
 	add_child(hud)
 	add_child(chat)
 	await get_tree().process_frame
-	var note: Control = hud.get_node("%NotificationLabel")
+	var note: Control = hud.toasts
 	var box: Control = chat.get_node("%Panel")
-	t.check(note.offset_bottom < box.offset_top and note.grow_vertical == Control.GROW_DIRECTION_BEGIN, "notifications sit above the chat box and grow upward")
+	t.check(note.anchor_top == 0.0 and note.anchor_left == 0.5 and note.grow_vertical == Control.GROW_DIRECTION_END and box.anchor_top == 1.0, "notifications stack down from the top centre, away from the chat box")
 	hud.queue_free()
 	chat.queue_free()
 
@@ -350,7 +419,7 @@ func _test_ui_router() -> void:
 	hud._on_windows_changed()
 	await get_tree().create_timer(UiTokens.NORMAL + 0.15).timeout
 	t.check(get_tree().paused and UiRouter.top() == pause and UiRouter.has_modal() and pause.get_node_or_null("UiBackdrop") != null, "the pause menu joins the stack and dims the world")
-	t.check(is_equal_approx((hud.get_node("TopLeft") as CanvasItem).modulate.a, hud.BEHIND_WINDOW), "the HUD steps back behind it, though the game is paused (%.2f)" % (hud.get_node("TopLeft") as CanvasItem).modulate.a)
+	t.check(is_equal_approx(hud.hud_root.modulate.a, hud.BEHIND_WINDOW) and hud.toasts.is_visible_in_tree(), "the HUD fades out behind it, though the game is paused, and toasts still show (%.2f)" % hud.hud_root.modulate.a)
 	hud.queue_free()
 	Input.parse_input_event(esc)
 	await get_tree().process_frame
@@ -1018,16 +1087,18 @@ func _test_spell_effects() -> void:
 	add_child(hud)
 	hud._bind_player(player)
 	await get_tree().process_frame
-	t.check(hud.get_node("%HotbarRoot").visible and hud.hotbar_selected_index() == caster.equipped_slot(), "HUD hotbar is visible and highlights the equipped slot")
+	t.check(hud.hotbar.visible and hud.hotbar_selected_index() == caster.equipped_slot(), "HUD hotbar is visible and highlights the equipped slot")
 	caster.select_slot(0)
 	await get_tree().process_frame
-	t.check(hud.hotbar_selected_index() == 0 and hud.get_node("%Hotbar").get_child_count() == SpellCaster.QUICK_SLOT_COUNT, "hotbar follows selection and has ten slots")
+	t.check(hud.hotbar_selected_index() == 0 and hud.hotbar.get_child_count() == SpellCaster.QUICK_SLOT_COUNT and hud.hotbar.get_child(0) is SpellSlot, "hotbar follows selection and has ten roundels")
+	var first_slot: SpellSlot = hud.hotbar.get_child(0)
+	t.check(first_slot.key_chip.text == "1" and first_slot.mastery_max == SpellMastery.THRESHOLDS.size() - 1 and first_slot.icon_id == SpellSlot.icon_for(caster.quick_slots[0]), "a roundel shows its key, the mastery pips and the icon for its spell's effect")
 	var old_house: int = player.house
 	player.set_profile(str(player.role), 4)
-	var hud_crest: TextureRect = hud.get_node("%HouseCrest")
-	t.check(hud_crest.visible and hud_crest.texture == CharacterProfile.crest(4, CharacterProfile.CREST_ICON) and hud_crest.modulate == CharacterProfile.house_color(4), "the HUD shows the player's house crest in the house colour")
+	var hud_badge: HouseBadge = hud.plate.badge
+	t.check(hud_badge.house == 4 and hud_badge.crest_rect.texture == HouseBadge.sized(CharacterProfile.crest(4, CharacterProfile.CREST_CARD), HouseBadge.Size.MEDIUM) and hud.plate.meta_label.text.begins_with(CharacterProfile.house_name(4)), "the HUD shows the player's house crest and house")
 	player.set_profile(str(player.role), 0)
-	t.check(not hud_crest.visible, "the unsorted have no crest on the HUD")
+	t.check(hud_badge.house == 0 and hud_badge.crest_rect.texture == HouseBadge.sized(load(HouseBadge.EMBLEM), HouseBadge.Size.MEDIUM) and hud.plate.meta_label.text.to_lower().begins_with(tr("PROFILE_UNSORTED").to_lower()), "the unsorted show the school emblem")
 	# The robe crest needs a real (rigged) body; the test player wears the placeholder.
 	var body: Node3D = CharacterRegistry.load_scene("apprentice_m").instantiate()
 	add_child(body)
@@ -1042,7 +1113,7 @@ func _test_spell_effects() -> void:
 	body.queue_free()
 	player.set_profile(str(player.role), old_house)
 	hud.set_house_totals(PackedInt32Array([5, 10, 15, 20]))
-	t.check(hud.house_tally_text() == "5 10 15 20" and hud.get_node("%HouseTally").get_child(0).get_child(0) is TextureRect, "the HUD tally pairs each crest with its points")
+	t.check(hud.house_tally_text() == "5 10 15 20" and hud.house_tally.visible and is_equal_approx(hud.house_tally.fill_of(4), 1.0) and is_equal_approx(hud.house_tally.fill_of(2), 0.5), "the HUD crystals fill by each house's share of the leader's points")
 	hud.queue_free()
 	await _clear([floor_body, aim])
 

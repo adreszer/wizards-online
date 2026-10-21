@@ -10,6 +10,8 @@ enum Size { SMALL = 24, MEDIUM = 48, LARGE = 96 }
 
 const EMBLEM := "res://assets/ui/brand/emblem_512.png"
 
+static var _sized_cache: Dictionary = {}
+
 var crest_rect: TextureRect
 var name_label: Label
 var house := 0:
@@ -50,13 +52,13 @@ func _refresh() -> void:
 	crest_rect.custom_minimum_size = Vector2(px, px)
 	var sorted := house >= 1 and house <= CharacterProfile.MAX_HOUSE
 	if not sorted:
-		crest_rect.texture = load(EMBLEM)
+		crest_rect.texture = sized(load(EMBLEM), px)
 		crest_rect.modulate = Color(1, 1, 1, 0.45)
 	elif badge_size == Size.SMALL:
 		crest_rect.texture = CharacterProfile.crest(house, CharacterProfile.CREST_ICON)
 		crest_rect.modulate = CharacterProfile.house_color(house)
 	else:
-		crest_rect.texture = CharacterProfile.crest(house, CharacterProfile.CREST_CARD if badge_size == Size.MEDIUM else CharacterProfile.CREST_FULL)
+		crest_rect.texture = sized(CharacterProfile.crest(house, CharacterProfile.CREST_CARD if badge_size == Size.MEDIUM else CharacterProfile.CREST_FULL), px)
 		crest_rect.modulate = Color.WHITE
 	name_label.visible = show_name
 	name_label.text = CharacterProfile.house_name(house) if sorted else tr("PROFILE_UNSORTED")
@@ -66,3 +68,25 @@ func _refresh() -> void:
 		name_label.add_theme_font_size_override("font_size", UiTokens.SIZE_HINT)
 	else:
 		name_label.remove_theme_font_size_override("font_size")
+
+
+## `texture` shrunk smoothly to twice `px` (shown at `px`): the crests and the emblem
+## are far larger than a badge and have no mipmaps, so drawn straight they shimmer.
+static func sized(texture: Texture2D, px: int) -> Texture2D:
+	if texture == null or texture.get_width() <= px * 2:
+		return texture
+	var key := "%s@%d" % [texture.resource_path, px]
+	if _sized_cache.has(key):
+		return _sized_cache[key]
+	var img := texture.get_image()
+	if img == null:
+		return texture
+	img = img.duplicate()
+	if img.is_compressed():
+		img.decompress()
+	var h := int(round(px * 2.0 * img.get_height() / img.get_width()))
+	img.resize(px * 2, h, Image.INTERPOLATE_LANCZOS)
+	var out := ImageTexture.create_from_image(img)
+	out.set_size_override(Vector2i(px, int(round(h / 2.0))))
+	_sized_cache[key] = out
+	return out

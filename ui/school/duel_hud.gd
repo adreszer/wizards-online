@@ -41,7 +41,7 @@ func _on_message(op: int, payload: Dictionary) -> void:
 	_label.visible = state != "over"
 	var player := get_tree().get_first_node_in_group(&"local_player") as Player
 	if state == "challenged" and payload.get("b", "") == me and before != "challenged":
-		GameEvents.notification_requested.emit(tr("DUEL_CHALLENGED") % str(payload.get("a_name", "")), 8.0)
+		GameEvents.notify(tr("DUEL_CHALLENGED") % str(payload.get("a_name", "")), 8.0, ToastStack.Kind.INFO, "wand")
 	elif state == "countdown" and before != "countdown" and player != null and me in [payload.get("a", ""), payload.get("b", "")]:
 		player.gestures.play(&"bow")
 	elif state == "over":

@@ -42,6 +42,17 @@ From game-icons.net (https://game-icons.net), licensed CC BY 3.0 (https://creati
 | settings | cog | Lorc |
 | shop | chest | Delapouite |
 | spell | magic-swirl | Lorc |
+| spell_dark | evil-moon | Lorc |
+| spell_fire | burning-embers | Lorc |
+| spell_force | energy-arrow | Lorc |
+| spell_frost | snowflake-1 | Lorc |
+| spell_growth | sprout | Lorc |
+| spell_levitate | lift | Lorc |
+| spell_light | sun-radiations | Lorc |
+| spell_mend | healing | Delapouite |
+| spell_unlock | padlock-open | Delapouite |
+| spell_water | water-drop | Sbed |
+| spell_wind | whirlwind | Lorc |
 | subject_arithmancy | abacus | Delapouite |
 | subject_astronomy | telescope | Delapouite |
 | subject_charms | magic-palm | Lorc |

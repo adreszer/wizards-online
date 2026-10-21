@@ -85,7 +85,7 @@ func on_event(ev: Dictionary) -> void:
 			if step.has("text"):
 				if record["step"] < steps.size():
 					GameEvents.mystery_cue.emit("clue")
-				GameEvents.notification_requested.emit(tr(str(step["text"])), 6.0)
+				GameEvents.notify(tr(str(step["text"])), 6.0, ToastStack.Kind.DISCOVERY, "secret")
 			if record["step"] >= steps.size():
 				record["solved"] = true
 				_solve(m)
@@ -122,7 +122,7 @@ func _solve(m: Dictionary) -> void:
 		if node != null and node.has_method(&"apply_world_state"):
 			node.apply_world_state(solved["set_state"][oid], false)
 	if solved.has("text"):
-		GameEvents.notification_requested.emit(tr(str(solved["text"])), 6.0)
+		GameEvents.notify(tr(str(solved["text"])), 6.0, ToastStack.Kind.DISCOVERY, "secret")
 
 
 func _held_item() -> String:

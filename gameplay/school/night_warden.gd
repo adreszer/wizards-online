@@ -99,7 +99,7 @@ func _watch(zone: AreaZone) -> void:
 	if sees(_body.global_transform, player.global_position, player.get_world_3d()):
 		_caught_reported = true
 		NetworkManager.send_op(NetworkProtocol.OP_CAUGHT, {"area": String(zone.area_id)})
-		GameEvents.notification_requested.emit(tr("WARDEN_CAUGHT"), 6.0)
+		GameEvents.notify(tr("WARDEN_CAUGHT"), 6.0, ToastStack.Kind.WARNING)
 
 
 ## Whether the warden standing at `warden` sees a point: close, in front, nothing between.

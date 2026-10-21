@@ -86,7 +86,7 @@ func setup(player: Node, movement: PlayerMovement, inventory: Inventory, attach:
 func on_server_flight(kind: String, data: Dictionary) -> void:
 	if kind == "flight" and data.get("land", false) and mount != null and _player != null and _player.get("is_local") == true:
 		dismount()
-		GameEvents.notification_requested.emit(tr("NOTIFY_NO_FLYING_HERE"), 4.0)
+		GameEvents.notify(tr("NOTIFY_NO_FLYING_HERE"), 4.0, ToastStack.Kind.WARNING)
 
 
 ## Local player: start riding the first mount item carried, or land.
@@ -105,12 +105,12 @@ func is_riding() -> bool:
 ## Local player: mount `definition` if it is an owned mount and flying is allowed here.
 func mount_item(definition: ItemDefinition) -> bool:
 	if definition == null or not definition.is_mount():
-		GameEvents.notification_requested.emit(tr("NOTIFY_NO_BROOM"), 5.0)
+		GameEvents.notify(tr("NOTIFY_NO_BROOM"), 5.0, ToastStack.Kind.WARNING)
 		return false
 	if _inventory != null and not _inventory.has(definition.id):
 		return false
 	if not can_fly_here():
-		GameEvents.notification_requested.emit(tr("NOTIFY_FLY_OUTDOORS_ONLY"), 4.0)
+		GameEvents.notify(tr("NOTIFY_FLY_OUTDOORS_ONLY"), 4.0, ToastStack.Kind.WARNING)
 		return false
 	_movement.set_flying(true)
 	_show(definition)
@@ -151,7 +151,7 @@ func _open_sky() -> bool:
 func on_area_changed(zone: AreaZone) -> void:
 	if mount != null and zone != null and not is_open_air_kind(zone.kind):
 		dismount()
-		GameEvents.notification_requested.emit(tr("NOTIFY_NO_FLYING_HERE"), 4.0)
+		GameEvents.notify(tr("NOTIFY_NO_FLYING_HERE"), 4.0, ToastStack.Kind.WARNING)
 
 
 ## Local: the inventory changed (the server may have taken the broom away).

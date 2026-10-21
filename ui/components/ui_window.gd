@@ -102,13 +102,7 @@ func add_hint(text: String) -> Label:
 
 ## Adds a key hint to the footer: the action's key chip and what it does ("[Esc] close").
 func add_key_hint(action: StringName, verb: String) -> HBoxContainer:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", UiTokens.SPACE_1 + 2)
-	row.add_child(KeyChip.new(action))
-	var l := Label.new()
-	l.text = verb
-	l.theme_type_variation = &"WindowFooter"
-	row.add_child(l)
+	var row := KeyChip.hint_row(action, verb, &"WindowFooter")
 	footer.add_child(row)
 	footer.visible = true
 	return row

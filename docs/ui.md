@@ -143,13 +143,13 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - **Owner checkpoint:** approve the look before the screens are rebuilt.
 
 ### Milestone 67 — The HUD
-- [ ] Remove the text column. Top left: house badge, name, year. Health appears only when below full or in a duel (vial). Fragments, coins and "in hand" show as toasts or in the satchel, not permanently
-- [ ] Hotbar: spell roundels, key chips, radial cooldown, mastery pips, selected glow; held item slot beside it
-- [ ] Interaction prompt near the crosshair as a key chip + verb ("[E] Otwórz drzwi")
-- [ ] Top right: sun/moon dial with the time and the next lesson line; a compact four-crystal house tally
-- [ ] Minimap: round brass ring with a compass rose, area name below
-- [ ] `ToastStack` for every notification; `AreaBanner` on entering a named area; lesson start and bell banners
-- [ ] HUD hides cleanly in photo mode and while windows are open
+- [x] Remove the text column. Top left: `PlayerPlate` (crest, name, house in its colour and the year; staff see their title) and the lesson-tools key chip for staff. Health is a `ProgressVial` only while hurt (and a moment after healing) or in a duel. Fragments and coins are toasts; the purse moved to the satchel
+- [x] Hotbar: ten `SpellSlot` roundels with the slot key chips (the `spell_slot_N` bindings), the effect's icon (`spell_<effect>`, 11 new placeholder icons), radial cooldown, mastery pips, a halo on the selected spell; the spell's name and incantation above; the held item in an `ItemSlot` beside it
+- [x] Interaction prompt under the crosshair as a key chip + verb ("[E] Usiądź"); `HudCrosshair` is drawn, with a halo
+- [x] Top right: `DayDial` (a window of sky that follows the day, the sun or the moon over a horizon, in a brass ring) with the time and the lesson now/next (else the part of the day); `HouseCrystals`, four crystals filled by each house's share of the leader's points (online)
+- [x] Minimap: a round window in a brass ring with ticks and the north pointer (`minimap_ring` in the frame kit), the place and floor below
+- [x] `ToastStack` for every notification (`GameEvents.notify(text, seconds, kind, icon)` gives it its kind; plain `notification_requested` stays an info toast), on its own layer above windows; `AreaBanner` on entering a named area (not again for the same area within 30 s); the lesson-start bell shows the subject and the room as a banner
+- [x] The HUD and the minimap fade out behind windows; `toggle_hud` (F2, rebindable) hides the whole interface for screenshots. The HUD and the minimap no longer style anything by hand (`UiBox` gives code-built screens their spacing)
 
 ### Milestone 68 — Front door: main menu, loading, pause, settings
 - [ ] Main menu: logo (placeholder wordmark until the commission), live castle backdrop at dusk with a slow drift, music; Play online, Practise offline, Settings, Credits, Quit. Server host/port move under "Advanced"; name and character choice move into the first-run flow

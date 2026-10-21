@@ -571,7 +571,7 @@ func _announce_quests(before: Array, now: Array) -> void:
 		for h in 4:
 			var was: bool = not old.is_empty() and (old[0].get("done", []) as Array).size() > h and old[0].done[h] == true
 			if not was and (q.get("done", []) as Array).size() > h and q.done[h] == true and not before.is_empty():
-				GameEvents.notification_requested.emit(tr("QUEST_DONE") % [CharacterProfile.house_name(h + 1), tr(str(q.get("name_key", ""))) % int(q.get("target", 0)), int(q.get("points", 0))], 7.0)
+				GameEvents.notify(tr("QUEST_DONE") % [CharacterProfile.house_name(h + 1), tr(str(q.get("name_key", ""))) % int(q.get("target", 0)), int(q.get("points", 0))], 7.0, ToastStack.Kind.REWARD, "quest")
 
 
 ## Report, block or unblock a player; staff mute (minutes) or kick; admins ban.
@@ -657,13 +657,13 @@ func _on_lesson_message(op_code: int, payload: Dictionary) -> void:
 			house_cup = payload
 			house_cup_changed.emit(house_cup)
 			if payload.get("fresh", false):
-				GameEvents.notification_requested.emit(tr("HOUSE_CUP_AWARDED") % CharacterProfile.house_name(int(payload.get("winner", 0))), 10.0)
+				GameEvents.notify(tr("HOUSE_CUP_AWARDED") % CharacterProfile.house_name(int(payload.get("winner", 0))), 10.0, ToastStack.Kind.REWARD, "house_points")
 		NetworkProtocol.OP_GUEST_PASS_GRANTED:
 			guest_passes[int(payload.get("house", 0))] = float(payload.get("until", 0))
-			GameEvents.notification_requested.emit(tr("GUEST_PASS_GRANTED") % [str(payload.get("by", "")), CharacterProfile.house_name(int(payload.get("house", 0)))], 6.0)
+			GameEvents.notify(tr("GUEST_PASS_GRANTED") % [str(payload.get("by", "")), CharacterProfile.house_name(int(payload.get("house", 0)))], 6.0, ToastStack.Kind.INFO, "castle")
 		NetworkProtocol.OP_HOMEWORK_NEW:
 			var def := SubjectRegistry.load_definition(str(payload.get("subject", "")))
-			GameEvents.notification_requested.emit(tr("HOMEWORK_NEW") % [tr(def.display_name) if def != null else "?", str(payload.get("text", ""))], 8.0)
+			GameEvents.notify(tr("HOMEWORK_NEW") % [tr(def.display_name) if def != null else "?", str(payload.get("text", ""))], 8.0, ToastStack.Kind.INFO, "homework")
 		NetworkProtocol.OP_LESSON_TOOL_RESULT:
 			lesson_tool_result_received.emit(payload.get("ok", false) == true, str(payload.get("tool", "")), str(payload.get("reason", "")))
 

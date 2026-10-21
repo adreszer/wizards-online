@@ -59,23 +59,35 @@ func _init() -> void:
 	add_child(key_chip)
 
 
-## Fills the slot with a spell; `def` null empties it.
+## Fills the slot with a spell (its colour, and the icon for its effect); `def` null
+## empties it.
 func set_spell(def: SpellDefinition) -> void:
 	empty = def == null
 	if def != null:
 		spell_color = def.color
+		icon_id = icon_for(def)
+
+
+## The icon id for a spell: "spell_<effect>" when the set has one, else the generic one.
+static func icon_for(def: SpellDefinition) -> String:
+	var id := "spell_" + String(def.effect_type)
+	return id if UiIcons.has(id) else "spell"
 
 
 func _draw() -> void:
 	var c := Vector2(size.x / 2.0, SIZE / 2.0)
 	var ring_state := "disabled" if disabled else "selected" if selected else "normal"
 	var ring := UiFrames.texture("slot_ring_" + ring_state)
+	if selected:
+		# A candle-warm halo round the chosen spell, readable at a glance.
+		draw_circle(c, SIZE / 2.0 + 1.0, Color(UiTokens.BRASS_BRIGHT, 0.22), true, -1.0, true)
+		draw_arc(c, SIZE / 2.0 - 4.0, 0.0, TAU, 64, Color(UiTokens.BRASS_BRIGHT, 0.85), 2.5, true)
 	draw_texture_rect(ring, Rect2(c - Vector2(SIZE, SIZE) / 2.0, Vector2(SIZE, SIZE)), false)
 	if not empty:
 		var col := spell_color if not disabled else spell_color.lerp(Color(0.4, 0.4, 0.4), 0.7)
-		draw_circle(c, ROUNDEL, col.darkened(0.55))
-		draw_circle(c + Vector2(-2, -3), ROUNDEL * 0.78, col.darkened(0.25))
-		draw_circle(c + Vector2(-5, -7), ROUNDEL * 0.35, Color(col.lightened(0.4), 0.35))
+		draw_circle(c, ROUNDEL, col.darkened(0.55), true, -1.0, true)
+		draw_circle(c + Vector2(-2, -3), ROUNDEL * 0.78, col.darkened(0.25), true, -1.0, true)
+		draw_circle(c + Vector2(-5, -7), ROUNDEL * 0.35, Color(col.lightened(0.4), 0.35), true, -1.0, true)
 		if _icon != null:
 			var s := Vector2(ICON, ICON)
 			draw_texture_rect(_icon, Rect2(c - s / 2.0, s), false, col.lightened(0.75))

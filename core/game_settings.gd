@@ -23,7 +23,7 @@ const DEFAULTS := {
 }
 ## Actions a player may rebind (the rest stay fixed).
 const BINDABLE := ["move_forward", "move_backward", "move_left", "move_right", "jump", "sprint", "interact", "cast", "mount",
-	"journal", "emote_menu", "raise_hand", "chat", "map"]
+	"journal", "emote_menu", "raise_hand", "chat", "map", "toggle_hud"]
 ## House symbols shown beside house colours when house_symbols is on.
 const HOUSE_SYMBOLS := ["", "▲", "◆", "●", "■"]
 

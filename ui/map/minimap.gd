@@ -2,8 +2,10 @@ class_name Minimap
 extends CanvasLayer
 ## Bottom-right minimap: a MapView that follows the local player, north up,
 ## on the storey they stand on (the ground floor outdoors), zoomed in indoors
-## and out on the grounds. Below it the name of the place and the storey.
-## Display only: it never takes the mouse or the keyboard.
+## and out on the grounds, seen through a round window in a brass ring with the
+## north pointer (assets/ui/frames/minimap_ring). Below it the name of the place
+## and the storey. Display only: it never takes the mouse or the keyboard. Fades
+## out with the HUD behind windows and when the interface is hidden.
 
 const INDOOR_ZOOM := 2.4
 const OUTDOOR_ZOOM := 0.7
@@ -11,12 +13,30 @@ const OUTDOOR_ZOOM := 0.7
 @onready var _root: Control = %Root
 @onready var _view: MapView = %View
 @onready var _place: Label = %PlaceLabel
+@onready var _clip: Control = %Clip
+@onready var _ring: TextureRect = %Ring
 
 var castle_map: CastleMap
+var _hud_shown := true
 
 
 func _ready() -> void:
 	_root.visible = false
+	_clip.draw.connect(func() -> void: _clip.draw_circle(_clip.size / 2.0, _clip.size.x / 2.0, Color.WHITE, true, -1.0, true))
+	_ring.texture = UiFrames.texture("minimap_ring")
+	UiRouter.changed.connect(_fade)
+	GameEvents.hud_toggled.connect(func(shown: bool) -> void:
+		_hud_shown = shown
+		_fade())
+
+
+func _fade() -> void:
+	_ring.texture = UiFrames.texture("minimap_ring")
+	var alpha := 1.0 if _hud_shown and not UiRouter.has_modal() else 0.0
+	if GameSettings.get_value("reduce_motion") or not is_inside_tree():
+		_root.modulate.a = alpha
+	else:
+		_root.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).tween_property(_root, "modulate:a", alpha, UiTokens.NORMAL)
 
 
 func set_map(map: CastleMap) -> void:

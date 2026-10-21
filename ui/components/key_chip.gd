@@ -52,6 +52,23 @@ func refresh() -> void:
 		text = label_for(action, is_inside_tree() and UiRouter.using_pad())
 
 
+## A key hint: the chip for `action` and `verb` (translated text) beside it in the
+## label style `variation`; the label is the row's second child.
+static func hint_row(action: StringName, verb: String, variation: StringName) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", UiTokens.SPACE_1 + 2)
+	var chip := KeyChip.new(action)
+	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(chip)
+	var l := Label.new()
+	l.text = verb
+	l.theme_type_variation = variation
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(l)
+	return row
+
+
 ## The name of what triggers `action`: its pad button when `pad`, else its key or mouse
 ## button; "—" when nothing is bound.
 static func label_for(for_action: StringName, pad: bool) -> String:
@@ -67,7 +84,10 @@ static func label_for(for_action: StringName, pad: bool) -> String:
 	for e in events:
 		if e is InputEventKey:
 			var k := e as InputEventKey
-			var code: Key = DisplayServer.keyboard_get_keycode_from_physical(k.physical_keycode) if k.physical_keycode != 0 else k.keycode
+			var code: Key = k.keycode
+			if k.physical_keycode != 0:
+				# The key's letter on this keyboard layout; headless has no layout.
+				code = k.physical_keycode if DisplayServer.get_name() == "headless" else DisplayServer.keyboard_get_keycode_from_physical(k.physical_keycode)
 			if SHORT_KEYS.has(code):
 				return TranslationServer.translate(SHORT_KEYS[code])
 			return OS.get_keycode_string(code)

@@ -39,7 +39,25 @@ func _init() -> void:
 ## Shows an item: an icon id from UiIcons (or "" for an empty slot) and how many; a
 ## count of 1 or less shows no number.
 func set_item(icon_id: String, count := 1) -> void:
+	icon_rect.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	icon_rect.custom_minimum_size = Vector2.ZERO
+	icon_rect.modulate = UiTokens.BRASS_BRIGHT if selected else UiTokens.CANDLE
 	icon_rect.texture = UiIcons.icon(icon_id, ICON) if icon_id != "" else null
+	count_label.text = str(count) if count > 1 else ""
+
+
+## Shows an item by its own icon texture (an ItemDefinition's), drawn at ICON size;
+## null falls back to the satchel icon.
+func set_texture(texture: Texture2D, count := 1) -> void:
+	if texture == null:
+		set_item("satchel", count)
+		return
+	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.custom_minimum_size = Vector2(ICON, ICON)
+	icon_rect.texture = texture
+	icon_rect.modulate = Color.WHITE
 	count_label.text = str(count) if count > 1 else ""
 
 

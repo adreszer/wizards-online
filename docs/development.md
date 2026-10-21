@@ -34,7 +34,7 @@ All commands below assume `godot` resolves.
 
 Choose **Play OFFLINE**. The whole castle is explorable without any backend.
 
-Controls: WASD move · Shift run · Space jump · move the mouse to look (cursor captured) · scroll wheel zoom · left click / F cast · E interact · Tab satchel (inventory; click the torch to hold it, the broom to ride it) · M castle map (drag, wheel zoom, PgUp/PgDn floors) · B mount / land the broom (flying: the broom follows the mouse, W forward, Space up, C or Ctrl down, Shift faster, hold C on the ground to land) · Enter or T chat · Esc pause · ` (or F1; Fn+F1 on a Mac) free the cursor, e.g. for screenshots, and back to mouse look · F3 debug overlay.
+Controls: WASD move · Shift run · Space jump · move the mouse to look (cursor captured) · scroll wheel zoom · left click / F cast · E interact · Tab satchel (inventory; click the torch to hold it, the broom to ride it) · M castle map (drag, wheel zoom, PgUp/PgDn floors) · B mount / land the broom (flying: the broom follows the mouse, W forward, Space up, C or Ctrl down, Shift faster, hold C on the ground to land) · Enter or T chat · Esc pause · ` (or F1; Fn+F1 on a Mac) free the cursor, e.g. for screenshots, and back to mouse look · F2 hide the whole interface (screenshots), again to bring it back · F3 debug overlay.
 
 ## Backend (Nakama + PostgreSQL)
 

@@ -89,7 +89,7 @@ func use_bed(n: int) -> void:
 	if p.is_empty():
 		var seed := first_seed()
 		if seed == "":
-			GameEvents.notification_requested.emit(tr("GARDEN_NO_SEEDS"), 4.0)
+			GameEvents.notify(tr("GARDEN_NO_SEEDS"), 4.0, ToastStack.Kind.WARNING)
 			return
 		r = await NetworkManager.request("garden_plant", {"plot": n, "seed": seed})
 	elif not p.get("watered", false):

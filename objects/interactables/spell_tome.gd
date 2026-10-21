@@ -42,7 +42,7 @@ func _on_interacted(interactor: Node) -> void:
 		NetworkManager.send_study_tome(String(spell.id))
 	else:
 		caster.learn_spell(spell)
-		GameEvents.notification_requested.emit(tr("NOTIFY_SPELL_LEARNED") % tr(spell.display_name), 6.0)
+		GameEvents.notify(tr("NOTIFY_SPELL_LEARNED") % tr(spell.display_name), 6.0, ToastStack.Kind.LEARNED)
 	Sfx.play_at(_book, BOOK_OPEN, -2.0, 15.0)
 	_audio.play()
 	learned.emit(interactor)

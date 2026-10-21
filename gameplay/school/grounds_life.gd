@@ -149,7 +149,7 @@ func care(kind: String) -> void:
 			has_treat = true
 	var r: Dictionary = await NetworkManager.request("creature_feed" if has_treat else "creature_pet", {"kind": kind})
 	if not r.ok:
-		GameEvents.notification_requested.emit(NetworkManager.refusal_text(r.reason), 3.0)
+		GameEvents.notify(NetworkManager.refusal_text(r.reason), 3.0, ToastStack.Kind.WARNING)
 		return
 	var key := "CREATURE_BOND_ADOPT" if r.data.get("can_adopt", false) else "CREATURE_BOND"
 	GameEvents.notification_requested.emit(tr(key) % [tr("CREATURE_" + kind.to_upper()), int(r.data.get("bond", 0))], 4.0)
