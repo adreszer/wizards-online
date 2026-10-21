@@ -7,7 +7,9 @@ extends Node3D
 ## fingers, so the torch positions itself each frame: it moves the grip to the
 ## palm and orients itself from the *character's* facing (not the hand's), held
 ## upright with a forward/outward lean so the flame clears the shoulder even
-## with the arm hanging at the side.
+## with the arm hanging at the side. The flame crackles (a looped sound at the head).
+
+const CRACKLE := preload("res://assets/audio/player/torch_held_loop.wav")
 
 ## Radius the torch lights up, in metres.
 @export var light_radius: float = 9.0
@@ -40,6 +42,23 @@ func _ready() -> void:
 	process_priority = 100
 	_character = _find_character()
 	_align()
+	var crackle := AudioStreamPlayer3D.new()
+	crackle.name = "Crackle"
+	crackle.stream = looped(CRACKLE)
+	crackle.volume_db = -8.0
+	crackle.max_distance = 14.0
+	_light.add_child(crackle)
+	crackle.play(randf() * CRACKLE.get_length())
+
+
+## Loop points live in the gitignored .import files, so a WAV meant to loop is set
+## to loop over its whole length here.
+static func looped(stream: AudioStreamWAV) -> AudioStreamWAV:
+	if stream.loop_mode == AudioStreamWAV.LOOP_DISABLED:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		stream.loop_begin = 0
+		stream.loop_end = int(stream.get_length() * stream.mix_rate)
+	return stream
 
 
 func _process(delta: float) -> void:

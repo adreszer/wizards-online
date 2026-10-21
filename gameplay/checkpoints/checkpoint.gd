@@ -4,7 +4,9 @@ extends Area3D
 ## Reusable: drop into any level and size the collision shape.
 
 @export var respawn_point: Node3D
-## Only the first activation shows feedback; re-entering silently refreshes.
+const ACTIVATE_SOUND := preload("res://assets/audio/player/checkpoint_activate.wav")
+
+## Only the first activation shows feedback (and the attuning chime); re-entering silently refreshes.
 var _activated: bool = false
 
 
@@ -25,3 +27,10 @@ func _on_body_entered(body: Node3D) -> void:
 	if not _activated:
 		_activated = true
 		GameEvents.checkpoint_activated.emit(self)
+		var chime := AudioStreamPlayer3D.new()
+		chime.stream = ACTIVATE_SOUND
+		chime.volume_db = -4.0
+		chime.finished.connect(chime.queue_free)
+		add_child(chime)
+		chime.global_position = get_respawn_transform().origin
+		chime.play()

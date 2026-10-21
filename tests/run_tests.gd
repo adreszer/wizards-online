@@ -78,6 +78,7 @@ func _run() -> void:
 	await _test_map()
 	await _test_setpieces()
 	await _test_day_night()
+	await _test_player_sounds()
 	await _test_timetable()
 	await _test_chat()
 	await _test_gestures()
@@ -2087,6 +2088,82 @@ func _test_setpieces() -> void:
 		player.movement.request_jump()
 		await _wait(0.1)
 		t.check(not player.movement.is_held(), "a jump frees it")
+	castle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_player_sounds() -> void:
+	t.section("Player sounds")
+	for s: StringName in PlayerSounds.SURFACES:
+		var r := PlayerSounds.step_stream(s)
+		t.check(r.streams_count == int(PlayerSounds.STEP_COUNTS[s]) and r.streams_count > 1 and r.get_stream(0) != null, "%s has %d footsteps" % [s, r.streams_count])
+	var crackle := HeldTorch.looped(HeldTorch.CRACKLE)
+	t.check(crackle.loop_mode == AudioStreamWAV.LOOP_FORWARD and crackle.loop_end > crackle.mix_rate, "the torch crackle loops")
+	var castle := CASTLE_SCENE.instantiate()
+	add_child(castle)
+	await get_tree().process_frame
+	var terrain: Terrain = castle.get_node("Grounds/Terrain")
+	# One zone per kind whose floor centre isn't inside a smaller zone.
+	var by_kind := {}
+	for z: AreaZone in get_tree().get_nodes_in_group(AreaZone.GROUP):
+		var floor_at := z.global_position + Vector3.DOWN * (z.size.y / 2.0 - 0.2)
+		if not by_kind.has(z.kind) and PlayerSounds.zone_at(get_tree(), floor_at + Vector3.UP) == z:
+			by_kind[z.kind] = z
+	var corridor: AreaZone = by_kind["corridor"]
+	var feet := corridor.global_position + Vector3.DOWN * (corridor.size.y / 2.0 - 0.2)
+	await _spawn_player(feet + Vector3.UP * 0.1)
+	for kind: String in ["corridor", "common_room", "classroom", "library"]:
+		var z: AreaZone = by_kind.get(kind)
+		var expected: StringName = PlayerSounds.KIND_SURFACES.get(kind, &"stone")
+		var at := z.global_position + Vector3.DOWN * (z.size.y / 2.0 - 0.2) if z != null else Vector3.ZERO
+		t.check(z != null and PlayerSounds.surface_at(player, at) == expected, "a %s floor sounds like %s" % [kind, expected])
+	var field: Vector3 = await _open_ground(terrain, by_kind["grounds"])
+	t.check(field != Vector3.INF and PlayerSounds.surface_at(player, field) == &"grass", "open grounds sound like grass")
+	var shallow := Vector3.INF
+	for i in 4000:
+		var x := randf_range(-600.0, 600.0)
+		var zz := randf_range(-600.0, 600.0)
+		if terrain.is_inside(x, zz) and terrain.height_at(x, zz) < terrain.water_level - 0.1 and terrain.height_at(x, zz) > terrain.water_level - 0.6:
+			shallow = Vector3(x, terrain.water_level - 0.05, zz)
+			break
+	t.check(shallow != Vector3.INF and PlayerSounds.surface_at(player, shallow) == &"water", "wading in the lake shallows splashes")
+	var grate := StaticBody3D.new()
+	var shape := CollisionShape3D.new()
+	shape.shape = BoxShape3D.new()
+	(shape.shape as BoxShape3D).size = Vector3(2, 0.2, 2)
+	grate.add_child(shape)
+	grate.set_meta(&"surface", &"metal")
+	castle.add_child(grate)
+	grate.global_position = Vector3(0, 500, 0)
+	await get_tree().physics_frame
+	t.check(PlayerSounds.surface_at(player, Vector3(0, 500.1, 0)) == &"metal", "a floor's surface meta wins")
+	# One step per stride while walking, a longer stride running, none standing or after a teleport.
+	var sounds := player.sounds
+	sounds._last_position = player.global_position
+	player.animation_controller.set_movement_state_name("walk")
+	sounds.steps_played = 0
+	sounds._travelled = 0.0
+	for i in 40:
+		player.global_position += Vector3(0.1, 0, 0)
+		sounds._physics_process(0.016)
+	t.check(sounds.steps_played == 2, "4 m walking is 2 steps (%d)" % sounds.steps_played)
+	t.check(sounds.last_surface == &"stone", "steps in a corridor are on stone (%s)" % sounds.last_surface)
+	player.animation_controller.set_movement_state_name("run")
+	sounds.steps_played = 0
+	for i in 48:
+		player.global_position += Vector3(0.1, 0, 0)
+		sounds._physics_process(0.016)
+	t.check(sounds.steps_played == 2, "4.8 m running is 2 steps (%d)" % sounds.steps_played)
+	sounds.steps_played = 0
+	player.global_position += Vector3(10, 0, 0)
+	sounds._physics_process(0.016)
+	player.animation_controller.set_movement_state_name("idle")
+	for i in 20:
+		player.global_position += Vector3(0.2, 0, 0)
+		sounds._physics_process(0.016)
+	t.check(sounds.steps_played == 0, "no step for a teleport or while standing")
+	player.queue_free()
+	player = null
 	castle.queue_free()
 	await get_tree().process_frame
 

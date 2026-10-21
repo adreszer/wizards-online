@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CollectibleDefinition" load_steps=3 format=3 uid="uid://fragmentdef001"]
 
 [ext_resource type="Script" path="res://gameplay/collectibles/collectible_definition.gd" id="1"]
-[ext_resource type="AudioStream" path="res://assets/audio/pickup.wav" id="2"]
+[ext_resource type="AudioStream" path="res://assets/audio/player/fragment_collect.wav" id="2"]
 
 [resource]
 script = ExtResource("1")

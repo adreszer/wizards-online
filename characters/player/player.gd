@@ -85,6 +85,8 @@ var off_hand: Node3D
 var speech_bubble: SpeechBubble
 ## Social gestures and sitting (raise a hand, wave, bow…).
 var gestures: Gestures
+## Footsteps, jumps, landings, hits (PlayerSounds).
+var sounds: PlayerSounds
 
 
 func _ready() -> void:
@@ -107,6 +109,10 @@ func _ready() -> void:
 	gestures.name = "Gestures"
 	add_child(gestures)
 	gestures.setup(self, visual)
+	sounds = PlayerSounds.new()
+	sounds.name = "Sounds"
+	add_child(sounds)
+	sounds.setup(self)
 	if is_local:
 		_setup_local()
 	else:
