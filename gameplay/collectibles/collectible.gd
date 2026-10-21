@@ -29,6 +29,9 @@ var _time: float = randf() * TAU
 
 
 func _ready() -> void:
+	# The shards spin every frame: no shadow, or every shadowed light near them re-renders.
+	for node in _visual.find_children("*", "GeometryInstance3D", true, false):
+		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	if definition == null:
 		push_warning("Collectible without definition at %s" % get_path())
 		return

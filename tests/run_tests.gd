@@ -3068,14 +3068,16 @@ func _test_school_life() -> void:
 			"the paddock creatures are real models with a care spot")
 		var wing_count := (life.creatures["glimmerwing"] as Node).find_children("wing_*", "", true, false).size()
 		t.check(wing_count == 2, "the glimmerwing has two wings to beat (%d)" % wing_count)
-		var hopper: Creature = life.creatures["mossling"]
-		var start := hopper.global_position
+		# A mossling of its own (the paddock moves its creatures every frame).
+		var hopper := Creature.create("mossling")
+		add_child(hopper)
 		var heights: Array[float] = []
-		for i in 30:
-			hopper.global_position = start + Vector3(0.05 * i, 0, 0)
+		for i in 40:
+			hopper.global_position = Vector3(0.05 * i, 200, 0)
 			await get_tree().process_frame
 			heights.append(hopper.get_node("Model").position.y)
 		t.check(heights.max() > 0.03 and hopper.moving > 0.5, "a moving mossling hops (%.2f m)" % heights.max())
+		hopper.queue_free()
 	var seasons := castle.get_node_or_null("Seasons") as Seasons
 	t.check(seasons != null and seasons.candles != null and seasons.candles.get_child_count() >= 20, "candles float in the great hall")
 	castle.queue_free()
@@ -3152,11 +3154,16 @@ func _test_light_budget() -> void:
 	for n: Node in [torch, plain, sparks]:
 		n.queue_free()
 	# Props that move every frame would make every shadowed light near them re-render.
-	for check: Array in [["res://gameplay/collectibles/collectible.tscn", "Visual/Mesh"], ["res://objects/interactables/spell_tome.tscn", "Book/Mesh"],
+	for check: Array in [["res://gameplay/collectibles/collectible.tscn", "Visual"], ["res://objects/interactables/spell_tome.tscn", "Book"],
 			["res://objects/school/practice_target.tscn", "Disc"]]:
 		var inst: Node = (load(check[0]) as PackedScene).instantiate()
-		var mesh := inst.get_node_or_null(check[1]) as GeometryInstance3D
-		t.check(mesh != null and mesh.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF, "%s: the moving part casts no shadow" % check[0].get_file())
+		add_child(inst)
+		var moving := inst.get_node_or_null(check[1])
+		var parts: Array = [moving] + (moving.find_children("*", "GeometryInstance3D", true, false) if moving != null else [])
+		parts = parts.filter(func(n: Variant) -> bool: return n is GeometryInstance3D)
+		t.check(moving != null and parts.all(func(g: GeometryInstance3D) -> bool: return g.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF),
+			"%s: the moving part casts no shadow" % check[0].get_file())
+		inst.queue_free()
 		inst.free()
 	t.check(DayNightCycle.is_indoor_kind("classroom") and DayNightCycle.is_indoor_kind("corridor") and not DayNightCycle.is_indoor_kind("grounds")
 		and not DayNightCycle.is_indoor_kind("outdoor") and not DayNightCycle.is_indoor_kind(""), "indoors and out by area kind")
