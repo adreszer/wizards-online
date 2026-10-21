@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/characters/apprentice_m/apprentice_m.glb" id="1"]
 [ext_resource type="Script" path="res://characters/components/animation_controller.gd" id="2"]
+[ext_resource type="Script" path="res://objects/items/wand_mesh.gd" id="wand"]
 
 [sub_resource type="AnimationNodeAnimation" id="ANA_idle"]
 animation = &"Idle_4"
@@ -82,17 +83,11 @@ nodes/Cast/position = Vector2(100, 0)
 nodes/output/position = Vector2(350, 0)
 node_connections = [&"Movement", 0, &"Idle", &"Movement", 1, &"Walk", &"Movement", 2, &"Run", &"Movement", 3, &"Jump", &"Movement", 4, &"Fall", &"Movement", 5, &"Land", &"Cast", 0, &"Movement", &"Cast", 1, &"CastAnim", &"output", 0, &"Cast"]
 
-[sub_resource type="StandardMaterial3D" id="Mat_Wand"]
-albedo_color = Color(0.35, 0.22, 0.12, 1)
-
 [sub_resource type="StandardMaterial3D" id="Mat_Glow"]
 albedo_color = Color(0.7, 0.55, 1, 1)
 emission_enabled = true
 emission = Color(0.6, 0.45, 1, 1)
 emission_energy_multiplier = 3.0
-
-[sub_resource type="BoxMesh" id="Mesh_Wand"]
-size = Vector3(0.035, 0.42, 0.035)
 
 [sub_resource type="SphereMesh" id="Mesh_Glow"]
 radius = 0.07
@@ -124,18 +119,17 @@ use_external_skeleton = true
 external_skeleton = NodePath("../Model/target_character/Skeleton3D")
 
 [node name="WandMesh" type="MeshInstance3D" parent="Wand"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0.03)
-mesh = SubResource("Mesh_Wand")
-surface_material_override/0 = SubResource("Mat_Wand")
+transform = Transform3D(0.342, -0.9374, 0.06555, 0.9397, 0.3412, -0.02386, -0, 0.06976, 0.9976, 0, 0.075, -0.02)
+script = ExtResource("wand")
 
 [node name="Glow" type="MeshInstance3D" parent="Wand"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.44, 0.03)
+transform = Transform3D(0.342, -0.9374, 0.06555, 0.9397, 0.3412, -0.02386, -0, 0.06976, 0.9976, -0.239, 0.162, -0.002212)
 visible = false
 mesh = SubResource("Mesh_Glow")
 surface_material_override/0 = SubResource("Mat_Glow")
 
 [node name="CastOrigin" type="Marker3D" parent="Wand"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0.03)
+transform = Transform3D(0.342, -0.9374, 0.06555, 0.9397, 0.3412, -0.02386, -0, 0.06976, 0.9976, -0.2531, 0.1671, -0.001166)
 
 [node name="OffHand" type="BoneAttachment3D" parent="."]
 bone_name = "mixamorig_LeftHand"

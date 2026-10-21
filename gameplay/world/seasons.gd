@@ -13,6 +13,9 @@ extends Node3D
 const HALL := &"great_hall"
 const LEAF_COLOURS := {"autumn": Color(0.55, 0.28, 0.07), "winter": Color(0.72, 0.74, 0.76), "spring": Color(0.62, 0.45, 0.52), "summer": Color(0.12, 0.22, 0.08)}
 const BUSH_COLOURS := {"autumn": Color(0.34, 0.24, 0.08), "winter": Color(0.6, 0.62, 0.62), "spring": Color(0.16, 0.32, 0.1), "summer": Color(0.1, 0.2, 0.08)}
+## Textured foliage multiplies its leaf colours by these (autumn turns it russet, winter
+## frosts it); the placeholders take the flat colours above instead.
+const TEXTURED_TINTS := {"summer": Color(1, 1, 1), "spring": Color(1.08, 1.15, 0.95), "autumn": Color(1.9, 0.95, 0.4), "winter": Color(1.7, 1.75, 1.85)}
 const PARTICLE_COLOURS := {"autumn": Color(0.75, 0.38, 0.1), "winter": Color(0.95, 0.97, 1.0), "spring": Color(1.0, 0.75, 0.85)}
 
 var season := ""
@@ -129,23 +132,28 @@ func set_season(s: String) -> void:
 	if s == season:
 		return
 	season = s
-	_tint("broadleaf", 1, LEAF_COLOURS[s])
-	_tint("bush", 0, BUSH_COLOURS[s])
-	_tint("conifer", 1, Color(0.62, 0.66, 0.66) if s == "winter" else Color(0.07, 0.17, 0.09))
+	_tint("broadleaf", 1, LEAF_COLOURS[s], s)
+	_tint("bush", 0, BUSH_COLOURS[s], s)
+	_tint("conifer", 1, Color(0.62, 0.66, 0.66) if s == "winter" else Color(0.07, 0.17, 0.09), "winter" if s == "winter" else "summer")
 	if PARTICLE_COLOURS.has(s):
 		var mat := particles.process_material as ParticleProcessMaterial
 		mat.color = PARTICLE_COLOURS[s]
 		mat.gravity = Vector3(0.3, -1.2, 0.1) if s == "winter" else Vector3(0.6, -1.8, 0.2)
 
 
-## The placeholder flora (shared meshes) take the season's colour.
-static func _tint(kind: String, surface: int, colour: Color) -> void:
+## The flora (shared meshes) take the season's colour, or a tint for textured foliage.
+static func _tint(kind: String, surface: int, colour: Color, s: String) -> void:
 	var mesh := FloraMeshes.mesh_for(kind)
 	if mesh == null or surface >= mesh.get_surface_count():
 		return
 	var mat := mesh.surface_get_material(surface) as StandardMaterial3D
-	if mat != null:
+	if mat == null:
+		return
+	if mat.albedo_texture == null:
 		mat.albedo_color = colour
+		return
+	# Real foliage (tools/make_flora.py) is already green: a gentle tint per season.
+	mat.albedo_color = TEXTURED_TINTS[s]
 
 
 func _build_particles() -> GPUParticles3D:

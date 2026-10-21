@@ -3024,6 +3024,20 @@ func _test_school_life() -> void:
 	var decor := Seasons.build_decor("midwinter", Vector3.ZERO, Vector3(20, 9, 40))
 	t.check(decor.get_child_count() >= 30, "midwinter dresses the hall (%d)" % decor.get_child_count())
 	decor.free()
+	# The grounds' flora are game-weight models (tools/make_flora.py): leaves cut out, seasons tint them.
+	for kind in ["conifer", "broadleaf", "bush", "rock"]:
+		var fm := FloraMeshes.mesh_for(kind)
+		var tris := 0
+		for s in fm.get_surface_count():
+			tris += (fm.surface_get_arrays(s)[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3
+		var leaf := fm.surface_get_material(fm.get_surface_count() - 1) as BaseMaterial3D
+		t.check(leaf.albedo_texture != null and tris < 1000, "%s is a textured model of %d triangles" % [kind, tris])
+		if kind != "rock":
+			t.check(leaf.transparency == BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR and leaf.cull_mode == BaseMaterial3D.CULL_DISABLED, "%s leaves are cut out and two-sided" % kind)
+	Seasons._tint("broadleaf", 1, Seasons.LEAF_COLOURS["autumn"], "autumn")
+	var autumn := (FloraMeshes.mesh_for("broadleaf").surface_get_material(1) as BaseMaterial3D).albedo_color
+	Seasons._tint("broadleaf", 1, Seasons.LEAF_COLOURS["summer"], "summer")
+	t.check(autumn.r > autumn.g and autumn.g > autumn.b, "autumn turns the broadleaf leaves russet")
 	t.check(CastleSchedule.open_at("globe_room/door_1", 2, 12.0) and not CastleSchedule.open_at("globe_room/door_1", 3, 12.0), "the globe room opens only on Wednesdays")
 	t.check(CastleSchedule.open_at("map_room/door_1", 0, 23.0) and not CastleSchedule.open_at("map_room/door_1", 0, 12.0) and CastleSchedule.open_at("old_cells/door_1", 0, 12.0) and not CastleSchedule.open_at("old_cells/door_1", 0, 23.0),
 		"by night the corridors swap their doors")
@@ -3374,6 +3388,13 @@ func _test_characters() -> void:
 		t.check(player.cast_origin != null and player.cast_origin.is_inside_tree(), "%s: cast origin found" % id)
 		var socket := player.visual.find_child("OffHand", true, false)
 		t.check(socket != null, "%s: OffHand socket present in the body" % id)
+		# The wand lies across the fist (the hand bone runs along the fingers), its tip at the cast origin.
+		var wand := player.visual.find_child("WandMesh", true, false) as MeshInstance3D
+		var hand := wand.get_parent() as Node3D
+		var across := absf(wand.global_basis.y.normalized().dot(hand.global_basis.y.normalized()))
+		t.check(wand.mesh != null and across < 0.5, "%s: wand is held across the palm, not as part of the hand" % id)
+		var origin := wand.global_transform.affine_inverse() * player.cast_origin.global_position
+		t.check(Vector2(origin.x, origin.z).length() < 0.01 and origin.y > WandMesh.TIP and origin.y < WandMesh.TIP + 0.04, "%s: spells leave from the wand's tip" % id)
 		player.inventory.load_state(ItemRegistry.default_state())
 		player.inventory.hold_id(&"torch")
 		t.check(_find_light(player) != null and _find_light(player).is_inside_tree(), "%s: held torch lights up in the off hand" % id)

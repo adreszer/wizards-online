@@ -2,7 +2,8 @@ class_name FloraMeshes
 extends RefCounted
 ## Meshes for the grounds' scattered flora. A kind can be replaced by a real model:
 ## list its mesh resource under "flora" in content/castle/kit.json (kind -> res://…mesh.tres
-## or a .glb's mesh); otherwise a low-poly placeholder is built here from primitives.
+## or a .glb, whose first mesh is used: tools/make_flora.py builds them, bark first and
+## leaf cards second); otherwise a low-poly placeholder is built here from primitives.
 
 const KIT_PATH := "res://content/castle/kit.json"
 
@@ -18,9 +19,30 @@ static func mesh_for(kind: String) -> Mesh:
 		var res: Resource = load(kit["flora"][kind])
 		if res is Mesh:
 			mesh = res
+		elif res is PackedScene:
+			mesh = _first_mesh(res as PackedScene)
 	if mesh == null:
 		mesh = _placeholder(kind)
 	_cache[kind] = mesh
+	return mesh
+
+
+## The first mesh in a model scene, its leaf cards cut out (alpha scissor, both faces):
+## a duplicate, so Seasons can tint it without touching the imported resource.
+static func _first_mesh(scene: PackedScene) -> Mesh:
+	var root := scene.instantiate()
+	var found := root.find_children("*", "MeshInstance3D", true, false)
+	var mesh: Mesh = null
+	if not found.is_empty():
+		mesh = (found[0] as MeshInstance3D).mesh.duplicate(true) as Mesh
+		for s in mesh.get_surface_count():
+			var mat := mesh.surface_get_material(s) as BaseMaterial3D
+			if mat != null and (mat.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED or mat.resource_name.begins_with("leaves")):
+				mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+				mat.alpha_scissor_threshold = 0.4
+				mat.alpha_antialiasing_mode = BaseMaterial3D.ALPHA_ANTIALIASING_ALPHA_TO_COVERAGE
+				mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	root.free()
 	return mesh
 
 
