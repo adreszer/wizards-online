@@ -8,6 +8,8 @@ extends StaticBody3D
 ## sparks up the column (gain) or down it (loss). Offline there is no tally:
 ## the columns stand empty and unranked.
 
+const COLUMN_BASE := preload("res://assets/models/school/column_base.glb")
+const COLUMN_CAP := preload("res://assets/models/school/column_cap.glb")
 const COLUMN_PITCH := 1.75
 const COLUMN_HEIGHT := 3.6
 const COLUMN_RADIUS := 0.42
@@ -139,10 +141,6 @@ func _build() -> void:
 	var stone := StandardMaterial3D.new()
 	stone.albedo_color = Color(0.34, 0.32, 0.36)
 	stone.roughness = 0.85
-	var gold := StandardMaterial3D.new()
-	gold.albedo_color = Color(0.78, 0.6, 0.28)
-	gold.metallic = 0.85
-	gold.roughness = 0.35
 	var glass := StandardMaterial3D.new()
 	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	glass.albedo_color = Color(0.8, 0.85, 0.95, 0.16)
@@ -184,16 +182,15 @@ func _build() -> void:
 		tube.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		tube.position.y = PLINTH_HEIGHT + COLUMN_HEIGHT * 0.5
 		column.add_child(tube)
-		for ring_y in [PLINTH_HEIGHT + 0.05, PLINTH_HEIGHT + COLUMN_HEIGHT - 0.03]:
-			var ring := MeshInstance3D.new()
-			var ring_mesh := CylinderMesh.new()
-			ring_mesh.top_radius = COLUMN_RADIUS + 0.06
-			ring_mesh.bottom_radius = COLUMN_RADIUS + 0.06
-			ring_mesh.height = 0.1
-			ring.mesh = ring_mesh
-			ring.material_override = gold
-			ring.position.y = ring_y
-			column.add_child(ring)
+		# An ornate brass foot and crown hold each glass column (Meshy, cut from one model).
+		var foot := COLUMN_BASE.instantiate() as Node3D
+		foot.scale = Vector3(1, 0.55, 1)
+		foot.position.y = PLINTH_HEIGHT
+		column.add_child(foot)
+		var crown := COLUMN_CAP.instantiate() as Node3D
+		crown.scale = Vector3(1, 0.6, 1)
+		crown.position.y = PLINTH_HEIGHT + COLUMN_HEIGHT - 0.12
+		column.add_child(crown)
 
 		var fill := MeshInstance3D.new()
 		var fill_mesh := CylinderMesh.new()

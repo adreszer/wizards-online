@@ -1,14 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://plaque0000001"]
+[gd_scene format=3 uid="uid://plaque0000001"]
 
 [ext_resource type="Script" path="res://objects/interactables/plaque.gd" id="1"]
 [ext_resource type="Script" path="res://gameplay/interaction/interactable.gd" id="2"]
-
-[sub_resource type="StandardMaterial3D" id="Mat"]
-albedo_color = Color(0.72, 0.62, 0.4, 1)
-metallic = 0.5
-
-[sub_resource type="BoxMesh" id="Mesh"]
-size = Vector3(1.2, 0.8, 0.12)
+[ext_resource type="PackedScene" path="res://assets/models/environment/props5/plaque.glb" id="model"]
 
 [sub_resource type="BoxShape3D" id="Shape"]
 size = Vector3(1.2, 0.8, 0.3)
@@ -23,9 +17,8 @@ script = ExtResource("2")
 prompt_text = "INTERACT_READ"
 focus_point_offset = Vector3(0, 0, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="."]
-mesh = SubResource("Mesh")
-surface_material_override/0 = SubResource("Mat")
+[node name="Mesh" parent="." instance=ExtResource("model")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
 
 [node name="Shape" type="CollisionShape3D" parent="."]
 shape = SubResource("Shape")

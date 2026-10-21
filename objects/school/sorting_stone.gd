@@ -15,6 +15,7 @@ const WORLD_KIND := "sorting_stone"
 
 @onready var _interactable: Interactable = $Interactable
 @onready var _crystal: MeshInstance3D = $Crystal
+@onready var _crystal_height: float = _crystal.position.y
 var _phase: float = 0.0
 
 
@@ -26,7 +27,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_phase += delta
 	_crystal.rotation.y += delta * 0.6
-	_crystal.position.y = 1.55 + sin(_phase * 1.4) * 0.06
+	_crystal.position.y = _crystal_height + sin(_phase * 1.4) * 0.06
 
 
 func _on_interacted(interactor: Node) -> void:

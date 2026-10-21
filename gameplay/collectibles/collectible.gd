@@ -41,14 +41,18 @@ func _ready() -> void:
 
 
 func _apply_definition() -> void:
-	var mesh := _visual.get_node_or_null("Mesh") as MeshInstance3D
-	if mesh != null:
-		var mat := mesh.get_active_material(0) as StandardMaterial3D
-		if mat != null:
-			mat = mat.duplicate()
-			mat.albedo_color = definition.color
-			mat.emission = definition.color
-			mesh.set_surface_override_material(0, mat)
+	# The crystal shards glow in the definition's colour.
+	for node in _visual.find_children("*", "MeshInstance3D", true, false):
+		var mesh := node as MeshInstance3D
+		for i in mesh.get_surface_override_material_count():
+			var mat := mesh.get_active_material(i) as StandardMaterial3D
+			if mat != null:
+				mat = mat.duplicate()
+				mat.albedo_color = definition.color
+				mat.emission_enabled = true
+				mat.emission = definition.color
+				mat.emission_energy_multiplier = 1.6
+				mesh.set_surface_override_material(i, mat)
 	_burst.color = definition.color
 	if definition.pickup_sound != null:
 		_audio.stream = definition.pickup_sound

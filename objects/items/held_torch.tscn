@@ -1,27 +1,7 @@
-[gd_scene load_steps=19 format=3 uid="uid://heldtorch0001"]
+[gd_scene format=3 uid="uid://heldtorch0001"]
 
 [ext_resource type="Script" path="res://objects/items/held_torch.gd" id="1"]
-
-[sub_resource type="CylinderMesh" id="HandleMesh"]
-top_radius = 0.028
-bottom_radius = 0.022
-height = 0.56
-
-[sub_resource type="StandardMaterial3D" id="HandleMat"]
-albedo_color = Color(0.45, 0.3, 0.17, 1)
-roughness = 0.85
-
-[sub_resource type="CylinderMesh" id="HeadMesh"]
-top_radius = 0.045
-bottom_radius = 0.036
-height = 0.14
-
-[sub_resource type="StandardMaterial3D" id="HeadMat"]
-albedo_color = Color(0.16, 0.11, 0.07, 1)
-roughness = 1.0
-emission_enabled = true
-emission = Color(0.5, 0.15, 0.02, 1)
-emission_energy_multiplier = 0.15
+[ext_resource type="PackedScene" path="res://assets/models/items/held_torch.glb" id="model"]
 
 [sub_resource type="Gradient" id="FlameRamp"]
 offsets = PackedFloat32Array(0, 0.25, 0.6, 1)
@@ -111,20 +91,11 @@ size = Vector2(0.05, 0.05)
 [node name="HeldTorch" type="Node3D"]
 script = ExtResource("1")
 
-[node name="Handle" type="MeshInstance3D" parent="."]
-cast_shadow = 0
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16, 0)
-mesh = SubResource("HandleMesh")
-surface_material_override/0 = SubResource("HandleMat")
-
-[node name="Head" type="MeshInstance3D" parent="."]
-cast_shadow = 0
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47, 0)
-mesh = SubResource("HeadMesh")
-surface_material_override/0 = SubResource("HeadMat")
+[node name="Torch" parent="." instance=ExtResource("model")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 
 [node name="Flame" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 light_color = Color(1, 0.78, 0.55, 1)
 light_energy = 2.6
 omni_range = 9.0
@@ -133,7 +104,7 @@ shadow_enabled = true
 
 [node name="FlameParticles" type="GPUParticles3D" parent="."]
 cast_shadow = 0
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.53, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 amount = 48
 lifetime = 0.45
 local_coords = true
@@ -142,7 +113,7 @@ draw_pass_1 = SubResource("FlameQuad")
 
 [node name="Embers" type="GPUParticles3D" parent="."]
 cast_shadow = 0
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47, 0)
 amount = 12
 lifetime = 1.1
 local_coords = false

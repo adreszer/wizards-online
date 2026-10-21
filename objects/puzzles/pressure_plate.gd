@@ -17,7 +17,7 @@ const WORLD_KIND := "pressure_plate"
 var is_active: bool = false
 var _count: int = 0
 
-@onready var _plate: MeshInstance3D = $Plate
+@onready var _plate: Node3D = $Plate
 
 
 func _ready() -> void:
@@ -40,7 +40,8 @@ func _update() -> void:
 	if active == is_active:
 		return
 	is_active = active
-	_plate.position.y = 0.02 if is_active else 0.08
+	# The slab (its base at the origin) sinks flush with the floor while pressed.
+	_plate.position.y = -0.04 if is_active else 0.02
 	if is_active:
 		activated.emit()
 	else:

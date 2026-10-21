@@ -105,7 +105,19 @@ static func build_corner(at: Transform3D, owner: String, decor: Array, house: in
 	return corner
 
 
-## A simple stand-in model for a decor item (real props come with art).
+## Shelf decorations: model and height (m). The trophy is the house cup in miniature,
+## the music box a little chest, the moonpetal the castle's potted plant.
+const DECOR_MODELS := {
+	"brass_lantern": ["res://assets/models/decor/decor_lantern.glb", 0.22],
+	"potted_moonpetal": ["res://assets/models/environment/modular/plant_pot.glb", 0.26],
+	"music_box": ["res://assets/models/environment/modular/chest.glb", 0.12],
+	"trophy_small": ["res://assets/models/school/house_cup.glb", 0.2],
+	"game_set": ["res://assets/models/decor/decor_game_set.glb", 0.04],
+}
+
+
+## A decor item: a pennant in the house colour, a glowing star chart, or a model on a
+## small shelf.
 static func decor_mesh(id: String, house: int) -> Node3D:
 	var root := Node3D.new()
 	root.name = id
@@ -132,31 +144,23 @@ static func decor_mesh(id: String, house: int) -> Node3D:
 			var s := MeshInstance3D.new()
 			s.mesh = shelf
 			s.position = Vector3(0, -0.14, 0.09)
+			var wood := StandardMaterial3D.new()
+			wood.albedo_color = Color(0.3, 0.19, 0.11)
+			wood.roughness = 0.7
+			s.material_override = wood
 			root.add_child(s)
-			var shapes := {"brass_lantern": [CylinderMesh.new(), Color(0.8, 0.6, 0.25)], "potted_moonpetal": [SphereMesh.new(), Color(0.78, 0.82, 0.95)],
-				"music_box": [BoxMesh.new(), Color(0.45, 0.25, 0.15)], "trophy_small": [CylinderMesh.new(), Color(0.95, 0.78, 0.3)], "game_set": [BoxMesh.new(), Color(0.2, 0.25, 0.45)]}
-			var m: PrimitiveMesh = shapes[id][0]
-			if m is CylinderMesh:
-				(m as CylinderMesh).top_radius = 0.07
-				(m as CylinderMesh).bottom_radius = 0.09
-				(m as CylinderMesh).height = 0.22
-			elif m is SphereMesh:
-				(m as SphereMesh).radius = 0.1
-				(m as SphereMesh).height = 0.2
-			elif m is BoxMesh:
-				(m as BoxMesh).size = Vector3(0.22, 0.12, 0.14)
-			mi.mesh = m
-			mi.position = Vector3(0, -0.02, 0.09)
-			mat.albedo_color = shapes[id][1]
-			mat.metallic = 0.6 if id in ["brass_lantern", "trophy_small"] else 0.0
+			var piece := (load(DECOR_MODELS[id][0]) as PackedScene).instantiate() as Node3D
+			fit_height(piece, DECOR_MODELS[id][1])
+			piece.position = Vector3(0, -0.125, 0.09)
+			root.add_child(piece)
 			if id == "brass_lantern":
-				mat.emission_enabled = true
-				mat.emission = Color(1.0, 0.75, 0.4)
 				var light := OmniLight3D.new()
+				light.position = Vector3(0, -0.02, 0.09)
 				light.omni_range = 2.5
 				light.light_energy = 0.7
 				light.light_color = Color(1.0, 0.75, 0.45)
 				root.add_child(light)
+			return root
 		_:
 			var b := BoxMesh.new()
 			b.size = Vector3(0.2, 0.2, 0.05)
@@ -165,3 +169,16 @@ static func decor_mesh(id: String, house: int) -> Node3D:
 	mi.material_override = mat
 	root.add_child(mi)
 	return root
+
+
+## Scales `node` uniformly so its meshes stand `height` tall (base kept at its origin).
+static func fit_height(node: Node3D, height: float) -> void:
+	var box := AABB()
+	var first := true
+	for mi in node.find_children("*", "MeshInstance3D", true, false):
+		var b := (mi as MeshInstance3D).get_aabb()
+		b = (mi as MeshInstance3D).transform * b if mi.get_parent() == node else b
+		box = b if first else box.merge(b)
+		first = false
+	if not first and box.size.y > 0.0001:
+		node.scale = Vector3.ONE * (height / box.size.y)

@@ -104,6 +104,7 @@ func _run() -> void:
 	await _test_ui_window()
 	await _test_runtime_keys()
 	await _test_characters()
+	_test_real_models()
 	_test_server_content()
 	await _test_world_objects()
 	_test_mysteries()
@@ -3432,6 +3433,36 @@ func _test_localization() -> void:
 
 
 # --- Characters -----------------------------------------------------------------------
+
+## The puzzle pieces, school objects and grounds dressing are models, not primitives: only
+## their glows (rune discs, rings, crystals, light marks) may still be built from shapes.
+func _test_real_models() -> void:
+	t.section("Real models")
+	var scenes := ["res://objects/puzzles/pressure_plate.tscn", "res://objects/puzzles/pushable_block.tscn",
+		"res://objects/interactables/plaque.tscn", "res://objects/environment/grounds/goal_ring.tscn",
+		"res://objects/school/practice_target.tscn", "res://objects/school/sorting_stone.tscn",
+		"res://objects/interactables/lever.tscn", "res://objects/interactables/spell_tome.tscn",
+		"res://objects/interactables/lore_book.tscn", "res://objects/puzzles/secret_wall.tscn",
+		"res://objects/puzzles/magic_door.tscn", "res://objects/items/held_torch.tscn",
+		"res://objects/environment/grounds/lantern_post.tscn", "res://gameplay/checkpoints/checkpoint.tscn",
+		"res://gameplay/collectibles/collectible.tscn", "res://objects/items/broom.tscn"]
+	var glows := ["Disc", "Ring", "Crystal"]
+	for path in scenes:
+		var node := (load(path) as PackedScene).instantiate()
+		add_child(node)
+		var shapes := node.find_children("*", "MeshInstance3D", true, false).filter(func(m: Node) -> bool:
+			return (m as MeshInstance3D).mesh is PrimitiveMesh and not glows.has(m.name))
+		t.check(shapes.is_empty(), "%s is built from models (%s)" % [path.get_file(), ", ".join(shapes.map(func(m: Node) -> String: return m.name))])
+		node.free()
+	var corner := DormitoryCorners.build_corner(Transform3D(), "Ola", ["brass_lantern", "potted_moonpetal", "music_box", "trophy_small", "game_set"], 1)
+	var trinkets := 0
+	for id in ["brass_lantern", "potted_moonpetal", "music_box", "trophy_small", "game_set"]:
+		var piece := corner.find_child(id, true, false)
+		if piece != null and piece.find_children("*", "MeshInstance3D", true, false).any(func(m: Node) -> bool: return not ((m as MeshInstance3D).mesh is PrimitiveMesh)):
+			trinkets += 1
+	corner.free()
+	t.check(trinkets == 5, "every dorm shelf decoration is a model (%d of 5)" % trinkets)
+
 
 func _test_characters() -> void:
 	t.section("Characters")

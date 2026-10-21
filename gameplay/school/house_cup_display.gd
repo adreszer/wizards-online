@@ -7,7 +7,7 @@ extends Node3D
 const HALL := &"great_hall"
 
 var winner := 0
-var _cup: MeshInstance3D
+var _cup: Node3D
 var _banner: Node3D
 var _label: Label3D
 
@@ -23,27 +23,12 @@ func _ready() -> void:
 
 
 func _build() -> void:
-	var plinth := MeshInstance3D.new()
-	var box := BoxMesh.new()
-	box.size = Vector3(1.0, 1.1, 1.0)
-	plinth.mesh = box
-	plinth.position.y = 0.55
-	var stone := StandardMaterial3D.new()
-	stone.albedo_color = Color(0.45, 0.43, 0.4)
-	plinth.material_override = stone
+	# A carved granite plinth (the pushable block's stone, scaled) and the golden cup.
+	var plinth := (load("res://assets/models/environment/props5/pushable_block.glb") as PackedScene).instantiate() as Node3D
+	plinth.scale = Vector3(1.0, 1.1, 1.0) / 1.44
 	add_child(plinth)
-	_cup = MeshInstance3D.new()
-	var cup := CylinderMesh.new()
-	cup.top_radius = 0.28
-	cup.bottom_radius = 0.1
-	cup.height = 0.55
-	_cup.mesh = cup
-	_cup.position.y = 1.45
-	var gold := StandardMaterial3D.new()
-	gold.albedo_color = Color(0.95, 0.75, 0.3)
-	gold.metallic = 1.0
-	gold.roughness = 0.25
-	_cup.material_override = gold
+	_cup = (load("res://assets/models/school/house_cup.glb") as PackedScene).instantiate() as Node3D
+	_cup.position.y = 1.1
 	add_child(_cup)
 	_banner = Node3D.new()
 	_banner.name = "Banner"

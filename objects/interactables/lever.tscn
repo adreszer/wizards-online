@@ -1,17 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://lever00000001"]
+[gd_scene format=3 uid="uid://lever00000001"]
 
 [ext_resource type="Script" path="res://objects/interactables/lever.gd" id="1"]
 [ext_resource type="Script" path="res://gameplay/interaction/interactable.gd" id="2"]
 [ext_resource type="AudioStream" path="res://assets/audio/switch.wav" id="3"]
-
-[sub_resource type="StandardMaterial3D" id="BaseMat"]
-albedo_color = Color(0.3, 0.3, 0.34, 1)
-
-[sub_resource type="StandardMaterial3D" id="HandleMat"]
-albedo_color = Color(0.8, 0.3, 0.25, 1)
-
-[sub_resource type="BoxMesh" id="BaseMesh"]
-size = Vector3(0.6, 1.0, 0.6)
+[ext_resource type="PackedScene" path="res://assets/models/environment/props5/lever_base.glb" id="base"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/props5/lever_handle.glb" id="arm"]
 
 [sub_resource type="BoxShape3D" id="Shape"]
 size = Vector3(0.8, 1.6, 0.8)
@@ -26,18 +19,12 @@ script = ExtResource("2")
 prompt_text = "INTERACT_PULL_LEVER"
 focus_point_offset = Vector3(0, 1.0, 0)
 
-[node name="Base" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-mesh = SubResource("BaseMesh")
-surface_material_override/0 = SubResource("BaseMat")
+[node name="Base" parent="." instance=ExtResource("base")]
 
 [node name="Handle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.766044, 0.642788, 0, -0.642788, 0.766044, 0, 1.0, 0)
 
-[node name="HandleMesh" type="MeshInstance3D" parent="Handle"]
-transform = Transform3D(0.15, 0, 0, 0, 0.9, 0, 0, 0, 0.15, 0, 0.45, 0)
-mesh = SubResource("BaseMesh")
-surface_material_override/0 = SubResource("HandleMat")
+[node name="HandleMesh" parent="Handle" instance=ExtResource("arm")]
 
 [node name="Shape" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)

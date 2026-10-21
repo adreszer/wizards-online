@@ -108,22 +108,15 @@ func _build_dishes() -> void:
 				places.append(t * Transform3D(Basis(Vector3.UP, side * PI / 2.0 + PI / 2.0), Vector3(x, TABLE_TOP, side * 0.22)))
 			if i % 2 == 0:
 				middles.append(t * Transform3D(Basis(Vector3.UP, float(i) * 0.7), Vector3(x + SEAT_PITCH * 0.5, TABLE_TOP, 0.0)))
-	var plate := _cylinder(0.12, 0.015)
-	_add("Plates", plate, Color(0.86, 0.84, 0.78), places, Vector3.ZERO)
-	_add("Food", _dome(0.07, 0.04), Color(0.62, 0.36, 0.18), places, Vector3(0, 0.015, 0))
-	_add("Goblets", _cylinder(0.035, 0.12), Color(0.75, 0.6, 0.28), places, Vector3(0.16, 0.0, -0.08), 0.6)
-	_add("Platters", _cylinder(0.2, 0.03), Color(0.7, 0.68, 0.64), middles, Vector3.ZERO, 0.4)
-	_add("Roasts", _dome(0.14, 0.1), Color(0.55, 0.28, 0.12), middles, Vector3(0, 0.03, 0))
-	_add("Bread", _dome(0.09, 0.07), Color(0.82, 0.6, 0.32), middles, Vector3(0.32, 0.0, 0.05))
-	_add("Fruit", _dome(0.08, 0.08), Color(0.78, 0.2, 0.15), middles, Vector3(-0.32, 0.0, -0.04))
+	# Poly Haven tableware and food (CC0), composed in Blender at table size.
+	_add("Plates", _model("feast_plate"), places, Vector3.ZERO)
+	_add("Goblets", _model("feast_goblet"), places, Vector3(0.16, 0.0, -0.08))
+	_add("Platters", _model("feast_platter"), middles, Vector3.ZERO)
+	_add("Bread", _model("feast_bread"), middles, Vector3(0.36, 0.0, 0.05))
+	_add("Fruit", _model("feast_fruit"), middles, Vector3(-0.36, 0.0, -0.04))
 
 
-func _add(node_name: String, mesh: Mesh, color: Color, xforms: Array[Transform3D], offset: Vector3, metal: float = 0.0) -> void:
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
-	mat.roughness = 0.55
-	mat.metallic = metal
-	mesh.surface_set_material(0, mat)
+func _add(node_name: String, mesh: Mesh, xforms: Array[Transform3D], offset: Vector3) -> void:
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.mesh = mesh
@@ -140,34 +133,10 @@ func _add(node_name: String, mesh: Mesh, color: Color, xforms: Array[Transform3D
 	_dishes.append(mmi)
 
 
-static func _cylinder(radius: float, height: float) -> Mesh:
-	var m := CylinderMesh.new()
-	m.top_radius = radius
-	m.bottom_radius = radius * 0.9
-	m.height = height
-	m.radial_segments = 16
-	m.rings = 1
-	var arr := ArrayMesh.new()
-	arr.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, _lifted(m.get_mesh_arrays(), height / 2.0))
-	return arr
-
-
-static func _dome(radius: float, height: float) -> Mesh:
-	var m := SphereMesh.new()
-	m.radius = radius
-	m.height = height * 2.0
-	m.is_hemisphere = true
-	m.radial_segments = 14
-	m.rings = 5
-	var arr := ArrayMesh.new()
-	arr.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, m.get_mesh_arrays())
-	return arr
-
-
-## Mesh arrays moved up so the shape stands on y = 0.
-static func _lifted(arrays: Array, dy: float) -> Array:
-	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
-	for i in verts.size():
-		verts[i].y += dy
-	arrays[Mesh.ARRAY_VERTEX] = verts
-	return arrays
+## The mesh of assets/models/feast/<name>.glb (its base at y = 0), textures and all.
+static func _model(name: String) -> Mesh:
+	var scene := load("res://assets/models/feast/%s.glb" % name) as PackedScene
+	var root := scene.instantiate()
+	var mesh := (root.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D).mesh
+	root.free()
+	return mesh

@@ -6,6 +6,7 @@ extends Node3D
 ## village shop (the ShopPanel). castle.gd adds it; it only draws and asks.
 
 const CREATURES := {"mossling": Color(0.45, 0.75, 0.35), "emberkit": Color(0.95, 0.45, 0.2), "glimmerwing": Color(0.75, 0.75, 1.0)}
+const SHOP_COUNTER := preload("res://assets/models/environment/props5/shop_counter.glb")
 const SHOPS := ["apothecary", "bookshop", "broom_workshop", "general_store", "instrument_maker", "joke_shop", "stationer", "sweet_shop", "tailor"]
 
 var cauldrons: Array[InteractSpot] = []
@@ -42,7 +43,14 @@ func _ready() -> void:
 		var counter := InteractSpot.create("INTERACT_SHOP", Color(0.95, 0.8, 0.4), 0.3)
 		counter.name = "Counter_" + shop
 		add_child(counter)
-		counter.global_position = z.global_position + Vector3(0, -z.size.y / 2.0 + 1.0, 0)
+		var floor_at := z.global_position + Vector3(0, -z.size.y / 2.0, 0)
+		# The shopkeeper's counter (an oak counter with a brass scale), the spot just
+		# above its top.
+		var desk := SHOP_COUNTER.instantiate() as Node3D
+		desk.name = "Desk_" + shop
+		add_child(desk)
+		desk.global_position = floor_at
+		counter.global_position = floor_at + Vector3(0, 1.45, 0.45)
 		var s := shop
 		counter.used.connect(func(_who: Node) -> void: GameEvents.panel_requested.emit("shop", {"shop": s}))
 		counters[shop] = counter

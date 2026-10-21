@@ -1,13 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://pushblock0001"]
+[gd_scene format=3 uid="uid://pushblock0001"]
 
 [ext_resource type="Script" path="res://objects/puzzles/pushable_block.gd" id="1"]
 [ext_resource type="Script" path="res://gameplay/spells/spell_receiver.gd" id="2"]
-
-[sub_resource type="StandardMaterial3D" id="Mat"]
-albedo_color = Color(0.75, 0.6, 0.35, 1)
-
-[sub_resource type="BoxMesh" id="Mesh"]
-size = Vector3(1.4, 1.4, 1.4)
+[ext_resource type="PackedScene" path="res://assets/models/environment/props5/pushable_block.glb" id="model"]
 
 [sub_resource type="BoxShape3D" id="Shape"]
 size = Vector3(1.4, 1.4, 1.4)
@@ -28,9 +23,8 @@ script = ExtResource("1")
 script = ExtResource("2")
 accepted_effect_types = Array[StringName]([&"force", &"wind", &"levitate"])
 
-[node name="Mesh" type="MeshInstance3D" parent="."]
-mesh = SubResource("Mesh")
-surface_material_override/0 = SubResource("Mat")
+[node name="Mesh" parent="." instance=ExtResource("model")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
 
 [node name="Shape" type="CollisionShape3D" parent="."]
 shape = SubResource("Shape")
