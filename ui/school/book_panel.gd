@@ -46,6 +46,7 @@ func _ready() -> void:
 	box.add_child(row)
 	var prev := Button.new()
 	prev.text = "◀"
+	prev.set_meta(&"ui_sound", &"")   # the page turns instead of a click
 	prev.pressed.connect(func() -> void: turn(-1))
 	row.add_child(prev)
 	_footer = Label.new()
@@ -55,6 +56,7 @@ func _ready() -> void:
 	row.add_child(_footer)
 	var next := Button.new()
 	next.text = "▶"
+	next.set_meta(&"ui_sound", &"")
 	next.pressed.connect(func() -> void: turn(1))
 	row.add_child(next)
 	_root.visible = false
@@ -82,7 +84,10 @@ func close() -> void:
 
 
 func turn(step: int) -> void:
+	var before := page
 	page = clampi(page + step, 0, maxi(0, pages.size() - 1))
+	if page != before:
+		UiSounds.play(&"book_page_turn")
 	_show_page()
 
 

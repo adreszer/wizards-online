@@ -11,6 +11,10 @@ extends StaticBody3D
 const COLUMN_BASE := preload("res://assets/models/school/column_base.glb")
 const COLUMN_CAP := preload("res://assets/models/school/column_cap.glb")
 const COLUMN_PITCH := 1.75
+## The columns hum softly; a burst rises with chimes or falls with dim tones.
+const HUM := preload("res://assets/audio/school/house_column_loop.wav")
+const GAIN_SOUND := preload("res://assets/audio/school/house_points_gain.wav")
+const LOSS_SOUND := preload("res://assets/audio/school/house_points_loss.wav")
 const COLUMN_HEIGHT := 3.6
 const COLUMN_RADIUS := 0.42
 const PLINTH_HEIGHT := 0.6
@@ -45,6 +49,9 @@ var _phase := 0.0
 
 func _ready() -> void:
 	_build()
+	var hum := Sfx.loop_player(self, "Hum", HUM, -16.0, 14.0)
+	hum.position.y = PLINTH_HEIGHT + COLUMN_HEIGHT / 2.0
+	Sfx.start_loop(hum)
 	NetworkManager.house_totals_changed.connect(set_totals)
 	set_totals(NetworkManager.get_house_totals())
 
@@ -135,6 +142,7 @@ func _burst(i: int, gain: bool) -> void:
 	p.color = CharacterProfile.house_color(i + 1) if gain else CharacterProfile.house_color(i + 1).darkened(0.5)
 	p.restart()
 	p.emitting = true
+	Sfx.play_at(p, GAIN_SOUND if gain else LOSS_SOUND, -2.0, 40.0)
 
 
 func _build() -> void:

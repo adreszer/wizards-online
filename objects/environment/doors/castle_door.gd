@@ -29,6 +29,8 @@ const UNLOCKED := preload("res://assets/audio/world/lock_unlocked.wav")
 @export var start_open: bool = false
 @export var open_angle_degrees: float = 90.0
 @export var swing_duration: float = 0.9
+@export var open_sound: AudioStream = preload("res://assets/audio/world/door_wood_open.wav")
+@export var close_sound: AudioStream = preload("res://assets/audio/world/door_wood_close.wav")
 
 var is_open: bool = false
 var is_locked: bool = false
@@ -123,6 +125,7 @@ func set_open(value: bool, instant: bool = false) -> void:
 		_tween = create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		for i in 2:
 			_tween.tween_property(_hinges[i], "rotation:y", targets[i], swing_duration)
+		_audio.stream = open_sound if is_open else close_sound
 		_audio.play()
 	_occluder.visible = not is_open
 	_update_prompt()
@@ -140,7 +143,7 @@ func apply_world_state(state: Variant, instant: bool) -> void:
 	if lock != is_locked:
 		is_locked = lock
 		if not lock and not instant:
-			_audio.play()
+			Sfx.play_at(self, UNLOCKED, -2.0, 20.0, Vector3(0, 1.2, 0))
 			unlocked.emit()
 	var open_now: bool = (state is bool and state) if state != null else (start_open and not locked)
 	set_open(open_now, instant)

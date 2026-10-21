@@ -7,6 +7,8 @@ extends Node3D
 const HALL := &"great_hall"
 
 var winner := 0
+## Whether a cup state has been seen yet: the first one (joining) plays no fanfare.
+var _seen := false
 var _cup: Node3D
 var _banner: Node3D
 var _label: Label3D
@@ -45,7 +47,14 @@ func _build() -> void:
 
 
 func show_cup(cup: Dictionary) -> void:
+	var before := winner
 	winner = int(cup.get("winner", 0))
+	# A house just won the cup: the fanfare (a one-shot event track) for everyone.
+	if _seen and winner > 0 and winner != before:
+		var music := get_tree().root.find_child("MusicDirector", true, false) as MusicDirector
+		if music != null:
+			music.event_track = &"house_cup"
+	_seen = true
 	visible = winner > 0
 	if winner <= 0:
 		return

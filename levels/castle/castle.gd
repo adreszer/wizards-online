@@ -3,8 +3,8 @@ extends Node3D
 ## only wires generic reactions (secrets, checkpoints) and adds the
 ## WorldObjectSync that keeps objects in step with the server and the
 ## DayNightCycle that lights the world from the school clock, and the
-## SchoolBells that ring the timetable, and the MusicDirector that plays day or
-## night music. Rooms are
+## SchoolBells that ring the timetable, the MusicDirector that plays day or
+## night music and the AmbienceDirector that plays the sound of each place. Rooms are
 ## AreaZones (see gameplay/world/area_zone.gd) that other systems key off.
 
 var world_object_sync: WorldObjectSync
@@ -30,6 +30,10 @@ func _ready() -> void:
 	music.name = "MusicDirector"
 	music.cycle = day_night
 	add_child(music)
+	var ambience := AmbienceDirector.new()
+	ambience.name = "AmbienceDirector"
+	ambience.cycle = day_night
+	add_child(ambience)
 	var boards := ClassroomBoards.new()
 	boards.name = "ClassroomBoards"
 	add_child(boards)

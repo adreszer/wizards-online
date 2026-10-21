@@ -10,6 +10,8 @@ extends Node3D
 
 const AREA := &"pitch"
 const TEAM_COLOR := {"a": Color(0.95, 0.55, 0.2), "b": Color(0.35, 0.6, 1.0)}
+## A goal: the lantern carried through the ring, heard at that ring by everyone near.
+const GOAL := preload("res://assets/audio/flying/goal_ring_pass.wav")
 const RING_RADIUS := 3.0
 const RING_REPORT := 4.5
 
@@ -56,6 +58,7 @@ func _ready() -> void:
 	layer.add_child(hud)
 	NetworkManager.pushed.connect(func(kind: String, data: Dictionary) -> void:
 		if kind == "lantern_chase":
+			_cheer_goals(_view, data)
 			_view = data)
 	GameEvents.spell_hit_player.connect(_on_spell_hit_player)
 
@@ -151,6 +154,17 @@ func _process(_delta: float) -> void:
 		if Vector2(me.global_position.x - ring_at.x, me.global_position.z - ring_at.z).length() < RING_REPORT and now - _ring_reported_at > 1.5:
 			_ring_reported_at = now
 			NetworkManager.request("chase_ring", {})
+
+
+## A team whose score went up just flew its lantern through its ring.
+func _cheer_goals(before: Dictionary, after: Dictionary) -> void:
+	var old: Variant = before.get("scores", {})
+	var new: Variant = after.get("scores", {})
+	if not old is Dictionary or not new is Dictionary:
+		return
+	for t: String in rings:
+		if int((new as Dictionary).get(t, 0)) > int((old as Dictionary).get(t, 0)):
+			Sfx.play_at(rings[t], GOAL, 0.0, 60.0)
 
 
 func _place_lantern(t: String) -> void:

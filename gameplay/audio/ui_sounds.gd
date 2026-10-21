@@ -25,7 +25,18 @@ const SOUNDS := {
 	&"spell_select": preload("res://assets/audio/ui/ui_spell_select.wav"),
 	&"clue_found": preload("res://assets/audio/ui/ui_clue_found.wav"),
 	&"mystery_solved": preload("res://assets/audio/ui/ui_mystery_solved.wav"),
+	&"book_page_turn": preload("res://assets/audio/ui/ui_book_page_turn.wav"),
+	&"potion_pour": preload("res://assets/audio/school/potion_pour.wav"),
+	&"potion_brew_success": preload("res://assets/audio/school/potion_brew_success.wav"),
+	&"potion_brew_fail": preload("res://assets/audio/school/potion_brew_fail.wav"),
+	# The sorting reveal, one per house (CharacterProfile house numbers).
+	&"sorting_reveal_1": preload("res://assets/audio/school/sorting_reveal_drakoryn.wav"),
+	&"sorting_reveal_2": preload("res://assets/audio/school/sorting_reveal_grypheon.wav"),
+	&"sorting_reveal_3": preload("res://assets/audio/school/sorting_reveal_phoenara.wav"),
+	&"sorting_reveal_4": preload("res://assets/audio/school/sorting_reveal_hipporys.wav"),
 }
+## Small fanfares rather than blips: they may run for a few seconds.
+const LONG: Array[StringName] = [&"clue_found", &"mystery_solved", &"sorting_reveal_1", &"sorting_reveal_2", &"sorting_reveal_3", &"sorting_reveal_4", &"potion_brew_fail"]
 ## Seconds before the same sound may play again (a burst of hovers or chat lines
 ## plays once).
 const MIN_GAP := {&"hover": 0.06, &"chat_message": 0.25, &"notification": 0.8}

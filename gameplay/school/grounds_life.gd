@@ -3,10 +3,13 @@ extends Node3D
 ## Life outside the classrooms, as the server's feature modules describe it: the Potions
 ## classroom's cauldrons (open the CauldronPanel), the paddock's creatures (feed with a
 ## treat, else pet; bonds build up to adopting a familiar), and a counter in every
-## village shop (the ShopPanel). castle.gd adds it; it only draws and asks.
+## village shop (the ShopPanel). castle.gd adds it; it only draws and asks. The
+## cauldrons bubble and the paddock snorts and shuffles for anyone nearby.
 
 const CREATURES := {"mossling": Color(0.45, 0.75, 0.35), "emberkit": Color(0.95, 0.45, 0.2), "glimmerwing": Color(0.75, 0.75, 1.0)}
 const SHOP_COUNTER := preload("res://assets/models/environment/props5/shop_counter.glb")
+const BUBBLING := preload("res://assets/audio/school/cauldron_bubble_loop.wav")
+const PADDOCK_SOUND := preload("res://assets/audio/ambience/creature_paddock_loop.wav")
 const SHOPS := ["apothecary", "bookshop", "broom_workshop", "general_store", "instrument_maker", "joke_shop", "stationer", "sweet_shop", "tailor"]
 
 var cauldrons: Array[InteractSpot] = []
@@ -28,8 +31,12 @@ func _ready() -> void:
 			c.global_position = elixirs.global_position + Vector3((i - 0.5) * elixirs.size.x * 0.3, -elixirs.size.y / 2.0 + 0.9, elixirs.size.z * 0.25)
 			c.used.connect(func(_who: Node) -> void: GameEvents.panel_requested.emit("cauldron", {}))
 			cauldrons.append(c)
+			Sfx.start_loop(Sfx.loop_player(c, "Bubbling", BUBBLING, -14.0, 10.0))
 	_paddock = zones.get("paddock") as AreaZone
 	if _paddock != null:
+		var pen := Sfx.loop_player(self, "Paddock", Sfx.looped(PADDOCK_SOUND), -4.0, maxf(_paddock.size.x, _paddock.size.z) * 0.5 + 15.0)
+		pen.global_position = _paddock.global_position
+		Sfx.start_loop(pen)
 		for kind: String in CREATURES:
 			var body := build_creature(kind, CREATURES[kind])
 			add_child(body)

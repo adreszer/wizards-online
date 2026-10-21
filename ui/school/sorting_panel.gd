@@ -112,6 +112,11 @@ func _finish(ok: bool, house: int, reason: String) -> void:
 		_question.text = tr("SORT_RESULT") % CharacterProfile.house_name(house)
 		_result.text = tr("SORT_WELCOME")
 		_reveal_crest(house)
+		UiSounds.play(StringName("sorting_reveal_%d" % house))
+		# The ceremony's music swells with the reveal (a one-shot event track).
+		var music := get_tree().root.find_child("MusicDirector", true, false) as MusicDirector
+		if music != null:
+			music.event_track = &"sorting"
 		sorting_completed.emit(house)
 	else:
 		var key := "SORT_REASON_" + reason

@@ -21,6 +21,8 @@ const EAT_REACH := 1.2
 ## The meal being served ("" = none): its translation key.
 var serving: String = ""
 var tables: Array[Transform3D] = []
+## The tables filling with a whoosh and a clatter of plates, heard in the hall.
+const APPEARS := preload("res://assets/audio/school/feast_appears.wav")
 var _dishes: Array[MultiMeshInstance3D] = []
 var _timer := 0.0
 
@@ -59,6 +61,9 @@ func update(quiet: bool) -> void:
 			mm.visible = serving != ""
 		if serving != "" and not quiet and not tables.is_empty():
 			GameEvents.notification_requested.emit(tr("MEAL_SERVED") % tr(serving), 5.0)
+			var hall := get_parent() as Node3D
+			if hall != null:
+				Sfx.play_at(hall, APPEARS, 0.0, 45.0, hall.to_local(tables[tables.size() / 2].origin) + Vector3.UP)
 	var player := get_tree().get_first_node_in_group(&"local_player") as Player
 	if player != null:
 		_feed(player)

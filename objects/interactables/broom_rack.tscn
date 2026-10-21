@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://objects/interactables/broom_rack.gd" id="1"]
 [ext_resource type="Script" path="res://gameplay/interaction/interactable.gd" id="2"]
-[ext_resource type="AudioStream" path="res://assets/audio/player/item_pickup.wav" id="3"]
+[ext_resource type="AudioStream" path="res://assets/audio/flying/broom_take.wav" id="3"]
 
 [sub_resource type="BoxShape3D" id="Shape"]
 size = Vector3(2.1, 2.0, 0.6)

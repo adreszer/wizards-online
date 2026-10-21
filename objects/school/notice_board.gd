@@ -14,6 +14,9 @@ extends StaticBody3D
 @onready var _interactable: Interactable = $Interactable
 @onready var _label: Label3D = $Text
 var _timer := 0.0
+## The newest house-board post seen (null before the first refresh): a new one is pinned up.
+var _last_post: Variant = null
+const PINNED := preload("res://assets/audio/school/notice_pinned.wav")
 
 
 func _ready() -> void:
@@ -37,6 +40,11 @@ func _notification(what: int) -> void:
 
 func refresh() -> void:
 	_label.text = board_text(NetworkManager.timetable, NetworkManager.server_time(), max_lines)
+	var posts: Variant = NetworkManager.feature("house_board").get("posts", [])
+	var newest := str((posts as Array)[0].get("text", "")) if posts is Array and not (posts as Array).is_empty() else ""
+	if _last_post != null and newest != "" and newest != _last_post:
+		Sfx.play_at(self, PINNED, -4.0, 15.0, Vector3(0, 1.5, 0.1))
+	_last_post = newest
 
 
 ## The board's text: a title, then "Mon 18:00  Charms" lines (the running one marked).

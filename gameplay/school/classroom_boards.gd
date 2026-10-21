@@ -17,6 +17,9 @@ const IDLE_REFRESH := 5.0
 ## area id → Label3D
 var labels: Dictionary = {}
 var _timer := 0.0
+## What each board's professor had written at the last refresh: new writing scratches.
+var _written: Dictionary = {}
+const CHALK_SOUND := preload("res://assets/audio/school/chalk_writing.wav")
 
 
 func _ready() -> void:
@@ -51,6 +54,10 @@ func refresh() -> void:
 		var text := board_text_for(area, lessons, NetworkManager.timetable, NetworkManager.server_time())
 		label.text = text
 		label.modulate = CHALK if lessons.has(area) else CHALK_DIM
+		var written := str(lessons[area].get("board", "")) if lessons.has(area) else ""
+		if _written.has(area) and written != "" and written != _written[area]:
+			Sfx.play_at(label, CHALK_SOUND, -4.0, 18.0)
+		_written[area] = written
 
 
 ## What the board in `area` shows: the professor's text during a lesson (the subject

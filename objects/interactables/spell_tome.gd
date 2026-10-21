@@ -6,6 +6,8 @@ signal learned(by: Node)
 
 ## Kind name in the server's world-object map (generated/world_objects.lua).
 const WORLD_KIND := "spell_tome"
+## The heavy book creaking open as it is studied (the learn chime follows on Audio).
+const BOOK_OPEN := preload("res://assets/audio/school/book_open_heavy.wav")
 
 ## Stable id ("<area>/<name>") the server uses to refer to this object; set
 ## by the castle generator. Empty for objects outside the castle.
@@ -41,6 +43,7 @@ func _on_interacted(interactor: Node) -> void:
 	else:
 		caster.learn_spell(spell)
 		GameEvents.notification_requested.emit(tr("NOTIFY_SPELL_LEARNED") % tr(spell.display_name), 6.0)
+	Sfx.play_at(_book, BOOK_OPEN, -2.0, 15.0)
 	_audio.play()
 	learned.emit(interactor)
 	set_process(false)

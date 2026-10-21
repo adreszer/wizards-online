@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://assets/models/environment/modular/door_leaf_oak.glb" id="2"]
 [ext_resource type="Script" path="res://gameplay/interaction/interactable.gd" id="3"]
 [ext_resource type="Script" path="res://gameplay/spells/spell_receiver.gd" id="4"]
-[ext_resource type="AudioStream" path="res://assets/audio/door.wav" id="5"]
+[ext_resource type="AudioStream" path="res://assets/audio/world/door_wood_open.wav" id="5"]
 
 [sub_resource type="BoxShape3D" id="LeafShape"]
 size = Vector3(1.76, 3.0, 0.13)

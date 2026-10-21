@@ -5,7 +5,8 @@ extends Node
 ## (zone kind `grounds`: estate, lake, village…; walled courtyards count as the
 ## castle), the night track everywhere from dusk, and the lesson track inside a
 ## classroom while a lesson runs there (any hour), the flying track while the
-## local player rides a broom (any hour). A change crossfades to the other
+## local player rides a broom (any hour), the mystery track inside a hidden room
+## (zone kind `secret`). A change crossfades to the other
 ## track, which resumes where it was left, and each track loops by crossfading its
 ## own end into its start, so the files need no exact loop points. Plays on the
 ## Music bus (default_bus_layout.tres), not positional. Added by castle.gd next
@@ -45,6 +46,8 @@ const AREA_FADE := 4.0
 const OUTDOOR_DELAY := 3.0
 ## Area kinds that play the grounds music by day.
 const OUTDOOR_KINDS: Array[String] = ["grounds"]
+## Area kinds that play the mystery track (hidden rooms).
+const SECRET_KINDS: Array[String] = ["secret"]
 ## Seconds the music takes to rise from silence when the level starts.
 const START_FADE := 3.0
 
@@ -74,6 +77,8 @@ var outdoors := false
 var in_lesson := false
 ## Whether the music treats the player as flying.
 var flying := false
+## Whether the music treats the player as inside a hidden room.
+var in_secret := false
 
 var _players: Array[AudioStreamPlayer] = []
 var _active := 0
@@ -110,11 +115,13 @@ func _process(delta: float) -> void:
 
 
 ## The track for a phase of the school day, indoors or out, in a lesson, on a broom.
-static func track_for(phase: SchoolClock.Phase, outside := false, lesson := false, on_broom := false) -> StringName:
+static func track_for(phase: SchoolClock.Phase, outside := false, lesson := false, on_broom := false, secret := false) -> StringName:
 	if lesson:
 		return &"lesson"
 	if on_broom:
 		return &"flying"
+	if secret:
+		return &"mystery"
 	if phase == SchoolClock.Phase.DAWN or phase == SchoolClock.Phase.DAY:
 		return &"grounds" if outside else &"day"
 	return &"night"
@@ -127,7 +134,7 @@ func update(dt := 0.0) -> void:
 	if want.is_empty():
 		_follow_area(dt)
 		var phase := cycle.phase if cycle != null else SchoolClock.phase_of(NetworkManager.school_hours())
-		want = event_track if not event_track.is_empty() else track_for(phase, outdoors, in_lesson, flying)
+		want = event_track if not event_track.is_empty() else track_for(phase, outdoors, in_lesson, flying, in_secret)
 	if want != current:
 		var fade := AREA_FADE
 		if current.is_empty():
@@ -154,7 +161,8 @@ func _follow_area(dt: float) -> void:
 		var lessons: Dictionary = lessons_override if lessons_override != null else NetworkManager.get_lessons()
 		lesson_here = lessons.has(str(tracker.current_area_id()))
 	var flying_here := movement != null and movement.is_flying
-	if out_here == outdoors and lesson_here == in_lesson and flying_here == flying:
+	var secret_here := tracker != null and SECRET_KINDS.has(tracker.current_kind())
+	if out_here == outdoors and lesson_here == in_lesson and flying_here == flying and secret_here == in_secret:
 		_outdoor_for = 0.0
 		return
 	_outdoor_for += dt
@@ -162,6 +170,7 @@ func _follow_area(dt: float) -> void:
 		outdoors = out_here
 		in_lesson = lesson_here
 		flying = flying_here
+		in_secret = secret_here
 		_outdoor_for = 0.0
 
 

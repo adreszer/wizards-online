@@ -6,6 +6,9 @@ extends Node
 ## with a HUD notification naming the subject and room. The bell is heard
 ## everywhere in the castle (not positional). Added by castle.gd.
 
+## One stroke of the tower's bronze bell (a recording; strokes overlap as they ring out).
+const BELL := preload("res://assets/audio/school/school_bell_stroke.wav")
+
 const STROKE_GAP := 0.9
 ## Strokes per event.
 const STROKES := {"warn": 1, "start": 3, "end": 2}
@@ -24,7 +27,7 @@ var rung: Array[Dictionary] = []
 func _ready() -> void:
 	_player = AudioStreamPlayer.new()
 	_player.name = "Bell"
-	_player.stream = bell_stream()
+	_player.stream = BELL
 	_player.volume_db = volume_db
 	_player.max_polyphony = 4
 	add_child(_player)
@@ -81,32 +84,3 @@ func _strike(count: int) -> void:
 		_player.play()
 		if i < count - 1:
 			await get_tree().create_timer(STROKE_GAP).timeout
-
-
-## A bronze bell stroke, synthesised once: inharmonic partials (hum, prime,
-## tierce, quint, nominal…) each decaying at its own rate.
-static var _stream: AudioStreamWAV
-
-static func bell_stream() -> AudioStreamWAV:
-	if _stream != null:
-		return _stream
-	var rate := 22050
-	var seconds := 3.2
-	var base := 392.0
-	var partials := [[0.5, 0.5, 0.9], [1.0, 1.0, 1.6], [1.19, 0.6, 2.2], [1.5, 0.45, 2.8], [2.0, 0.55, 3.4], [2.5, 0.25, 4.5], [3.0, 0.2, 5.5]]
-	var n := int(rate * seconds)
-	var data := PackedByteArray()
-	data.resize(n * 2)
-	for i in n:
-		var t := float(i) / rate
-		var v := 0.0
-		for p: Array in partials:
-			v += float(p[1]) * exp(-float(p[2]) * t) * sin(TAU * base * float(p[0]) * t)
-		v *= minf(1.0, t * 400.0) * 0.28   # a 2.5 ms strike, headroom for the sum
-		data.encode_s16(i * 2, int(clampf(v, -1.0, 1.0) * 32767.0))
-	_stream = AudioStreamWAV.new()
-	_stream.format = AudioStreamWAV.FORMAT_16_BITS
-	_stream.mix_rate = rate
-	_stream.stereo = false
-	_stream.data = data
-	return _stream

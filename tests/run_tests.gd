@@ -83,6 +83,7 @@ func _run() -> void:
 	await _test_player_sounds()
 	await _test_spell_sounds()
 	await _test_world_sounds()
+	await _test_place_sounds()
 	await _test_timetable()
 	await _test_chat()
 	await _test_gestures()
@@ -2493,6 +2494,55 @@ func _test_world_sounds() -> void:
 	t.check(after_clue == &"clue_found" and UiSounds.last_sound == &"mystery_solved", "a clue chimes and a solved mystery rings (%s, %s)" % [after_clue, UiSounds.last_sound])
 	await _clear(fixtures)
 
+func _test_place_sounds() -> void:
+	t.section("Ambience, doors, school and guardian sounds")
+	# Every bed the director can pick exists.
+	var beds: Array = AmbienceDirector.BY_AREA.values() + AmbienceDirector.BY_PREFIX.values() + AmbienceDirector.BY_KIND.values().filter(func(b: String) -> bool: return b != "")
+	beds += ["amb_great_hall_busy", "amb_great_hall_empty", "amb_forest", "amb_forest_night", "amb_grounds_day", "amb_grounds_night", "amb_rain_outdoor", "amb_rain_window"]
+	var missing := beds.filter(func(b: String) -> bool: return not ResourceLoader.exists(AmbienceDirector.PATH % b))
+	t.check(missing.is_empty(), "every ambience bed exists (missing: %s)" % str(missing))
+	var thunder := range(1, AmbienceDirector.THUNDER_COUNT + 1).all(func(i: int) -> bool: return ResourceLoader.exists(AmbienceDirector.PATH % ("thunder_%d" % i)))
+	t.check(thunder, "the thunder rolls exist")
+	t.check(AmbienceDirector.bed_for("great_hall", "hall", false, true) == "amb_great_hall_busy" and AmbienceDirector.bed_for("great_hall", "hall", true, false) == "amb_great_hall_empty", "the great hall is busy at meals and empty otherwise")
+	t.check(AmbienceDirector.bed_for("clock_tower_3", "tower", false, false) == "amb_clock_tower" and AmbienceDirector.bed_for("hidden_east_wing_r8", "secret", false, false) == "amb_hidden_room", "areas pick their bed by id and prefix")
+	t.check(AmbienceDirector.bed_for("east_wing_c1", "corridor", false, false) == "amb_corridor" and AmbienceDirector.bed_for("tailor", "shop", false, false) == "", "else by kind; shops are quiet")
+	t.check(AmbienceDirector.bed_for("", "", true, false) == "amb_grounds_night" and AmbienceDirector.bed_for("estate", "grounds", false, false) == "amb_grounds_day", "outdoors has a day and a night bed")
+	t.check(AmbienceDirector.rain_for("amb_dungeon", false, true) == "" and AmbienceDirector.rain_for("amb_grounds_day", true, true) == "amb_rain_outdoor" and AmbienceDirector.rain_for("amb_library", false, true) == "amb_rain_window" and AmbienceDirector.rain_for("amb_library", false, false) == "", "rain falls outside, patters on windows, never underground")
+	var ambience := AmbienceDirector.new()
+	add_child(ambience)
+	ambience._switch("bed", "amb_corridor")
+	var playing: Array = ambience._layers["bed"].slice(0, 2).filter(func(p: AudioStreamPlayer) -> bool: return p.playing)
+	t.check(playing.size() == 1 and (playing[0] as AudioStreamPlayer).bus == &"Ambience", "a bed plays on the Ambience bus")
+	var active: AudioStreamPlayer = playing[0]
+	ambience._crossfade("bed", active.stream, 0.0, AmbienceDirector.OVERLAP, 0.0)
+	var fresh: AudioStreamPlayer = ambience._layers["bed"][ambience._layers["bed"][2]]
+	t.check(AmbienceDirector.loop_due(11.8, 13.7) and not AmbienceDirector.loop_due(5.0, 13.7) and fresh != active and fresh.playing and fresh.stream == active.stream,
+		"a bed near its end crossfades into a fresh start of itself")
+	ambience.queue_free()
+	t.check(MusicDirector.track_for(SchoolClock.Phase.DAY, false, false, false, true) == &"mystery", "a hidden room plays the mystery music")
+	# Doors: oak creaks open and thuds shut; the great doors boom.
+	var door: CastleDoor = CASTLE_DOOR_SCENE.instantiate()
+	add_child(door)
+	door.set_open(true)
+	var opened: AudioStream = door._audio.stream
+	door.set_open(false)
+	t.check(opened == door.open_sound and door._audio.stream == door.close_sound and door.open_sound != door.close_sound, "a castle door has an opening and a closing sound")
+	var grand: CastleDoor = GRAND_DOOR_SCENE.instantiate()
+	add_child(grand)
+	t.check(grand.open_sound != door.open_sound and grand.close_sound != door.close_sound, "the ceremonial doors sound bigger")
+	door.queue_free()
+	grand.queue_free()
+	# The crystal guardian hums, rings when hit and shatters.
+	var guardian: Enemy = GUARDIAN_SCENE.instantiate()
+	add_child(guardian)
+	guardian.global_position = Vector3(200, 0, 200)
+	await get_tree().process_frame
+	t.check(guardian._idle_voice != null and guardian._idle_voice.playing, "the guardian hums while it stands")
+	guardian._say(guardian.hit_sound)
+	t.check(_sounds_under(guardian).has(guardian.hit_sound) and guardian.death_sound != null and guardian.alert_sound != null and guardian.attack_sound != null, "it has hit, alert, attack and shatter sounds")
+	guardian.queue_free()
+	await get_tree().process_frame
+
 func _test_day_night() -> void:
 	t.section("Day and night")
 	var clock := SchoolClock.new()
@@ -2583,8 +2633,7 @@ func _test_day_night() -> void:
 	t.check(AudioServer.get_bus_index(&"UI") > 0, "there is a UI bus")
 	for id: StringName in UiSounds.SOUNDS:
 		var ui_stream := UiSounds.SOUNDS[id] as AudioStream
-		# The mystery chimes are small fanfares; everything else is a blip.
-		var longest := 4.0 if id in [&"clue_found", &"mystery_solved"] else 1.5
+		var longest := 4.0 if id in UiSounds.LONG else 1.5
 		t.check(ui_stream != null and ui_stream.get_length() > 0.05 and ui_stream.get_length() < longest, "ui sound %s is short (%.2f s)" % [id, ui_stream.get_length() if ui_stream else 0.0])
 	UiSounds._last_played.clear()
 	var sound_button := Button.new()
@@ -3475,7 +3524,7 @@ func _test_timetable() -> void:
 	var saved := NetworkManager.timetable
 	NetworkManager.timetable = tt
 	var bells := castle.get_node_or_null("SchoolBells") as SchoolBells
-	t.check(bells != null and SchoolBells.bell_stream().data.size() > 10000, "the castle has a bell")
+	t.check(bells != null and SchoolBells.BELL.get_length() > 2.0, "the castle has a bell")
 	if bells != null:
 		bells.set_process(false)
 		bells.check(charms - 301.0)

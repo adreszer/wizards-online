@@ -190,6 +190,8 @@ Built (2026-10-21): all of them. `shifting_stair_move` is a loop (`shifting_stai
 | curtain_draw | Gen | 1.5 s | | 2 | Heavy velvet bed curtains drawn along an iron rail: a soft swish and rings sliding |
 | window_shutter | Gen | 1.5 s | | 2 | Wooden window shutters swinging open in a stone castle: a creak and a wooden clap |
 
+Built (2026-10-21): every door but `house_door_refuse` (a house door refusing plays `magic_door_refuse`). Not made: chests, wardrobe, curtains, shutters (furniture has no interaction yet).
+
 ## 5. School life and classrooms
 
 | ID | Source | Len | Loop | Takes | Prompt |
@@ -220,6 +222,8 @@ Built (2026-10-21): all of them. `shifting_stair_move` is a loop (`shifting_stai
 | globe_spin | Gen | 2 s | | 2 | A large old wooden globe spun on its brass stand: a smooth whirring spin slowing with soft ticks |
 | creature_paddock_loop | Lib | 10 s | Loop | 2 | Animals in a wooden paddock: soft snorts, hooves shifting on straw, an occasional wing flutter, seamless |
 
+Built (2026-10-21): bell, sorting stone and reveals, house points and columns, feast, notice, page turn, heavy book, chalk (a short one-shot), cauldron and potions, paddock (with the ambiences, `assets/audio/ambience/`). Not made: quill, telescope, crystal ball, abacus, rune stone, globe (decorations only).
+
 ## 6. Brooms and flying
 
 | ID | Source | Len | Loop | Takes | Prompt |
@@ -231,6 +235,8 @@ Built (2026-10-21): all of them. `shifting_stair_move` is a loop (`shifting_stai
 | broom_flight_fast_loop | Gen | 6 s | Loop | 3 | Flying very fast through the sky: strong wind roaring past the ears, robes flapping hard, seamless |
 | broom_land | Gen | 1 s | | 3 | Landing from flight: feet hitting the ground with a soft thump and the wind dying down |
 | goal_ring_pass | Gen | 1.5 s | | 3 | Flying through a floating hoop: a bright quick whoosh and a clear rising chime |
+
+Built (2026-10-21): all but `broom_return` (brooms are never handed back). The flight loops blend by speed; `goal_ring_pass` is a Lantern Chase goal.
 
 ## 7. Player
 
@@ -266,6 +272,8 @@ The current enemy, `characters/enemies/crystal_guardian.tscn`.
 | guardian_attack | Gen | 1.5 s | | 3 | A crystal construct charging and releasing a blast: a rising glassy whine and a sharp crystalline crack |
 | guardian_hit | Gen | 0.8 s | | 3 | A spell striking a large crystal body: a hard glassy clank and a ringing chip of crystal |
 | guardian_shatter | Gen | 2.5 s | | 3 | A large crystal construct shattering: a deep crack, a cascade of breaking glass and crystal shards scattering on stone |
+
+Built (2026-10-21): all five, through `Enemy`'s sound exports on `crystal_guardian.tscn`.
 
 ## 9. UI
 
@@ -324,6 +332,8 @@ Loops per area, keyed by `AreaZone`. Most are best from a library: real rooms an
 | amb_rain_outdoor | Lib | 30 s | Loop | | Steady rain falling on grass and stone |
 | amb_rain_window | Lib | 30 s | Loop | | Rain heard from inside a stone room, pattering on a leaded window |
 | thunder | Lib | 6 s | | | Distant rolling thunder over hills (4 variations) |
+
+Built (2026-10-21) with the MCP's 5 s limit: each loop is three 5 s takes spliced into a ~12 s seamless loop, stored as MP3 with its first 2 s repeated so `AmbienceDirector` crossfades it into itself; thunder is four 5 s rolls. Not made: `amb_divination_room`, `amb_river` (no such places).
 
 ## 11. Music
 

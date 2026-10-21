@@ -9,6 +9,9 @@ extends CharacterBody3D
 ## model only needs a different mapping. Enemies are local to each client for
 ## now (like puzzle state); the state machine keeps its inputs (target,
 ## damage) in one place so a server-driven variant can feed them later.
+##
+## Sounds (all optional, set per enemy scene): a hum while it stands alive, a cry
+## when it notices someone, its strike, a hit, and its death.
 
 signal target_acquired(target: Node3D)
 signal attacked(target: Node3D, hit: bool)
@@ -76,6 +79,13 @@ const LAYER_PLAYER := 1 << 1
 @export var blend_time: float = 0.2
 
 @export var model: Node3D
+@export_group("Sounds")
+@export var idle_loop: AudioStreamWAV
+@export var alert_sound: AudioStream
+@export var attack_sound: AudioStream
+@export var hit_sound: AudioStream
+@export var death_sound: AudioStream
+@export_group("")
 @export var health: Health
 @export var spell_receiver: SpellReceiver
 @export var nameplate: Label3D
@@ -87,6 +97,7 @@ var home_transform: Transform3D
 var _home_set: bool = false
 var _animation_player: AnimationPlayer
 var _state_time: float = 0.0
+var _idle_voice: AudioStreamPlayer3D
 var _hit_applied: bool = false
 var _knockback: Vector3 = Vector3.ZERO
 var _flash_tween: Tween
@@ -123,6 +134,10 @@ func _ready() -> void:
 		spell_receiver.spell_received.connect(_on_spell_received)
 	if nameplate != null:
 		nameplate.text = tr(name_key)
+	if idle_loop != null:
+		_idle_voice = Sfx.loop_player(self, "IdleHum", idle_loop, -10.0, 20.0)
+		_idle_voice.position.y = 1.5
+		Sfx.start_loop(_idle_voice)
 	_enter(State.IDLE)
 
 
@@ -183,6 +198,18 @@ func _physics_process(delta: float) -> void:
 
 
 func _enter(new_state: State) -> void:
+	match new_state:
+		State.ALERT:
+			_say(alert_sound)
+		State.ATTACK, State.STOMP:
+			_say(attack_sound)
+		State.DEAD:
+			_say(death_sound)
+			if _idle_voice != null:
+				_idle_voice.stop()
+		State.IDLE:
+			if _idle_voice != null and state == State.DEAD:
+				Sfx.start_loop(_idle_voice)
 	state = new_state
 	_state_time = 0.0
 	_hit_applied = false
@@ -388,8 +415,10 @@ func _on_spell_received(effect: SpellEffect) -> void:
 			_enter(State.BLOCK)
 		health.apply_damage(maxi(1, int(round(amount * block_damage_factor))), effect.caster)
 		blocked.emit(effect)
+		_say(SpellProjectile.WARDED)
 		return
 	health.apply_damage(amount, effect.caster)
+	_say(hit_sound)
 	if effect.effect_type == &"force" or effect.effect_type == &"wind":
 		var shove := effect.direction
 		shove.y = 0.0
@@ -402,6 +431,12 @@ func _on_spell_received(effect: SpellEffect) -> void:
 			target = caster
 			target_acquired.emit(target)
 			_enter(State.ALERT)
+
+
+## A one-shot from the enemy's body (nothing when the scene has no such sound).
+func _say(stream: AudioStream) -> void:
+	if stream != null and is_inside_tree():
+		Sfx.play_at(self, stream, 0.0, 35.0, Vector3(0, 1.5, 0))
 
 
 func _flash() -> void:

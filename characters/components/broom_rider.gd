@@ -12,6 +12,9 @@ extends Node
 ##
 ## Flight is client-side like the rest of movement (the server relays it
 ## unvalidated); owning the broom is the only gate besides area rules.
+##
+## Everyone near hears a rider kick off, the wind (a gentle rush blending into a
+## roar with speed) and the landing.
 
 signal mount_changed(definition: ItemDefinition)
 
@@ -25,6 +28,13 @@ const SKY_CHECK_HEIGHT := 40.0
 const LAYER_WORLD := 1 << 0
 ## Height of the broom's seat above the feet.
 const SEAT_HEIGHT := 0.76
+const TAKEOFF := preload("res://assets/audio/flying/broom_takeoff.wav")
+const LAND := preload("res://assets/audio/flying/broom_land.wav")
+const WIND_SLOW := preload("res://assets/audio/flying/broom_flight_slow_loop.wav")
+const WIND_FAST := preload("res://assets/audio/flying/broom_flight_fast_loop.wav")
+## Speeds (m/s) between which the wind blends from the gentle rush to the roar.
+const WIND_CALM := 4.0
+const WIND_ROAR := 30.0
 
 ## Ridden mount, null on foot.
 var mount: ItemDefinition
@@ -48,6 +58,8 @@ var _bob_time: float = 0.0
 var _last_yaw: float = 0.0
 var _last_position: Vector3 = Vector3.ZERO
 var _velocity: Vector3 = Vector3.ZERO
+var _wind_slow: AudioStreamPlayer3D
+var _wind_fast: AudioStreamPlayer3D
 
 
 func setup(player: Node, movement: PlayerMovement, inventory: Inventory, attach: Node3D) -> void:
@@ -57,6 +69,9 @@ func setup(player: Node, movement: PlayerMovement, inventory: Inventory, attach:
 	_attach = attach
 	_last_yaw = (player as Node3D).rotation.y
 	_last_position = (player as Node3D).global_position
+	if _wind_slow == null:
+		_wind_slow = Sfx.loop_player(player as Node3D, "WindSlow", WIND_SLOW, -10.0, 30.0)
+		_wind_fast = Sfx.loop_player(player as Node3D, "WindFast", WIND_FAST, -60.0, 40.0)
 	var skeleton := attach.find_child("Skeleton3D", true, false) as Skeleton3D if attach != null else null
 	_wand_mesh = attach.find_child("WandMesh", true, false) as Node3D if attach != null else null
 	if skeleton != null:
@@ -182,6 +197,11 @@ func _first_mount() -> ItemDefinition:
 func _show(definition: ItemDefinition) -> void:
 	if definition == mount:
 		return
+	if _player != null and (definition == null) != (mount == null):
+		Sfx.play_at(_player as Node3D, TAKEOFF if definition != null else LAND, -2.0, 30.0)
+		if definition == null and _wind_slow != null:
+			_wind_slow.stop()
+			_wind_fast.stop()
 	if mount_node != null:
 		mount_node.queue_free()
 		mount_node = null
@@ -216,6 +236,7 @@ func _process(delta: float) -> void:
 		target_roll = clampf(yaw_rate * 0.14 * clampf(horizontal / 8.0, 0.0, 1.0), -0.55, 0.55)
 		_bob_time += delta
 		bob = sin(_bob_time * 2.2) * 0.05 * (1.0 - clampf(horizontal / 10.0, 0.0, 1.0))
+		_wind(_velocity.length())
 		# Reduced motion (settings): no banking or bobbing, a calmer ride.
 		if GameSettings.get_value("reduce_motion"):
 			target_roll = 0.0
@@ -231,6 +252,17 @@ func _process(delta: float) -> void:
 	var pivot := Vector3(0.0, SEAT_HEIGHT, 0.0)
 	var tilt := Basis(Vector3.RIGHT, _pitch) * Basis(Vector3.BACK, _roll)
 	pose = Transform3D(Basis.IDENTITY, pivot + Vector3.UP * bob) * Transform3D(tilt, Vector3.ZERO) * Transform3D(Basis.IDENTITY, -pivot)
+
+
+## The wind while riding at `speed`: the gentle rush fades as the roar rises.
+func _wind(speed: float) -> void:
+	if _wind_slow == null:
+		return
+	var k := clampf((speed - WIND_CALM) / (WIND_ROAR - WIND_CALM), 0.0, 1.0)
+	_wind_slow.volume_db = linear_to_db(lerpf(0.55, 0.2, k))
+	_wind_fast.volume_db = linear_to_db(maxf(k, 0.001))
+	Sfx.start_loop(_wind_slow)
+	Sfx.start_loop(_wind_fast)
 
 
 func _update_ride_pose(delta: float, yaw_rate: float) -> void:

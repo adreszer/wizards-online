@@ -3,16 +3,26 @@ extends FeaturePanel
 ## A cauldron in the Potions classroom (server feature "brew"): add what you carry,
 ## stir, set the heat, wait, and bottle; the recipe book lists what the school brews.
 ## Potions you carry can be drunk from here too. Opened from the cauldron (Interact).
+## The pot bubbles while the panel is open; adding pours, bottling fizzes or burps.
+
+const BUBBLING := preload("res://assets/audio/school/cauldron_bubble_loop.wav")
 
 var _steps: Label
 var _ingredients: HBoxContainer
 var _drinks: HBoxContainer
 var _book: RichTextLabel
+var _bubbling: AudioStreamPlayer
 
 
 func _ready() -> void:
 	half_size = Vector2(380, 270)
 	super()
+	_bubbling = AudioStreamPlayer.new()
+	_bubbling.name = "Bubbling"
+	_bubbling.stream = Sfx.looped(BUBBLING)
+	_bubbling.bus = &"UI"
+	_bubbling.volume_db = -10.0
+	add_child(_bubbling)
 	GameEvents.panel_requested.connect(func(panel: String, _args: Dictionary) -> void:
 		if panel == "cauldron":
 			open_panel())
@@ -109,6 +119,7 @@ func _bottle() -> void:
 		show_result(r)
 		return
 	var potion := str(r.data.get("potion", ""))
+	UiSounds.play(&"potion_brew_fail" if potion == "" else &"potion_brew_success")
 	if potion == "":
 		status_label.text = tr("CAULDRON_SLUDGE")
 	else:
@@ -120,5 +131,18 @@ func _ask(kind: String, payload: Dictionary) -> void:
 	var r: Dictionary = await NetworkManager.request(kind, payload)
 	if not r.ok:
 		show_result(r)
+	elif kind == "brew_add":
+		UiSounds.play(&"potion_pour")
 	elif kind == "potion_drink":
 		close()
+
+
+func open_panel() -> void:
+	super()
+	if is_open:
+		_bubbling.play()
+
+
+func close() -> void:
+	_bubbling.stop()
+	super()
