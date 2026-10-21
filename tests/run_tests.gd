@@ -1530,6 +1530,11 @@ func _test_castle() -> void:
 			untranslated.append(z.display_key)
 	t.check(untranslated.is_empty(), "every area has a translated name (missing: %s)" % ", ".join(untranslated))
 	t.check(castle.get_node_or_null("StartPoint") != null, "castle has a StartPoint")
+	# Jolt refuses bodies past physics/jolt_physics_3d/limits/max_bodies (the default 10240
+	# ran out once two castles were alive in the tests); keep the castle well under it.
+	var bodies := castle.find_children("*", "CollisionObject3D", true, false).size()
+	var max_bodies := int(ProjectSettings.get_setting("physics/jolt_physics_3d/limits/max_bodies", 10240))
+	t.check(bodies * 4 <= max_bodies, "the castle's %d physics bodies stay under a quarter of Jolt's limit (%d)" % [bodies, max_bodies])
 	var shell: CastleExterior = castle.get_node_or_null("Exterior")
 	var shell_ok := shell != null
 	for part in ["Roofs", "Stone"]:
@@ -3490,13 +3495,22 @@ func _test_characters() -> void:
 		t.check(socket != null, "%s: OffHand socket present in the body" % id)
 		# The wand lies across the fist (the hand bone runs along the fingers), its tip at the cast origin.
 		var wand := player.visual.find_child("WandMesh", true, false) as MeshInstance3D
-		var hand := wand.get_parent() as Node3D
-		var across := absf(wand.global_basis.y.normalized().dot(hand.global_basis.y.normalized()))
-		t.check(wand.mesh != null and across < 0.5, "%s: wand is held across the palm, not as part of the hand" % id)
-		var origin := wand.global_transform.affine_inverse() * player.cast_origin.global_position
-		t.check(Vector2(origin.x, origin.z).length() < 0.01 and origin.y > WandMesh.TIP and origin.y < WandMesh.TIP + 0.04, "%s: spells leave from the wand's tip" % id)
-		var perch := PotionEffects.shoulder_of(player) - player.global_position
-		t.check(perch.y > 1.2 and perch.y < 1.7 and Vector2(perch.x, perch.z).length() < 0.3, "%s: a familiar perches on the shoulder (%s)" % [id, perch])
+		if wand == null:
+			# The placeholder body (a capsule) has no wand model, only the cast origin.
+			t.check(id == "placeholder", "%s: a wand in the hand (only the placeholder has none)" % id)
+		else:
+			var hand := wand.get_parent() as Node3D
+			var across := absf(wand.global_basis.y.normalized().dot(hand.global_basis.y.normalized()))
+			t.check(wand.mesh != null and across < 0.5, "%s: wand is held across the palm, not as part of the hand" % id)
+			var origin := wand.global_transform.affine_inverse() * player.cast_origin.global_position
+			t.check(Vector2(origin.x, origin.z).length() < 0.01 and origin.y > WandMesh.TIP and origin.y < WandMesh.TIP + 0.04, "%s: spells leave from the wand's tip" % id)
+		var shoulder := PotionEffects.shoulder_of(player)
+		var perch := shoulder - player.global_position
+		if shoulder == Vector3.INF:
+			# No skeleton: the familiar uses its fixed fallback spot.
+			t.check(id == "placeholder", "%s: a shoulder bone for familiars (only the placeholder has none)" % id)
+		else:
+			t.check(perch.y > 1.2 and perch.y < 1.7 and Vector2(perch.x, perch.z).length() < 0.3, "%s: a familiar perches on the shoulder (%s)" % [id, perch])
 		player.inventory.load_state(ItemRegistry.default_state())
 		player.inventory.hold_id(&"torch")
 		t.check(_find_light(player) != null and _find_light(player).is_inside_tree(), "%s: held torch lights up in the off hand" % id)
