@@ -139,7 +139,7 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - [x] Components (`ui/components/`): `KeyChip` (bound key from the InputMap, pad button after pad input, follows rebinding), `ToastStack` (info, reward, learned, discovery, warning; newest four), `AreaBanner`, `SpellSlot` (ring, roundel in the spell's colour, key chip, cooldown sweep, mastery pips, selected and disabled), `ItemSlot`, `HouseBadge` (crest + name in house colour with its symbol, S/M/L; the emblem for the unsorted), `UiTooltip` (title, body, key hint), `UiDialog` (`confirm()` and `error()` with Retry, on the router stack), `ProgressVial`, `UiSpinner`; `UiWindow.add_key_hint()`; `UiRouter.device_changed`
 - [x] Placeholder icon set: 54 game-icons.net icons (HUD, toasts, chat channels, the twelve subjects) as DPITextures (sharp at any size) behind `UiIcons.icon(id, px)`; `tools/make_ui_icons.py` writes them and `assets/ui/icons/CREDITS.md`. The final set replaces the files under the same ids
 - [x] `levels/dev/ui_gallery.tscn`: four pages (windows and controls in both families, play surfaces, icons and houses, dialogs); `tools/capture_ui.gd` captures them first
-- [ ] Owner reviews the style frames and signs off the direction
+- [x] Owner reviews the style frames and signs off the direction (approved 2026-10-22)
 - **Owner checkpoint:** approve the look before the screens are rebuilt.
 
 ### Milestone 67 — The HUD
