@@ -9,9 +9,16 @@ extends Node3D
 ## sampled every [member trail_spacing] metres and one particle is emitted at
 ## each sample, so the whole flight path glows evenly no matter how fast the
 ## projectile moves or how the frame rate compares to the physics rate.
+##
+## Sounds: the spell's travel loop while it flies, its impact where it lands, a
+## glassy rebound when it strikes a receiver that refuses its kind of magic (a
+## torch hit by frost… it glances off), a fizzle when it dies out at full range.
 
 signal hit(collider: Node, position: Vector3)
 signal expired()
+
+const WARDED := preload("res://assets/audio/spells/spell_warded.wav")
+const FIZZLE := preload("res://assets/audio/spells/spell_fizzle.wav")
 
 @export var collision_mask: int = 0b0000_1101  # world | remote_player | spell_target
 @export var burst_lifetime: float = 0.5
@@ -30,12 +37,15 @@ var cosmetic: bool = false
 var exclude_rids: Array[RID] = []
 ## Strength multiplier (a clean traced rune casts stronger, RuneTracer).
 var power: float = 1.0
+## True when it struck a receiver that refused it (tests).
+var refused: bool = false
 
 var _travelled: float = 0.0
 var _finished: bool = false
 ## Distance travelled since the last trail particle was laid.
 var _trail_carry: float = 0.0
 var _rng := RandomNumberGenerator.new()
+var _travel_audio: AudioStreamPlayer3D
 
 @onready var _mesh: MeshInstance3D = $Mesh
 @onready var _light: OmniLight3D = $OmniLight3D
@@ -70,6 +80,15 @@ func _ready() -> void:
 			_trail.process_material = trail_mat
 		if definition.impact_sound != null:
 			_audio.stream = definition.impact_sound
+		if definition.travel_sound != null:
+			_travel_audio = AudioStreamPlayer3D.new()
+			_travel_audio.name = "TravelAudio"
+			_travel_audio.stream = SoundLoops.looped(definition.travel_sound)
+			_travel_audio.volume_db = -8.0
+			_travel_audio.unit_size = 4.0
+			_travel_audio.max_distance = 30.0
+			add_child(_travel_audio)
+			_travel_audio.play(_rng.randf() * definition.travel_sound.get_length())
 	if direction.length_squared() > 0.0:
 		look_at(global_position + direction, Vector3.UP if absf(direction.y) < 0.99 else Vector3.RIGHT)
 
@@ -102,12 +121,12 @@ func _on_hit(collider: Node, position: Vector3, _normal: Vector3) -> void:
 		GameEvents.spell_hit_player.emit((collider as Player).peer_id, definition.id)
 	if collider is Player and (collider as Player).sounds != null:
 		(collider as Player).sounds.play_hurt()
-	if not cosmetic:
-		var receiver := SpellReceiver.find_on(collider)
-		if receiver != null:
-			var effect := SpellEffect.create(definition, caster, caster_id, position, direction)
-			effect.strength *= power
-			receiver.receive(effect)
+	var receiver := SpellReceiver.find_on(collider)
+	refused = receiver != null and not receiver.can_receive(definition.effect_type)
+	if not cosmetic and receiver != null and not refused:
+		var effect := SpellEffect.create(definition, caster, caster_id, position, direction)
+		effect.strength *= power
+		receiver.receive(effect)
 	hit.emit(collider, position)
 	# Leave the burst scene just short of the surface so it is not buried in it.
 	_spawn_burst_scene(position - direction * 0.3)
@@ -137,6 +156,8 @@ func _lay_trail(from: Vector3, to: Vector3) -> void:
 func _fizzle() -> void:
 	expired.emit()
 	_spawn_burst_scene(global_position)
+	_audio.stream = FIZZLE
+	_audio.volume_db = -6.0
 	_finish(false)
 
 
@@ -156,9 +177,13 @@ func _finish(impact: bool) -> void:
 	_finished = true
 	_mesh.visible = false
 	_light.visible = false
+	if _travel_audio != null:
+		_travel_audio.stop()
+	if refused:
+		_audio.stream = WARDED
 	if impact:
 		_burst.emitting = true
-		if _audio.stream != null:
-			_audio.play()
+	if _audio.stream != null:
+		_audio.play()
 	# Keep the node alive until both the burst and the last trail particles have faded.
 	get_tree().create_timer(maxf(burst_lifetime, _trail.lifetime)).timeout.connect(queue_free)

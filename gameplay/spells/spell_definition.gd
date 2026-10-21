@@ -7,6 +7,9 @@ extends Resource
 ## Translation keys; callers show tr(display_name) / tr(description).
 @export var display_name: String = "SPELL_ARCANE_PULSE_NAME"
 @export var description: String = ""
+## Translation key of the spoken words (Latin, the same in every language). The
+## caster says them in their character's voice: assets/audio/voice/<voice>/<id>.wav.
+@export var incantation: String = ""
 @export var icon: Texture2D
 ## Effect type that SpellReceivers filter on. Current vocabulary (see
 ## docs/architecture.md → Spells): force, levitate, wind, fire, water, frost,
@@ -23,5 +26,7 @@ extends Resource
 @export var strength: float = 6.0
 @export var aim_assist_angle_degrees: float = 7.0
 @export var cast_sound: AudioStream
+## Loops on the projectile while it flies (SoundLoops sets the loop points).
+@export var travel_sound: AudioStreamWAV
 @export var impact_sound: AudioStream
 @export var color: Color = Color(0.65, 0.5, 1.0)

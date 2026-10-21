@@ -3,14 +3,15 @@ extends RefCounted
 ## Playable character bodies. Ids travel over the network (join metadata /
 ## roster), so keep them short and stable. Scenes must expose an
 ## `AnimationController` child, a `CastOrigin` marker and an `OffHand` socket
-## (held items) somewhere inside.
+## (held items) somewhere inside. `voice` names the folder of spoken incantations
+## (assets/audio/voice/<voice>/).
 
 const DEFAULT := "apprentice_m"
 
 const CHARACTERS := {
-	"apprentice_m": {"scene": "res://characters/visuals/apprentice_m.tscn", "name_key": "CHAR_APPRENTICE_M"},
-	"apprentice_f": {"scene": "res://characters/visuals/apprentice_f.tscn", "name_key": "CHAR_APPRENTICE_F"},
-	"placeholder": {"scene": "res://characters/components/character_visual.tscn", "name_key": "CHAR_PLACEHOLDER"},
+	"apprentice_m": {"scene": "res://characters/visuals/apprentice_m.tscn", "name_key": "CHAR_APPRENTICE_M", "voice": "apprentice_m"},
+	"apprentice_f": {"scene": "res://characters/visuals/apprentice_f.tscn", "name_key": "CHAR_APPRENTICE_F", "voice": "apprentice_f"},
+	"placeholder": {"scene": "res://characters/components/character_visual.tscn", "name_key": "CHAR_PLACEHOLDER", "voice": "apprentice_m"},
 }
 
 
@@ -36,3 +37,7 @@ static func load_scene(id: String) -> PackedScene:
 
 static func name_key(id: String) -> String:
 	return str(CHARACTERS[sanitize(id)]["name_key"])
+
+
+static func voice(id: String) -> String:
+	return str(CHARACTERS[sanitize(id)].get("voice", "apprentice_m"))

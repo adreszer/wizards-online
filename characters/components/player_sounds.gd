@@ -1,7 +1,9 @@
 class_name PlayerSounds
 extends Node3D
 ## The sounds a player's body makes, heard in 3D by everyone nearby: footsteps by
-## surface, jump, landing (soft or hard), being hit, reforming at a waypoint.
+## surface, jump, landing (soft or hard), being hit, reforming at a waypoint, and
+## the incantation spoken with every cast, in the character's voice
+## (CharacterRegistry.voice), higher while a squeaky-voice potion lasts.
 ## Added by Player for local and remote players alike. Both read the animation
 ## state name (synced for remote players), so steps come from distance travelled
 ## while walking or running: one step per stride, which follows the speed without
@@ -34,8 +36,12 @@ const RESPAWN := preload("res://assets/audio/player/respawn.wav")
 ## Remote players: seconds in the air before a landing counts as hard (the local
 ## player uses PlayerMovement.hard_landing_speed).
 @export var hard_landing_air_time: float = 0.9
+## Pitch of the incantation under a squeaky-voice potion.
+@export var squeaky_pitch: float = 1.45
 
 static var _step_streams := {}
+## "<voice>/<spell id>" -> AudioStream, or null when that line was never recorded.
+static var _voice_lines := {}
 static var _terrain: Terrain
 static var _terrain_searched_msec := -100000
 
@@ -43,8 +49,11 @@ var player: Player
 ## The last footstep's surface and the number of steps so far, for tests.
 var last_surface: StringName = &""
 var steps_played := 0
+## The last incantation spoken ("<voice>/<spell id>"), for tests.
+var last_incantation := ""
 var _steps: AudioStreamPlayer3D
 var _body: AudioStreamPlayer3D
+var _voice: AudioStreamPlayer3D
 var _travelled := 0.0
 var _last_position := Vector3.INF
 var _state := "idle"
@@ -55,6 +64,7 @@ func setup(p_player: Player) -> void:
 	player = p_player
 	_steps = _make_player("Steps", -9.0, 24.0)
 	_body = _make_player("Body", -4.0, 30.0)
+	_voice = _make_player("Voice", -2.0, 32.0)
 	player.health.damaged.connect(func(_amount: int, _source: Node) -> void: play_hurt())
 	player.respawn_handler.respawned.connect(func(_t: Transform3D) -> void: _play(_body, RESPAWN))
 	if player.is_local:
@@ -65,6 +75,30 @@ func setup(p_player: Player) -> void:
 
 func play_hurt() -> void:
 	_play(_body, HURT)
+
+
+## Says the spell's words. A cast while the last words are still being spoken
+## stays silent rather than cutting them off.
+func play_incantation(definition: SpellDefinition) -> void:
+	if definition == null or _voice.playing:
+		return
+	var key := "%s/%s" % [CharacterRegistry.voice(player.character_id), definition.id]
+	var stream := voice_line(key)
+	if stream == null:
+		return
+	last_incantation = key
+	var effects := get_tree().get_first_node_in_group(PotionEffects.GROUP) as PotionEffects
+	var squeaky := effects != null and effects.effect_of(player.display_name) == "voice"
+	_voice.pitch_scale = squeaky_pitch if squeaky else randf_range(0.98, 1.02)
+	_play(_voice, stream)
+
+
+## The recorded line "<voice>/<spell id>", or null.
+static func voice_line(key: String) -> AudioStream:
+	if not _voice_lines.has(key):
+		var path := "res://assets/audio/voice/%s.wav" % key
+		_voice_lines[key] = load(path) if ResourceLoader.exists(path) else null
+	return _voice_lines[key]
 
 
 func _physics_process(delta: float) -> void:

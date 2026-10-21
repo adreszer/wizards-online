@@ -44,21 +44,11 @@ func _ready() -> void:
 	_align()
 	var crackle := AudioStreamPlayer3D.new()
 	crackle.name = "Crackle"
-	crackle.stream = looped(CRACKLE)
+	crackle.stream = SoundLoops.looped(CRACKLE)
 	crackle.volume_db = -8.0
 	crackle.max_distance = 14.0
 	_light.add_child(crackle)
 	crackle.play(randf() * CRACKLE.get_length())
-
-
-## Loop points live in the gitignored .import files, so a WAV meant to loop is set
-## to loop over its whole length here.
-static func looped(stream: AudioStreamWAV) -> AudioStreamWAV:
-	if stream.loop_mode == AudioStreamWAV.LOOP_DISABLED:
-		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		stream.loop_begin = 0
-		stream.loop_end = int(stream.get_length() * stream.mix_rate)
-	return stream
 
 
 func _process(delta: float) -> void:

@@ -1,15 +1,17 @@
-[gd_resource type="Resource" script_class="SpellDefinition" load_steps=5 format=3 uid="uid://quicksprout01"]
+[gd_resource type="Resource" script_class="SpellDefinition" load_steps=6 format=3 uid="uid://quicksprout01"]
 
 [ext_resource type="Script" path="res://gameplay/spells/spell_definition.gd" id="1"]
 [ext_resource type="PackedScene" path="res://gameplay/spells/spell_projectile.tscn" id="2"]
-[ext_resource type="AudioStream" path="res://assets/audio/cast.wav" id="3"]
-[ext_resource type="AudioStream" path="res://assets/audio/impact.wav" id="4"]
+[ext_resource type="AudioStream" path="res://assets/audio/spells/spell_quicksprout_cast.wav" id="3"]
+[ext_resource type="AudioStream" path="res://assets/audio/spells/spell_quicksprout_impact.wav" id="4"]
+[ext_resource type="AudioStream" path="res://assets/audio/spells/spell_quicksprout_travel.wav" id="5"]
 
 [resource]
 script = ExtResource("1")
 id = &"quicksprout"
 display_name = "SPELL_QUICKSPROUT_NAME"
 description = "SPELL_QUICKSPROUT_DESC"
+incantation = "SPELL_QUICKSPROUT_INCANTATION"
 effect_type = &"growth"
 range = 12.0
 cooldown = 1.0
@@ -18,5 +20,6 @@ projectile_scene = ExtResource("2")
 strength = 1.0
 aim_assist_angle_degrees = 8.0
 cast_sound = ExtResource("3")
+travel_sound = ExtResource("5")
 impact_sound = ExtResource("4")
 color = Color(0.4, 0.85, 0.3, 1)

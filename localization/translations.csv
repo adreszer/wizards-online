@@ -19,6 +19,7 @@ HUD_HEALTH,Health,Zdrowie
 HUD_FRAGMENTS,Fragments: %d / %d,Fragmenty: %d / %d
 HUD_SPELL_NONE,Spell: —,Czar: —
 HUD_SPELL,Spell: %s,Czar: %s
+HUD_SPELL_INCANTATION,Spell: %s — “%s”,Czar: %s — „%s”
 HUD_PROMPT,[E] %s,[E] %s
 HUD_STATUS_ONLINE,Online · %s,Online · %s
 HUD_STATUS_CONNECTING,Connecting…,Łączenie…
@@ -75,6 +76,7 @@ PLAQUE_FINAL,"Turn every statue to face the far door, then pull the lever.","Zwr
 PLAQUE_REWARD,You have reached the end of this path. Thank you for playing.,To koniec tej ścieżki. Dziękujemy za grę.
 SPELL_ARCANE_PULSE_NAME,Arcane Pulse,Tajemny Impuls
 SPELL_ARCANE_PULSE_DESC,A focused pulse of raw arcane force. Activates magical mechanisms and shoves loose objects.,Skupiony impuls czystej tajemnej mocy. Uruchamia magiczne mechanizmy i odpycha luźne przedmioty.
+SPELL_ARCANE_PULSE_INCANTATION,Arcana Pulsa,Arcana Pulsa
 COLLECTIBLE_ARCANE_FRAGMENT,Arcane Fragment,Tajemny Fragment
 PLAYER_DEFAULT_NAME,Apprentice,Uczeń
 MENU_CHARACTER,Character,Postać
@@ -199,24 +201,34 @@ PLAQUE_STARGAZING,The astronomy platform. Lessons happen after dark; the sky is 
 PLAQUE_GROUNDS,"The school grounds. Greenhouse to the east, the beast paddock to the west, the entrance hall straight ahead.","Błonia szkoły. Szklarnia na wschód, zagroda dla stworzeń na zachód, sień na wprost."
 SPELL_UPLIFT_NAME,Uplift,Wzniesienie
 SPELL_UPLIFT_DESC,Lifts a loose object off the ground and lets it hover for a few heartbeats.,Unosi luźny przedmiot nad ziemię i pozwala mu zawisnąć na kilka uderzeń serca.
+SPELL_UPLIFT_INCANTATION,Surge Sublimis,Surge Sublimis
 SPELL_GALEWIND_NAME,Galewind,Wichura
 SPELL_GALEWIND_DESC,A hard gust of conjured wind. Shoves loose objects much further than a plain pulse.,Silny podmuch wyczarowanego wiatru. Odpycha luźne przedmioty znacznie dalej niż zwykły impuls.
+SPELL_GALEWIND_INCANTATION,Procella Ruat,Procella Ruat
 SPELL_EMBERKINDLE_NAME,Emberkindle,Żarzenie
 SPELL_EMBERKINDLE_DESC,"A spark of living flame. Lights torches, braziers and anything that should burn.","Iskra żywego płomienia. Zapala pochodnie, kosze ogniowe i wszystko, co powinno płonąć."
+SPELL_EMBERKINDLE_INCANTATION,Accende Favillam,Accende Favillam
 SPELL_WELLSPRING_NAME,Wellspring,Źródło
 SPELL_WELLSPRING_DESC,A burst of clear water. Douses flames and fills what stands empty.,"Strumień czystej wody. Gasi płomienie i napełnia to, co stoi puste."
+SPELL_WELLSPRING_INCANTATION,Fons Erumpe,Fons Erumpe
 SPELL_FROSTBIND_NAME,Frostbind,Mroźne Pęta
 SPELL_FROSTBIND_DESC,Biting cold in a thrown shard. Freezes water and smothers small fires.,Kąsający chłód w rzuconym odłamku. Zamraża wodę i dusi małe ognie.
+SPELL_FROSTBIND_INCANTATION,Gelu Liga,Gelu Liga
 SPELL_GLOWMOTE_NAME,Glowmote,Świetlik
 SPELL_GLOWMOTE_DESC,"Conjures a floating mote of light where it lands. It lingers for a while, then fades.","Przywołuje unoszący się świetlny pyłek w miejscu trafienia. Świeci przez chwilę, po czym gaśnie."
+SPELL_GLOWMOTE_INCANTATION,Scintilla Mane,Scintilla Mane
 SPELL_DUSKVEIL_NAME,Duskveil,Zmierzchna Zasłona
 SPELL_DUSKVEIL_DESC,A veil of shadow. Snuffs out torches and lamps — useful for those who prefer not to be seen.,"Zasłona cienia. Gasi pochodnie i lampy — przydatna tym, którzy wolą pozostać niezauważeni."
+SPELL_DUSKVEIL_INCANTATION,Vela Crepusculo,Vela Crepusculo
 SPELL_UNBOLT_NAME,Unbolt,Odryglowanie
 SPELL_UNBOLT_DESC,"Slides bolts and turns keys from afar. Opens what is merely locked, never what is warded.","Odsuwa rygle i przekręca klucze z daleka. Otwiera to, co tylko zamknięte, nigdy to, co strzeżone."
+SPELL_UNBOLT_INCANTATION,Pessulum Solve,Pessulum Solve
 SPELL_MENDWEAVE_NAME,Mendweave,Cerowanie
 SPELL_MENDWEAVE_DESC,"Knits broken things back together: cracked pots, torn pages, snapped wands.","Zszywa rzeczy zepsute: pęknięte dzbany, podarte kartki, złamane różdżki."
+SPELL_MENDWEAVE_INCANTATION,Texe Integrum,Texe Integrum
 SPELL_QUICKSPROUT_NAME,Quicksprout,Rozkwit
 SPELL_QUICKSPROUT_DESC,Coaxes a seed or a wilting plant into sudden growth.,Nakłania nasiono lub więdnącą roślinę do nagłego wzrostu.
+SPELL_QUICKSPROUT_INCANTATION,Germina Cito,Germina Cito
 HUD_HOTBAR_HINT,Spells: 1–0 select · Q/R cycle · LMB cast,Czary: 1–0 wybór · Q/R zmiana · LPM rzucanie
 ROLE_PROFESSOR_TITLE,Prof.,prof.
 ROLE_ADMIN_TITLE,Steward,Zarządca

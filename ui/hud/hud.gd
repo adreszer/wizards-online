@@ -155,7 +155,11 @@ func _on_spell_learned(definition: Resource) -> void:
 		_cooldown_bar.visible = false
 		_crosshair.visible = false
 	else:
-		_spell_label.text = tr("HUD_SPELL") % tr(definition.display_name)
+		var incantation := (definition as SpellDefinition).incantation if definition is SpellDefinition else ""
+		if incantation.is_empty():
+			_spell_label.text = tr("HUD_SPELL") % tr(definition.display_name)
+		else:
+			_spell_label.text = tr("HUD_SPELL_INCANTATION") % [tr(definition.display_name), tr(incantation)]
 		_cooldown_bar.visible = true
 		_crosshair.visible = true
 	_refresh_hotbar()

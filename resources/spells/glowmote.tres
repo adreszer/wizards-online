@@ -1,16 +1,18 @@
-[gd_resource type="Resource" script_class="SpellDefinition" load_steps=6 format=3 uid="uid://glowmote00001"]
+[gd_resource type="Resource" script_class="SpellDefinition" load_steps=7 format=3 uid="uid://glowmote00001"]
 
 [ext_resource type="Script" path="res://gameplay/spells/spell_definition.gd" id="1"]
 [ext_resource type="PackedScene" path="res://gameplay/spells/spell_projectile.tscn" id="2"]
-[ext_resource type="AudioStream" path="res://assets/audio/cast.wav" id="3"]
-[ext_resource type="AudioStream" path="res://assets/audio/impact.wav" id="4"]
+[ext_resource type="AudioStream" path="res://assets/audio/spells/spell_glowmote_cast.wav" id="3"]
+[ext_resource type="AudioStream" path="res://assets/audio/spells/spell_glowmote_impact.wav" id="4"]
 [ext_resource type="PackedScene" path="res://objects/spells/light_mote.tscn" id="5"]
+[ext_resource type="AudioStream" path="res://assets/audio/spells/spell_glowmote_travel.wav" id="6"]
 
 [resource]
 script = ExtResource("1")
 id = &"glowmote"
 display_name = "SPELL_GLOWMOTE_NAME"
 description = "SPELL_GLOWMOTE_DESC"
+incantation = "SPELL_GLOWMOTE_INCANTATION"
 effect_type = &"light"
 range = 22.0
 cooldown = 1.0
@@ -20,5 +22,6 @@ burst_scene = ExtResource("5")
 strength = 1.0
 aim_assist_angle_degrees = 5.0
 cast_sound = ExtResource("3")
+travel_sound = ExtResource("6")
 impact_sound = ExtResource("4")
 color = Color(1, 0.97, 0.8, 1)

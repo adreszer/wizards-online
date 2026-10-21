@@ -5,6 +5,7 @@ extends Node
 ## PlayerMovement's scripted-control API. Exit code 1 on any failure.
 
 const PLAYER_SCENE := preload("res://characters/player/player.tscn")
+const SPELL_PROJECTILE_SCENE := preload("res://gameplay/spells/spell_projectile.tscn")
 const SWITCH_SCENE := preload("res://objects/puzzles/magic_switch.tscn")
 const LEVER_SCENE := preload("res://objects/interactables/lever.tscn")
 const COLLECTIBLE_SCENE := preload("res://gameplay/collectibles/collectible.tscn")
@@ -79,6 +80,7 @@ func _run() -> void:
 	await _test_setpieces()
 	await _test_day_night()
 	await _test_player_sounds()
+	await _test_spell_sounds()
 	await _test_timetable()
 	await _test_chat()
 	await _test_gestures()
@@ -2165,7 +2167,7 @@ func _test_player_sounds() -> void:
 	for s: StringName in PlayerSounds.SURFACES:
 		var r := PlayerSounds.step_stream(s)
 		t.check(r.streams_count == int(PlayerSounds.STEP_COUNTS[s]) and r.streams_count > 1 and r.get_stream(0) != null, "%s has %d footsteps" % [s, r.streams_count])
-	var crackle := HeldTorch.looped(HeldTorch.CRACKLE)
+	var crackle := SoundLoops.looped(HeldTorch.CRACKLE)
 	t.check(crackle.loop_mode == AudioStreamWAV.LOOP_FORWARD and crackle.loop_end > crackle.mix_rate, "the torch crackle loops")
 	var castle := CASTLE_SCENE.instantiate()
 	add_child(castle)
@@ -2235,6 +2237,53 @@ func _test_player_sounds() -> void:
 	castle.queue_free()
 	await get_tree().process_frame
 
+
+func _test_spell_sounds() -> void:
+	t.section("Spell sounds")
+	var complete := true
+	for def in SpellRegistry.all():
+		var words := def.incantation
+		var spoken := CharacterRegistry.CHARACTERS.keys().all(func(c: String) -> bool:
+			return PlayerSounds.voice_line("%s/%s" % [CharacterRegistry.voice(c), def.id]) != null)
+		if def.cast_sound == null or def.travel_sound == null or def.impact_sound == null \
+				or words.is_empty() or tr(words) == words or not spoken:
+			complete = false
+			t.check(false, "%s has cast, travel and impact sounds and spoken words" % def.id)
+	t.check(complete, "every spell has its own cast, travel and impact sounds and an incantation in both voices")
+	var frost := SpellRegistry.load_definition("frostbind")
+	var target := StaticBody3D.new()
+	var receiver := SpellReceiver.new()
+	receiver.accepted_effect_types = [&"fire"]
+	target.add_child(receiver)
+	add_child(target)
+	var proj := SPELL_PROJECTILE_SCENE.instantiate() as SpellProjectile
+	proj.configure(frost, Vector3.FORWARD, null, "", true)
+	add_child(proj)
+	var travel := proj.get_node_or_null("TravelAudio") as AudioStreamPlayer3D
+	t.check(travel != null and travel.stream == frost.travel_sound and (travel.stream as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_FORWARD,
+		"a spell in flight plays its looping travel sound")
+	proj._on_hit(target, Vector3.ZERO, Vector3.BACK)
+	t.check(proj.refused and proj._audio.stream == SpellProjectile.WARDED, "frost on a fire-only target glances off with the warded sound")
+	var proj2 := SPELL_PROJECTILE_SCENE.instantiate() as SpellProjectile
+	proj2.configure(frost, Vector3.FORWARD, null, "", true)
+	add_child(proj2)
+	proj2._fizzle()
+	t.check(proj2._audio.stream == SpellProjectile.FIZZLE, "a spell dying out at full range fizzles")
+	target.queue_free()
+	await _spawn_player(Vector3(0, 300, 0), "apprentice_f")
+	var glow := SpellRegistry.load_definition("glowmote")
+	player.sounds.play_incantation(glow)
+	t.check(player.sounds.last_incantation == "apprentice_f/glowmote", "the caster speaks the words in their character's voice (%s)" % player.sounds.last_incantation)
+	var effects := PotionEffects.new()
+	add_child(effects)
+	effects.effects = {player.display_name: {"effect": "voice", "until": NetworkManager.server_time() + 100.0}}
+	player.sounds._voice.stop()
+	player.sounds.play_incantation(glow)
+	t.check(is_equal_approx(player.sounds._voice.pitch_scale, player.sounds.squeaky_pitch), "a squeaky-voice potion raises the incantation")
+	effects.queue_free()
+	player.queue_free()
+	player = null
+	await get_tree().process_frame
 
 func _test_day_night() -> void:
 	t.section("Day and night")

@@ -385,9 +385,11 @@ func _on_flying_changed(is_flying: bool) -> void:
 		GameEvents.notification_requested.emit(tr("NOTIFY_FLIGHT_CONTROLS"), 7.0)
 
 
-func _on_spell_cast(_definition: SpellDefinition, _origin: Vector3, _direction: Vector3) -> void:
+func _on_spell_cast(definition: SpellDefinition, _origin: Vector3, _direction: Vector3) -> void:
 	animation_controller.play_cast()
 	broom_rider.on_cast()
+	if sounds != null:
+		sounds.play_incantation(definition)
 
 
 func _exit_tree() -> void:

@@ -22,7 +22,7 @@ Every sound and music track the game needs, with the prompt to generate it. Buil
 
 **Files**
 - Short sounds go in `assets/audio/<group>/<id>.wav`; music and ambience loops go in `assets/audio/<group>/<id>.mp3` (Godot plays MP3 natively), loudness-matched to −18 LUFS, with the untouched download kept in `source/` next to them (WAV downloads stored there as lossless FLAC) (a `.gdignore` keeps Godot out of it).
-- Spells are wired through `cast_sound` and `impact_sound` on each `resources/spells/*.tres`.
+- Spells are wired through `cast_sound`, `travel_sound` (looped on the projectile) and `impact_sound` on each `resources/spells/*.tres`; the spoken words through `incantation` and `assets/audio/voice/<voice>/<spell>.wav`.
 - The castle bell is synthesised in code today (`SchoolBells.bell_stream()`); `school_bell_stroke` replaces it.
 
 **Provenance (for Steam's AI content disclosure)**
@@ -100,6 +100,24 @@ Each spell has three sounds: **cast** (at the hand), **travel** (a loop on the p
 | spell_fizzle | Gen | 1 s | | 3 | A spell failing in a wand: a weak sputtering crackle and a deflating puff, like a damp match |
 | spell_warded | Gen | 1.5 s | | 3 | A spell bouncing off an invisible magical ward: a deep resonant glassy thrum and a dull shimmering rebound |
 | spell_learned | Gen | 3 s | | 4 | A new spell settling into memory: a rising shimmer of glass chimes, a warm swell of air, a final soft bell-like ring (replaces `learn.wav`) |
+
+### Incantations (built)
+
+Every spell has original Latin words (`SpellDefinition.incantation`, translation keys `SPELL_*_INCANTATION`, the same in Polish and English), spoken by the caster on every cast in their body's voice. Two voices designed with ElevenLabs Voice Design (young adult apprentices; the designer refuses voices described as under 18), lines from Text to Speech `eleven_v3` with a delivery tag. Never reuse or echo franchise incantations.
+
+| Spell | Words | Meaning | Delivery tag |
+|---|---|---|---|
+| arcane_pulse | Arcana Pulsa | push, hidden powers | shouts commandingly |
+| uplift | Surge Sublimis | rise, aloft | firmly, rising |
+| galewind | Procella Ruat | let the storm rush | shouts forcefully |
+| emberkindle | Accende Favillam | kindle the ember | sharply, commanding |
+| wellspring | Fons Erumpe | spring, burst forth | clearly, commanding |
+| frostbind | Gelu Liga | frost, bind | sharp and cold |
+| glowmote | Scintilla Mane | spark, stay | softly, with wonder |
+| duskveil | Vela Crepusculo | veil with twilight | in a low, hushed voice |
+| unbolt | Pessulum Solve | loosen the bolt | crisp and precise |
+| mendweave | Texe Integrum | weave it whole | warmly, steady |
+| quicksprout | Germina Cito | sprout quickly | brightly, encouraging |
 
 ## 2. Spell effects on the world
 

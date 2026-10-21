@@ -3,7 +3,10 @@ extends Node3D
 ## What potions do, for everyone to see (server feature "effects": {name: {effect, until}}),
 ## and familiars walking with their owners ("familiars": {name: kind}). Glow lights the
 ## drinker; featherfall slows the local player's falls; a squeaky voice shrinks their
-## speech bubbles; robe-dye changes their robe colour; confetti bursts once. world.gd adds it.
+## speech bubbles and raises their spoken incantations (PlayerSounds); robe-dye changes
+## their robe colour; confetti bursts once. world.gd adds it.
+
+const GROUP := &"potion_effects"
 
 var effects: Dictionary = {}
 var familiars: Dictionary = {}
@@ -14,6 +17,7 @@ var _feather_saved: Array = []
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
 	NetworkManager.pushed.connect(func(kind: String, data: Dictionary) -> void:
 		if kind == "effects":
 			_on_effects(data)
