@@ -263,9 +263,9 @@ HOUSE_3_ANIMAL,Phoenix,Feniks
 HOUSE_4_ANIMAL,Hippocampus,Hipokamp
 HUD_HOUSE,House: %s,Dom: %s
 HUD_COINS,Purse: %s,Sakiewka: %s
-CURRENCY_ONE,%d crown,%d korona
-CURRENCY_FEW,%d crowns,%d korony
-CURRENCY_MANY,%d crowns,%d koron
+CURRENCY_ONE,%d gold,%d sztuka złota
+CURRENCY_FEW,%d gold,%d sztuki złota
+CURRENCY_MANY,%d gold,%d sztuk złota
 WALLET_FROM_LESSON,%s for attending %s,%s za obecność na lekcji: %s
 WALLET_FROM_MYSTERY,%s for solving a mystery,%s za rozwiązaną zagadkę
 WALLET_FROM_SHOP,Purchase: %s,Zakup: %s
@@ -380,7 +380,7 @@ NOTIFY_FLIGHT_CONTROLS,Flying: the broom follows the mouse · W forward · Space
 INVENTORY_RIDING_MARK,(riding),(w locie)
 INVENTORY_CLICK_TO_RIDE,Click to mount it or land (shortcut: B).,"Kliknij, aby wsiąść albo wylądować (skrót: B)."
 CHAT_OFFLINE_COMMANDS_ONLY,Offline there is nobody to talk to; only commands work here (/help).,Offline nie ma z kim rozmawiać; działają tylko komendy (/pomoc).
-CHEAT_HELP,"Talk: /w whisper · /s shout · /msg name text · /r reply. Gestures: /wave /bow /raise /clap /point /shrug /cheer /notes /sit /stand (G opens the menu, H raises a hand). Dev: /broom gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /plan opens the timetable · /coins <amount> changes your purse · /goto <place> takes you there (station, village, castle, an area) · /help this list. School life: /friends · /friend name · /profile name · /clubs · /game name · /watch · /ladder · /chase join a|b · /drink potion · /adopt kind · /familiar kind · /decorate · /share on|off · /wing · /settings. Staff: /detention name · /licence name · /quiet · /bell · /head name house · /houseboard text · /housestats · /event kind minutes length area title · /announce text · /admin.","Rozmowa: /sz szept · /k krzyk · /pw imię tekst · /odp odpowiedź. Gesty: /machaj /ukłon /ręka /klaszcz /wskaż /wzrusz /wiwat /notuj /usiądź /wstań (G otwiera menu, H zgłasza się). Dla testów: /miotla daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /plan otwiera plan lekcji · /korony <ilość> zmienia zawartość sakiewki · /idz <miejsce> przenosi na miejsce (stacja, wioska, zamek, obszar) · /pomoc ta lista. Życie szkoły: /przyjaciele · /przyjaciel imię · /profil imię · /kluby · /gra imię · /patrz · /ranking · /poscig dolacz a|b · /wypij eliksir · /adoptuj rodzaj · /chowaniec rodzaj · /dekoruj · /udostepnij on|off · /skrzydlo · /ustawienia. Kadra: /kara imię · /licencja imię · /cisza · /dzwonek · /opiekun imię dom · /ogloszenie tekst · /dom · /wydarzenie rodzaj minuty długość miejsce tytuł · /oglos tekst · /admin."
+CHEAT_HELP,"Talk: /w whisper · /s shout · /msg name text · /r reply. Gestures: /wave /bow /raise /clap /point /shrug /cheer /notes /sit /stand (G opens the menu, H raises a hand). Dev: /broom gives a flying broom · /give <item> gives any item · /time [hh:mm | day | night] shows or sets the school time · /plan opens the timetable · /gold <amount> changes your purse · /goto <place> takes you there (station, village, castle, an area) · /help this list. School life: /friends · /friend name · /profile name · /clubs · /game name · /watch · /ladder · /chase join a|b · /drink potion · /adopt kind · /familiar kind · /decorate · /share on|off · /wing · /settings. Staff: /detention name · /licence name · /quiet · /bell · /head name house · /houseboard text · /housestats · /event kind minutes length area title · /announce text · /admin.","Rozmowa: /sz szept · /k krzyk · /pw imię tekst · /odp odpowiedź. Gesty: /machaj /ukłon /ręka /klaszcz /wskaż /wzrusz /wiwat /notuj /usiądź /wstań (G otwiera menu, H zgłasza się). Dla testów: /miotla daje latającą miotłę · /daj <przedmiot> daje dowolny przedmiot · /czas [gg:mm | dzien | noc] pokazuje lub ustawia czas w szkole · /plan otwiera plan lekcji · /złoto <ilość> zmienia zawartość sakiewki · /idz <miejsce> przenosi na miejsce (stacja, wioska, zamek, obszar) · /pomoc ta lista. Życie szkoły: /przyjaciele · /przyjaciel imię · /profil imię · /kluby · /gra imię · /patrz · /ranking · /poscig dolacz a|b · /wypij eliksir · /adoptuj rodzaj · /chowaniec rodzaj · /dekoruj · /udostepnij on|off · /skrzydlo · /ustawienia. Kadra: /kara imię · /licencja imię · /cisza · /dzwonek · /opiekun imię dom · /ogloszenie tekst · /dom · /wydarzenie rodzaj minuty długość miejsce tytuł · /oglos tekst · /admin."
 CHEAT_GIVE_USAGE,Usage: /give <item>. Items: %s,Użycie: /daj <przedmiot>. Przedmioty: %s
 CHEAT_UNKNOWN,Unknown command: %s (try /help).,Nieznana komenda: %s (spróbuj /pomoc).
 CHEAT_UNKNOWN_ITEM,"No item called ""%s"". Items: %s",Nie ma przedmiotu „%s”. Przedmioty: %s
@@ -431,9 +431,9 @@ CHEAT_GOTO_UNKNOWN,"No place called ""%s"".",Nie ma miejsca „%s”.
 CHEAT_GOTO_DONE,Moved to %s.,Przeniesiono: %s.
 CHEAT_GOTO_NOT_ALLOWED,Only professors and admins can jump around online.,W trybie online przenosić się mogą tylko profesorowie i administratorzy.
 CHEAT_COINS_NOW,In your purse: %s.,W sakiewce: %s.
-CHEAT_COINS_USAGE,Usage: /coins <amount> (a minus takes coins away).,Użycie: /korony <ilość> (minus zabiera).
+CHEAT_COINS_USAGE,Usage: /gold <amount> (a minus takes gold away).,Użycie: /złoto <ilość> (minus zabiera).
 CHEAT_COINS_REQUESTED,Asking the server to change your purse…,Prośba do serwera o zmianę sakiewki…
-CHEAT_COINS_INSUFFICIENT,Not enough coins in the purse.,Za mało w sakiewce.
+CHEAT_COINS_INSUFFICIENT,Not enough gold in the purse.,Za mało złota w sakiewce.
 HUD_LESSON_NOW,Now: %s (until %s),Teraz: %s (do %s)
 HUD_LESSON_NEXT,Next: %s · %s,Następna: %s · %s
 DAY_MON,Mon,pon.
@@ -694,7 +694,7 @@ REFUSED_UNKNOWN_TASK,There is no such task.,Nie ma takiego zadania.
 REFUSED_NO_DETENTION,You have no detention.,Nie masz szlabanu.
 REFUSED_UNKNOWN_REQUEST,The castle does not know that request.,Zamek nie zna takiej prośby.
 REFUSED_SERVER_ERROR,Something went wrong in the castle.,Coś poszło nie tak w zamku.
-REFUSED_INSUFFICIENT,Not enough coins.,Za mało koron.
+REFUSED_INSUFFICIENT,Not enough gold.,Za mało złota.
 OK_DETENTION_ASSIGN,Detention given.,Szlaban zadany.
 DETENTION_GIVEN,Detention from %s: %s in the %s.,"Szlaban od: %s. Zadanie: %s, miejsce: %s."
 DETENTION_DONE,Detention served: %s.,Szlaban odbyty: %s.
@@ -1014,7 +1014,7 @@ OK_CREATURE_ADOPT,It follows you home.,Idzie za tobą do domu.
 OK_FAMILIAR_SET,Your familiar comes along.,Twój chowaniec idzie z tobą.
 INTERACT_SHOP,Browse the shop,Obejrzyj towary
 SHOP_TITLE,Shop,Sklep
-SHOP_PURSE,Your purse: %d coins,Sakiewka: %d koron
+SHOP_PURSE,Your purse: %s,Sakiewka: %s
 SHOP_CLOSED,The village is open at weekends.,Wioska jest otwarta w weekendy.
 SHOP_BUY,Buy,Kup
 SHOP_SELL,Sell,Sprzedaj

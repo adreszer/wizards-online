@@ -6,7 +6,7 @@ extends RefCounted
 ##   /give <item id> (/daj)      give any registered item
 ##   /time [hh[:mm]] (/czas)     show the school time, or move the clock (everyone's, online)
 ##   /plan (/timetable)          open the timetable
-##   /coins <±n> (/korony)      add coins to (or take them from) your own purse
+##   /gold <±n> (/złoto)        add gold to (or take it from) your own purse
 ##   /goto <place> (/idz)        jump to the station, the village, the castle gate or any area id
 ##                               (offline always; online only professors and admins)
 ##   /help (/pomoc)              list the commands
@@ -76,7 +76,7 @@ const HELP_ALIASES: Array[String] = ["help", "pomoc", "?"]
 const TIME_ALIASES: Array[String] = ["time", "czas", "godzina"]
 const PLAN_ALIASES: Array[String] = ["plan", "timetable", "lekcje"]
 const GOTO_ALIASES: Array[String] = ["goto", "tp", "idz", "idź"]
-const COINS_ALIASES: Array[String] = ["coins", "korony", "monety", "kasa"]
+const COINS_ALIASES: Array[String] = ["gold", "złoto", "zloto", "coins", "korony", "monety", "kasa"]
 ## Named places for /goto; anything else is looked up as an area id.
 const PLACE_ALIASES := {"station": "@station", "stacja": "@station", "dworzec": "@station", "pociag": "@station", "pociąg": "@station",
 	"village": "@village", "wioska": "@village", "rynek": "@village",

@@ -2157,8 +2157,8 @@ func _test_currency() -> void:
 	var seen: Array = []
 	var on_wallet := func(coins: int, delta: int, _s: String, _d: String) -> void: seen.append([coins, delta])
 	NetworkManager.wallet_changed.connect(on_wallet)
-	ChatCommands.run("/coins 25", null)
-	ChatCommands.run("/korony -100", null)
+	ChatCommands.run("/gold 25", null)
+	ChatCommands.run("/złoto -100", null)
 	var said := ChatCommands.run("/coins", null)
 	var usage := ChatCommands.run("/coins lots", null)
 	NetworkManager.wallet_changed.disconnect(on_wallet)

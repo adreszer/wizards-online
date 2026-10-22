@@ -192,6 +192,7 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 |---|---|
 | Art direction | Decided (owner, 2026-10-21): "candlelit oak and parchment" as above. |
 | Fonts | Decided: Cormorant SC / EB Garamond / Fira Sans. |
+| Currency name | Decided (owner, 2026-10-22): gold / "złoto" ("12 sztuk złota"); only the `CURRENCY_*` keys name it. |
 | Logo and crests | Decided: generated with AI, prompts and rules in `docs/brand-prompts.md`; crests made with ChatGPT and in the game; edit by hand and register the logo as a trademark. |
 | Icon tool | Recraft for the final set; game-icons.net placeholders now. |
 | Gamepad / Steam Deck for 1.0 | Yes: Steam players expect it and the Deck is a good fit for this game. Budgeted in Milestone 72. |

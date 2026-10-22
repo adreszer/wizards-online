@@ -1,5 +1,5 @@
--- The school's currency (placeholder name "crowns" / "korony" until the owner picks one;
--- the client only knows translation keys). One unit, no denominations.
+-- The school's currency, gold ("złoto"; the name lives only in the client's CURRENCY_*
+-- translation keys, here it is "coins"). One unit, no denominations.
 --
 -- Balances live in Nakama's wallet (one per account, changeset { coins = n }), so a
 -- change is atomic, can never go below zero, and lands in Nakama's wallet ledger with

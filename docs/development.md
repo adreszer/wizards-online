@@ -217,7 +217,7 @@ Open the chat (Enter or T; works offline too) and type a command:
 - `/broom` or `/miotla`: a flying broom (B to fly)
 - `/give <item id>` (`/daj`): any item from `ItemRegistry.ITEM_IDS`
 - `/plan` (`/lekcje`, `/timetable`): opens the timetable (online only; offline there is none)
-- `/coins [±n]` (`/korony`): shows your purse, or adds (minus: takes) coins; online through the server (cheats_enabled or admins), offline a practice purse
+- `/gold [±n]` (`/złoto`, also `/coins`): shows your purse, or adds (minus: takes) gold; online through the server (cheats_enabled or admins), offline a practice purse
 - `/goto <place>` (`/idz`, `/tp`): jumps to `station` (`stacja`), `village` (`wioska`), `castle` (`zamek`) or any area id (`sweet_shop`, `great_hall`…); offline always, online professors and admins only
 - `/time` (`/czas`): the school time; `/time 14:30`, `/time dawn|day|dusk|night` (`swit|dzien|zmierzch|noc`) moves the clock (online: for everyone, and it stays moved across restarts)
 - `/help` (`/pomoc`): the list
