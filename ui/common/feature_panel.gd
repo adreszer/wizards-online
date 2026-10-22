@@ -13,6 +13,10 @@ var body: VBoxContainer
 var status_label: Label
 ## Half the card's size in pixels.
 var half_size := Vector2(330, 240)
+## Parchment for school life; chrome (oak) for system screens such as settings.
+var family := UiWindow.Family.PARCHMENT
+## False when the subclass scrolls its own content (tabs with a page each).
+var scrolls := true
 
 const INK := UiTokens.INK
 
@@ -20,7 +24,7 @@ const INK := UiTokens.INK
 func _ready() -> void:
 	layer = 4
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	card = UiWindow.new()
+	card = UiWindow.new(family, scrolls)
 	card.centre(half_size)
 	card.close_requested.connect(close)
 	title_label = card.title_label

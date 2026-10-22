@@ -2,12 +2,12 @@ class_name GameSettings
 extends RefCounted
 ## Player settings beyond name and language: graphics (a preset plus render scale, FSR,
 ## shadows, ambient occlusion, indirect light, global illumination, glow, fog, VSync, an
-## FPS cap; the preset also sets how far light shadows reach, see LightQuality),
-## accessibility (interface size, reduced motion, house symbols beside house colours,
-## captions for sounds) and key bindings. Stored in user://settings.cfg next to
+## FPS cap, full screen; the preset also sets how far light shadows reach, see
+## LightQuality), sound (a volume per bus), controls (look speed, invert), accessibility
+## (interface size, reduced motion, house symbols beside house colours, captions for
+## sounds) and key bindings. Stored in user://settings.cfg next to
 ## GameSession's own keys; applied at start and whenever changed (SettingsPanel).
 
-const PATH := GameSession.SETTINGS_PATH
 const PRESETS := ["low", "medium", "high", "ultra"]
 ## What each preset sets; individual settings override afterwards.
 const PRESET_VALUES := {
@@ -18,9 +18,14 @@ const PRESET_VALUES := {
 }
 const DEFAULTS := {
 	"preset": "high", "render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": false, "gi": true, "glow": true, "fog": true,
-	"vsync": true, "fps_cap": 0,
+	"vsync": true, "fps_cap": 0, "fullscreen": false,
+	"vol_master": 1.0, "vol_music": 0.8, "vol_ambience": 0.9, "vol_ui": 0.9,
+	"look_sensitivity": 1.0, "invert_y": false,
 	"ui_scale": 1.0, "reduce_motion": false, "house_symbols": false, "captions": false,
 }
+## Volume settings and the audio bus each one sets (default_bus_layout.tres). A volume
+## is linear, 0–1, on top of the bus's own level in the layout; 0 mutes the bus.
+const VOLUMES := {"vol_master": &"Master", "vol_music": &"Music", "vol_ambience": &"Ambience", "vol_ui": &"UI"}
 ## Actions a player may rebind (the rest stay fixed).
 const BINDABLE := ["move_forward", "move_backward", "move_left", "move_right", "jump", "sprint", "interact", "cast", "mount",
 	"journal", "emote_menu", "raise_hand", "chat", "map", "toggle_hud"]
@@ -32,13 +37,15 @@ const NO_SHADOWS := &"no_shadows"
 
 static var values: Dictionary = DEFAULTS.duplicate()
 static var bindings: Dictionary = {}
+## Each bus's own level in the layout (dB), read once before the first volume is applied.
+static var _bus_base: Dictionary = {}
 
 
 static func load_settings() -> void:
 	var cfg := ConfigFile.new()
 	values = DEFAULTS.duplicate()
 	bindings = {}
-	if cfg.load(PATH) == OK:
+	if cfg.load(GameSession.settings_path) == OK:
 		for k: String in DEFAULTS:
 			values[k] = cfg.get_value("settings", k, DEFAULTS[k])
 		for action: String in BINDABLE:
@@ -49,12 +56,14 @@ static func load_settings() -> void:
 
 static func save_settings() -> void:
 	var cfg := ConfigFile.new()
-	cfg.load(PATH)   # keep GameSession's own keys
+	cfg.load(GameSession.settings_path)   # keep GameSession's own keys
 	for k: String in values:
 		cfg.set_value("settings", k, values[k])
+	if cfg.has_section("keys"):
+		cfg.erase_section("keys")   # a key put back to its default leaves no entry
 	for action: String in bindings:
 		cfg.set_value("keys", action, bindings[action])
-	cfg.save(PATH)
+	cfg.save(GameSession.settings_path)
 
 
 static func get_value(key: String) -> Variant:
@@ -88,11 +97,31 @@ static func key_of(action: String) -> int:
 
 
 ## Binds `action` to `keycode` (physical), replacing its other keys; mouse and pad stay.
-static func bind(action: String, keycode: int) -> void:
+## A bindable action that already had the key takes `action`'s old key instead (a
+## swap, so no two actions share a key); returns that action, or "".
+static func bind(action: String, keycode: int) -> String:
 	if not BINDABLE.has(action) or not InputMap.has_action(action):
-		return
+		return ""
+	var old := key_of(action)
+	var swapped := ""
+	for other: String in BINDABLE:
+		if other != action and key_of(other) == keycode and old != 0 and old != keycode:
+			bindings[other] = old
+			_apply_binding(other, old)
+			swapped = other
 	bindings[action] = keycode
 	_apply_binding(action, keycode)
+	save_settings()
+	return swapped
+
+
+## Back to the keys the game ships with.
+static func reset_bindings() -> void:
+	bindings = {}
+	for action: String in BINDABLE:
+		InputMap.action_erase_events(action)
+		for e in (ProjectSettings.get_setting("input/" + action, {}) as Dictionary).get("events", []):
+			InputMap.action_add_event(action, e)
 	save_settings()
 
 
@@ -126,8 +155,13 @@ static func apply(tree: SceneTree) -> void:
 		vp.set_meta(&"ui_frames_hooked", true)
 		vp.size_changed.connect(_update_frames.bind(vp))
 	Engine.max_fps = int(get_value("fps_cap"))
+	apply_volumes()
 	if DisplayServer.get_name() != "headless":
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if get_value("vsync") else DisplayServer.VSYNC_DISABLED)
+		var mode := DisplayServer.window_get_mode()
+		var full := mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
+		if full != bool(get_value("fullscreen")):
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if get_value("fullscreen") else DisplayServer.WINDOW_MODE_WINDOWED)
 	RenderingServer.directional_shadow_atlas_set_size(4096 if get_value("shadows") else 256, true)
 	for node in tree.root.find_children("*", "WorldEnvironment", true, false):
 		var env := (node as WorldEnvironment).environment
@@ -151,6 +185,19 @@ static func apply(tree: SceneTree) -> void:
 			(node as DirectionalLight3D).shadow_enabled = bool(get_value("shadows"))
 	LightQuality.shadow_distance = LightQuality.distance_for(str(get_value("preset")), bool(get_value("shadows")))
 	LightQuality.watch(tree)
+
+
+## Sets each bus from its volume setting.
+static func apply_volumes() -> void:
+	for key: String in VOLUMES:
+		var idx := AudioServer.get_bus_index(VOLUMES[key])
+		if idx < 0:
+			continue
+		if not _bus_base.has(key):
+			_bus_base[key] = AudioServer.get_bus_volume_db(idx)
+		var v := clampf(float(get_value(key)), 0.0, 1.0)
+		AudioServer.set_bus_mute(idx, v <= 0.001)
+		AudioServer.set_bus_volume_db(idx, float(_bus_base[key]) + linear_to_db(maxf(v, 0.001)))
 
 
 ## Sharp UI frames when the interface is drawn larger than 1:1 (UiFrames).

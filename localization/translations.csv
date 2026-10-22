@@ -1085,7 +1085,7 @@ OK_WING_CONTRIBUTE,Progress added.,Dodano postęp.
 SETTINGS_TITLE,Settings,Ustawienia
 SETTINGS_TAB_GRAPHICS,Graphics,Grafika
 SETTINGS_TAB_ACCESS,Accessibility,Dostępność
-SETTINGS_TAB_KEYS,Keys,Klawisze
+SETTINGS_TAB_KEYS,Controls,Sterowanie
 SETTINGS_PRESET,Quality,Jakość
 SETTINGS_PRESET_LOW,Low,Niska
 SETTINGS_PRESET_MEDIUM,Medium,Średnia
@@ -1100,7 +1100,7 @@ SETTINGS_GI,Global illumination,Oświetlenie globalne
 SETTINGS_GLOW,Glow,Poświata
 SETTINGS_FOG,Fog,Mgła
 SETTINGS_VSYNC,VSync,Synchronizacja pionowa
-SETTINGS_FPS_CAP,FPS limit (0 = none),Limit klatek (0 = brak)
+SETTINGS_FPS_CAP,Frame rate limit,Limit klatek
 SETTINGS_UI_SCALE,Interface size,Rozmiar interfejsu
 SETTINGS_REDUCE_MOTION,Reduce motion (no banking or bobbing on the broom),Mniej ruchu (bez przechyłów i kołysania na miotle)
 SETTINGS_HOUSE_SYMBOLS,House symbols beside house colours,Symbole domów obok ich barw
@@ -1188,3 +1188,20 @@ GALLERY_ERROR_TEXT,The school's server does not answer. Check your connection an
 UI_KEY_SPACE,Space,Spacja
 HUD_SPELL_LINE,%s — “%s”,%s — „%s”
 ACTION_TOGGLE_HUD,Hide interface,Ukryj interfejs
+SETTINGS_TAB_AUDIO,Sound,Dźwięk
+SETTINGS_TAB_INTERFACE,Interface,Interfejs
+SETTINGS_TAB_LANGUAGE,Language,Język
+SETTINGS_FULLSCREEN,Full screen,Pełny ekran
+SETTINGS_FPS_UNLIMITED,No limit,Bez limitu
+SETTINGS_VOL_MASTER,Overall volume,Głośność ogólna
+SETTINGS_VOL_MUSIC,Music,Muzyka
+SETTINGS_VOL_AMBIENCE,Surroundings,Otoczenie
+SETTINGS_VOL_UI,Interface sounds,Dźwięki interfejsu
+SETTINGS_LOOK_SENSITIVITY,Look speed,Szybkość rozglądania
+SETTINGS_INVERT_Y,Invert vertical look,Odwróć oś pionową
+SETTINGS_KEYS_HEADER,Keys,Klawisze
+SETTINGS_CHANGE_KEY,Change,Zmień
+SETTINGS_RESET_KEYS,Restore default keys,Przywróć domyślne klawisze
+SETTINGS_KEYS_RESTORED,The default keys are back.,Przywrócono domyślne klawisze.
+SETTINGS_KEY_SWAPPED,That key was taken: %s now has the old one.,Ten klawisz był zajęty: %s dostaje poprzedni.
+SETTINGS_HIDE_HUD_HINT,hides the whole interface (for screenshots),ukrywa cały interfejs (do zrzutów ekranu)

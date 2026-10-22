@@ -319,6 +319,18 @@ func _sliders(t: Theme, track: Color, fill: Color, fill_hover: Color, focus: Sty
 		t.set_stylebox("grabber_area", type, _box(fill, Color(0, 0, 0, 0), 0, 3, m))
 		t.set_stylebox("grabber_area_highlight", type, _box(fill_hover, Color(0, 0, 0, 0), 0, 3, m))
 		t.set_stylebox("focus", type, focus)
+	# Brass knobs, switches and ticks from the frame kit.
+	for type in ["HSlider", "VSlider"]:
+		t.set_icon("grabber", type, load(UiFrames.path("slider_knob_normal")))
+		t.set_icon("grabber_highlight", type, load(UiFrames.path("slider_knob_hover")))
+		t.set_icon("grabber_disabled", type, load(UiFrames.path("slider_knob_normal")))
+	for pair: Array in [["CheckButton", "toggle_"], ["CheckBox", "check_"]]:
+		t.set_icon("checked", pair[0], load(UiFrames.path(pair[1] + "on")))
+		t.set_icon("unchecked", pair[0], load(UiFrames.path(pair[1] + "off")))
+		t.set_icon("checked_disabled", pair[0], load(UiFrames.path(pair[1] + "on_disabled")))
+		t.set_icon("unchecked_disabled", pair[0], load(UiFrames.path(pair[1] + "off_disabled")))
+	t.set_icon("checked_mirrored", "CheckButton", load(UiFrames.path("toggle_on")))
+	t.set_icon("unchecked_mirrored", "CheckButton", load(UiFrames.path("toggle_off")))
 
 
 ## Horizontal rules use the family's ornamental line (`piece`); vertical ones stay a

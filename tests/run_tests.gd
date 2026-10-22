@@ -45,6 +45,8 @@ var player: Player
 
 
 func _ready() -> void:
+	# Whatever the tests save goes to a file of their own, never the player's settings.
+	GameSession.settings_path = "user://test_settings.cfg"
 	await _run()
 
 
@@ -138,10 +140,59 @@ func _test_ui_window() -> void:
 	await _test_ui_router()
 	await _test_ui_kit()
 	await _test_hud()
+	await _test_settings_window()
 
 
 ## Milestone 66: the frame kit behind the themes, the 2x swap, the icon registry and
 ## the components.
+## Settings (docs/ui.md, Milestone 68): six tabs in a chrome window, volumes per bus,
+## key chips with Change, a taken key swaps, the defaults come back. The player's own
+## bindings and volumes are put back afterwards.
+func _test_settings_window() -> void:
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(GameSession.settings_path))
+	var saved_bindings := GameSettings.bindings.duplicate()
+	var saved_values := GameSettings.values.duplicate()
+	GameSettings.values["vol_music"] = 0.5
+	GameSettings.apply_volumes()
+	var music := AudioServer.get_bus_index(&"Music")
+	t.check(is_equal_approx(AudioServer.get_bus_volume_db(music), float(GameSettings._bus_base["vol_music"]) + linear_to_db(0.5)) and not AudioServer.is_bus_mute(music), "a volume sets its bus on top of the layout's level")
+	GameSettings.values["vol_music"] = 0.0
+	GameSettings.apply_volumes()
+	t.check(AudioServer.is_bus_mute(music), "a volume at zero mutes the bus")
+	var panel := SettingsPanel.new()
+	add_child(panel)
+	await get_tree().process_frame
+	t.check(panel.tabs.get_tab_count() == SettingsPanel.TABS.size() and panel.card.family == UiWindow.Family.CHROME and panel._key_chips.size() == GameSettings.BINDABLE.size(), "settings is a chrome window with six tabs and a key chip per bindable action")
+	panel.open_panel()
+	var jump_key := GameSettings.key_of("jump")
+	var interact_key := GameSettings.key_of("interact")
+	panel._start_rebind("jump")
+	var press := InputEventKey.new()
+	press.physical_keycode = interact_key as Key
+	press.pressed = true
+	panel._input(press)
+	t.check(GameSettings.key_of("jump") == interact_key and GameSettings.key_of("interact") == jump_key and panel.status_label.text != "", "binding a taken key swaps the two and says so")
+	t.check((panel._key_chips["jump"] as KeyChip).text == KeyChip.label_for(&"jump", false), "the key chip shows the new key")
+	GameSettings.reset_bindings()
+	var shipped: InputEventKey = (ProjectSettings.get_setting("input/jump") as Dictionary)["events"].filter(func(e: InputEvent) -> bool: return e is InputEventKey)[0]
+	t.check(GameSettings.key_of("jump") == shipped.physical_keycode and GameSettings.bindings.is_empty(), "the default keys come back")
+	var cfg := ConfigFile.new()
+	cfg.load(GameSession.settings_path)
+	t.check(not cfg.has_section("keys"), "keys put back to their defaults leave nothing saved")
+	GameSession._save_settings()
+	cfg = ConfigFile.new()
+	cfg.load(GameSession.settings_path)
+	t.check(cfg.has_section("settings") and cfg.has_section_key("player", "name_chosen"), "saving the name and language keeps the graphics, sound and key settings")
+	panel.close()
+	panel.queue_free()
+	GameSettings.values = saved_values
+	GameSettings.bindings = saved_bindings
+	GameSettings.reset_bindings()
+	GameSettings.bindings = saved_bindings
+	GameSettings.apply_bindings()
+	GameSettings.apply_volumes()
+
+
 ## The HUD (docs/ui.md, Milestone 67): toasts by kind, the prompt as a key chip, the
 ## health vial only while hurt, area banners, hiding for screenshots, the dial and the
 ## round minimap.

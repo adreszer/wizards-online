@@ -186,8 +186,10 @@ func set_distance(value: float) -> void:
 
 ## Rotate by a mouse-style delta in pixels (also used by tests / future gamepad look).
 func apply_look_delta(relative: Vector2) -> void:
-	yaw -= deg_to_rad(relative.x * mouse_sensitivity)
-	pitch -= deg_to_rad(relative.y * mouse_sensitivity)
+	# The player's look speed and invert setting scale the rig's own sensitivity.
+	var speed := mouse_sensitivity * float(GameSettings.get_value("look_sensitivity"))
+	yaw -= deg_to_rad(relative.x * speed)
+	pitch -= deg_to_rad(relative.y * speed * (-1.0 if GameSettings.get_value("invert_y") else 1.0))
 	var low := flight_min_pitch_degrees if flight_mode else min_pitch_degrees
 	var high := flight_max_pitch_degrees if flight_mode else max_pitch_degrees
 	pitch = clampf(pitch, deg_to_rad(low), deg_to_rad(high))

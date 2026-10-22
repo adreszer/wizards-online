@@ -8,11 +8,16 @@ extends Node
 enum PlayMode { OFFLINE, ONLINE }
 
 const SETTINGS_PATH := "user://settings.cfg"
+## Where settings are read and written; tests point it at a file of their own, so a run
+## never changes the player's settings.
+static var settings_path := SETTINGS_PATH
 const MAX_DISPLAY_NAME_LENGTH := 16
 
 var play_mode: PlayMode = PlayMode.OFFLINE
 ## Empty until settings are loaded; then the saved name or the localized default.
 var display_name: String = ""
+## False until the player has picked a name (the main menu's first-run card asks).
+var name_chosen := false
 ## Localization.AUTO, "pl" or "en"; persisted. The effective locale is
 ## TranslationServer.get_locale().
 var language: String = Localization.AUTO
@@ -86,6 +91,7 @@ static func _is_name_char(code: int) -> bool:
 
 func set_display_name(raw: String) -> void:
 	display_name = sanitize_display_name(raw)
+	name_chosen = true
 	_save_settings()
 
 
@@ -151,9 +157,11 @@ func get_total(collectible_id: StringName) -> int:
 
 func _load_settings() -> void:
 	var cfg := ConfigFile.new()
-	if cfg.load(SETTINGS_PATH) != OK:
+	if cfg.load(settings_path) != OK:
 		return
 	display_name = str(cfg.get_value("player", "display_name", display_name))
+	# Players from before the first-run card had picked their name in the old menu.
+	name_chosen = cfg.get_value("player", "name_chosen", cfg.has_section_key("player", "display_name")) == true
 	language = str(cfg.get_value("player", "language", language))
 	character_id = CharacterRegistry.sanitize(str(cfg.get_value("player", "character", character_id)))
 	look = CharacterLook.sanitize(cfg.get_value("player", "look", {}))
@@ -166,7 +174,9 @@ func _load_settings() -> void:
 
 func _save_settings() -> void:
 	var cfg := ConfigFile.new()
+	cfg.load(settings_path)   # keep GameSettings' sections (graphics, sound, keys)
 	cfg.set_value("player", "display_name", display_name)
+	cfg.set_value("player", "name_chosen", name_chosen)
 	cfg.set_value("player", "language", language)
 	cfg.set_value("player", "character", character_id)
 	cfg.set_value("player", "look", look)
@@ -174,7 +184,7 @@ func _save_settings() -> void:
 	if not server_address_locked:
 		cfg.set_value("network", "host", nakama_host)
 		cfg.set_value("network", "port", nakama_port)
-	cfg.save(SETTINGS_PATH)
+	cfg.save(settings_path)
 
 
 ## Supports launching two clients on one machine:

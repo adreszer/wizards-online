@@ -110,6 +110,14 @@ func _run() -> void:
 		GameEvents.panel_requested.emit(p, {"name": "Tester"})
 		await _frames(20)
 		_save("panel_" + p)
+		if p == "settings":
+			# Every other tab of the settings window too.
+			for panel in world.find_children("*", "SettingsPanel", true, false):
+				var tabs: TabContainer = (panel as SettingsPanel).tabs
+				for i in range(1, tabs.get_tab_count()):
+					tabs.current_tab = i
+					await _frames(6)
+					_save("panel_settings_%d" % i)
 		_press_escape()
 		await _frames(4)
 	var pause := world.get_node_or_null("PauseMenu")

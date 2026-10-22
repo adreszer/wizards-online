@@ -18,6 +18,82 @@
   ],
   "tile": true
  },
+ "check_off": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   22,
+   22
+  ],
+  "tile": false
+ },
+ "check_off_disabled": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   22,
+   22
+  ],
+  "tile": false
+ },
+ "check_on": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   22,
+   22
+  ],
+  "tile": false
+ },
+ "check_on_disabled": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   22,
+   22
+  ],
+  "tile": false
+ },
  "ink_separator": {
   "margin": [
    48,
@@ -619,6 +695,44 @@
   ],
   "tile": true
  },
+ "slider_knob_hover": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   22,
+   22
+  ],
+  "tile": false
+ },
+ "slider_knob_normal": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   22,
+   22
+  ],
+  "tile": false
+ },
  "slot_ring_disabled": {
   "margin": [
    0,
@@ -694,6 +808,82 @@
    68
   ],
   "tile": true
+ },
+ "toggle_off": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   44,
+   24
+  ],
+  "tile": false
+ },
+ "toggle_off_disabled": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   44,
+   24
+  ],
+  "tile": false
+ },
+ "toggle_on": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   44,
+   24
+  ],
+  "tile": false
+ },
+ "toggle_on_disabled": {
+  "margin": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   44,
+   24
+  ],
+  "tile": false
  },
  "wax_seal_hover": {
   "margin": [

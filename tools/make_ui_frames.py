@@ -666,6 +666,60 @@ def tooltip():
     oak_panel("oak_tooltip", P=6, border=BRASS_DIM, alpha=0.97)
 
 
+def toggle(state):
+    """A switch for CheckButton: an inset oak track with a brass knob, left when off;
+    on, the track glows warm and the knob sits right."""
+    W, H = 44, 24
+    cv = Canvas(W, H)
+    on = state.startswith("on")
+    dim = state.endswith("disabled")
+    track = lambda X, Y: sd_rrect(X, Y, 2, 4, W - 2, H - 4, (H - 8) / 2)
+    cv.over(BLACK, cov(track(cv.X - 0.4, cv.Y - 0.8) - 0.5) * 0.45)
+    fill = lerp(OAK_INSET, BRASS_DIM, 0.8) if on else OAK_INSET
+    rgb = np.broadcast_to(np.asarray(fill, dtype=np.float32), cv.rgb.shape).copy()
+    rgb = lerp(rgb, BLACK, np.clip(1 - (cv.Y - 4) / 6, 0, 1) * 0.5)
+    cv.over(rgb, cov(track(cv.X, cv.Y)))
+    cv.over(BRASS_DIM if not on else BRASS, cov(np.abs(track(cv.X, cv.Y) + 0.5) - 0.5) * 0.9)
+    kx = W - 13 if on else 13
+    knob = lambda X, Y: sd_circle(X, Y, kx, H / 2, 8.5)
+    cv.over(BLACK, cov(knob(cv.X - 0.6, cv.Y - 1.2) - 0.4) * 0.5)
+    cv.over(brass(cv, knob, BRASS_BRIGHT if on else BRASS, 1.8), cov(knob(cv.X, cv.Y)))
+    if dim:
+        cv.a *= 0.45
+    cv.save("toggle_" + state, tile=False)
+
+
+def check(state):
+    """A CheckBox square: an inset well with a brass rim, and a brass tick when on."""
+    S = 22
+    cv = Canvas(S, S)
+    on = state.startswith("on")
+    box = lambda X, Y: sd_rrect(X, Y, 3, 3, S - 3, S - 3, 3)
+    cv.over(BLACK, cov(box(cv.X - 0.4, cv.Y - 0.8) - 0.4) * 0.45)
+    rgb = np.broadcast_to(np.asarray(OAK_INSET, dtype=np.float32), cv.rgb.shape).copy()
+    cv.over(rgb, cov(box(cv.X, cv.Y)))
+    rim = lambda X, Y: np.abs(box(X, Y) + 0.7) - 0.7
+    cv.over(brass(cv, rim, BRASS, 1.0), cov(rim(cv.X, cv.Y)))
+    if on:
+        tick = lambda X, Y: np.minimum(sd_segment(X, Y, 7, 11.5, 10, 15, 1.4), sd_segment(X, Y, 10, 15, 15.5, 7.5, 1.4))
+        cv.over(BLACK, cov(tick(cv.X - 0.4, cv.Y - 0.8)) * 0.5)
+        cv.over(brass(cv, tick, BRASS_BRIGHT, 1.0), cov(tick(cv.X, cv.Y)))
+    if state.endswith("disabled"):
+        cv.a *= 0.45
+    cv.save("check_" + state, tile=False)
+
+
+def slider_knob(state):
+    """The HSlider grabber: a small brass boss."""
+    S = 22
+    cv = Canvas(S, S)
+    knob = lambda X, Y: sd_circle(X, Y, S / 2, S / 2, 7.5)
+    cv.over(BLACK, cov(knob(cv.X - 0.6, cv.Y - 1.2) - 0.5) * 0.5)
+    cv.over(brass(cv, knob, BRASS_BRIGHT if state == "hover" else BRASS, 1.8), cov(knob(cv.X, cv.Y)))
+    cv.over(BRASS_DIM * 0.6, cov(sd_circle(cv.X, cv.Y, S / 2, S / 2, 1.6)) * 0.8)
+    cv.save("slider_knob_" + state, tile=False)
+
+
 def minimap_ring():
     """The round minimap's bezel: a brass ring with engraved ticks every 15 degrees, a
     north pointer on top, and a soft shadow falling inward onto the map, which shows
@@ -742,6 +796,11 @@ def main():
         item_slot(s)
     brass_separator()
     minimap_ring()
+    for st in ("off", "on", "off_disabled", "on_disabled"):
+        toggle(st)
+        check(st)
+    for st in ("normal", "hover"):
+        slider_knob(st)
     with open(os.path.join(OUT, "frames.json"), "w") as f:
         json.dump(MANIFEST, f, indent=1, sort_keys=True)
         f.write("\n")
