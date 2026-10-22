@@ -141,10 +141,64 @@ func _test_ui_window() -> void:
 	await _test_ui_kit()
 	await _test_hud()
 	await _test_settings_window()
+	await _test_front_door()
 
 
 ## Milestone 66: the frame kit behind the themes, the 2x swap, the icon registry and
 ## the components.
+## The front door (docs/ui.md, Milestone 68): the menu asks a first-time player's name
+## before playing, credits name the icon authors, the loading screen shows a lore card
+## and a tip, windows blur the world, pause asks before leaving.
+func _test_front_door() -> void:
+	var saved_name := GameSession.display_name
+	var saved_chosen := GameSession.name_chosen
+	var menu: Control = load("res://ui/menus/main_menu.tscn").instantiate()
+	add_child(menu)
+	await get_tree().process_frame
+	var started: Array[bool] = []
+	menu.start_requested.connect(func() -> void: started.append(true))
+	t.check(menu.backdrop is MenuBackdrop and menu.online_button.text == "MENU_PLAY_ONLINE" and menu.credits_button.is_visible_in_tree(), "the menu has the backdrop and its five choices")
+	GameSession.name_chosen = false
+	menu._on_offline()
+	t.check(menu.first_run.visible and started.is_empty(), "a first-time player is asked their name before playing")
+	menu.name_edit.text = "Ola"
+	menu._confirm_first_run()
+	t.check(started.size() == 1 and GameSession.display_name == "Ola" and GameSession.name_chosen and not menu.first_run.visible, "then the game starts with that name")
+	t.check(menu.playing_as.text == tr("MENU_PLAYING_AS") % "Ola", "the menu says who is playing")
+	menu._on_offline()
+	t.check(started.size() == 2, "after that the menu starts straight away")
+	menu.queue_free()
+	GameSession.display_name = saved_name
+	GameSession.name_chosen = saved_chosen
+	var icons := CreditsPanel.icon_line()
+	t.check(icons.contains("Lorc") and icons.contains("Delapouite") and icons.contains("Sbed") and icons.contains("CC BY 3.0"), "the credits name every icon author (%s)" % icons)
+	var credits := CreditsPanel.new()
+	add_child(credits)
+	await get_tree().process_frame
+	t.check(credits.body.get_child_count() > CreditsPanel.SECTIONS.size() * 2, "the credits window lists its sections")
+	credits.queue_free()
+	var loading := LoadingScreen.new(7)
+	add_child(loading)
+	await get_tree().process_frame
+	t.check(tr(loading.lore_title.text) != loading.lore_title.text and tr(loading.lore_text.text) != loading.lore_text.text and not loading.tip_label.text.contains("LOADING_TIP_"), "the loading screen shows a lore card and a tip")
+	loading.finish()
+	var pause: Node = (load("res://ui/menus/pause_menu.tscn") as PackedScene).instantiate()
+	add_child(pause)
+	await get_tree().process_frame
+	pause._set_paused(true)
+	await get_tree().process_frame
+	var backdrop := pause.get_node_or_null("UiBackdrop") as ColorRect
+	t.check(backdrop != null and backdrop.material is ShaderMaterial and (backdrop.material as ShaderMaterial).shader == UiRouter.BLUR, "the world behind a window is blurred")
+	pause._ask("PAUSE_CONFIRM_QUIT", func() -> void: pass)
+	var dialog := UiRouter.top() as UiDialog
+	t.check(dialog != null and dialog.message_label.text == tr("PAUSE_CONFIRM_QUIT"), "leaving asks first")
+	dialog._answer(false)
+	t.check(get_tree().paused and UiRouter.top() == pause, "and No stays paused")
+	pause._set_paused(false)
+	pause.queue_free()
+	get_tree().paused = false
+
+
 ## Settings (docs/ui.md, Milestone 68): six tabs in a chrome window, volumes per bus,
 ## key chips with Change, a taken key swaps, the defaults come back. The player's own
 ## bindings and volumes are put back afterwards.
@@ -490,7 +544,7 @@ func _test_server_address_lock() -> void:
 		GameSession.server_address_locked = locked
 		var menu: Control = load("res://ui/menus/main_menu.tscn").instantiate()
 		add_child(menu)
-		var shown: bool = menu.get_node("%HostEdit").visible and menu.get_node("%PortLabel").visible
+		var shown: bool = menu.advanced_button.visible
 		t.check(shown != locked, "server fields %s" % ("hidden in an exported build" if locked else "shown in the editor"))
 		menu.free()
 	GameSession.server_address_locked = was_locked
@@ -3800,15 +3854,15 @@ func _test_localization() -> void:
 		t.check(untranslated.is_empty(), "[%s] every key translates (stale import? %s)" % [locale, str(untranslated)])
 
 	TranslationServer.set_locale("en")
-	t.check(tr("MENU_PLAY_OFFLINE") == "Play OFFLINE", "en: MENU_PLAY_OFFLINE")
+	t.check(tr("MENU_PLAY_OFFLINE") == "Practise offline", "en: MENU_PLAY_OFFLINE")
 	t.check((tr("HUD_FRAGMENTS") % [3, 11]) == "Fragments: 3 / 11", "en: formatted HUD_FRAGMENTS")
 	TranslationServer.set_locale("pl")
-	t.check(tr("MENU_PLAY_OFFLINE") == "Graj OFFLINE", "pl: MENU_PLAY_OFFLINE")
+	t.check(tr("MENU_PLAY_OFFLINE") == "Ćwicz offline", "pl: MENU_PLAY_OFFLINE")
 	t.check(tr("PLAYER_DEFAULT_NAME") == "Uczeń", "pl: default player name has diacritics intact")
 	t.check(GameSession.sanitize_display_name("") == "Uczeń", "pl: empty display name falls back to localized default")
 	# Fallback locale is Polish: an unsupported locale gets Polish text.
 	TranslationServer.set_locale("de")
-	t.check(tr("MENU_PLAY_OFFLINE") == "Graj OFFLINE", "unsupported locale falls back to Polish")
+	t.check(tr("MENU_PLAY_OFFLINE") == "Ćwicz offline", "unsupported locale falls back to Polish")
 
 	t.check(Localization.resolve("pl") == "pl" and Localization.resolve("en") == "en", "explicit setting wins")
 	t.check(Localization.SUPPORTED.has(Localization.resolve(Localization.AUTO)), "auto resolves to a supported locale")

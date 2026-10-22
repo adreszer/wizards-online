@@ -20,6 +20,7 @@ signal changed
 signal device_changed(pad: bool)
 
 const DIM := Color(0, 0, 0, 0.45)
+const BLUR := preload("res://ui/theme/backdrop_blur.gdshader")
 ## How visible the HUD stays behind a modal window.
 const HUD_BEHIND := 0.25
 
@@ -149,6 +150,11 @@ func _make_backdrop() -> ColorRect:
 	var r := ColorRect.new()
 	r.name = "UiBackdrop"
 	r.color = DIM
+	# The world behind blurred as well as dimmed, so the window reads first.
+	var blur := ShaderMaterial.new()
+	blur.shader = BLUR
+	blur.set_shader_parameter("dim", DIM)
+	r.material = blur
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	r.set_anchors_preset(Control.PRESET_FULL_RECT)
 	r.visible = false

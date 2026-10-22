@@ -152,11 +152,12 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - [x] The HUD and the minimap fade out behind windows; `toggle_hud` (F2, rebindable) hides the whole interface for screenshots. The HUD and the minimap no longer style anything by hand (`UiBox` gives code-built screens their spacing)
 
 ### Milestone 68 — Front door: main menu, loading, pause, settings
-- [ ] Main menu: logo (placeholder wordmark until the commission), live castle backdrop at dusk with a slow drift, music; Play online, Practise offline, Settings, Credits, Quit. Server host/port move under "Advanced"; name and character choice move into the first-run flow
-- [ ] Loading screen with lore cards and tips; connection, reconnect and error dialogs with retry
-- [ ] Pause menu over a blurred, dimmed world
-- [ ] Settings as a full window with tabs (Graphics, Audio, Controls, Interface, Accessibility, Language), styled sliders and toggles, a proper rebinding screen with key chips
-- [ ] Credits screen (fonts, CC BY icons, music, tools)
+- [x] Main menu: the wordmark and five choices (Play online, Practise offline, Settings, Credits, Quit) over the castle at dusk drifting slowly (`MenuBackdrop`; a still rendered by `tools/capture_menu_backdrop.gd` instead of the live castle, so the menu opens at once), the main theme playing. A first-time player gets a "Who are you?" card (name and look) before playing; "Playing as … change" opens it again. The server address sits under Advanced, editor only
+- [x] Loading screen (`LoadingScreen`): the backdrop, a parchment lore card (six, original), a tip (eight) and the spinner, drawn before the world builds. A failed connection is a `UiDialog.error` with Retry (menu); a connection lost in the castle that does not come back by itself is one too (Retry, or Close to keep playing offline)
+- [x] Pause: a chrome window over the world blurred and dimmed (every window's backdrop now blurs, `ui/theme/backdrop_blur.gdshader`); returning to the menu and quitting ask first
+- [x] Settings as a full chrome window with tabs (Graphics, Sound, Controls, Interface, Accessibility, Language): brass switches, ticks and slider knobs from the frame kit, percentages beside sliders, full screen, an FPS limit list, a volume per bus (new), look speed and invert, every key as a key chip with Change (a taken key swaps), restore default keys; it opens from the menu too
+- [x] Credits (`CreditsPanel`): engine and server, fonts, icons (authors read from `assets/ui/icons/CREDITS.md`, shipped with the game), textures, models, music and sound, brand art
+- Fixed on the way: saving the name or language no longer wipes the graphics, sound and key settings; tests write a settings file of their own
 
 ### Milestone 69 — Reading surfaces: journal, books, satchel, map
 - [ ] Journal as an open book: two-page spread, ribbon tabs on the edge, page-turn animation and sound; spellbook pages with roundels and mastery; grades in ink; calendar and post pages

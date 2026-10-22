@@ -113,6 +113,9 @@ godot --headless --path . tests/check_ui.tscn
 python3 tools/make_ui_frames.py --fetch
 # the placeholder icons (game-icons.net, CC BY 3.0) as DPITextures in assets/ui/icons/, with CREDITS.md
 python3 tools/make_ui_icons.py
+# the main menu's backdrop (assets/ui/menu/backdrop.jpg): the castle at dusk from the grounds
+# (needs a window; --out=/abs/file.jpg --hours= --from=x,y,z --at=x,y,z try a framing without touching it)
+godot --path . tools/capture_menu_backdrop.tscn
 # after changing fonts, theme values or frames: rewrite ui/theme/ (commit the output)
 godot --headless --path . -s tools/build_ui_theme.gd
 # after changing the symbol blocks: rebuild the trimmed symbol fallbacks (pip install fonttools)

@@ -5,8 +5,8 @@ MENU_LANGUAGE,Language,Język
 MENU_LANGUAGE_AUTO,System default,Domyślny systemu
 MENU_HOST,Nakama host,Serwer Nakama
 MENU_PORT,Nakama port,Port Nakama
-MENU_PLAY_OFFLINE,Play OFFLINE,Graj OFFLINE
-MENU_PLAY_ONLINE,Play ONLINE,Graj ONLINE
+MENU_PLAY_OFFLINE,Practise offline,Ćwicz offline
+MENU_PLAY_ONLINE,Play online,Graj online
 MENU_QUIT,Quit,Wyjdź
 MENU_CONTROLS,WASD move · Shift run · Space jump · Mouse look · Wheel zoom · LMB cast · E interact · Tab satchel · M map · B broom · Enter chat · ` free cursor · F3 debug · Esc pause,WASD ruch · Shift bieg · Spacja skok · Mysz rozglądanie · Kółko zoom · LPM czar · E interakcja · Tab sakwa · M mapa · B miotła · Enter czat · ` uwolnij kursor · F3 debug · Esc pauza
 MENU_CONNECTING,Connecting…,Łączenie…
@@ -1205,3 +1205,45 @@ SETTINGS_RESET_KEYS,Restore default keys,Przywróć domyślne klawisze
 SETTINGS_KEYS_RESTORED,The default keys are back.,Przywrócono domyślne klawisze.
 SETTINGS_KEY_SWAPPED,That key was taken: %s now has the old one.,Ten klawisz był zajęty: %s dostaje poprzedni.
 SETTINGS_HIDE_HUD_HINT,hides the whole interface (for screenshots),ukrywa cały interfejs (do zrzutów ekranu)
+MENU_CREDITS,Credits,Twórcy
+MENU_PLAYING_AS,Playing as %s,Grasz jako %s
+MENU_CHANGE,change,zmień
+MENU_ADVANCED,Advanced,Zaawansowane
+MENU_CONNECT_FAILED,Can't reach the school,Nie można połączyć się ze szkołą
+FIRST_RUN_TITLE,Who are you?,Kim jesteś?
+FIRST_RUN_TEXT,"Pick the name other students will see, and how you look. You can change both later.","Wybierz imię, które zobaczą inni uczniowie, i swój wygląd. Oba możesz później zmienić."
+FIRST_RUN_CONTINUE,Continue,Dalej
+CREDITS_MADE_BY,Made by,Autor
+CREDITS_ENGINE,Engine and server,Silnik i serwer
+CREDITS_FONTS,Fonts,Kroje pisma
+CREDITS_ICONS,Icons,Ikony
+CREDITS_TEXTURES,Textures,Tekstury
+CREDITS_MODELS,Models and animation,Modele i animacje
+CREDITS_SOUND,Music and sound,Muzyka i dźwięk
+CREDITS_ART,Brand art,Grafika marki
+CREDITS_THANKS,"Thank you for playing, and to everyone who teaches here.","Dziękujemy za grę i wszystkim, którzy tu uczą."
+LOADING_TEXT,Opening the castle gates…,Otwieramy bramy zamku…
+LOADING_TIP,Tip,Wskazówka
+LOADING_TIP_1,"Lost? M opens the castle map; PgUp and PgDn change the floor.","Zgubiłeś się? M otwiera mapę zamku, a PgUp i PgDn zmieniają piętro."
+LOADING_TIP_2,Tab opens your satchel: hold a torch or take out your broom.,Tab otwiera sakwę: weź pochodnię do ręki albo wyjmij miotłę.
+LOADING_TIP_3,"Spells sit on keys 1 to 0; Q and R step through them.","Czary są pod klawiszami 1–0; Q i R przełączają między nimi."
+LOADING_TIP_4,F2 hides the whole interface when you want a clear view.,"F2 ukrywa cały interfejs, gdy chcesz czystego widoku."
+LOADING_TIP_5,"Chat reaches only those nearby; /w whispers, /s shouts.","Czat słyszą tylko osoby w pobliżu; /w szepcze, /s krzyczy."
+LOADING_TIP_6,"Professors award house points; so do solved mysteries.","Profesorowie przyznają punkty domom; rozwiązane tajemnice także."
+LOADING_TIP_7,"Some walls are not walls. Look for cracks, odd torches and statues that turn.","Niektóre ściany nie są ścianami. Szukaj pęknięć, dziwnych pochodni i obracanych posągów."
+LOADING_TIP_8,The timetable hangs on the notice boards; the bell rings five minutes before a lesson.,Plan lekcji wisi na tablicach ogłoszeń; dzwon bije pięć minut przed lekcją.
+LORE_1_TITLE,The Choosing Stone,Kamień Wyboru
+LORE_1_TEXT,"Deep in the Great Hall stands a stone older than the castle. Touch it, and it names the house you belong to: Drakoryn, Grypheon, Phoenara or Hipporys.","W głębi Wielkiej Sali stoi kamień starszy niż zamek. Dotknij go, a nazwie dom, do którego należysz: Drakoryn, Grypheon, Phoenara albo Hipporys."
+LORE_2_TITLE,Four houses,Cztery domy
+LORE_2_TEXT,"Drakoryn, Grypheon, Phoenara and Hipporys each keep a common room, a dormitory and their colours. Only members, and the guests they let in, may pass the door.","Drakoryn, Grypheon, Phoenara i Hipporys mają własne pokoje wspólne, dormitoria i barwy. Przez ich drzwi przejdą tylko członkowie domu i goście, których wpuszczą."
+LORE_3_TITLE,The House Cup,Puchar Domów
+LORE_3_TEXT,"In the Great Hall four glass columns fill with light as the houses earn points. When the term ends, the fullest takes the Cup.","W Wielkiej Sali cztery szklane kolumny napełniają się światłem, gdy domy zdobywają punkty. Na koniec semestru najpełniejsza zdobywa Puchar."
+LORE_4_TITLE,Lessons,Lekcje
+LORE_4_TEXT,"Lessons are taught live, by professors who are players too. A spell learned in class is yours to use all over the castle.","Lekcje prowadzą na żywo profesorowie, którzy też są graczami. Czar poznany na zajęciach możesz potem rzucać w całym zamku."
+LORE_5_TITLE,After curfew,Po ciszy nocnej
+LORE_5_TEXT,"At night the corridors belong to the warden, and students caught wandering cost their house points. Yet some doors open only in the dark.","Nocą korytarze należą do strażnika, a przyłapani uczniowie tracą punkty dla swojego domu. A jednak niektóre drzwi otwierają się tylko po zmroku."
+LORE_6_TITLE,The castle remembers,Zamek pamięta
+LORE_6_TEXT,"Corridors shift, stairs swing and some doors open only at night. Whoever built the Academy left questions in its walls, and not all of them have been answered.","Korytarze się przesuwają, schody obracają, a niektóre drzwi otwierają się tylko nocą. Ktokolwiek zbudował Akademię, zostawił w jej murach pytania — nie na wszystkie znaleziono odpowiedź."
+NET_LOST_TITLE,Connection lost,Utracono połączenie
+PAUSE_CONFIRM_MENU,Leave the school and return to the menu?,Opuścić szkołę i wrócić do menu?
+PAUSE_CONFIRM_QUIT,Close the game?,Zamknąć grę?

@@ -23,8 +23,6 @@ const STYLE_ALLOWLIST := {
 	"res://ui/inventory/inventory_panel.tscn": 6,
 	"res://ui/map/map_panel.tscn": 10,
 	"res://ui/map/map_view.gd": 28,
-	"res://ui/menus/main_menu.tscn": 8,
-	"res://ui/menus/pause_menu.tscn": 2,
 	"res://ui/school/book_panel.gd": 7,
 	"res://ui/school/character_creator.gd": 13,
 	"res://ui/school/duel_hud.gd": 3,
