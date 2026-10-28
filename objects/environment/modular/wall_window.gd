@@ -13,6 +13,12 @@ extends StaticBody3D
 ## filling the opening on the wall's centre plane. Generated children are
 ## rebuilt on ready and never saved. The glass is opaque, so the module keeps a
 ## full occluder and full collision like a plain wall.
+##
+## Glazed windows also get a fake light shaft in the game (not in the editor): the
+## open sides of a slanted prism from the opening down into the room, drawn additive
+## with one shared shader material. No real light and no shadow, so it costs one
+## transparent draw within SHAFT_RANGE and nothing of the light budget. set_daylight
+## turns it into warm daylight by day and a faint blue moonbeam at night.
 
 @export var window_scene: PackedScene = preload("res://objects/environment/windows/window_gothic_iron.tscn"):
 	set(value):
@@ -40,6 +46,20 @@ const GLASS_DAY_ENERGY_GI := 3.0
 
 static var _reveal_material: StandardMaterial3D
 static var _glass_material: StandardMaterial3D
+static var _shaft_material: ShaderMaterial
+
+const SHAFT_SHADER := preload("res://objects/environment/modular/light_shaft.gdshader")
+## Where a shaft goes from the opening: into the room (+Z) and down, metres.
+const SHAFT_REACH := Vector3(0.0, -3.6, 4.2)
+## The far end of the shaft is this much wider than the opening (the light spreads).
+const SHAFT_SPREAD := 1.25
+## Shafts are drawn out to this distance from the camera (fading out over the last 6 m).
+const SHAFT_RANGE := 40.0
+const SHAFT_DAY := Color(1.0, 0.9, 0.72)
+const SHAFT_NIGHT := Color(0.55, 0.65, 1.0)
+## Shaft strength at full daylight and at night (moonlight).
+const SHAFT_DAY_STRENGTH := 0.16
+const SHAFT_NIGHT_STRENGTH := 0.035
 
 
 func _ready() -> void:
@@ -69,6 +89,8 @@ func _rebuild() -> void:
 	_add_generated(_build_reveal(segs))
 	if frame.glass:
 		_add_generated(_build_glass(segs))
+		if not Engine.is_editor_hint():
+			_add_generated(build_shaft(segs))
 	_add_backing(o, arches)
 	if occluder and not Engine.is_editor_hint():
 		var occ := OccluderInstance3D.new()
@@ -201,6 +223,63 @@ func _build_glass(segs: Array) -> MeshInstance3D:
 	return mi
 
 
+## The fake light shaft for an opening outline (module space): the four sides of a
+## prism from the opening's bounding box (a little inside it) along SHAFT_REACH,
+## widening by SHAFT_SPREAD. UV.x runs across a side, UV.y from the window (0) to the
+## far end (1).
+static func build_shaft(segs: Array) -> MeshInstance3D:
+	var lo := Vector2(INF, INF)
+	var hi := Vector2(-INF, -INF)
+	for seg in segs:
+		var p: Vector2 = seg[0]
+		lo = Vector2(minf(lo.x, p.x), minf(lo.y, p.y))
+		hi = Vector2(maxf(hi.x, p.x), maxf(hi.y, p.y))
+	var mid := (lo + hi) / 2.0
+	var half := (hi - lo) / 2.0 * 0.9
+	var z := 0.2   # just inside the room's wall face
+	var near: Array[Vector3] = []
+	var far: Array[Vector3] = []
+	for c: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(1, 1), Vector2(-1, 1)]:
+		near.append(Vector3(mid.x + c.x * half.x, mid.y + c.y * half.y, z))
+		far.append(Vector3(mid.x + c.x * half.x * SHAFT_SPREAD, mid.y + c.y * half.y * SHAFT_SPREAD, z) + SHAFT_REACH)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in 4:
+		var j := (i + 1) % 4
+		var quad := [near[i], near[j], far[j], far[i]]
+		var uvs := [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)]
+		st.set_normal((near[j] - near[i]).cross(far[i] - near[i]).normalized())
+		for k in [0, 1, 2, 0, 2, 3]:
+			st.set_uv(uvs[k])
+			st.add_vertex(quad[k])
+	var mi := MeshInstance3D.new()
+	mi.name = "LightShaft"
+	mi.mesh = st.commit()
+	mi.material_override = _get_shaft_material()
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+	mi.visibility_range_end = SHAFT_RANGE
+	mi.visibility_range_end_margin = 6.0
+	mi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+	return mi
+
+
+static func _get_shaft_material() -> ShaderMaterial:
+	if _shaft_material == null:
+		_shaft_material = ShaderMaterial.new()
+		_shaft_material.shader = SHAFT_SHADER
+		_shaft_material.set_shader_parameter("shaft", shaft_color(0.0))
+	return _shaft_material
+
+
+## The shaft's colour (rgb) and strength (a) at `daylight` 0 (night, moonlight) … 1 (day).
+static func shaft_color(daylight: float) -> Color:
+	var t := clampf(daylight, 0.0, 1.0)
+	var c := SHAFT_NIGHT.lerp(SHAFT_DAY, t)
+	c.a = lerpf(SHAFT_NIGHT_STRENGTH, SHAFT_DAY_STRENGTH, t)
+	return c
+
+
 ## Dark mortar behind the stone faces like ModularWallRun's slab, around the opening.
 func _add_backing(o: Vector4, arches: Vector2) -> void:
 	# Kept clear of the reveal so their faces never z-fight with it.
@@ -249,6 +328,7 @@ static func set_daylight(amount: float, gi: bool = false) -> void:
 	var t := clampf(amount, 0.0, 1.0)
 	glass.emission = GLASS_NIGHT_EMISSION.lerp(GLASS_DAY_EMISSION, t)
 	glass.emission_energy_multiplier = lerpf(0.6, GLASS_DAY_ENERGY_GI if gi else 1.5, t)
+	_get_shaft_material().set_shader_parameter("shaft", shaft_color(t))
 
 
 ## Leaded glass at night: dark grey-blue, glossy, with a faint cool glow so the

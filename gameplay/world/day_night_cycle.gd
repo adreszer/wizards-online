@@ -23,7 +23,13 @@ signal phase_changed(phase: SchoolClock.Phase)
 
 ## Highest elevation of the sun at noon and of the moon at midnight (degrees).
 const MAX_ELEVATION_DEG := 58.0
-const SUN_ENERGY := 1.25
+const SUN_ENERGY := 2.0
+## Under the open sky by day the flat ambient (no GI) is this much stronger, so the
+## grounds' shaded sides read as daylit, not as night; indoors it stays as it was.
+const OUTDOOR_DAY_AMBIENT := 1.9
+## The sky's energy at full daylight (1 at night). With GI on the sky is what lights
+## the shaded grounds and what comes in through doors and windows.
+const DAY_SKY_ENERGY := 1.5
 const MOON_ENERGY := 0.38
 const SUN_LOW := Color(1.0, 0.58, 0.32)
 const SUN_HIGH := Color(1.0, 0.96, 0.9)
@@ -220,6 +226,12 @@ func _current_atmosphere() -> String:
 	return atmosphere_for(str(tracker.current_area_id()), tracker.current_kind())
 
 
+## The ambient multiplier for `daylight` (0–1) and `indoors_share` (0 outdoors … 1 indoors):
+## OUTDOOR_DAY_AMBIENT outdoors at full day, 1 at night and indoors.
+static func outdoor_day_boost(daylight_share: float, indoors_share: float) -> float:
+	return lerpf(1.0, OUTDOOR_DAY_AMBIENT, clampf(daylight_share, 0.0, 1.0) * (1.0 - clampf(indoors_share, 0.0, 1.0)))
+
+
 ## Whether an area of `kind` is indoors ("" is no area: the open grounds).
 static func is_indoor_kind(kind: String) -> bool:
 	return kind != "" and not OPEN_AIR_KINDS.has(kind)
@@ -247,7 +259,7 @@ func apply_hours(h: float) -> void:
 		var atm: Dictionary = ATMOSPHERES.get(atmosphere, {})
 		var w := _atmosphere_weight if not atm.is_empty() else 0.0
 		environment.ambient_light_color = (look.amb as Color).lerp(atm.get("amb", look.amb), w * 0.6)
-		environment.ambient_light_energy = float(look.amb_e) * lerpf(1.0, float(atm.get("amb_k", 1.0)), w) * lerpf(1.0, INDOOR_AMBIENT, indoors)
+		environment.ambient_light_energy = float(look.amb_e) * lerpf(1.0, float(atm.get("amb_k", 1.0)), w) * lerpf(1.0, INDOOR_AMBIENT, indoors) * outdoor_day_boost(daylight, indoors)
 		environment.fog_light_color = (look.fog as Color).lerp(atm.get("fog", look.fog), w * 0.7)
 		environment.fog_density = float(look.fog_d) * lerpf(1.0, float(atm.get("fog_k", 1.0)), w) * morning_mist(h) * (Seasons.RAIN_FOG if Seasons.rain_today else 1.0)
 	if sky_material != null:
@@ -255,6 +267,7 @@ func apply_hours(h: float) -> void:
 		sky_material.sky_horizon_color = look.hor
 		sky_material.ground_horizon_color = look.gnd
 		sky_material.sky_cover_modulate = Color(1, 1, 1, look.stars)
+		sky_material.energy_multiplier = lerpf(1.0, DAY_SKY_ENERGY, daylight)
 	var gi := environment != null and environment.sdfgi_enabled
 	if fill_light != null:
 		var atm_fill := float(ATMOSPHERES.get(atmosphere, {}).get("fill_k", 1.0))

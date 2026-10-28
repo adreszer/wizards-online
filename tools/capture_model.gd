@@ -7,7 +7,8 @@ extends Node
 ## rendered once from that viewpoint instead, e.g. to look into a castle room;
 ## --open-doors swings every CastleDoor and HouseDoor in it open first; --frames=N waits N
 ## frames after placing the camera (streamed terrain detail needs a few dozen);
-## --house-totals=a,b,c,d shows that tally on every HouseTally in it.
+## --house-totals=a,b,c,d shows that tally on every HouseTally in it; --hours=12,18.8,0
+## pins the level's DayNightCycle to each school hour in turn and saves one PNG per hour.
 
 const FLOOR := preload("res://objects/environment/modular/floor_tile.tscn")
 
@@ -29,6 +30,7 @@ var _double_sided := false
 var _target := Vector3.INF
 var _settle_frames := 20
 var _house_totals := PackedInt32Array()
+var _hours := PackedFloat32Array()
 
 
 func _ready() -> void:
@@ -50,6 +52,9 @@ func _ready() -> void:
 		elif arg.begins_with("--house-totals="):
 			for part in arg.trim_prefix("--house-totals=").split(","):
 				_house_totals.append(int(part))
+		elif arg.begins_with("--hours="):
+			for part in arg.trim_prefix("--hours=").split(","):
+				_hours.append(float(part))
 		elif arg.begins_with("--target="):
 			_target = _vec(arg.trim_prefix("--target="))
 	if _scene.is_empty():
@@ -96,8 +101,17 @@ func _run() -> void:
 		cam.global_position = _eye
 		cam.look_at(_target, Vector3.UP)
 		await _frames(_settle_frames)
-		_save("custom")
-		print("Saved 1 capture of %s to %s" % [_scene, _out])
+		var cycle := scene_root.find_child("DayNightCycle", true, false) as DayNightCycle
+		if _hours.is_empty() or cycle == null:
+			_save("custom")
+		for h in _hours:
+			if cycle == null:
+				break
+			cycle.time_override = h
+			cycle.refresh()
+			await _frames(30)
+			_save("custom_%s" % SchoolClock.format(h).replace(":", ""))
+		print("Saved capture of %s to %s" % [_scene, _out])
 		get_tree().quit(0)
 		return
 	var env := WorldEnvironment.new()
