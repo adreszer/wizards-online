@@ -175,8 +175,12 @@ const CHAT_SAY := "say"
 const CHAT_WHISPER := "whisper"
 const CHAT_SHOUT := "shout"
 const CHAT_ROOM := "world"
-## Server RPC that finds (or creates) the shared world match.
+## Server RPC that finds (or creates) the shared world match. The request carries
+## {protocol: PROTOCOL_VERSION}; a server on another version answers {error: "outdated", server}.
 const RPC_JOIN_WORLD := "join_world"
+## Bump whenever an op code, payload shape or RPC changes in a way an older client or
+## server cannot read; exported to the server, which turns away any other version.
+const PROTOCOL_VERSION := 1
 ## Server RPC that changes a character's role/house (admin or HTTP key).
 const RPC_ADMIN_SET_PROFILE := "admin_set_profile"
 ## Server RPC that resets world objects and shared mysteries (admin or HTTP key; dev and tests).

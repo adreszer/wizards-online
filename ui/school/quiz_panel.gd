@@ -12,7 +12,7 @@ const RESULT_SECONDS := 8.0
 var is_open := false
 var view: Dictionary = {}
 var _area := ""
-var _root: PanelContainer
+var card: UiWindow
 var _title: Label
 var _question: Label
 var _choices: VBoxContainer
@@ -33,37 +33,29 @@ func _ready() -> void:
 
 
 func _build() -> void:
-	_root = PanelContainer.new()
-	_root.anchor_left = 1.0
-	_root.anchor_right = 1.0
-	_root.anchor_top = 0.5
-	_root.anchor_bottom = 0.5
-	_root.offset_left = -440
-	_root.offset_right = -20
-	_root.offset_top = -170
-	_root.offset_bottom = 170
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.06, 0.05, 0.09, 0.92)
-	style.border_color = Color(0.85, 0.7, 0.4, 0.85)
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(8)
-	style.set_content_margin_all(14)
-	_root.add_theme_stylebox_override("panel", style)
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 8)
-	_root.add_child(box)
-	_title = Label.new()
-	_title.theme_type_variation = &"TitleLabel"
-	_title.add_theme_color_override("font_color", Color(0.94, 0.82, 0.55))
-	box.add_child(_title)
+	# A parchment card at the right edge, clear of the classroom in the middle.
+	card = UiWindow.new(UiWindow.Family.PARCHMENT, false)
+	card.anchor_left = 1.0
+	card.anchor_right = 1.0
+	card.anchor_top = 0.5
+	card.anchor_bottom = 0.5
+	card.offset_left = -460
+	card.offset_right = -UiTokens.SPACE_4
+	card.offset_top = -190
+	card.offset_bottom = 190
+	card.close_requested.connect(ui_back)
+	card.visible = false
+	add_child(card)
+	_title = card.title_label
+	_status = card.status_label
+	var box := card.body
 	_question = Label.new()
 	_question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_question.theme_type_variation = &"BookLabel"
-	_question.add_theme_font_size_override("font_size", 22)
 	box.add_child(_question)
-	_choices = VBoxContainer.new()
+	_choices = UiBox.v(UiTokens.SPACE_1)
 	box.add_child(_choices)
-	var row := HBoxContainer.new()
+	var row := UiBox.h(UiTokens.SPACE_2)
 	box.add_child(row)
 	_entry = LineEdit.new()
 	_entry.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -75,12 +67,6 @@ func _build() -> void:
 	_send.text = "QUIZ_SEND"
 	_send.pressed.connect(func() -> void: _answer_text(_entry.text))
 	row.add_child(_send)
-	_status = Label.new()
-	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status.add_theme_font_size_override("font_size", 14)
-	box.add_child(_status)
-	_root.visible = false
-	add_child(_root)
 
 
 ## Shows the question as the server sent it ({} = gone).
@@ -117,7 +103,8 @@ func show_view(p_view: Dictionary) -> void:
 	if is_new:
 		_entry.text = ""
 	_status.text = status_text(view)
-	_root.visible = true
+	if not card.visible:
+		card.show_window()
 	if closed:
 		_hide_timer = RESULT_SECONDS
 		_release()
@@ -156,7 +143,7 @@ func _answer_text(text: String) -> void:
 func open() -> void:
 	is_open = true
 	UiSounds.play(&"panel_open")
-	_root.visible = true
+	card.visible = true
 	UiRouter.opened(self)
 	if _entry.get_parent().visible:
 		_entry.grab_focus()
@@ -179,7 +166,7 @@ func _release() -> void:
 func _dismiss() -> void:
 	_release()
 	view = {}
-	_root.visible = false
+	card.hide_window()
 
 
 func _process(delta: float) -> void:

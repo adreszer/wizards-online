@@ -15,16 +15,49 @@ local Moderation = require("moderation")
 
 local WORLD_LABEL = "world"
 
-local function find_or_create_world()
-  local matches = nk.match_list(1, true, WORLD_LABEL, 0, 200, "")
-  if matches and #matches > 0 then
-    return matches[1].match_id
-  end
-  return nk.match_create("world_match", {})
+-- The elected world match lives in storage (system-owned "world"/"match" {id}).
+-- Two joins right after a server start (every client reconnecting after a deploy)
+-- can both find no match and both create one: the conditional write lets exactly
+-- one of them become the world; the other answers with the winner, and its own
+-- empty match shuts down (world_match.lua, ELECTION).
+local function elected()
+  local ok, objects = pcall(nk.storage_read, { { collection = "world", key = "match", user_id = nil } })
+  local o = ok and objects and objects[1] or nil
+  return o and type(o.value) == "table" and o.value.id or nil, o and o.version or nil
 end
 
--- RPC "join_world": returns the id of the shared world match.
+local function alive(match_id)
+  if type(match_id) ~= "string" or match_id == "" then return false end
+  local ok, m = pcall(nk.match_get, match_id)
+  return ok and m ~= nil
+end
+
+local function find_or_create_world()
+  local id, version = elected()
+  if alive(id) then return id end
+  local matches = nk.match_list(10, true, WORLD_LABEL, 0, 200, "")
+  if matches and #matches > 0 then
+    table.sort(matches, function(a, b) return a.match_id < b.match_id end)
+    id = matches[1].match_id
+  else
+    id = nk.match_create("world_match", {})
+  end
+  local wrote = pcall(nk.storage_write, { { collection = "world", key = "match", user_id = nil, value = { id = id },
+    version = version or "*", permission_read = 0, permission_write = 0 } })
+  if wrote then return id end
+  local winner = elected()
+  return alive(winner) and winner or id
+end
+
+-- RPC "join_world": {protocol} → the id of the shared world match, or
+-- {error = "outdated", server} when the client speaks another protocol version
+-- (clients from before the check send no version and are turned away too).
 local function rpc_join_world(context, payload)
+  local ok, data = pcall(nk.json_decode, payload or "")
+  local version = ok and type(data) == "table" and data.protocol or nil
+  if version ~= P.PROTOCOL_VERSION then
+    return nk.json_encode({ error = "outdated", server = P.PROTOCOL_VERSION })
+  end
   local match_id = find_or_create_world()
   return nk.json_encode({ match_id = match_id })
 end

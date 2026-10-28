@@ -47,6 +47,8 @@ NET_ERROR_WITH_CODE,%s: %s (%d),%s: %s (%d)
 NET_SOCKET_FAILED,Socket connection failed: %s,Połączenie z serwerem nie powiodło się: %s
 NET_JOIN_RPC_FAILED,join_world RPC failed: %s (is the Nakama Lua module loaded?),RPC join_world nie powiodło się: %s (czy moduł Lua Nakamy jest załadowany?)
 NET_JOIN_NO_MATCH,join_world RPC returned no match id,RPC join_world nie zwróciło identyfikatora świata
+NET_OUTDATED_CLIENT,"This version of the game is out of date. Download the latest version to play online.","Ta wersja gry jest nieaktualna. Pobierz najnowszą wersję, aby grać online."
+NET_OUTDATED_SERVER,"The school's server is running an older version than this game. Try again in a few minutes.","Serwer szkoły działa na starszej wersji niż ta gra. Spróbuj ponownie za kilka minut."
 NET_JOIN_FAILED,Joining the world failed: %s,Dołączenie do świata nie powiodło się: %s
 NET_CHAT_JOIN_FAILED,Chat join failed: %s,Dołączenie do czatu nie powiodło się: %s
 INTERACT_DEFAULT,Interact,Użyj
@@ -1247,3 +1249,44 @@ LORE_6_TEXT,"Corridors shift, stairs swing and some doors open only at night. Wh
 NET_LOST_TITLE,Connection lost,Utracono połączenie
 PAUSE_CONFIRM_MENU,Leave the school and return to the menu?,Opuścić szkołę i wrócić do menu?
 PAUSE_CONFIRM_QUIT,Close the game?,Zamknąć grę?
+SETTINGS_TAB_ACCOUNT,Account,Konto
+ACCOUNT_UNPROTECTED,Your character is tied to this computer only. Add an email and password so you can get it back after a reinstall or on another computer.,"Twoja postać jest przypisana tylko do tego komputera. Dodaj e-mail i hasło, aby odzyskać ją po ponownej instalacji lub na innym komputerze."
+ACCOUNT_OFFLINE,Join the school online to see whether your character is protected.,"Dołącz do szkoły online, aby sprawdzić, czy Twoja postać jest zabezpieczona."
+ACCOUNT_PROTECTED,Your character is protected with %s.,Twoja postać jest zabezpieczona adresem %s.
+ACCOUNT_HELP,"Protect: while online, adds the email and password to this character. Sign in here: on a new computer, takes your protected character to this one (from then on it plays as that character).","Zabezpiecz: będąc online, dodaje e-mail i hasło do tej postaci. Zaloguj tutaj: na nowym komputerze przenosi tu zabezpieczoną postać (od tej pory grasz nią)."
+ACCOUNT_EMAIL,Email,E-mail
+ACCOUNT_EMAIL_HINT,name@example.com,imie@example.com
+ACCOUNT_PASSWORD,Password,Hasło
+ACCOUNT_PASSWORD_HINT,at least 8 characters,co najmniej 8 znaków
+ACCOUNT_PROTECT,Protect my character,Zabezpiecz postać
+ACCOUNT_RECOVER,Sign in here,Zaloguj tutaj
+ACCOUNT_WORKING,One moment…,Chwileczkę…
+ACCOUNT_PROTECT_DONE,Done. Keep the email and password safe: they are the only way back to this character.,Gotowe. Zachowaj e-mail i hasło: tylko dzięki nim odzyskasz tę postać.
+ACCOUNT_RECOVER_DONE,Signed in. Choose Play online to continue as your character.,"Zalogowano. Wybierz Graj online, aby kontynuować jako Twoja postać."
+ACCOUNT_NEEDS_ONLINE,Join the school online first.,Najpierw dołącz do szkoły online.
+ACCOUNT_BAD_EMAIL,That doesn't look like an email address.,To nie wygląda na adres e-mail.
+ACCOUNT_SHORT_PASSWORD,The password needs at least 8 characters.,Hasło musi mieć co najmniej 8 znaków.
+ACCOUNT_WRONG_LOGIN,Wrong email or password.,Nieprawidłowy e-mail lub hasło.
+ACCOUNT_EMAIL_TAKEN,That email already protects another character.,Ten e-mail zabezpiecza już inną postać.
+ACCOUNT_FAILED,The account could not be changed,Nie udało się zmienić konta
+REFUSED_UNKNOWN_OBJECT,That isn't something you can take.,Tego nie da się zabrać.
+ACCOUNT_DELETE,Delete my character,Usuń moją postać
+ACCOUNT_DELETE_CONFIRM,"This deletes your character for good: house, spells, items, gold and progress. It cannot be undone.","To usunie Twoją postać na zawsze: dom, zaklęcia, przedmioty, złoto i postępy. Nie da się tego cofnąć."
+ACCOUNT_DELETE_YES,"Delete for good","Usuń na zawsze"
+ACCOUNT_DELETE_DONE,Your character has been deleted. Play online starts a new one.,Twoja postać została usunięta. Graj online rozpocznie nową.
+INVENTORY_HOLD,Take in hand,Weź do ręki
+INVENTORY_PUT_AWAY,Put away,Schowaj
+INVENTORY_MOUNT,Mount (B),Wsiądź (B)
+INVENTORY_LAND,Land (B),Wyląduj (B)
+MAP_LEGEND,Legend,Legenda
+MAP_LEGEND_YOU,You,Ty
+MAP_KIND_HALL,Halls,Sale
+MAP_KIND_CLASSROOM,Classrooms,Klasy
+MAP_KIND_LIBRARY,Library,Biblioteka
+MAP_KIND_CORRIDOR,Corridors,Korytarze
+MAP_KIND_TOWER,Towers,Wieże
+MAP_KIND_STAIR_TURRET,Stair turrets,Wieżyczki schodowe
+MAP_KIND_OUTDOOR,Courtyards,Dziedzińce
+MAP_KIND_SECRET,Hidden rooms,Ukryte komnaty
+MAP_KIND_HOUSE,House rooms (in the house's colour),Komnaty domów (w barwach domu)
+CREATOR_TURN,"Turn (or drag on the left)","Obróć (lub przeciągnij po lewej)"

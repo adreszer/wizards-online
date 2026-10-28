@@ -176,6 +176,51 @@ function M.new_state()
   return { world = {}, house = {} }
 end
 
+-- World and house progress as plain JSON for storage (house keys as "1".."4"; the
+-- session ids in `players` go stale with a restart, so they are left out).
+local function lasting(record)
+  return { step = record.step, at = record.at, solved = record.solved, solved_at = record.solved_at }
+end
+
+function M.to_saved(mstate)
+  local out = { world = {}, house = {} }
+  for id, record in pairs(mstate.world) do
+    if record.step > 0 or record.solved then out.world[id] = lasting(record) end
+  end
+  for house, records in pairs(mstate.house) do
+    local h = {}
+    for id, record in pairs(records) do
+      if record.step > 0 or record.solved then h[id] = lasting(record) end
+    end
+    if next(h) then out.house[tostring(house)] = h end
+  end
+  return out
+end
+
+-- The inverse of to_saved, keeping only mysteries that still exist and steps in range.
+function M.from_saved(engine, saved)
+  local mstate = M.new_state()
+  if type(saved) ~= "table" then return mstate end
+  local known = {}
+  for _, m in ipairs(engine.list) do known[m.id] = m end
+  local function restore(records, scope)
+    local out = {}
+    for id, r in pairs(type(records) == "table" and records or {}) do
+      local m = known[id]
+      if m and m.scope == scope and type(r) == "table" and type(r.step) == "number" and r.step >= 0 and r.step <= #m.steps then
+        out[id] = { step = r.step, at = r.at, solved = r.solved == true or nil, solved_at = r.solved_at }
+      end
+    end
+    return out
+  end
+  mstate.world = restore(saved.world, "world")
+  for key, records in pairs(type(saved.house) == "table" and saved.house or {}) do
+    local house = tonumber(key)
+    if house and house >= 1 then mstate.house[house] = restore(records, "house") end
+  end
+  return mstate
+end
+
 local function record_for(mstate, m, ev, ctx)
   if m.scope == "world" then
     mstate.world[m.id] = mstate.world[m.id] or { step = 0 }

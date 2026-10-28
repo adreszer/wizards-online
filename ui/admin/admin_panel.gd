@@ -22,6 +22,8 @@ const ROLES := ["student", "prefect", "professor", "admin"]
 
 func _ready() -> void:
 	half_size = Vector2(460, 300)
+	# Staff tools are chrome (oak and brass), not school-life parchment.
+	family = UiWindow.Family.CHROME
 	super()
 	GameEvents.panel_requested.connect(func(panel: String, _args: Dictionary) -> void:
 		if panel == "admin":

@@ -1,66 +1,58 @@
 class_name BookPanel
 extends CanvasLayer
-## Reads a book (GameEvents.book_requested): the title, one page at a time, with page
-## turning (buttons, A/D or the arrow keys). Esc closes.
+## Reads a book (GameEvents.book_requested) as an open book (UiBook): the title heads
+## the left page, two pages to a spread, the spread turned with A/D, the arrow keys or
+## the page corners. Esc or the seal closes.
+
+const HALF := Vector2(500, 300)
 
 var is_open := false
 var pages: PackedStringArray = []
+## The left page of the open spread (0, 2, 4…).
 var page := 0
-var _root: PanelContainer
+var book: UiBook
 var _title: Label
-var _text: RichTextLabel
-var _footer: Label
+var _texts: Array[RichTextLabel] = []
+var _prev: Button
+var _next: Button
 
 
 func _ready() -> void:
 	layer = 3
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	GameEvents.book_requested.connect(open)
-	_root = PanelContainer.new()
-	_root.set_anchors_preset(Control.PRESET_CENTER)
-	_root.offset_left = -360
-	_root.offset_right = 360
-	_root.offset_top = -260
-	_root.offset_bottom = 260
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.9, 0.85, 0.72, 0.98)   # parchment
-	style.border_color = Color(0.45, 0.3, 0.16)
-	style.set_border_width_all(3)
-	style.set_corner_radius_all(4)
-	style.set_content_margin_all(26)
-	_root.add_theme_stylebox_override("panel", style)
-	_root.theme = load(UiTokens.PARCHMENT_THEME)
-	var box := VBoxContainer.new()
-	_root.add_child(box)
+	book = UiBook.new()
+	book.centre(HALF)
+	book.close_requested.connect(close)
+	book.visible = false
+	add_child(book)
 	_title = Label.new()
 	_title.theme_type_variation = &"TitleLabel"
-	_title.add_theme_color_override("font_color", Color(0.3, 0.18, 0.08))
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(_title)
-	_text = RichTextLabel.new()
-	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_text.add_theme_color_override("default_color", Color(0.18, 0.12, 0.07))
-	_text.theme_type_variation = &"BookRichText"
-	box.add_child(_text)
-	var row := HBoxContainer.new()
-	box.add_child(row)
-	var prev := Button.new()
-	prev.text = "◀"
-	prev.set_meta(&"ui_sound", &"")   # the page turns instead of a click
-	prev.pressed.connect(func() -> void: turn(-1))
-	row.add_child(prev)
-	_footer = Label.new()
-	_footer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_footer.add_theme_color_override("font_color", Color(0.35, 0.25, 0.15))
-	row.add_child(_footer)
-	var next := Button.new()
-	next.text = "▶"
-	next.set_meta(&"ui_sound", &"")
-	next.pressed.connect(func() -> void: turn(1))
-	row.add_child(next)
-	_root.visible = false
-	add_child(_root)
+	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	book.left.add_child(_title)
+	for column: VBoxContainer in [book.left, book.right]:
+		var text := RichTextLabel.new()
+		text.theme_type_variation = &"BookRichText"
+		text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		text.scroll_active = true
+		column.add_child(text)
+		_texts.append(text)
+	# Turning by the page corners: a quiet arrow at the foot of each page.
+	_prev = _corner("◀", -1, book.left)
+	_next = _corner("▶", 1, book.right)
+
+
+func _corner(glyph: String, step: int, column: VBoxContainer) -> Button:
+	var b := Button.new()
+	b.text = glyph
+	b.flat = true
+	b.focus_mode = Control.FOCUS_NONE
+	b.set_meta(&"ui_sound", &"")   # the page turns instead of a click
+	b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if step < 0 else Control.SIZE_SHRINK_END
+	b.pressed.connect(func() -> void: turn(step))
+	column.add_child(b)
+	return b
 
 
 func open(title_key: String, page_keys: PackedStringArray) -> void:
@@ -69,9 +61,9 @@ func open(title_key: String, page_keys: PackedStringArray) -> void:
 	_title.text = tr(title_key)
 	is_open = true
 	UiSounds.play(&"panel_open")
-	_root.visible = true
+	book.show_book()
 	UiRouter.opened(self)
-	_show_page()
+	_show_spread()
 
 
 func close() -> void:
@@ -79,21 +71,27 @@ func close() -> void:
 		return
 	is_open = false
 	UiSounds.play(&"panel_close")
-	_root.visible = false
+	book.hide_book()
 	UiRouter.closed(self)
 
 
+## Turns `step` spreads (two pages each) forward or back.
 func turn(step: int) -> void:
 	var before := page
-	page = clampi(page + step, 0, maxi(0, pages.size() - 1))
+	page = clampi(page + 2 * step, 0, maxi(0, (pages.size() - 1) / 2 * 2))
 	if page != before:
-		UiSounds.play(&"book_page_turn")
-	_show_page()
+		book.turn(step)
+	_show_spread()
 
 
-func _show_page() -> void:
-	_text.text = tr(pages[page]) if page < pages.size() else ""
-	_footer.text = tr("BOOK_PAGE") % [page + 1, maxi(1, pages.size())]
+func _show_spread() -> void:
+	_title.visible = page == 0
+	for i in 2:
+		var at := page + i
+		_texts[i].text = tr(pages[at]) if at < pages.size() else ""
+	book.set_folios(page + 1, page + 2 if page + 1 < pages.size() else 0)
+	_prev.disabled = page == 0
+	_next.disabled = page + 2 >= pages.size()
 
 
 func _input(event: InputEvent) -> void:

@@ -124,7 +124,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Spell switch `spell-switch-crystal.glb` (9,225 tris) fitted into `magic_switch.tscn` at 1.7 m tall; on/off feedback is an additive glow sphere inside the crystal plus the light
 - [x] Rotating statue `statue_rotating.glb` (9,924 tris) fitted into `rotating_statue.tscn` at 2.8 m; the model's pointing arm faces +Z so the wrapper rotates it 180° (state 0 = arm toward the far door), pivot on the figure's axis
 - [x] Level generator emits plaque translation keys (regenerations had reverted the localization commit's key change)
-- [ ] Textures: floor2 ships four 4K maps, the others mix 2K/4K; downscale metallic-roughness maps to 2K when convenient
+- [x] Textures: every embedded map capped at 2K, metallic-roughness and occlusion at 1K (`tools/shrink_glb_textures.py`, run over `assets/`; 56 GLBs, 846 → 425 MB); new drops go through it too
 - [x] Doorway module `doorway.glb` → `doorway.tscn` (4 × 4 × 0.35 m, pointed arch ≈3.8 m wide at the base, ≈3.8 m tall; jamb + arch box collision); replaces every greybox lintel (7 doors + training archway)
 - [x] `doorway.glb` remeshed: 9,003 tris + normal map, identical bounds
 - [x] Magic door slab `door_magical_sliding.glb` (7,478 tris + normal map) fitted into `magic_door.tscn` as exactly 3.0 × 3.2 × 0.4 m on the sliding AnimatableBody3D; collision and animation unchanged
@@ -241,7 +241,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Sorting questions moved into `resources/school/sorting.tres` (`SortingQuestionnaire`); `ItemRegistry.ITEM_IDS` is an explicit list like `SPELL_IDS`
 - [x] `character_profile.lua`, `world_match.lua`, `world.lua` use the generated modules (op codes, RPC names, chat cap, spell ids, sorting, item catalogue, character ids); no hand-kept mirror lists remain
 - [x] Freshness: `run_tests.tscn` "Server content" section fails on a stale export or a registry that does not match its `.tres` files; `tools/check.sh` regenerates castle + content, fails on an uncommitted diff, then runs the script check and gameplay tests (opt-in pre-push hook: `git config core.hooksPath tools/hooks`)
-- [ ] Race: two `join_world` calls in quick succession on a fresh server can create two world matches (the label index lags `match_create`); seen once in the two-client test right after a server start
+- [x] Race: two `join_world` calls in quick succession on a fresh server could create two world matches. Fixed: the world match is elected through a conditional storage write (`world`/`match`), every join answers with the elected one, and a losing match that stays empty for a minute shuts down (verified: six simultaneous joins on a fresh server, one match)
 
 ### Milestone 19 — Placement data and stable object ids
 - [x] `content/placements.json` read by the castle generator (tomes, enemies, plaques, fragments, checkpoints, sorting stone, switch/block); scene placement unchanged (verified node-for-node against the previous scene)
@@ -254,7 +254,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] `WorldObjectSync` on the client; secret walls, switches, doors, torches, levers, statues apply server state (`apply_world_state`, instant for snapshots); `RotatingStatue.set_state`, `Lever.set_on`; offline unchanged
 - [x] Multiplayer test: B's switch hit (real trigger path) is a request, the server flips it for both clients, dropped events (wrong area, unknown object, unknown spell), the rejoin snapshot carries it; reconnect test checks the snapshot; offline tests for every kind
 - [x] Placement entries take `"set": {property: value}` overrides (the practice switch is toggleable)
-- [ ] Persist world object state across server restarts (today it lives in the match)
+- [x] Persist world object state across server restarts (Milestone 63); world and house mystery progress saved with it (`Mysteries.to_saved` / `from_saved`, mysteries removed from the content are dropped)
 
 ### Milestone 21 — Mysteries as data (server-only)
 - [x] `nakama/modules/mysteries.lua` step engine (spell with effect/state, interact, enter/holding, together, ordered, timed, reset_on_wrong); world/house/player scopes; validation at load; world mysteries re-arm after a while once nobody would be trapped
@@ -277,11 +277,12 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Client export presets (Windows Desktop, macOS) with include/exclude filters, committed without signing secrets
 - [x] `tools/check_build.sh` + `tools/list_pck.py`: exports a pack, fails on server/dev files or any server-only text or mystery id in its bytes (verified to catch a deliberate leak)
 - [x] Offline practice mysteries (`content/offline_mysteries.json`, `OfflineMysteryEngine`): the secret walls get their own public offline solutions; the online ones stay server-only
-- [ ] Run `tools/check_build.sh` in CI once there is CI
+- [x] `tools/check_build.sh` in CI: job `build-leak-check` in `.github/workflows/check.yml` (pushes to main; downloads the export templates)
 - [x] Hosted server for Coolify (`docker-compose.coolify.yml`, `deploy/nakama/`: image with modules and content baked in, secrets from the environment, cheats off through `school_rules.local.json`); `docs/deploy.md`
 - [x] Release client points at the hosted server: exported builds (feature `template`) use `play.arcane-academy.pl`, 443, https and the production server key (`.template` overrides of `game/network/*`); the editor keeps the local server. Exported builds cannot change it (`GameSession.server_address_locked`: no host/port fields in the menu, saved settings and `--host`/`--port` ignored)
 - [x] Game name Arcane Academy (window, menu, export names, bundle id `pl.arcane-academy.client`); fixed user data folder `Arcane Academy` so a later rename never orphans settings or the device id
-- [ ] Client/server version check on join; release script (tests, leak check, exports, butler push to itch.io)
+- [x] Client/server version check on join: `NetworkProtocol.PROTOCOL_VERSION` (exported to the server) travels with `join_world`; another version is turned away with a clear message (client out of date / server older), and a reconnect after a server update stops retrying
+- [x] Release script `tools/release.sh <version> [--push]`: clean tree, `tools/check.sh`, the leak check for both presets, both exports stamped with the version, zips in `export/release/<version>/`, `--push` uploads with butler to itch.io (`ITCH_TARGET`, channels `windows` and `mac`) and tags `v<version>`. First release goes to itch.io (owner, 2026-10-28); Steam later
 
 ### Milestones 24–32 — Generated castle and grounds at scale (design: docs/castle-generation.md)
 Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B) are validators that refuse to write the scene; ids and details in the design doc.
@@ -373,7 +374,7 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] Feast, duel and mystery tracks processed and preloaded; `MusicDirector.event_track` lets those features cue their track over the clock and the area (starts from the top, 4 s crossfade) and clear it again
 - [x] Flying music: while the local player rides a broom (`PlayerMovement.is_flying`), at any hour, the `flying` track after the same 3 s delay (a short hop changes nothing); a lesson still wins
 - [x] One-shot tracks: `sorting` (ceremony, 1:59) and `house_cup` (fanfare, 0:29) play once as an `event_track`, trailing silence trimmed, and clear themselves when they end so the clock's music returns; the whole music list is now in the game
-- [ ] Set `event_track` from the feast schedule, duelling club, mystery discovery, sorting ceremony and house cup award once those exist; music volume slider in settings
+- [x] `event_track` set by the feast, the duel HUD, the sorting panel and the house cup; hidden rooms play the mystery track; volume sliders per bus in settings (Milestone 68)
 - [x] UI sounds (list section 9, all 12, ElevenLabs Sound Effects through the MCP, one take each; originals in `assets/audio/ui/source/`): `UiSounds` autoload (`gameplay/audio/ui_sounds.gd`) on a `UI` bus at −8 dB; every button hovers and clicks (meta `ui_sound` overrides or silences: panel close buttons leave it to the panel), panels play open/close (map and satchel their own), others' chat lines tick, DMs chime, HUD notifications ring, refusals in a FeaturePanel knock, switching spells shimmers, pause opens/closes; per-sound minimum gaps and slight pitch jitter; tests
 - [x] Player sounds (list section 7, all 16, generated; footsteps too, though the list marks them Lib: a 5 s walk per surface sliced into single steps, 42 in all): `PlayerSounds` (`characters/components/player_sounds.gd`, added by `Player` for local and remote players) plays a step per stride travelled while walking (1.7 m) or running (2.4 m) through an `AudioStreamRandomizer` per surface; the surface is a floor collider's `surface` meta, else lake shallows (water), else the area kind (grounds grass, station gravel, bridge/shops/inn/post office/library wood, common rooms and dormitories carpet), else grass on open terrain and stone; jump and soft/hard landing (local from `PlayerMovement`, remote from state changes), hurt on damage or a spell hitting a player, respawn; checkpoint chime on first activation; fragment and broom-rack pickups; a held torch crackles (looped WAV, `Sfx.looped`); placeholders `pickup.wav`, `hurt.wav` removed; tests
 - [x] Spell sounds (list section 1, all 35, generated, one take each; four near-silent takes re-rolled): every spell has its own cast, travel loop and impact (`SpellDefinition.travel_sound`, looped by `Sfx`, on the projectile in flight); a spell that strikes a receiver refusing its kind of magic glances off with the warded rebound, one dying at full range fizzles; the old shared `cast.wav`/`impact.wav` removed; tests
@@ -383,9 +384,11 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [ ] Not made (nothing in the game uses them yet): chests, wardrobes, bed curtains, shutters, telescope, crystal ball, abacus, rune stone, globe, quill, broom return, river and divination room ambiences; a volume slider for the Ambience bus
 - [ ] Sounds still without an object: water freezing, a basin filling, a mended object (list section 2), for when those puzzles exist
 - [ ] More voices once the character creator offers more than two bodies (or a voice choice of its own); a second take per line so repeats vary; professors' demonstration lines
-- [ ] Tag floors with the `surface` meta where the area guess is wrong (wooden stages and stairs, rugs in halls, iron grates, gravel paths through the grounds); more metal and wood steps if they repeat
-- [ ] UI volume slider in settings; more takes for hover/click through an `AudioStreamRandomizer` if the repeats grate
-- [ ] Sound effects, ambiences per area, footsteps per surface, reverb per area (the rest of the list)
+- [x] Surfaces where the area guess is wrong: `SurfacePatch` (a box footprint, in the rug wrapper: 38 rugs sound like carpet) and gravel wherever the grounds splat marks a path (`Terrain.path_weight`); the floor `surface` meta still works for grates
+- [ ] Wooden stages and stairs once they exist as their own pieces (drop a `SurfacePatch` in the wrapper); more metal and wood steps if they repeat
+- [x] UI volume slider in settings (Milestone 68)
+- [ ] More takes for hover/click through an `AudioStreamRandomizer` if the repeats grate
+- [x] Reverb per area: `ReverbDirector` moves every positional sound onto the World bus and glides its reverb with the local player's area kind (hall, stone, room, cellar, soft furnishings, open air)
 
 ### Milestone 39 — Proximity chat, direct messages, speech bubbles
 - [x] Chat through the world match (`nakama/modules/chat.lua`): say (18 m, same area), whisper (4 m, same area), shout (45 m, through walls), positions from the players' own movement snapshots; rate limits per mode in `school_rules.json`; Nakama's chat channels closed
@@ -556,7 +559,8 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] Area reports must agree with the player's own position (the zone boxes are now in `world_areas.lua`); a report ahead of the next state waits for it
 - [x] World objects survive a server restart (stored when changed, torches excepted); display names go through the word filter
 - [x] Settings (`GameSettings`, `SettingsPanel`, pause menu or `/settings`): graphics presets (low…ultra), render scale with FSR, shadows, ambient occlusion, indirect light, glow, fog, VSync, an FPS cap; interface size, reduced motion, house symbols beside house colours, captions for sounds; rebindable keys
-- [ ] Steam (needs GodotSteam), account recovery
+- [x] Account recovery: Settings → Account adds an email and password to the character (Nakama email link); "Sign in here" on another computer moves this device onto that account (a fresh account left behind keeps a throwaway custom id so Nakama lets the device go)
+- [ ] Steam (needs GodotSteam), after the itch.io launch
 
 ### Milestone 64 — The living castle, finished: schedule, chains, seasons, stacks, portraits
 - [x] The shifting castle (`CastleSchedule`, exported as `generated/castle_schedule.lua`, `features/shifting.lua`): the globe room opens only on Wednesdays; by night the map room's door opens and the old cells' door shuts, by day the other way; the server drives them so nobody holds one against the schedule (offline the client follows the same rules)
@@ -615,8 +619,8 @@ The plan, art direction, asset sources and per-milestone checklists are in `docs
 - [x] Milestone 66 — Art kit v1 and the UI gallery (owner checkpoint on the look). Direction approved by the owner (2026-10-21, "candlelit oak and parchment"). Done: the frame kit (`tools/make_ui_frames.py`, CC0 paper and oak, 1x/2x, `assets/ui/frames/`), the themes on textured nine-slice styles with the 2x swap (`UiFrames`), the components (`KeyChip`, `ToastStack`, `AreaBanner`, `SpellSlot`, `ItemSlot`, `HouseBadge`, `UiTooltip`, `UiDialog`, `ProgressVial`, `UiSpinner`), the placeholder icons behind `UiIcons` (`tools/make_ui_icons.py`), the gallery `levels/dev/ui_gallery.tscn`. Signed off by the owner (2026-10-22)
 - [x] Milestone 67 — The HUD: `ui/hud/hud.gd` built from the components (`PlayerPlate`, `ProgressVial` while hurt, `SpellSlot` hotbar with key chips, cooldown sweep and mastery pips, held `ItemSlot`, key-chip prompt, `DayDial`, `HouseCrystals`, toasts by kind through `GameEvents.notify`, area and lesson banners), the round brass minimap, F2 hides the interface, the purse in the satchel
 - [x] Milestone 68 — Main menu, loading, pause, settings: the menu over the castle at dusk with a first-run name card, the loading screen with lore and tips, connection dialogs with Retry, pause over a blurred world with confirmations, settings as a six-tab chrome window (sound volumes, key chips with swap and reset), credits
-- [ ] Milestone 69 — Journal, books, satchel, map
-- [ ] Milestone 70 — School life screens
+- [~] Milestone 69 — Journal, books, satchel, map: built (`UiBook`, the journal, books, satchel, map and timetable on the frame kit, new pieces `book_cover`, `book_page_left/right`, `book_tab_*` in `tools/make_ui_frames.py`); the optional handwriting face is still open; owner checkpoint on the look
+- [~] Milestone 70 — School life screens: sorting ceremony, character creator with a turntable, quiz card, duel banner, gesture panel, chrome staff windows; the hand-styled allowlist is down from 20 files to 7 (map drawing, board game, club badges, chat, debug)
 - [ ] Milestone 71 — Chat, bubbles, nameplates, profiles
 - [ ] Milestone 72 — Polish and ship check
 
@@ -678,12 +682,11 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Known limitations
 
-- Online, world objects (secret walls, switches, torches, levers, statues) are server-authoritative but kept in match memory (reset on server restart); pushable blocks, pressure plates and fragment pickups are still local to each client.
-- No PvP, no damage between players. Spell events carry a caster ID and are relayed only for known spells; a future server-validated target field enables duels.
-- Remote players are client-authoritative for their own transform (see `docs/architecture.md` → Authority).
-- Chat has length/whitespace sanitization only; no moderation.
-- Placeholder capsule character with procedural placeholder animations.
+- Remote players are client-authoritative for their own transform (see `docs/architecture.md` → Authority); the server checks area reports against positions (Milestone 63) but not movement itself, so a modified client can still move faster than it should.
+- The one pushable block in the castle is simulated by each client (no pressure plates are placed yet); fragments are kept per character on the server (`features/fragments.lua`).
 - Enemies are local to each client (own copy, own health, only the local player is attacked); no shared combat yet.
+- PvP only in the duelling rooms (Milestone 53), with consent.
+- Two bodies (apprentice_f, apprentice_m) with procedural poses; no authored animation clips yet.
 
 ## Testing status
 

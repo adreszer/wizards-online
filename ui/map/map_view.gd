@@ -38,6 +38,8 @@ const LABEL_PRIORITY := ["hall", "classroom", "library", "common_room", "dormito
 @export var label_font_size: int = 12
 ## Prints an "N" at the top edge (the minimap).
 @export var show_compass: bool = false
+## Draws a compass rose in the top-right corner (the full map).
+@export var show_rose: bool = false
 
 var castle_map: CastleMap:
 	set(value):
@@ -151,6 +153,8 @@ func _draw_ink() -> void:
 	if show_room_labels:
 		_draw_room_labels(rooms, view)
 	_draw_players()
+	if show_rose:
+		_draw_rose(Vector2(size.x - 56.0, 60.0), 38.0)
 	if show_compass:
 		var font := get_theme_default_font()
 		var north := tr("MAP_NORTH")
@@ -158,6 +162,28 @@ func _draw_ink() -> void:
 		var at := Vector2(size.x * 0.5 - w * 0.5, 4.0 + font.get_ascent(14))
 		_ink.draw_string_outline(font, at, north, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 4, Color(0, 0, 0, 0.7))
 		_ink.draw_string(font, at, north, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1, 0.95, 0.8))
+
+
+## An inked compass rose: eight points (the cardinal ones long, north in rubric), a
+## ring, and N above it.
+func _draw_rose(c: Vector2, r: float) -> void:
+	_ink.draw_circle(c, r * 0.62, PAPER.lerp(INK, 0.08), true, -1.0, true)
+	_ink.draw_arc(c, r * 0.62, 0.0, TAU, 48, INK, 1.2, true)
+	_ink.draw_arc(c, r * 0.55, 0.0, TAU, 48, INK, 0.6, true)
+	for i in 8:
+		var angle := -PI / 2.0 + i * PI / 4.0
+		var length := r if i % 2 == 0 else r * 0.55
+		var tip := c + Vector2.from_angle(angle) * length
+		var side := Vector2.from_angle(angle + PI / 2.0) * r * (0.13 if i % 2 == 0 else 0.1)
+		var colour: Color = UiTokens.RUBRIC if i == 0 else INK
+		# Each point is two half-blades, one inked solid and one left paler, for relief.
+		_ink.draw_colored_polygon(PackedVector2Array([c, tip, c + side]), colour)
+		_ink.draw_colored_polygon(PackedVector2Array([c, tip, c - side]), colour.lerp(PAPER, 0.55))
+	_ink.draw_circle(c, 2.5, INK, true, -1.0, true)
+	var font := get_theme_default_font()
+	var north := tr("MAP_NORTH")
+	var w := font.get_string_size(north, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x
+	_ink.draw_string(font, c + Vector2(-w / 2.0, -r - 4.0), north, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, UiTokens.RUBRIC)
 
 
 ## Player-facing name of a storey: the dungeons, the ground floor, floor N.

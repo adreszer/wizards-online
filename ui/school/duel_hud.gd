@@ -17,9 +17,8 @@ func _ready() -> void:
 	_label.offset_left = -300
 	_label.offset_right = 300
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_label.add_theme_font_size_override("font_size", 26)
-	_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
-	_label.add_theme_constant_override("outline_size", 8)
+	# The banner lettering: display face, brass, a shadow that reads over any scene.
+	_label.theme_type_variation = &"BannerSubLabel"
 	_label.visible = false
 	add_child(_label)
 	NetworkManager.server_message.connect(_on_message)

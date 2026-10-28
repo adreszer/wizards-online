@@ -2,6 +2,9 @@ class_name Collectible
 extends Area3D
 ## Generic pickup. Registers itself with GameSession for "x / N" totals,
 ## spins/bobs, and collects on contact with the LOCAL player exactly once.
+## Online, a castle pickup (with an object_id) is reported to the server
+## (fragment_collect, features/fragments.lua), which keeps it on the character;
+## the server's "fragments" push on join hides the ones already taken.
 
 signal collected(definition: CollectibleDefinition)
 
@@ -41,6 +44,23 @@ func _ready() -> void:
 	_apply_definition()
 	GameSession.register_collectible(definition.id)
 	body_entered.connect(_on_body_entered)
+	if not object_id.is_empty():
+		NetworkManager.pushed.connect(_on_pushed)
+		_on_pushed("fragments", NetworkManager.feature("fragments"))
+
+
+func _on_pushed(kind: String, data: Dictionary) -> void:
+	if kind == "fragments" and object_id in (data.get("ids", []) as Array):
+		restore()
+
+
+## Marks this pickup as taken earlier (by the server's record): counted, gone, silent.
+func restore() -> void:
+	if is_collected or not GameSession.collect(definition, instance_key, true):
+		return
+	is_collected = true
+	set_deferred("monitoring", false)
+	queue_free()
 
 
 func _apply_definition() -> void:
@@ -87,5 +107,7 @@ func try_collect() -> bool:
 	if _audio.stream != null:
 		_audio.play()
 	collected.emit(definition)
+	if not object_id.is_empty() and NetworkManager.is_in_world():
+		NetworkManager.request("fragment_collect", {"o": object_id})
 	get_tree().create_timer(1.0).timeout.connect(queue_free)
 	return true

@@ -29,13 +29,7 @@ func _build() -> void:
 	_root.offset_right = 430
 	_root.offset_top = -250
 	_root.offset_bottom = -150
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.05, 0.04, 0.08, 0.88)
-	style.border_color = Color(0.85, 0.7, 0.4, 0.8)
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(8)
-	style.set_content_margin_all(10)
-	_root.add_theme_stylebox_override("panel", style)
+	_root.theme_type_variation = &"ChromePanel"
 	var box := VBoxContainer.new()
 	_root.add_child(box)
 	var title := Label.new()
@@ -56,7 +50,7 @@ func _build() -> void:
 	var footer := Label.new()
 	footer.text = "EMOTE_MENU_FOOTER"
 	footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	footer.add_theme_font_size_override("font_size", 13)
+	footer.theme_type_variation = &"HintLabel"
 	box.add_child(footer)
 	_root.visible = false
 	add_child(_root)

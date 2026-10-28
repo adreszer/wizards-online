@@ -10,10 +10,10 @@ extends Node3D
 ## any animation data. The local player also hears jumps and landings from its
 ## own PlayerMovement; remote players get them from state changes.
 ##
-## The surface under the feet: a floor collider (or its parent) with the meta
-## `surface` wins (iron grates, rugs, wooden stages…); otherwise shallow lake
-## water, then the area's kind (see KIND_SURFACES), then grass on open terrain
-## and stone everywhere else.
+## The surface under the feet: a SurfacePatch footprint (rugs, wooden stages,
+## stairs…) or a floor collider (or its parent) with the meta `surface` wins;
+## otherwise shallow lake water, then the area's kind (see KIND_SURFACES), then
+## grass on open terrain and stone everywhere else; grass on a terrain path is gravel.
 
 const SURFACES: Array[StringName] = [&"stone", &"wood", &"carpet", &"grass", &"gravel", &"water", &"metal"]
 ## How many single-step files each surface has (assets/audio/player/footstep_<surface>_<n>.wav).
@@ -24,6 +24,8 @@ const KIND_SURFACES := {
 	"shop": &"wood", "inn": &"wood", "post_office": &"wood", "library": &"wood",
 	"common_room": &"carpet", "dormitory": &"carpet",
 }
+## Above this splat path weight, grass underfoot is a gravel path.
+const PATH_GRAVEL := 0.5
 const JUMP := preload("res://assets/audio/player/jump.wav")
 const LAND_SOFT := preload("res://assets/audio/player/land_soft.wav")
 const LAND_HARD := preload("res://assets/audio/player/land_hard.wav")
@@ -156,6 +158,9 @@ static func surface_at(body: Node3D, pos: Vector3) -> StringName:
 	var space := body.get_world_3d().direct_space_state
 	var query := PhysicsRayQueryParameters3D.create(pos + Vector3.UP * 0.3, pos + Vector3.DOWN * 0.6, Player.LAYER_WORLD)
 	var hit := space.intersect_ray(query)
+	var patch := SurfacePatch.at(body.get_tree(), pos)
+	if patch != &"":
+		return patch
 	if not hit.is_empty():
 		var floor_node := hit.collider as Node
 		for n: Node in [floor_node, floor_node.get_parent()]:
@@ -165,10 +170,12 @@ static func surface_at(body: Node3D, pos: Vector3) -> StringName:
 	if terrain != null and terrain.is_inside(pos.x, pos.z) and pos.y < terrain.water_level + 0.1 \
 			and terrain.height_at(pos.x, pos.z) < terrain.water_level:
 		return &"water"
+	var on_terrain := terrain != null and terrain.is_inside(pos.x, pos.z) and absf(pos.y - terrain.height_at(pos.x, pos.z)) < 0.5
 	var zone := zone_at(body.get_tree(), pos + Vector3.UP)
-	if zone != null:
-		return KIND_SURFACES.get(zone.kind, &"stone")
-	return &"grass" if terrain != null and terrain.is_inside(pos.x, pos.z) and absf(pos.y - terrain.height_at(pos.x, pos.z)) < 0.5 else &"stone"
+	var surface: StringName = KIND_SURFACES.get(zone.kind, &"stone") if zone != null else (&"grass" if on_terrain else &"stone")
+	if surface == &"grass" and on_terrain and terrain.path_weight(pos.x, pos.z) > PATH_GRAVEL:
+		return &"gravel"
+	return surface
 
 
 ## The smallest AreaZone holding `point` (as AreaTracker picks it), or null.

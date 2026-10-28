@@ -1,18 +1,29 @@
 class_name Journal
 extends CanvasLayer
-## The school journal (J): the character's year and house, then tabs for the week's
-## timetable, the spellbook (mastery rank, points to the next, the spell's rune), the
-## school record per subject (attendance, self-study, quiz answers, practicals; read
-## from the server with the school_record RPC), and discoveries. Online only shows
-## the record; offline the record tab says it lives in the online school.
+## The school journal (J) as an open book (UiBook): the left page heads with the house
+## crest, the year and house, and the chosen section's name; ribbon bookmarks pick the
+## section (timetable, spellbook, school record, homework, house, calendar, post,
+## discoveries), whose entries run over both pages (split_entries). The spellbook draws
+## each spell as its roundel with mastery pips beside its rank and rune. The school
+## record is read from the server (school_record RPC); offline, the online-only
+## sections say they live in the online school. Homework is handed in from the foot of
+## the right page.
+
+const HALF := Vector2(540, 320)
+const SECTIONS := ["JOURNAL_TAB_TIMETABLE", "JOURNAL_TAB_SPELLS", "JOURNAL_TAB_RECORD", "JOURNAL_TAB_HOMEWORK",
+	"JOURNAL_TAB_HOUSE", "JOURNAL_TAB_CALENDAR", "JOURNAL_TAB_POST", "JOURNAL_TAB_DISCOVERIES"]
 
 var is_open := false
 var record: Dictionary = {}
+## The section shown (index into SECTIONS).
+var section := 0
+var book: UiBook
 var _player: Player
-var _root: PanelContainer
+var _badge: HouseBadge
 var _header: Label
-var _tabs: TabContainer
-var _pages: Dictionary = {}
+var _section_title: Label
+var _texts: Array[RichTextLabel] = []
+var _spells: Array[VBoxContainer] = []
 ## Your homework list from the server, and the hand-in row.
 var homework: Array = []
 var _hw_pick: OptionButton
@@ -32,58 +43,55 @@ func _ready() -> void:
 
 
 func _build() -> void:
-	_root = PanelContainer.new()
-	_root.set_anchors_preset(Control.PRESET_CENTER)
-	_root.offset_left = -430
-	_root.offset_right = 430
-	_root.offset_top = -300
-	_root.offset_bottom = 300
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.17, 0.13, 0.09, 0.96)   # leather
-	style.border_color = Color(0.72, 0.56, 0.3)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(6)
-	style.set_content_margin_all(16)
-	_root.add_theme_stylebox_override("panel", style)
-	var box := VBoxContainer.new()
-	_root.add_child(box)
+	book = UiBook.new()
+	book.centre(HALF)
+	book.close_requested.connect(close)
+	book.tab_selected.connect(show_section)
+	book.visible = false
+	add_child(book)
+	for key: String in SECTIONS:
+		book.add_tab(tr(key))
+	var head := UiBox.h(UiTokens.SPACE_3)
+	_badge = HouseBadge.new(0, HouseBadge.Size.MEDIUM, false)
+	head.add_child(_badge)
 	_header = Label.new()
-	_header.theme_type_variation = &"TitleLabel"
-	_header.add_theme_color_override("font_color", Color(0.95, 0.85, 0.6))
-	box.add_child(_header)
-	_tabs = TabContainer.new()
-	_tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	box.add_child(_tabs)
-	for key in ["JOURNAL_TAB_TIMETABLE", "JOURNAL_TAB_SPELLS", "JOURNAL_TAB_RECORD", "JOURNAL_TAB_HOMEWORK", "JOURNAL_TAB_HOUSE", "JOURNAL_TAB_CALENDAR", "JOURNAL_TAB_POST", "JOURNAL_TAB_DISCOVERIES"]:
-		var page := RichTextLabel.new()
-		page.name = tr(key)
-		page.bbcode_enabled = true
-		page.scroll_active = true
-		page.add_theme_color_override("default_color", Color(0.93, 0.9, 0.82))
-		_tabs.add_child(page)
-		_pages[key] = page
+	_header.theme_type_variation = &"BookLabel"
+	_header.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_header.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_header.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(_header)
+	book.left.add_child(head)
+	_section_title = Label.new()
+	_section_title.theme_type_variation = &"TitleLabel"
+	book.left.add_child(_section_title)
+	book.left.add_child(HSeparator.new())
+	for column: VBoxContainer in [book.left, book.right]:
+		var text := RichTextLabel.new()
+		text.theme_type_variation = &"BookRichText"
+		text.bbcode_enabled = true
+		text.scroll_active = true
+		text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		column.add_child(text)
+		_texts.append(text)
+		var spells := UiBox.v(UiTokens.SPACE_2)
+		spells.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		column.add_child(spells)
+		_spells.append(spells)
 	# Handing homework in: pick an open assignment, write, send.
-	var hand_in := HBoxContainer.new()
+	_hand_in_row = UiBox.h(UiTokens.SPACE_2)
 	_hw_pick = OptionButton.new()
-	_hw_pick.custom_minimum_size = Vector2(220, 0)
-	hand_in.add_child(_hw_pick)
+	_hw_pick.custom_minimum_size = Vector2(150, 0)
+	_hand_in_row.add_child(_hw_pick)
 	_hw_text = LineEdit.new()
 	_hw_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_hw_text.placeholder_text = "HOMEWORK_ANSWER_PLACEHOLDER"
 	_hw_text.max_length = 600
-	hand_in.add_child(_hw_text)
+	_hand_in_row.add_child(_hw_text)
 	var send := Button.new()
 	send.text = "HOMEWORK_HAND_IN"
 	send.pressed.connect(_hand_in)
-	hand_in.add_child(send)
-	box.add_child(hand_in)
-	_hand_in_row = hand_in
-	var foot := Label.new()
-	foot.text = "JOURNAL_FOOTER"
-	foot.add_theme_font_size_override("font_size", 13)
-	box.add_child(foot)
-	_root.visible = false
-	add_child(_root)
+	_hand_in_row.add_child(send)
+	book.right.add_child(_hand_in_row)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -93,15 +101,23 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if is_open and event.is_action_pressed("journal"):
+	if not is_open:
+		return
+	if event.is_action_pressed("journal"):
 		close()
-		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_page_down") or (event.is_action_pressed("ui_right") and not _hw_text.has_focus()):
+		show_section(posmod(section + 1, SECTIONS.size()))
+	elif event.is_action_pressed("ui_page_up") or (event.is_action_pressed("ui_left") and not _hw_text.has_focus()):
+		show_section(posmod(section - 1, SECTIONS.size()))
+	else:
+		return
+	get_viewport().set_input_as_handled()
 
 
 func open() -> void:
 	is_open = true
 	UiSounds.play(&"panel_open")
-	_root.visible = true
+	book.show_book()
 	UiRouter.opened(self)
 	refresh()
 	if NetworkManager.is_online():
@@ -118,23 +134,40 @@ func close() -> void:
 		return
 	is_open = false
 	UiSounds.play(&"panel_close")
-	_root.visible = false
+	book.hide_book()
 	UiRouter.closed(self)
+
+
+## Turns to section `index` (a bookmark, the arrow keys or PgUp/PgDn).
+func show_section(index: int) -> void:
+	if index == section:
+		return
+	var step := 1 if index > section else -1
+	section = index
+	book.select_tab(index)
+	book.turn(step)
+	refresh()
 
 
 func refresh() -> void:
 	var profile := NetworkManager.get_local_profile()
-	_header.text = header_text(profile, _player.house if _player != null else 0)
-	(_pages["JOURNAL_TAB_TIMETABLE"] as RichTextLabel).text = TimetablePanel.week_bbcode(NetworkManager.timetable, NetworkManager.server_time(), get_tree())
-	(_pages["JOURNAL_TAB_SPELLS"] as RichTextLabel).text = spells_bbcode(_player.spell_caster if _player != null else null)
-	(_pages["JOURNAL_TAB_RECORD"] as RichTextLabel).text = record_bbcode(record) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
-	(_pages["JOURNAL_TAB_DISCOVERIES"] as RichTextLabel).text = discoveries_bbcode(profile.get("discoveries", []))
-	(_pages["JOURNAL_TAB_POST"] as RichTextLabel).text = post_bbcode(NetworkManager.dm_history)
-	(_pages["JOURNAL_TAB_CALENDAR"] as RichTextLabel).text = EventReminders.calendar_bbcode(NetworkManager.timetable, NetworkManager.feature("events"),
-		NetworkManager.feature("clubs"), NetworkManager.server_time()) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
-	(_pages["JOURNAL_TAB_HOUSE"] as RichTextLabel).text = house_bbcode(NetworkManager.house_quests, NetworkManager.get_house_totals(), _player.house if _player != null else 0) + board_bbcode(NetworkManager.feature("house_board")) + wing_bbcode(NetworkManager.feature("wing")) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
+	var house := _player.house if _player != null else 0
+	_badge.house = house
+	_header.text = header_text(profile, house)
+	var key: String = SECTIONS[section]
+	_section_title.text = tr(key)
+	var spellbook := key == "JOURNAL_TAB_SPELLS"
+	for i in 2:
+		_texts[i].visible = not spellbook
+		_spells[i].visible = spellbook
+	if spellbook:
+		_fill_spellbook(_player.spell_caster if _player != null else null)
+	else:
+		var halves := split_entries(section_bbcode(key, profile, house))
+		_texts[0].text = halves[0]
+		_texts[1].text = halves[1]
+	book.set_folios(section * 2 + 1, section * 2 + 2)
 	var now := NetworkManager.server_time()
-	(_pages["JOURNAL_TAB_HOMEWORK"] as RichTextLabel).text = homework_bbcode(homework, now) if NetworkManager.is_online() else tr("JOURNAL_RECORD_OFFLINE")
 	_hw_pick.clear()
 	_open_ids.clear()
 	for h: Dictionary in homework:
@@ -143,7 +176,98 @@ func refresh() -> void:
 			var def := SubjectRegistry.load_definition(str(h.get("subject", "")))
 			_hw_pick.add_item(tr(def.display_name) if def != null else "?")
 			_open_ids.append(str(h.get("id", "")))
-	_hand_in_row.visible = not _open_ids.is_empty()
+	_hand_in_row.visible = key == "JOURNAL_TAB_HOMEWORK" and not _open_ids.is_empty()
+
+
+## The text of one section (all but the spellbook).
+func section_bbcode(key: String, profile: Dictionary, house: int) -> String:
+	var online := NetworkManager.is_online()
+	match key:
+		"JOURNAL_TAB_TIMETABLE":
+			return TimetablePanel.week_bbcode(NetworkManager.timetable, NetworkManager.server_time(), get_tree())
+		"JOURNAL_TAB_RECORD":
+			return record_bbcode(record) if online else tr("JOURNAL_RECORD_OFFLINE")
+		"JOURNAL_TAB_HOMEWORK":
+			return homework_bbcode(homework, NetworkManager.server_time()) if online else tr("JOURNAL_RECORD_OFFLINE")
+		"JOURNAL_TAB_HOUSE":
+			return house_bbcode(NetworkManager.house_quests, NetworkManager.get_house_totals(), house) + board_bbcode(NetworkManager.feature("house_board")) \
+				+ wing_bbcode(NetworkManager.feature("wing")) if online else tr("JOURNAL_RECORD_OFFLINE")
+		"JOURNAL_TAB_CALENDAR":
+			return EventReminders.calendar_bbcode(NetworkManager.timetable, NetworkManager.feature("events"),
+				NetworkManager.feature("clubs"), NetworkManager.server_time()) if online else tr("JOURNAL_RECORD_OFFLINE")
+		"JOURNAL_TAB_POST":
+			return post_bbcode(NetworkManager.dm_history)
+		"JOURNAL_TAB_DISCOVERIES":
+			return discoveries_bbcode(profile.get("discoveries", []))
+	return ""
+
+
+## The spellbook: each known spell as its roundel (colour, icon, mastery pips) beside
+## its name, rank and rune, half on each page.
+func _fill_spellbook(caster: SpellCaster) -> void:
+	for column in _spells:
+		for child in column.get_children():
+			column.remove_child(child)
+			child.queue_free()
+	if caster == null or caster.known_spells.is_empty():
+		var none := Label.new()
+		none.theme_type_variation = &"BookLabel"
+		none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		none.text = tr("JOURNAL_NO_SPELLS")
+		_spells[0].add_child(none)
+		return
+	var half := ceili(caster.known_spells.size() / 2.0)
+	for i in caster.known_spells.size():
+		var def: SpellDefinition = caster.known_spells[i]
+		var points := int(caster.mastery.get(String(def.id), 0))
+		var row := UiBox.h(UiTokens.SPACE_3)
+		var slot := SpellSlot.new()
+		slot.set_spell(def)
+		slot.mastery = SpellMastery.level_of(points)
+		slot.mastery_max = SpellMastery.THRESHOLDS.size() - 1
+		slot.key_chip.visible = false
+		slot.custom_minimum_size = Vector2(SpellSlot.SIZE, SpellSlot.SIZE)
+		row.add_child(slot)
+		var words := Label.new()
+		words.theme_type_variation = &"BookLabel"
+		words.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		words.text = spell_line(def, points)
+		row.add_child(words)
+		_spells[0 if i < half else 1].add_child(row)
+
+
+## "Name — rank (n to the next)" and the rune on a second line.
+static func spell_line(def: SpellDefinition, points: int) -> String:
+	var line := "%s — %s" % [TranslationServer.translate(def.display_name), TranslationServer.translate(SpellMastery.level_key(points))]
+	var next := SpellMastery.to_next(points)
+	if next > 0:
+		line += "  " + TranslationServer.translate("JOURNAL_MASTERY_NEXT") % next
+	var rune := str(RuneTracer.RUNES.get(String(def.id), ""))
+	if rune != "":
+		line += "\n" + TranslationServer.translate("JOURNAL_RUNE") % rune_arrows(rune)
+	return line
+
+
+## A section's text over the two pages: the entries (lines that start a new entry, not
+## an indented continuation) split as evenly by lines as whole entries allow.
+static func split_entries(text: String) -> PackedStringArray:
+	var lines := text.split("\n")
+	if lines.size() < 6:
+		return PackedStringArray([text, ""])
+	var best := 0
+	var best_gap := lines.size()
+	for i in range(1, lines.size()):
+		if lines[i].begins_with(" ") or lines[i].strip_edges() == "" and i + 1 < lines.size() and lines[i + 1].begins_with(" "):
+			continue
+		var gap := absi(lines.size() - 2 * i)
+		if gap < best_gap:
+			best_gap = gap
+			best = i
+	if best == 0:
+		return PackedStringArray([text, ""])
+	return PackedStringArray(["\n".join(lines.slice(0, best)), "\n".join(lines.slice(best)).strip_edges(true, false)])
 
 
 func _hand_in() -> void:

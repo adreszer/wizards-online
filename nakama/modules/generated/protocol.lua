@@ -68,6 +68,7 @@ return {
   OP_WALLET = 35,
   OP_WORLD_EVENT = 9,
   OP_WORLD_SNAPSHOT = 21,
+  PROTOCOL_VERSION = 1,
   RPC_ADMIN_ADVANCE_YEARS = "admin_advance_years",
   RPC_ADMIN_AWARD_CUP = "admin_award_cup",
   RPC_ADMIN_GRANT_COINS = "admin_grant_coins",

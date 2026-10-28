@@ -11,6 +11,8 @@ const SKIN_TONES: Array[Color] = [Color(1, 1, 1), Color(1.0, 0.92, 0.86), Color(
 ## Robe colours (0 = the painted charcoal, untouched).
 const ROBE_COLORS: Array[Color] = [Color(0.2, 0.2, 0.2), Color(0.06, 0.06, 0.07), Color(0.32, 0.22, 0.15), Color(0.18, 0.2, 0.33), Color(0.22, 0.27, 0.17)]
 const ROBE_KEYS: Array[String] = ["ROBE_CHARCOAL", "ROBE_BLACK", "ROBE_BROWN", "ROBE_NAVY", "ROBE_MOSS"]
+## About the skin of the bodies' textures, so a tone's swatch shows the skin it gives.
+const SKIN_BASE := Color(0.95, 0.76, 0.62)
 const SKIN_KEYS: Array[String] = ["SKIN_1", "SKIN_2", "SKIN_3", "SKIN_4", "SKIN_5"]
 ## The robe crest: on the upper-spine bone, offset in the character's frame
 ## (it faces -Z): up, toward the wearer's left, and out to the chest.

@@ -9,6 +9,7 @@ extends CanvasLayer
 ## toggle_hud hides all of it for screenshots. Reads player components via the
 ## local_player_spawned event; never drives gameplay.
 
+const SATCHEL := preload("res://ui/inventory/inventory_panel.gd")
 const FRAGMENT_ID := &"arcane_fragment"
 ## How visible the HUD stays behind an open window (UiRouter).
 const BEHIND_WINDOW := 0.0
@@ -353,7 +354,10 @@ func hotbar_selected_index() -> int:
 func _on_held_item_changed(definition: ItemDefinition) -> void:
 	held_slot.visible = definition != null
 	if definition != null:
-		held_slot.set_texture(definition.icon)
+		if definition.icon != null:
+			held_slot.set_texture(definition.icon)
+		else:
+			held_slot.set_item(SATCHEL.icon_id_for(definition))
 		held_slot.tooltip_text = tr(definition.display_name)
 
 

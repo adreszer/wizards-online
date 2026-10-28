@@ -134,13 +134,16 @@ func register_collectible(collectible_id: StringName) -> void:
 	GameEvents.collectible_total_changed.emit(collectible_id, _totals[collectible_id])
 
 
-## Returns false if this instance key was already collected.
-func collect(definition: Resource, instance_key: String) -> bool:
+## Returns false if this instance key was already collected. `quiet` counts it without
+## the collected signal (pickups restored from the server's record on join).
+func collect(definition: Resource, instance_key: String, quiet: bool = false) -> bool:
 	if _collected_keys.has(instance_key):
 		return false
 	_collected_keys[instance_key] = true
 	var id: StringName = definition.id
 	_collected[id] = int(_collected.get(id, 0)) + int(definition.value)
+	if quiet:
+		return true
 	GameEvents.collectible_collected.emit(definition, _collected[id], int(_totals.get(id, 0)))
 	return true
 

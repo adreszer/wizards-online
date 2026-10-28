@@ -1,22 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://profpanel0001"]
+[gd_scene load_steps=2 format=3 uid="uid://profpanel0001"]
 
 [ext_resource type="Script" path="res://ui/school/professor_panel.gd" id="1"]
-
-[sub_resource type="StyleBoxFlat" id="PanelStyle"]
-bg_color = Color(0.05, 0.04, 0.08, 0.9)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.85, 0.7, 0.4, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-content_margin_left = 18.0
-content_margin_top = 14.0
-content_margin_right = 18.0
-content_margin_bottom = 14.0
 
 [node name="ProfessorPanel" type="CanvasLayer"]
 layer = 2
@@ -45,11 +29,10 @@ offset_right = 390.0
 offset_bottom = 330.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("PanelStyle")
+theme_type_variation = &"ChromePanel"
 
 [node name="VBox" type="VBoxContainer" parent="Root/Panel"]
 layout_mode = 2
-theme_override_constants/separation = 8
 
 [node name="Title" type="Label" parent="Root/Panel/VBox"]
 theme_type_variation = &"TitleLabel"
@@ -66,7 +49,6 @@ autowrap_mode = 3
 
 [node name="LessonRow" type="HBoxContainer" parent="Root/Panel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
 alignment = 1
 
 [node name="LessonLabel" type="Label" parent="Root/Panel/VBox/LessonRow"]
@@ -85,7 +67,6 @@ text = "LESSON_OPEN"
 [node name="Columns" type="HBoxContainer" parent="Root/Panel/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 12
 
 [node name="StudentsBox" type="VBoxContainer" parent="Root/Panel/VBox/Columns"]
 layout_mode = 2
@@ -117,7 +98,6 @@ focus_mode = 0
 
 [node name="Buttons" type="HBoxContainer" parent="Root/Panel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
 alignment = 1
 
 [node name="GrantButton" type="Button" parent="Root/Panel/VBox/Buttons"]
@@ -140,7 +120,6 @@ text = "LESSON_GRANT_SELF"
 
 [node name="PointsRow" type="HBoxContainer" parent="Root/Panel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
 
 [node name="PointsTitle" type="Label" parent="Root/Panel/VBox/PointsRow"]
 layout_mode = 2
@@ -179,7 +158,6 @@ text = "POINTS_DEDUCT"
 
 [node name="LectureRow" type="HBoxContainer" parent="Root/Panel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
 
 [node name="LectureLine" type="LineEdit" parent="Root/Panel/VBox/LectureRow"]
 unique_name_in_owner = true
@@ -196,7 +174,6 @@ text = "LECTURE_SEND"
 
 [node name="PlanRow" type="HBoxContainer" parent="Root/Panel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
 
 [node name="PlanOption" type="OptionButton" parent="Root/Panel/VBox/PlanRow"]
 unique_name_in_owner = true
@@ -239,6 +216,6 @@ autowrap_mode = 3
 
 [node name="CloseHint" type="Label" parent="Root/Panel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+theme_type_variation = &"HintLabel"
 text = "LESSON_CLOSE_HINT"
 horizontal_alignment = 1

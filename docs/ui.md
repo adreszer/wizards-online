@@ -160,17 +160,17 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - Fixed on the way: saving the name or language no longer wipes the graphics, sound and key settings; tests write a settings file of their own
 
 ### Milestone 69 — Reading surfaces: journal, books, satchel, map
-- [ ] Journal as an open book: two-page spread, ribbon tabs on the edge, page-turn animation and sound; spellbook pages with roundels and mastery; grades in ink; calendar and post pages
-- [ ] Books (`BookPanel`) on the same spread
-- [ ] Satchel: leather bag window with an item grid, icons, tooltips, hold/put-away action
-- [ ] Map: parchment frame, compass rose, legend with icons, floor tabs; timetable as a parchment sheet
+- [x] Journal as an open book (`UiBook`: leather binding, two pages with a gutter, folios, ribbon bookmarks tucked under the binding, the page folding in from the spine with the page-turn sound, instant under reduced motion): crest, year and house head the left page; each section's entries run over both pages (`Journal.split_entries`); the spellbook as roundels with mastery pips beside rank and rune; the timetable, record, calendar and post in ink colours; ←/→ and PgUp/PgDn turn sections
+- [x] Books (`BookPanel`) on the same spread: the title heads the first page, two pages per spread, turned by A/D, the arrows or the page corners
+- [x] Satchel: a chrome window with a 5-wide grid of satchel squares (at least 15), an icon per item (from the set by id or category until items get painted icons), tooltips, the chosen item's icon, name, description and one action (take in hand, put away, mount, land; double click does it), what is in hand and the purse
+- [x] Map: a parchment sheet, the map inset, a tab per storey, a drawn compass rose, the legend (room colours, house rooms, you), the room under the cursor in the status line; the timetable as a parchment sheet with ink colours
 - [ ] Optional handwriting face for notes and the professor's board
 
 ### Milestone 70 — School life screens
-- [ ] Sorting as a ceremony: stone-dark vignette, question cards, the house reveal with the crest, a seal stamp and a sound
-- [ ] Character creator full screen: character turntable on the left, options and swatches on the right
-- [ ] Quizzes, homework, riddle doors, shop, cauldron, decor, duel HUD, Lantern Chase HUD on the new components
-- [ ] Professor and admin panels in a compact "staff ledger" chrome style: denser, keyboard-friendly, still on the theme
+- [x] Sorting as a ceremony: a stone-dark vignette over the scene, the stone's name as a banner, progress as marks, each question on a parchment card that rises in, the crest growing in and a wax seal stamping beside it, the house's own sound and the ceremony music
+- [x] Character creator: a chrome window on the right, the player framed on the left by a camera that orbits (drag the left of the screen, or the arrows); nothing blurs the preview (`UiRouter.SEE_WORLD`); colour chips are the `ColorSwatch` component
+- [~] Quizzes, homework, riddle doors, shop, cauldron, decor, duel HUD, Lantern Chase HUD on the new components: the quiz is a parchment card, the duel line banner lettering, the gesture wheel a chrome panel, homework lives in the journal; the board game and the club badges keep their own colours (content, not chrome)
+- [~] Professor and admin panels in chrome: the lesson panel and the admin window are oak and brass; a denser, keyboard-first layout is still open
 
 ### Milestone 71 — Social: chat, bubbles, nameplates, profiles
 - [ ] Chat: channel tabs (say, whisper, shout, house, DM), names in house colour with symbols, timestamps, fades when idle, unread counts

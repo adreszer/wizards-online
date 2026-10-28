@@ -41,6 +41,7 @@ var water_level: float = -1000.0
 var meta: Dictionary = {}
 
 var _q: PackedInt32Array
+var _splat_image: Image             # the splat, read back by path_weight
 var _holes: PackedByteArray         # per cell (size_x - 1) x (size_z - 1): 1 = no ground (a castle floor is there)
 var _material: ShaderMaterial
 var _chunks: Dictionary = {}        # Vector2i -> {far: MeshInstance3D, near: MeshInstance3D, body: StaticBody3D}
@@ -111,6 +112,24 @@ func height_at(x: float, z: float) -> float:
 	var a := lerpf(sample(ix, iz), sample(ix + 1, iz), tx)
 	var b := lerpf(sample(ix, iz + 1), sample(ix + 1, iz + 1), tx)
 	return lerpf(a, b, tz)
+
+
+## How much of the ground at world (x, z) is path or dirt (the splat's blue weight,
+## 0..1), for footsteps. The splat is read back once, on first use.
+func path_weight(x: float, z: float) -> float:
+	if _splat_image == null:
+		if meta.is_empty() or not meta.has("splat"):
+			return 0.0
+		var texture: Texture2D = load(meta["splat"])
+		_splat_image = texture.get_image() if texture != null else null
+		if _splat_image == null:
+			return 0.0
+		if _splat_image.is_compressed():
+			_splat_image.decompress()
+	var cell := float(meta.get("splat_spacing", spacing))
+	var px := clampi(int((x - origin.x) / cell), 0, _splat_image.get_width() - 1)
+	var pz := clampi(int((z - origin.y) / cell), 0, _splat_image.get_height() - 1)
+	return _splat_image.get_pixel(px, pz).b
 
 
 ## The quantised height grid as an RGBA8 image (R low byte, G high byte of each

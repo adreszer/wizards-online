@@ -1,8 +1,15 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/modular/rug.glb" id="1"]
+[ext_resource type="Script" path="res://gameplay/audio/surface_patch.gd" id="2"]
 
 [node name="Rug" type="Node3D"]
 
 [node name="Model" parent="." instance=ExtResource("1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.0)
+
+[node name="Footsteps" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 1.0)
+script = ExtResource("2")
+surface = &"carpet"
+size = Vector3(3, 0.6, 2)

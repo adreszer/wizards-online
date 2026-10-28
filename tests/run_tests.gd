@@ -38,6 +38,7 @@ const STATUE_SCENE := preload("res://objects/puzzles/rotating_statue.tscn")
 const DOOR_SCENE := preload("res://objects/puzzles/magic_door.tscn")
 const MINIMAP_SCENE := preload("res://ui/map/minimap.tscn")
 const MAP_PANEL_SCENE := preload("res://ui/map/map_panel.tscn")
+const InventoryPanelScript := preload("res://ui/inventory/inventory_panel.gd")
 const TestHelpers := preload("res://tests/test_helpers.gd")
 
 var t := TestHelpers.new()
@@ -509,6 +510,14 @@ func _test_ui_router() -> void:
 	t.check(UiRouter.top() == lower, "a freed panel leaves the stack")
 	lower.close()
 	t.check(UiRouter.open_count() == 0 and not GameSession.ui_input_captured and not UiRouter.has_modal(), "closing the last panel releases the keyboard")
+	var viewer := Control.new()
+	viewer.set_meta(UiRouter.SEE_WORLD, true)
+	add_child(viewer)
+	UiRouter.opened(viewer)
+	var viewer_dim := viewer.get_node_or_null("UiBackdrop") as ColorRect
+	t.check(UiRouter.has_modal() and GameSession.ui_input_captured and (viewer_dim == null or not viewer_dim.visible), "a panel that shows the world stays modal with nothing dimmed behind it")
+	UiRouter.closed(viewer)
+	viewer.queue_free()
 	var creator := CharacterCreator.new()
 	var quiz := QuizPanel.new()
 	t.check(creator.has_method("ui_back") and quiz.has_method("ui_back"), "the creator and the quiz handle Esc themselves")
@@ -1481,15 +1490,17 @@ func _test_inventory() -> void:
 	panel._bind_player(player)
 	panel.open()
 	t.check(panel.is_open and GameSession.ui_input_captured, "panel open captures UI input")
-	var buttons: Array = panel.get_node("%Slots").get_children().filter(func(n: Node) -> bool: return n is Button)
-	t.check(buttons.size() == 1, "one slot button for the torch")
-	if buttons.size() == 1:
-		(buttons[0] as Button).pressed.emit()
-		t.check(player.inventory.held_item == TORCH, "clicking the slot takes the torch in hand")
-		await get_tree().process_frame
-		buttons = panel.get_node("%Slots").get_children().filter(func(n: Node) -> bool: return n is Button)
-		(buttons[0] as Button).pressed.emit()
-		t.check(player.inventory.held_item == null, "clicking again puts it away")
+	var filled: Array = panel.squares.filter(func(b: Button) -> bool: return not b.disabled)
+	t.check(filled.size() == 1 and panel.squares.size() >= panel.MIN_SQUARES, "one filled square for the torch in a bag of %d" % panel.squares.size())
+	if filled.size() == 1:
+		(filled[0] as Button).pressed.emit()
+		t.check(player.inventory.held_item == null and panel._action.visible and panel._action.text == tr("INVENTORY_HOLD"), "clicking the square shows the torch and what to do with it")
+		panel._action.pressed.emit()
+		t.check(player.inventory.held_item == TORCH, "the action takes the torch in hand")
+		t.check(panel._action.text == tr("INVENTORY_PUT_AWAY"), "and offers to put it away")
+		panel.use(TORCH)
+		t.check(player.inventory.held_item == null, "using it again puts it away")
+	t.check(InventoryPanelScript.icon_id_for(TORCH) == "candle" and UiIcons.has(InventoryPanelScript.icon_id_for(TORCH)), "items get an icon from the set")
 	panel.close()
 	t.check(not panel.is_open and not GameSession.ui_input_captured, "panel close releases UI input")
 	panel.queue_free()
@@ -2373,10 +2384,10 @@ func _test_map() -> void:
 	open_ev.pressed = true
 	panel._unhandled_input(open_ev)
 	t.check(panel.is_open and GameSession.ui_input_captured, "M opens the map and it takes the keyboard")
-	var view: MapView = panel.get_node("%View")
+	var view: MapView = panel._view
 	for i in range(12):
 		panel.change_storey(1)
-	t.check(view.storey == castle_map.max_storey, "the floor buttons stop at the top storey (%d)" % view.storey)
+	t.check(view.storey == castle_map.max_storey, "the floors stop at the top storey (%d)" % view.storey)
 	panel.centre_on_player()
 	var before := view.screen_to_world(Vector2(100, 80))
 	panel.zoom_at(2.0, Vector2(100, 80))
@@ -2508,6 +2519,26 @@ func _test_player_sounds() -> void:
 	grate.global_position = Vector3(0, 500, 0)
 	await get_tree().physics_frame
 	t.check(PlayerSounds.surface_at(player, Vector3(0, 500.1, 0)) == &"metal", "a floor's surface meta wins")
+	var rug: Node3D = load("res://objects/environment/props/rug.tscn").instantiate()
+	castle.add_child(rug)
+	rug.global_position = Vector3(0, 500.1, 0)
+	t.check(PlayerSounds.surface_at(player, Vector3(0.5, 500.1, 1.0)) == &"carpet", "a rug on a grate sounds like carpet")
+	t.check(PlayerSounds.surface_at(player, Vector3(0.5, 500.1, -0.5)) == &"metal", "off the rug it is the grate again")
+	rug.queue_free()
+	var path := Vector3.INF
+	for i in 6000:
+		var x := randf_range(-600.0, 600.0)
+		var zz := randf_range(-600.0, 600.0)
+		if terrain.is_inside(x, zz) and terrain.has_ground(x, zz) and terrain.path_weight(x, zz) > 0.9 \
+				and terrain.height_at(x, zz) > terrain.water_level + 0.5 and PlayerSounds.zone_at(get_tree(), Vector3(x, terrain.height_at(x, zz) + 1.0, zz)) != null \
+				and PlayerSounds.zone_at(get_tree(), Vector3(x, terrain.height_at(x, zz) + 1.0, zz)).kind == "grounds":
+			path = Vector3(x, terrain.height_at(x, zz), zz)
+			break
+	t.check(path != Vector3.INF and PlayerSounds.surface_at(player, path) == &"gravel", "a path through the grounds crunches like gravel")
+	t.check(AudioServer.get_bus_index(ReverbDirector.BUS) >= 0 and ReverbDirector.ensure_bus() != null, "the World bus has its reverb")
+	t.check(_all_world_bus(player), "the player's own sounds play on the World bus")
+	t.check(ReverbDirector.preset_for("hall") == &"hall" and ReverbDirector.preset_for("grounds") == &"open" \
+			and ReverbDirector.preset_for("room") == &"room" and ReverbDirector.preset_for("secret") == &"cellar", "each kind of area has its reverb")
 	# One step per stride while walking, a longer stride running, none standing or after a teleport.
 	var sounds := player.sounds
 	sounds._last_position = player.global_position
@@ -3292,6 +3323,9 @@ func _test_journal() -> void:
 		PackedInt32Array([10, 20, 30, 40]), 3)
 	t.check(house.contains(tr("QUEST_PRACTICALS") % 5) and house.contains("5 / 5  ✓") and house.find(tr("HOUSE_3_NAME")) < house.find(tr("HOUSE_1_NAME")),
 		"the house page lists this week's quests, our house first (%s)" % house.replace("\n", " | "))
+	var halves := Journal.split_entries("[b]A[/b]\n   a1\n   a2\n[b]B[/b]\n   b1\n[b]C[/b]\n   c1\n   c2")
+	t.check(halves[0] == "[b]A[/b]\n   a1\n   a2" and halves[1] == "[b]B[/b]\n   b1\n[b]C[/b]\n   c1\n   c2", "a journal section runs over both pages, whole entries on each")
+	t.check(Journal.split_entries("short")[0] == "short" and Journal.split_entries("short")[1] == "", "a short section stays on the left page")
 	t.check(Journal.discoveries_bbcode(["loft", "map:loft", "founders_tale"]) == tr("JOURNAL_DISCOVERIES") % [2, 1], "discoveries and hidden rooms are counted")
 	var caster := SpellCaster.new()
 	caster.learn_spell(ARCANE_PULSE)
@@ -3324,8 +3358,12 @@ func _test_books() -> void:
 	var book := books[0] as LoreBook
 	book._on_interacted(null)
 	t.check(panel.is_open and panel.pages.size() == book.page_keys().size() and GameSession.ui_input_captured, "reading a book opens it")
+	t.check(panel.book.visible and panel._texts[0].text == tr(book.page_keys()[0]) and panel._texts[1].text == tr(book.page_keys()[1]),
+		"the first spread shows pages one and two")
 	panel.turn(1)
-	t.check(panel.page == 1, "pages turn")
+	t.check(panel.page == (2 if book.page_keys().size() > 2 else 0), "pages turn two at a time (%d)" % panel.page)
+	panel.turn(-5)
+	t.check(panel.page == 0, "and back to the start")
 	panel.close()
 	t.check(not GameSession.ui_input_captured, "and it closes")
 	panel.queue_free()
@@ -3731,6 +3769,11 @@ func _clear_floor_near(centre: Vector3, base_y: float) -> Vector3:
 	return centre
 
 
+func _all_world_bus(node: Node) -> bool:
+	var players := node.find_children("*", "AudioStreamPlayer3D", true, false)
+	return not players.is_empty() and players.all(func(p: AudioStreamPlayer3D) -> bool: return p.bus != &"Master")
+
+
 func _open_ground(terrain: Terrain, z: AreaZone) -> Vector3:
 	var half := Vector2(minf(z.size.x / 2.0 - 5.0, 60.0), minf(z.size.z / 2.0 - 5.0, 60.0))
 	var c := z.global_position
@@ -3738,7 +3781,7 @@ func _open_ground(terrain: Terrain, z: AreaZone) -> Vector3:
 		var x := clampf(c.x + offset.x * half.x, -900.0, 900.0)
 		var zz := clampf(c.z + offset.y * half.y, -900.0, 900.0)
 		var ground := terrain.height_at(x, zz)
-		if ground < terrain.water_level + 0.5 or not terrain.has_ground(x, zz):
+		if ground < terrain.water_level + 0.5 or not terrain.has_ground(x, zz) or terrain.path_weight(x, zz) > PlayerSounds.PATH_GRAVEL:
 			continue
 		terrain.focus_on(Vector3(x, ground, zz), true)
 		await get_tree().physics_frame

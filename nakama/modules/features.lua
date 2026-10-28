@@ -46,6 +46,7 @@ M.MODULES = {
   require("features.stacks"),
   require("features.portraits"),
   require("features.arrival"),
+  require("features.fragments"),
 }
 
 local by_kind = {}

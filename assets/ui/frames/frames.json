@@ -1,4 +1,136 @@
 {
+ "book_cover": {
+  "margin": [
+   40,
+   40,
+   40,
+   40
+  ],
+  "shadow": [
+   14,
+   14,
+   14,
+   14
+  ],
+  "size": [
+   208,
+   208
+  ],
+  "tile": true
+ },
+ "book_page_left": {
+  "margin": [
+   20,
+   20,
+   48,
+   20
+  ],
+  "shadow": [
+   6,
+   6,
+   0,
+   6
+  ],
+  "size": [
+   196,
+   168
+  ],
+  "tile": true
+ },
+ "book_page_right": {
+  "margin": [
+   48,
+   20,
+   20,
+   20
+  ],
+  "shadow": [
+   0,
+   6,
+   6,
+   6
+  ],
+  "size": [
+   196,
+   168
+  ],
+  "tile": true
+ },
+ "book_tab_hover": {
+  "content": [
+   12,
+   6,
+   26,
+   9
+  ],
+  "margin": [
+   8,
+   0,
+   22,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   62,
+   34
+  ],
+  "tile": true
+ },
+ "book_tab_normal": {
+  "content": [
+   12,
+   6,
+   26,
+   9
+  ],
+  "margin": [
+   8,
+   0,
+   22,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   62,
+   34
+  ],
+  "tile": true
+ },
+ "book_tab_selected": {
+  "content": [
+   12,
+   6,
+   26,
+   9
+  ],
+  "margin": [
+   8,
+   0,
+   22,
+   0
+  ],
+  "shadow": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "size": [
+   62,
+   34
+  ],
+  "tile": true
+ },
  "brass_separator": {
   "margin": [
    48,

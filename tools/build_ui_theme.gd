@@ -348,7 +348,8 @@ func _separators(t: Theme, color: Color, piece: String) -> void:
 
 ## The kit's own variations (oak theme; paper surfaces inherit them): KeyChip (a key
 ## cap behind a key name), Toast (a notification), ChromePanel, ItemSlot (a satchel
-## square), Ribbon (a cloth banner behind a title) and RibbonLabel, its lettering.
+## square), Ribbon (a cloth banner behind a title) and RibbonLabel, its lettering, and
+## the open book: BookCover, BookPageLeft / BookPageRight and the BookTab bookmarks.
 func _kit(t: Theme) -> void:
 	t.set_type_variation("KeyChip", "Label")
 	t.set_stylebox("normal", "KeyChip", _frame("key_chip", Vector2(7, 3), Vector2(7, 6)))
@@ -370,6 +371,23 @@ func _kit(t: Theme) -> void:
 	t.set_color("font_color", "RibbonLabel", T.CANDLE)
 	t.set_color("font_shadow_color", "RibbonLabel", Color(0, 0, 0, 0.5))
 	t.set_constant("shadow_offset_y", "RibbonLabel", 1)
+	# The open book (UiBook): the leather binding, the two pages and the ribbon bookmarks.
+	t.set_type_variation("BookCover", "PanelContainer")
+	t.set_stylebox("panel", "BookCover", _frame("book_cover", Vector2(T.SPACE_5, T.SPACE_5)))
+	t.set_type_variation("BookPageLeft", "PanelContainer")
+	t.set_stylebox("panel", "BookPageLeft", _frame("book_page_left", Vector2(T.SPACE_6, T.SPACE_6), Vector2(T.SPACE_7, T.SPACE_5)))
+	t.set_type_variation("BookPageRight", "PanelContainer")
+	var right := _frame("book_page_right", Vector2(T.SPACE_7, T.SPACE_6), Vector2(T.SPACE_6, T.SPACE_5))
+	t.set_stylebox("panel", "BookPageRight", right)
+	t.set_type_variation("BookTab", "Button")
+	var tab_normal := _frame("book_tab_normal", Vector2(T.SPACE_7 + 10, 6), Vector2(26, 9))
+	var tab_hover := _frame("book_tab_hover", Vector2(T.SPACE_7 + 10, 6), Vector2(26, 9))
+	var tab_selected := _frame("book_tab_selected", Vector2(T.SPACE_7 + 10, 6), Vector2(26, 9))
+	_button_styles(t, "BookTab", tab_normal, tab_hover, tab_selected, tab_normal, _empty(Vector2.ZERO))
+	_button_colors(t, "BookTab", T.CANDLE_SOFT, T.CANDLE, T.CANDLE, T.CANDLE_DIM)
+	t.set_font("font", "BookTab", load(UiFonts.UI_BOLD))
+	t.set_font_size("font_size", "BookTab", T.SIZE_SMALL)
+	t.set_constant("h_separation", "BookTab", T.SPACE_1)
 	# Area banners stand over the world: a soft shadow keeps them legible on any scene.
 	t.set_color("font_shadow_color", "BannerLabel", Color(0, 0, 0, 0.7))
 	t.set_constant("shadow_offset_y", "BannerLabel", 2)

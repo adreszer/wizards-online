@@ -289,6 +289,14 @@ Offline mode has no server, so the real mysteries do not run there. Instead `con
 
 `export_presets.cfg` holds the client presets (Windows Desktop, macOS) with the filters that keep server content out: `nakama/`, `tools/`, `tests/`, `docs/`, the dev/test levels and the placement source are excluded; `content/offline_mysteries.json` is included explicitly. Signing settings are added locally and never committed. Before shipping a build run `tools/check_build.sh` (needs the export templates): it exports a pack, lists its files (`tools/list_pck.py`) and fails if any server or dev file is inside or if any server-only text or mystery id appears in its bytes.
 
+A release to itch.io is one command: `tools/release.sh 0.2.0` builds and checks everything into `export/release/0.2.0/` (Windows zip and macOS zip); `tools/release.sh 0.2.0 --push` also uploads both with [butler](https://itch.io/docs/butler/) (`butler login` once; `ITCH_TARGET=<user>/<game>`, default `adreszer/arcane-academy`) and tags `v0.2.0`. The order matters when client and server change together:
+
+1. Bump `NetworkProtocol.PROTOCOL_VERSION` if any op code, payload shape or RPC changed (old clients are then told to update instead of failing in odd ways), run the exporter and commit.
+2. Redeploy the server (docs/deploy.md); players on the old client see "out of date" until they update.
+3. `tools/release.sh <version> --push`.
+
+New models go through `/usr/bin/python3 tools/shrink_glb_textures.py <file.glb>` (macOS: the system Python has Pillow): colour and normal maps at most 2K, metallic-roughness and occlusion 1K. A 4K map is about 21 MB of compressed texture in the pack.
+
 ## Adding an enemy
 
 1. Rig and animate in Meshy as for a character (Mixamo rig; at least idle, walk or run, an alert and an attack clip). Save as `assets/models/characters/<id>/<id>.glb`, import once.

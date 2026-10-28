@@ -280,6 +280,51 @@ func connect_online(display_name: String) -> String:
 	return ""
 
 
+## Adds an email and password to this character's account (online only). "" on success.
+func protect_account(email: String, password: String) -> String:
+	var err := NakamaAuthentication.check_credentials(email, password)
+	if not err.is_empty():
+		return err
+	if not is_in_world():
+		return tr("ACCOUNT_NEEDS_ONLINE")
+	return await authentication.protect_with_email(email, password)
+
+
+## The email protecting this character's account ("" when none, or offline).
+func account_email() -> String:
+	return await authentication.account_email() if is_in_world() else ""
+
+
+## Deletes this character's account for good (the player's right to erasure) and
+## leaves the world. The next Play online starts a new character. "" on success.
+func delete_account() -> String:
+	if not is_in_world():
+		return tr("ACCOUNT_NEEDS_ONLINE")
+	var auth_client := authentication.client
+	var auth_session := authentication.session
+	await disconnect_online()
+	authentication.client = auth_client
+	authentication.session = auth_session
+	return await authentication.delete_account()
+
+
+## Takes this computer back to a character protected with an email (see
+## NakamaAuthentication.recover_with_email); leaves the world first when online.
+## The next Play online joins as the recovered character. "" on success.
+func recover_account(email: String, password: String) -> String:
+	var err := NakamaAuthentication.check_credentials(email, password)
+	if not err.is_empty():
+		return err
+	if status != Status.OFFLINE and status != Status.ERROR:
+		await disconnect_online()
+	authentication.create_client(
+		GameSession.nakama_host, GameSession.nakama_port,
+		str(ProjectSettings.get_setting("game/network/scheme", "http")),
+		str(ProjectSettings.get_setting("game/network/server_key", "defaultkey")),
+		CONNECT_TIMEOUT_SECONDS)
+	return await authentication.recover_with_email(email, password)
+
+
 ## `reason` is shown to the player; defaults to the localized "Disconnected".
 func disconnect_online(reason: String = "") -> void:
 	if status == Status.OFFLINE:
@@ -818,6 +863,11 @@ func _on_socket_closed() -> void:
 		if err.is_empty():
 			system_message.emit(tr("CHAT_RECONNECTED"))
 			_reconnecting = false
+			return
+		if world_session.outdated:
+			# The server was updated past this client: retrying cannot help.
+			_reconnecting = false
+			disconnected.emit(err)
 			return
 	_reconnecting = false
 	_set_status(Status.ERROR, tr("NET_RECONNECT_FAILED_OFFLINE"))

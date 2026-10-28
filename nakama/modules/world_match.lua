@@ -90,6 +90,9 @@ local MAX_NAME_BYTES = 48
 local POSITION_SLACK, PENDING_AREA_SECONDS = 3.0, 4.0
 -- World objects are written to storage at most this often after a change.
 local WORLD_SAVE_SECONDS = 10
+-- A world match nobody has been in for this long, that is not the elected one
+-- (storage "world"/"match", see world.lua), lost a start-up race: it shuts down.
+local ELECTION_EMPTY_SECONDS = 60
 
 local M = {}
 
@@ -853,7 +856,7 @@ end
 local function save_world(state, now)
   if now - (state.world_saved_at or 0) < WORLD_SAVE_SECONDS then return end
   state.world_saved_at = now
-  local value = { objects = lasting_objects(state.world.objects) }
+  local value = { objects = lasting_objects(state.world.objects), mysteries = Mysteries.to_saved(state.mysteries) }
   local encoded = nk.json_encode(value)
   if encoded ~= state.world_saved then
     state.world_saved = encoded
@@ -1034,7 +1037,10 @@ function M.match_init(context, params)
   local saved = Store.read("world", "objects", nil)
   if saved and type(saved.objects) == "table" then
     for oid, s in pairs(lasting_objects(saved.objects)) do state.world.objects[oid] = s end
-    state.world_saved = nk.json_encode({ objects = lasting_objects(state.world.objects) })
+  end
+  if saved then
+    state.mysteries = Mysteries.from_saved(state.engine, saved.mysteries)
+    state.world_saved = nk.json_encode({ objects = lasting_objects(state.world.objects), mysteries = Mysteries.to_saved(state.mysteries) })
   end
   return state, TICK_RATE, "world"
 end
@@ -1152,6 +1158,20 @@ end
 
 function M.match_loop(context, dispatcher, tick, state, messages)
   local now = nk.time() / 1000
+  if tick % (TICK_RATE * 10) == 0 then
+    if next(state.presences) then
+      state.empty_since = nil
+    else
+      state.empty_since = state.empty_since or now
+      if now - state.empty_since >= ELECTION_EMPTY_SECONDS then
+        local elected = Store.read("world", "match", nil)
+        if elected and elected.id and elected.id ~= context.match_id then
+          nk.logger_info("world match " .. context.match_id .. " lost the election to " .. tostring(elected.id) .. "; shutting down")
+          return nil
+        end
+      end
+    end
+  end
   for _, change in ipairs(Objects.tick(state.world, now)) do
     broadcast_object(dispatcher, change[1], change[2])
   end

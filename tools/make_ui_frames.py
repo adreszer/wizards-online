@@ -411,6 +411,89 @@ def ribbon():
     cv.save("ribbon", shadow=(0, 0, 0, 0), content=(M + 6, 6, M + 6, 9))
 
 
+LEATHER = hexc("4a2418")
+LEATHER_LIT = hexc("6e3a24")
+
+
+def book_cover():
+    """The journal's and books' binding behind the open pages: tooled leather with a
+    blind-stamped rule and brass corner caps."""
+    P, M, C = 14, 40, 128
+    cv = Canvas(2 * M + C, 2 * M + C, (M, M, M, M), (C, C))
+    outer = lambda X, Y: sd_rrect(X, Y, P, P, cv.w - P, cv.h - P, 9)
+    so = outer(cv.X, cv.Y)
+    a = cov(so)
+    cv.over(BLACK, blur_alpha(cv, a, 7, 5) * 0.7)
+    d = -so
+    grain = cv.tile(detail("paper_mottle", C // 2)) * 0.5 + cv.tile(detail("paper_fibre", C // 4)) * 0.35
+    rgb = lerp(LEATHER * 0.8, LEATHER_LIT, np.clip(0.45 + 0.18 * grain, 0, 1))
+    # Worn, darker toward the edge; a soft highlight along the top lip.
+    rgb = lerp(rgb, LEATHER * 0.45, np.clip(np.exp(-np.maximum(d, 0) / 5.0), 0, 1) * 0.6)
+    cv.over(rgb, a)
+    cv.over(LEATHER_LIT * 1.25, cov(np.abs(d - 1.2) - 0.5) * np.clip(1 - (cv.Y - P) / 30, 0, 1) * 0.5)
+    # Blind-stamped double rule: pressed lines, dark with a light lower edge.
+    for inset, wgt in ((9.0, 0.7), (12.5, 0.45)):
+        cv.over(LEATHER * 0.35, cov(np.abs(d - inset) - 0.55) * wgt)
+        cv.over(LEATHER_LIT * 1.3, cov(np.abs(d - inset - 1.0) - 0.35) * wgt * 0.5)
+    # Brass corner caps.
+    for sx in (0, 1):
+        for sy in (0, 1):
+            def to_local(X, Y, sx=sx, sy=sy):
+                return (X if not sx else cv.w - X), (Y if not sy else cv.h - Y)
+
+            def cap(X, Y, to_local=to_local):
+                lx, ly = to_local(X, Y)
+                tri = (lx - P) + (ly - P) - 22.0
+                return np.maximum(tri, np.maximum(P - 0.5 - lx, P - 0.5 - ly))
+            cv.over(BLACK, cov(cap(cv.X - 0.8, cv.Y - 1.2) - 0.3) * 0.5)
+            cv.over(brass(cv, cap, BRASS * 0.95, 1.6), cov(cap(cv.X, cv.Y)) * a)
+    cv.save("book_cover", shadow=(P, P, P, P))
+
+
+def book_page(side):
+    """One page of an open book: paper whose spine edge (right on the left page, left
+    on the right page) curves down into shadow, with a faint ruled margin."""
+    P, C, S = 6, 128, 48   # shadow pad, period, spine margin
+    m = (P + 14, P + 14, S, P + 14) if side == "left" else (S, P + 14, P + 14, P + 14)
+    cv = Canvas(m[0] + m[2] + C, m[1] + m[3] + C, m, (C, C))
+    x0 = P if side == "left" else 0
+    x1 = cv.w if side == "left" else cv.w - P
+    sd = lambda X, Y: sd_rrect(X, Y, x0 - (0 if side == "left" else 6), P, x1 + (6 if side == "left" else 0), cv.h - P, 3)
+    a = cov(sd(cv.X, cv.Y))
+    cv.over(BLACK, blur_alpha(cv, a, 3, 2) * 0.4)
+    rgb = paper_rgb(cv, C, 0.8)
+    outer_d = (cv.X - x0) if side == "left" else (x1 - cv.X)
+    rgb = lerp(rgb, BURNT, np.clip(np.exp(-np.maximum(outer_d, 0) / 3.5) * 0.4, 0, 1))
+    # The gutter: the paper bends into the binding and darkens.
+    spine_d = (cv.w - cv.X) if side == "left" else cv.X
+    gutter = np.clip(1 - spine_d / S, 0, 1) ** 2.2
+    rgb = lerp(rgb, PARCHMENT_EDGE * 0.55, gutter * 0.75)
+    cv.over(rgb, a)
+    cv.save("book_page_" + side, shadow=(P, P, 0, P) if side == "left" else (0, P, P, P))
+
+
+def book_tab(state):
+    """A ribbon bookmark that sticks out past the right page: a cloth tab with a
+    notched tip; dull when not chosen, bright and longer when it is."""
+    M, C, H = 8, 32, 34
+    cv = Canvas(M + C + 22, H, (M, 0, 22, 0), (C, H))
+    top, bot = 4.0, H - 6.0
+    mid = (top + bot) / 2
+    reach = cv.w - 2.0 - (0 if state == "selected" else 6)
+    cut = 8.0 * (1 - np.abs(cv.Y - mid) / ((bot - top) / 2))
+    sd = np.maximum.reduce([top - cv.Y, cv.Y - bot, cv.X - (reach - cut), 0.0 - cv.X])
+    a = cov(sd)
+    cv.over(BLACK, blur_alpha(cv, a, 2.0, 2.0) * 0.45)
+    rows = np.sin((cv.Y - top) / (bot - top) * math.pi)
+    base = RUBRIC if state == "selected" else (BURNT * 0.75 if state == "normal" else RUBRIC * 0.85)
+    rgb = lerp(base * 0.62, base * 1.15, rows * 0.8 + 0.1)
+    weave = cv.tile(detail("paper_fibre", C)) * 0.05
+    cv.over(np.clip(rgb * (1 + weave)[..., None], 0, 1), a)
+    st = cov(np.abs(cv.Y - (top + 2.6)) - 0.35) * (np.floor(cv.X / 3.0) % 2 == 0) * np.clip(reach - cut - 4 - cv.X, 0, 1)
+    cv.over(BRASS, st * (0.8 if state == "selected" else 0.4))
+    cv.save("book_tab_" + state, shadow=(0, 0, 0, 0), content=(M + 4, 6, 26, 9))
+
+
 def wax_seal(state):
     S = 48
     cv = Canvas(S, S)
@@ -787,6 +870,11 @@ def main():
         wax_seal(s)
     oak_window()
     oak_panel()
+    book_cover()
+    book_page("left")
+    book_page("right")
+    for s in ("normal", "hover", "selected"):
+        book_tab(s)
     tooltip()
     key_chip()
     toast()

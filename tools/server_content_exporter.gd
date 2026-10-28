@@ -116,7 +116,7 @@ static func _protocol() -> Dictionary:
 	var out := {}
 	var constants: Dictionary = (NetworkProtocol as Script).get_script_constant_map()
 	for name: String in constants:
-		if name.begins_with("OP_") or name.begins_with("RPC_") or name in ["CHAT_ROOM", "MAX_CHAT_LENGTH"]:
+		if name.begins_with("OP_") or name.begins_with("RPC_") or name in ["CHAT_ROOM", "MAX_CHAT_LENGTH", "PROTOCOL_VERSION"]:
 			out[name] = constants[name]
 	return out
 

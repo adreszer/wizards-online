@@ -1,4 +1,13 @@
-[gd_resource type="AudioBusLayout" format=3]
+[gd_resource type="AudioBusLayout" load_steps=2 format=3]
+
+[sub_resource type="AudioEffectReverb" id="WorldReverb"]
+resource_name = "Reverb"
+predelay_msec = 20.0
+room_size = 0.1
+damping = 0.9
+hipass = 0.15
+dry = 1.0
+wet = 0.0
 
 [resource]
 bus/1/name = &"Music"
@@ -19,3 +28,11 @@ bus/3/mute = false
 bus/3/bypass_fx = false
 bus/3/volume_db = -4.0
 bus/3/send = &"Master"
+bus/4/name = &"World"
+bus/4/solo = false
+bus/4/mute = false
+bus/4/bypass_fx = false
+bus/4/volume_db = 0.0
+bus/4/send = &"Master"
+bus/4/effect/0/effect = SubResource("WorldReverb")
+bus/4/effect/0/enabled = true

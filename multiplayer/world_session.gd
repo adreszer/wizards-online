@@ -54,6 +54,8 @@ signal message_received(op_code: int, payload: Dictionary)
 var socket: NakamaSocket
 var match_id: String = ""
 var self_session_id: String = ""
+## True after the server turned this client away for a protocol mismatch (retrying cannot help).
+var outdated: bool = false
 var _closing: bool = false
 
 
@@ -71,10 +73,16 @@ func connect_socket(client: NakamaClient, session: NakamaSession) -> String:
 
 ## Asks the server module for the shared world match and joins it.
 func join_world(client: NakamaClient, session: NakamaSession, display_name: String, character_id: String = "") -> String:
-	var rpc: NakamaAPI.ApiRpc = await client.rpc_async(session, NetworkProtocol.RPC_JOIN_WORLD, "{}")
+	outdated = false
+	var request := NetworkProtocol.encode({"protocol": NetworkProtocol.PROTOCOL_VERSION})
+	var rpc: NakamaAPI.ApiRpc = await client.rpc_async(session, NetworkProtocol.RPC_JOIN_WORLD, request)
 	if rpc.is_exception():
 		return tr("NET_JOIN_RPC_FAILED") % rpc.get_exception().message
 	var payload := NetworkProtocol.decode(rpc.payload)
+	if str(payload.get("error", "")) == "outdated":
+		outdated = true
+		var server_version := int(payload.get("server", 0))
+		return tr("NET_OUTDATED_CLIENT" if server_version > NetworkProtocol.PROTOCOL_VERSION else "NET_OUTDATED_SERVER")
 	match_id = str(payload.get("match_id", ""))
 	if match_id.is_empty():
 		return tr("NET_JOIN_NO_MATCH")

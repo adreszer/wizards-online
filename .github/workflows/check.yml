@@ -23,3 +23,28 @@ jobs:
       - name: Logs
         if: failure()
         run: tail -n 80 .godot/check/*.log
+
+  # Exports the client pack and fails when server-only content or dev files leak into it
+  # (tools/check_build.sh); needs the export templates, so it runs on main only.
+  build-leak-check:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Godot 4.7.2 and export templates
+        run: |
+          curl -sSL -o godot.zip https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          unzip -q godot.zip
+          echo "GODOT=$PWD/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+          curl -sSL -o templates.tpz https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates
+          unzip -q templates.tpz -d tpl
+          mv tpl/templates ~/.local/share/godot/export_templates/4.7.2.stable
+      - name: Import
+        run: $GODOT --headless --path . --import || true
+      - name: Leak check
+        run: tools/check_build.sh "Windows Desktop"
+      - name: Logs
+        if: failure()
+        run: tail -n 80 export/check/export.log

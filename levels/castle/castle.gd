@@ -34,6 +34,9 @@ func _ready() -> void:
 	ambience.name = "AmbienceDirector"
 	ambience.cycle = day_night
 	add_child(ambience)
+	var reverb := ReverbDirector.new()
+	reverb.name = "ReverbDirector"
+	add_child(reverb)
 	var boards := ClassroomBoards.new()
 	boards.name = "ClassroomBoards"
 	add_child(boards)

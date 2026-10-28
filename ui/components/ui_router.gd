@@ -21,6 +21,9 @@ signal device_changed(pad: bool)
 
 const DIM := Color(0, 0, 0, 0.45)
 const BLUR := preload("res://ui/theme/backdrop_blur.gdshader")
+## Meta on a panel that shows the world itself (the character creator's preview): it
+## stays modal, but nothing dims or blurs behind it.
+const SEE_WORLD := &"ui_see_world"
 ## How visible the HUD stays behind a modal window.
 const HUD_BEHIND := 0.25
 
@@ -139,7 +142,7 @@ func _update() -> void:
 			panel.move_child(backdrop, 0)
 			_backdrops[panel] = backdrop
 		var was_shown := backdrop.visible
-		backdrop.visible = panel == modal
+		backdrop.visible = panel == modal and not panel.get_meta(SEE_WORLD, false)
 		if backdrop.visible and not was_shown and not GameSettings.get_value("reduce_motion"):
 			backdrop.modulate.a = 0.0
 			backdrop.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).tween_property(backdrop, "modulate:a", 1.0, UiTokens.NORMAL)

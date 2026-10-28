@@ -4,10 +4,12 @@ extends FeaturePanel
 ## graphics (a preset, full screen, render scale, the effects, VSync, an FPS cap), audio
 ## (a volume per bus), controls (look speed, invert, every rebindable key as a key chip
 ## with Change, and a way back to the defaults), interface (size, the F2 hint),
-## accessibility and language. Changes apply at once and are saved (GameSettings).
+## accessibility, language and the account (protect the character with an email and
+## password; take a protected character to this computer). Changes apply at once and
+## are saved (GameSettings).
 
 const FPS_CAPS := [0, 30, 60, 90, 120, 144, 240]
-const TABS := ["SETTINGS_TAB_GRAPHICS", "SETTINGS_TAB_AUDIO", "SETTINGS_TAB_KEYS", "SETTINGS_TAB_INTERFACE", "SETTINGS_TAB_ACCESS", "SETTINGS_TAB_LANGUAGE"]
+const TABS := ["SETTINGS_TAB_GRAPHICS", "SETTINGS_TAB_AUDIO", "SETTINGS_TAB_KEYS", "SETTINGS_TAB_INTERFACE", "SETTINGS_TAB_ACCESS", "SETTINGS_TAB_LANGUAGE", "SETTINGS_TAB_ACCOUNT"]
 
 var tabs: TabContainer
 var _rebinding := ""
@@ -18,6 +20,12 @@ var _sliders: Dictionary = {}
 var _preset: OptionButton
 var _fps: OptionButton
 var _language: OptionButton
+var _account_state: Label
+var _account_status: Label
+var _email: LineEdit
+var _password: LineEdit
+var _protect: Button
+var _delete: Button
 
 
 func _ready() -> void:
@@ -53,6 +61,7 @@ func _build() -> void:
 	_build_interface(pages[3])
 	_build_access(pages[4])
 	_build_language(pages[5])
+	_build_account(pages[6])
 
 
 func _build_graphics(page: VBoxContainer) -> void:
@@ -128,6 +137,77 @@ func _build_language(page: VBoxContainer) -> void:
 		_language.set_item_metadata(_language.item_count - 1, locale)
 	_language.item_selected.connect(func(i: int) -> void: GameSession.set_language(str(_language.get_item_metadata(i))))
 	_row(page, "MENU_LANGUAGE", _language)
+
+
+func _build_account(page: VBoxContainer) -> void:
+	_account_state = _caption("ACCOUNT_UNPROTECTED", &"")
+	page.add_child(_account_state)
+	page.add_child(_caption("ACCOUNT_HELP", &"HintLabel"))
+	_email = LineEdit.new()
+	_email.placeholder_text = tr("ACCOUNT_EMAIL_HINT")
+	_email.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_EMAIL_ADDRESS
+	_row(page, "ACCOUNT_EMAIL", _email)
+	_password = LineEdit.new()
+	_password.secret = true
+	_password.placeholder_text = tr("ACCOUNT_PASSWORD_HINT")
+	_row(page, "ACCOUNT_PASSWORD", _password)
+	var buttons := UiBox.h(UiTokens.SPACE_2)
+	_protect = Button.new()
+	_protect.text = tr("ACCOUNT_PROTECT")
+	_protect.pressed.connect(_on_protect)
+	buttons.add_child(_protect)
+	var recover := Button.new()
+	recover.text = tr("ACCOUNT_RECOVER")
+	recover.pressed.connect(_on_recover)
+	buttons.add_child(recover)
+	page.add_child(buttons)
+	_account_status = _caption("", &"HintLabel")
+	page.add_child(_account_status)
+	_delete = Button.new()
+	_delete.text = tr("ACCOUNT_DELETE")
+	_delete.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_delete.pressed.connect(_on_delete)
+	page.add_child(_delete)
+
+
+func _refresh_account() -> void:
+	if _account_state == null:
+		return
+	var online := NetworkManager.is_in_world()
+	_protect.disabled = not online
+	_delete.disabled = not online
+	_protect.tooltip_text = "" if online else tr("ACCOUNT_NEEDS_ONLINE")
+	var email: String = await NetworkManager.account_email() if online else ""
+	if not is_instance_valid(_account_state):
+		return
+	_account_state.text = tr("ACCOUNT_PROTECTED") % email if not email.is_empty() \
+		else tr("ACCOUNT_UNPROTECTED" if online else "ACCOUNT_OFFLINE")
+
+
+func _on_protect() -> void:
+	_account_status.text = tr("ACCOUNT_WORKING")
+	var err: String = await NetworkManager.protect_account(_email.text.strip_edges(), _password.text)
+	_password.text = ""
+	_account_status.text = err if not err.is_empty() else tr("ACCOUNT_PROTECT_DONE")
+	_refresh_account()
+
+
+func _on_delete() -> void:
+	var dialog := UiDialog.confirm(self, tr("ACCOUNT_DELETE"), tr("ACCOUNT_DELETE_CONFIRM"), "ACCOUNT_DELETE_YES", "UI_NO")
+	if not await dialog.answered:
+		return
+	_account_status.text = tr("ACCOUNT_WORKING")
+	var err: String = await NetworkManager.delete_account()
+	_account_status.text = err if not err.is_empty() else tr("ACCOUNT_DELETE_DONE")
+	_refresh_account()
+
+
+func _on_recover() -> void:
+	_account_status.text = tr("ACCOUNT_WORKING")
+	var err: String = await NetworkManager.recover_account(_email.text.strip_edges(), _password.text)
+	_password.text = ""
+	_account_status.text = err if not err.is_empty() else tr("ACCOUNT_RECOVER_DONE")
+	_refresh_account()
 
 
 # --- Rows ----------------------------------------------------------------------------------
@@ -209,6 +289,7 @@ func refresh() -> void:
 	for i in _language.item_count:
 		if _language.get_item_metadata(i) == GameSession.language:
 			_language.select(i)
+	_refresh_account()
 
 
 func _changed() -> void:
