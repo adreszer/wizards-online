@@ -519,7 +519,7 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] Heads of house (`features/heads.lua`): admins name a professor head of a house (`/head name house`); the head (and admins) see house-wide numbers (`/housestats`: points since the last cup by source, members, online, quests) and post to the house board with the house's prefects (`/houseboard text`); members read it in the journal's House tab and on notice boards
 - [x] Tests (two clients): head named, post delivered to the house only, students refused, the door asks before opening, wrong and right answers
 - [x] A hearth per house (dragon, griffin, phoenix, winged sea-horse mantels, `hearth_h1`–`h4`)
-- [ ] Trophy shelves per common room
+- [x] Trophy shelves per common room: a Meshy-made glass-fronted trophy cabinet per house (`trophy_h1`..`trophy_h4`: green with a dragon finial, red/gold griffin, orange phoenix, blue winged sea-horse), placed by `tools/castle/dressing.py` on the first common-room wall slot clear of the hearth
 
 ### Milestone 58 — Dormitories, the Echoes, the chart, the Unfinished Wing
 - [x] Item catalogue for school life (`ItemDefinition.category`, `price`, `shop`, `sell_price`, `effect`, `effect_seconds`, exported to the server): decorations, seeds, herbs, potion ingredients, potions, creature treats, three familiars, the Wayfinder's Chart; the broom is sold to licensed flyers
