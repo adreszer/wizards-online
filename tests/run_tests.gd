@@ -957,6 +957,8 @@ func _test_night_only() -> void:
 	t.check(wisp.night_only, "the ink-wisp is night_only")
 	add_child(wisp)
 	wisp.global_position = Vector3(40, 0.05, 40)
+	# Its post, pinned: whether it spawned awake or asleep depends on the real hour.
+	wisp.set_home(wisp.global_transform)
 	await get_tree().physics_frame
 	wisp.set_time_phase(SchoolClock.Phase.NIGHT)
 	t.check(not wisp.dormant and wisp.visible and wisp.collision_layer != 0, "at night the wisp is out")

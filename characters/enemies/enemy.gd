@@ -170,6 +170,10 @@ func set_time_phase(phase: int) -> void:
 		return
 	if awake:
 		dormant = false
+		# Spawned asleep, it never had a physics tick to learn its post: where it stands
+		# now (placed after spawning) is the post.
+		if not _home_set:
+			set_home(global_transform)
 		set_physics_process(true)
 		respawn()
 	else:
@@ -177,7 +181,8 @@ func set_time_phase(phase: int) -> void:
 
 
 func _go_dormant() -> void:
-	if not _home_set:
+	# The post is not taken here: asleep from _ready, the enemy may not be placed yet.
+	if not _home_set and is_physics_processing() and _state_time > 0.0:
 		set_home(global_transform)
 	dormant = true
 	target = null
