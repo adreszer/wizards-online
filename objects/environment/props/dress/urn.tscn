@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/dress/urn.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(1.021, 1.2, 0.7407)
+
+[node name="Urn" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0008144, -0.0005025, 0.3699)
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6002, 0.3704)
+shape = SubResource("Shape")

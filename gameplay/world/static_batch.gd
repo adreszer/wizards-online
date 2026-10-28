@@ -78,6 +78,7 @@ static var _prototypes: Dictionary = {}   # scene path -> {meshes: [[Mesh, Trans
 
 var _meshes: Dictionary = {}    # [cell, mesh, material] key -> {mesh, material, cell, xforms: Array[Transform3D]}
 var _shapes: Dictionary = {}    # cell -> Array of [Shape3D, Transform3D]
+var _patches: Array[SurfacePatch] = []
 var _flushed := false
 var instance_count := 0
 ## Seats of the benches, chairs and sofas taken in ([{t, both}], see Seats).
@@ -119,8 +120,13 @@ static func can_batch(scene: PackedScene) -> bool:
 	return scene != null and can_batch_path(scene.resource_path)
 
 
+## Set dressing (runners, clutter, small furniture): plain wrappers, all batchable.
+const DRESSING := "res://objects/environment/props/dress/"
+
+
 static func can_batch_path(path: String) -> bool:
-	return BATCHABLE.has(path) or path.begins_with(PLACEHOLDERS) or path.begins_with(TalkingPortraits.PORTRAIT_DIR)
+	return BATCHABLE.has(path) or path.begins_with(PLACEHOLDERS) or path.begins_with(TalkingPortraits.PORTRAIT_DIR) \
+		or path.begins_with(DRESSING)
 
 
 static func prototype(scene: PackedScene) -> Dictionary:
@@ -128,7 +134,7 @@ static func prototype(scene: PackedScene) -> Dictionary:
 	if _prototypes.has(path):
 		return _prototypes[path]
 	var root: Node3D = scene.instantiate()
-	var proto := {"meshes": [], "shapes": []}
+	var proto := {"meshes": [], "shapes": [], "patches": []}
 	_collect(root, root, Transform3D.IDENTITY, proto)
 	root.free()
 	_prototypes[path] = proto
@@ -148,6 +154,8 @@ static func _collect(root: Node3D, node: Node, xform: Transform3D, proto: Dictio
 			proto["meshes"].append([mi.mesh, t, mat, mi.cast_shadow])
 		elif child is CollisionShape3D and (child as CollisionShape3D).shape != null:
 			proto["shapes"].append([(child as CollisionShape3D).shape, t])
+		elif child is SurfacePatch:
+			proto["patches"].append([(child as SurfacePatch).surface, (child as SurfacePatch).size, t])
 		_collect(root, child, t, proto)
 
 
@@ -178,6 +186,13 @@ func add(scene: PackedScene, xform: Transform3D) -> bool:
 		_shapes[cell] = []
 	for s: Array in proto["shapes"]:
 		(_shapes[cell] as Array).append([s[0], local * (s[1] as Transform3D)])
+	# Footstep footprints (a rug's carpet) outlive the merge as plain nodes.
+	for p: Array in proto["patches"]:
+		var patch := SurfacePatch.new()
+		patch.surface = p[0]
+		patch.size = p[1]
+		patch.transform = local * (p[2] as Transform3D)
+		_patches.append(patch)
 	instance_count += 1
 	return true
 
@@ -234,5 +249,8 @@ func flush() -> void:
 			cs.transform = s[1]
 			body.add_child(cs)
 		add_child(body)
+	for patch in _patches:
+		add_child(patch)
 	_meshes.clear()
 	_shapes.clear()
+	_patches.clear()

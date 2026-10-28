@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/dress/log_basket.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.5191, 0.3965, 0.4618)
+
+[node name="LogBasket" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0007215, -0.002882, 0.2316)
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1982, 0.2309)
+shape = SubResource("Shape")

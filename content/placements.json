@@ -533,5 +533,36 @@
    "kind": "notice_board",
    "wall": "auto"
   }
+ ],
+ "lake_tunnel": [
+  {
+   "id": "wisp_tunnel_west",
+   "kind": "ink_wisp",
+   "at": [
+    -16,
+    0
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "wisp_tunnel_east",
+   "kind": "ink_wisp",
+   "at": [
+    14,
+    0
+   ],
+   "yaw": -90
+  }
+ ],
+ "north_wing_cm1": [
+  {
+   "id": "wisp_undercroft",
+   "kind": "ink_wisp",
+   "at": [
+    0,
+    20
+   ],
+   "yaw": 180
+  }
  ]
 }

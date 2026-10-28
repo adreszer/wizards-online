@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/dress/lectern_book.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.6943, 1.45, 0.335)
+
+[node name="LecternBook" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.004234, -0.0004419, 0.2006)
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7249, 0.1675)
+shape = SubResource("Shape")

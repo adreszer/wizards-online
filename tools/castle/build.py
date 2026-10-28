@@ -46,8 +46,9 @@ def ext_id(kind, path):
 
 nodes = []
 placed_nodes = []   # (parent container, (x, y, z), scene path): for the budget rules (budgets.py)
-def xf(pos, rot_y=0.0):
-    c = math.cos(rot_y); s = math.sin(rot_y)
+def xf(pos, rot_y=0.0, scale=1.0):
+    """A yaw (and an optional uniform floor-plane scale: x and z, height kept) at pos."""
+    c = math.cos(rot_y) * scale; s = math.sin(rot_y) * scale
     return f'Transform3D({c:.6f}, 0, {s:.6f}, 0, 1, 0, {-s:.6f}, 0, {c:.6f}, {pos[0]:.3f}, {pos[1]:.3f}, {pos[2]:.3f})'
 
 def block(name, center, size, parent="Geometry"):
@@ -56,11 +57,11 @@ def block(name, center, size, parent="Geometry"):
                  f'transform = {xf(center)}\n'
                  f'size = Vector3({size[0]:.3f}, {size[1]:.3f}, {size[2]:.3f})\n')
 
-def inst(name, path, pos, parent=".", rot_y=0.0, props=None, groups=None):
+def inst(name, path, pos, parent=".", rot_y=0.0, props=None, groups=None, scale=1.0):
     i = ext_id("PackedScene", path)
     placed_nodes.append((parent, pos, path))
     g = f' groups=[{", ".join(chr(34) + x + chr(34) for x in groups)}]' if groups else ""
-    body = f'[node name="{name}" parent="{parent}"{g} instance=ExtResource("{i}")]\ntransform = {xf(pos, rot_y)}\n'
+    body = f'[node name="{name}" parent="{parent}"{g} instance=ExtResource("{i}")]\ntransform = {xf(pos, rot_y, scale)}\n'
     for k, v in (props or {}).items():
         body += f'{k} = {v}\n'
     nodes.append(body)
@@ -811,6 +812,7 @@ KINDS = {
     "fragment": ("res://gameplay/collectibles/collectible.tscn", "Collectibles", True),
     "checkpoint": ("res://gameplay/checkpoints/checkpoint.tscn", "Checkpoints", False),
     "crystal_guardian": ("res://characters/enemies/crystal_guardian.tscn", "Enemies", False),
+    "ink_wisp": ("res://characters/enemies/ink_wisp.tscn", "Enemies", False),
     "magic_switch": ("res://objects/puzzles/magic_switch.tscn", "Puzzles", True),
     "pushable_block": ("res://objects/puzzles/pushable_block.tscn", "Puzzles", True),
     "rotating_statue": ("res://objects/puzzles/rotating_statue.tscn", "Puzzles", True),
@@ -1039,7 +1041,7 @@ def build(plan, kit, placements=PLACEMENTS):
     furniture_count += dressing.dress(plan, getattr(plan, "names_by_key", {}))
     stats = dict(rooms=len(rooms), wall_units=len(units), doors=len(doors), secrets=len(secrets), stairs=len(stairs), railings=railing_count, movers=mover_count,
                  torches=torch_count, windows=window_count, castle_doors=door_count, chandeliers=chandelier_count,
-                 furniture=furniture_count, enemies=placed["crystal_guardian"], nodes=len(nodes))
+                 furniture=furniture_count, enemies=placed["crystal_guardian"] + placed["ink_wisp"], nodes=len(nodes))
     return stats, scene_text(plan)
 
 

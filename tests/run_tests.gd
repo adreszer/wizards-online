@@ -52,12 +52,14 @@ func _ready() -> void:
 
 
 func _run() -> void:
-	# `-- --only=castle` runs one section (any _test_<name>), for quick iteration.
+	# `-- --only=castle` runs one section (any _test_<name>), `--only=inventory,interaction`
+	# several in that order (to find what one section leaves behind for the next).
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--only="):
-			var method := "_test_" + arg.get_slice("=", 1)
-			if has_method(method):
-				await call(method)
+			for section in arg.get_slice("=", 1).split(","):
+				var method := "_test_" + section
+				if has_method(method):
+					await call(method)
 			print(t.summary())
 			get_tree().quit(1 if t.failed > 0 else 0)
 			return
@@ -1723,10 +1725,10 @@ func _test_flying() -> void:
 	add_child(panel)
 	panel._bind_player(player)
 	panel.open()
-	for button: Button in panel.get_node("%Slots").get_children().filter(func(n: Node) -> bool: return n is Button):
-		if button.text.begins_with(tr(BROOM.display_name)):
-			button.pressed.emit()
-	t.check(movement.is_flying and not panel.is_open, "clicking the broom in the satchel mounts it and closes the panel")
+	panel.select(BROOM)
+	t.check(panel._action.text == tr("INVENTORY_MOUNT"), "the satchel offers to mount the broom")
+	panel._action.pressed.emit()
+	t.check(movement.is_flying and not panel.is_open, "mounting the broom from the satchel flies and closes the panel")
 	player.broom_rider.dismount()
 	panel._unbind_player(player)
 	panel.queue_free()
@@ -1836,6 +1838,18 @@ func _test_castle() -> void:
 			untranslated.append(z.display_key)
 	t.check(untranslated.is_empty(), "every area has a translated name (missing: %s)" % ", ".join(untranslated))
 	t.check(castle.get_node_or_null("StartPoint") != null, "castle has a StartPoint")
+	# Set dressing 2.0: the castle looks lived in.
+	var dress_batch: StaticBatch = castle.get_node_or_null("StaticBatch")
+	var patches := dress_batch.find_children("*", "SurfacePatch", true, false) if dress_batch != null else []
+	t.check(patches.size() >= 100, "rugs, runners and hall rugs keep their carpet footsteps through the batch (%d)" % patches.size())
+	var corridor: AreaZone = zones.filter(func(z: AreaZone) -> bool: return z.area_id == &"corridor_w_0").front()
+	var on_runner := patches.any(func(p: SurfacePatch) -> bool:
+		var d := (p.global_position - corridor.global_position).abs()
+		return p.surface == &"carpet" and d.x < corridor.size.x / 2.0 and d.y < corridor.size.y / 2.0 and d.z < corridor.size.z / 2.0)
+	t.check(on_runner, "a carpet runs down the middle of the west corridor")
+	var wisps := castle.find_children("*", "Enemy", true, false).filter(func(e: Node) -> bool: return (e as Enemy).name_key == "ENEMY_INK_WISP_NAME")
+	t.check(wisps.size() >= 3 and (wisps[0] as Enemy).hover_bob > 0.0 and (wisps[0] as Enemy).stomp_every == 0,
+		"ink-wisps haunt the lower passages, floating, with no stomp (%d)" % wisps.size())
 	# Jolt refuses bodies past physics/jolt_physics_3d/limits/max_bodies (the default 10240
 	# ran out once two castles were alive in the tests); keep the castle well under it.
 	var bodies := castle.find_children("*", "CollisionObject3D", true, false).size()
@@ -1888,7 +1902,7 @@ func _test_castle() -> void:
 	if placements is Dictionary:
 		for area: String in placements:
 			for entry: Dictionary in placements[area]:
-				if entry["kind"] in ["checkpoint", "crystal_guardian", "house_tally", "notice_board"]:
+				if entry["kind"] in ["checkpoint", "crystal_guardian", "ink_wisp", "house_tally", "notice_board"]:
 					continue
 				if not object_ids.has(area + "/" + str(entry["id"])):
 					missing_placed.append(area + "/" + str(entry["id"]))
@@ -2496,8 +2510,10 @@ func _test_player_sounds() -> void:
 	await _spawn_player(feet + Vector3.UP * 0.1)
 	for kind: String in ["corridor", "common_room", "classroom", "library"]:
 		var z: AreaZone = by_kind.get(kind)
-		var expected: StringName = PlayerSounds.KIND_SURFACES.get(kind, &"stone")
 		var at := z.global_position + Vector3.DOWN * (z.size.y / 2.0 - 0.2) if z != null else Vector3.ZERO
+		# A rug or runner on that spot wins over the room's floor.
+		var on_patch := SurfacePatch.at(get_tree(), at)
+		var expected: StringName = on_patch if on_patch != &"" else PlayerSounds.KIND_SURFACES.get(kind, &"stone")
 		t.check(z != null and PlayerSounds.surface_at(player, at) == expected, "a %s floor sounds like %s" % [kind, expected])
 	var field: Vector3 = await _open_ground(terrain, by_kind["grounds"])
 	t.check(field != Vector3.INF and PlayerSounds.surface_at(player, field) == &"grass", "open grounds sound like grass")

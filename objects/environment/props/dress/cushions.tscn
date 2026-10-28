@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/dress/cushions.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(1.078, 0.4961, 0.9937)
+
+[node name="Cushions" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.03027, -0.0006325, 0.3137)
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.248, 0.4968)
+shape = SubResource("Shape")

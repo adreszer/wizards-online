@@ -186,14 +186,15 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] `core/world.tscn` loads the castle; `levels/mvp` stays as the test fixture for the puzzle wiring
 - [x] Headless castle test: areas translated, a floor under every area's centre, walking from the start into the entrance hall fires area events, grand staircase and tower flights climbable
 - [x] Classrooms furnished: 13 classrooms get rows of student desks + benches (4 × 3 in the 24 m wing rooms and Potions, 3 × 2 in the SW tower rooms) facing the wall opposite the door, rows kept clear of the room centre; the professor's end gets a lectern on the centre line 2 m ahead of the first row and a professor's desk to its right, with the practice tomes to its left a slate board on an easel by the front wall and a wall board hung on that wall beside its mid-wall pillar (`CLASSROOM_FRONT` in the generator; 228 props ≈ 2.3 M tris, the castle's largest render cost after the floor tiles — revisit with LODs/impostors if frame time suffers)
-- [ ] Furnish the other rooms (great-hall tables, beds, bookshelves, cauldrons, greenhouse workbenches…) and give each classroom its subject props
+- [x] Every room furnished (Milestone 32), then set dressing 2.0 (2026-10-28) because the castle still felt empty: carpet runners down every corridor (crimson, blue in the north and archive wings, green in the east wing and below), room-sized hall rugs (`tools/make_carpets.py`, scaled to the room, kept clear of stairs), benches, clocks, urns, plants and side tables between the corridor portraits, a sitting set (rug, table, chairs, books or a writing set on the table; two in long rooms) and full walls (`FILLER`) in ordinary rooms, a hearth per house, log baskets, cushions, coat racks, harps and bookshelves in the common rooms, lecterns with chained books in the libraries; 16 new Meshy props in `objects/environment/props/dress/` (all batched, `StaticBatch.DRESSING`); furniture 1,900 → 5,384 pieces
 - [x] Windows: 195 `WallWindow` modules on walls facing outside or an open-air area (grounds, courtyard), in the lower row of every storey a room spans (two- and three-storey halls get a high second tier); every module except a wall's end modules and those next to a doorway, kept off stair walls, bookshelf walls and placed objects; a classroom's front wall gets a pair in its end modules, flanking the boards. Dungeons and secret rooms have none (`choose_windows` in the generator). Window type by room kind / room (`WINDOW_TYPES` / `WINDOW_ROOMS`): the wide rose window in classrooms and the great hall, the double in other halls, the library and common rooms, the single lancet elsewhere. Measured cost: windows add ≈1.2–2.3 M primitives per view (6–8 % incl. shadow passes), FPS unchanged
 - [ ] Outdoor lighting (the grounds are lit like night), daylight/moonlight through the windows; taller windows for the two-storey halls once a tall window type exists; glass greenhouse; tower exteriors (rooms currently share one plain exterior)
 - [x] Doors: 41 `CastleDoor`s (`emit_castle_doors`): oak pairs in the doorways of classrooms, offices, dormitories, common rooms, the library and tower rooms; ceremonial pairs, standing open (`start_open`), in both arches of the four wide openings (entrance, courtyard ×2, library) and in the great hall's doorways (`GRAND_DOOR_ROOMS`). House gates and hall/corridor passages stay open. Object ids count per room (`<room>/door_<n>`), so like torches they shift when a room's doors change. Leaves swing 90° into the room (toward the other side if a placed object stands in the way); a closed door occludes. Server-authoritative like levers: `castle_door` in `object_rules.lua`, states `"locked"` / false / true, `locked` exported to `world_objects.lua`; the staff room and the cellars start locked and an unlock spell (Unbolt, the first receiver for `unlock`) frees them, still shut. Offline the door acts locally. `tools/capture_model.tscn -- --open-doors` renders a scene with every door open
 - [x] House gates (`HouseDoor`) rebuilt on the oak leaves: same members-only rule and auto-close, leaves swing into the house area (the generator turns them), and the house crest is a round emblem (house colour in an iron rim, generated mesh) split across the meeting line on both faces, so it parts as the door opens. The greybox frame and the sliding slab are gone
 - [ ] Doors: relock after a while / at curfew (server tick like torch relighting); a carved frame around the crest plate on the house doors
 - [ ] House names, common-room access rules (server-side house membership), classroom/lesson context from `AreaZone`
-- [ ] Modelled stair asset to replace the generated slab steps; railings on flights; more secret passages and multi-step puzzles
+- [x] Railings: the 99 generated railings are the Meshy stone balustrade in equal sections, sheared on flights so rail and plinth follow the stair while the balusters stay upright
+- [ ] Modelled stair asset to replace the generated slab steps; more secret passages and multi-step puzzles
 - [ ] Performance pass in-game (torch count is 353 omni lights; cluster limits if many are visible at once)
 
 ### Milestone 15 — Spells and quick selection
@@ -234,7 +235,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] Server-authoritative enemies (shared position/health, every player a target, loot/house points on a kill)
 - [x] Shield block (Block5): while alert or chasing, a spell from the front is parried with `block_chance` for a quarter of its damage and no shove; ground stomp (Angry_Ground_Stomp_2) every third strike on a close target hits everyone in a 3.5 m ring
 - [ ] Hit reaction and death clips (the model ships none; today a flash and a shrink)
-- [ ] More enemy kinds and spawn rules (night only, secret rooms), enemy audio
+- [x] A second enemy: the ink-wisp (Meshy model, ElevenLabs sounds in `assets/audio/wisp/`), floating (`Enemy.hover_bob`), weak to light and wind, three in the lake tunnel and the undercroft
+- [ ] Spawn rules (night only, secret rooms)
 
 ### Milestone 18 — One source for shared lists (content pipeline, see docs/content-pipeline.md)
 - [x] `tools/export_server_content.gd` (+ `ServerContentExporter`): spells, items, sorting, characters, protocol constants → `nakama/modules/generated/*.lua`, loaded with `require("generated.<name>")`
@@ -348,7 +350,8 @@ Outside the estate's outer gatehouse (whose gate now stands open), at the foot o
 - [ ] New players start at `StationArrival` (needs a first-arrival flag on the profile so returning players spawn where they left)
 - [ ] Shops: an economy (roadmap Term G), shopkeepers, stock per shop, the village weekend schedule
 - [ ] A way back and forth faster than walking (~800 m from the platform to the castle gate): carriages along the causeway, or the train itself
-- [ ] Real assets for the houses, the train and the station (asset-drop workflow); snow and seasons
+- [x] The train at the station: a Meshy locomotive and carriages coupled along the platform (`Village._train`)
+- [ ] Real assets for the village houses and the station; snow and seasons
 
 ### Milestone 37 — Currency
 One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10-22; one unit, no denominations; only the `CURRENCY_*` translation keys name it, code and server data say coins).
@@ -515,7 +518,8 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] The riddle of the week (`features/common_rooms.lua`, `nakama/content/riddles.json`, eight original riddles in Polish and English): each house's door asks its own riddle each school week; members answer once a week (`RiddlePanel`), answers folded (case, diacritics, punctuation, articles); guests with a prefect's pass and staff skip it; admins can reset a student's answer
 - [x] Heads of house (`features/heads.lua`): admins name a professor head of a house (`/head name house`); the head (and admins) see house-wide numbers (`/housestats`: points since the last cup by source, members, online, quests) and post to the house board with the house's prefects (`/houseboard text`); members read it in the journal's House tab and on notice boards
 - [x] Tests (two clients): head named, post delivered to the house only, students refused, the door asks before opening, wrong and right answers
-- [ ] Unique decor per common room (fireplace styles, trophy shelves) waits for art; crests need the owner's artwork
+- [x] A hearth per house (dragon, griffin, phoenix, winged sea-horse mantels, `hearth_h1`–`h4`)
+- [ ] Trophy shelves per common room
 
 ### Milestone 58 — Dormitories, the Echoes, the chart, the Unfinished Wing
 - [x] Item catalogue for school life (`ItemDefinition.category`, `price`, `shop`, `sell_price`, `effect`, `effect_seconds`, exported to the server): decorations, seeds, herbs, potion ingredients, potions, creature treats, three familiars, the Wayfinder's Chart; the broom is sold to licensed flyers

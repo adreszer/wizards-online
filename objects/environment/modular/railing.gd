@@ -1,10 +1,12 @@
 @tool
 class_name Railing
 extends StaticBody3D
-## Stone balustrade: a solid parapet [member height] tall running along local
-## +X for [member length], its base rising by [member rise] over that length
-## (0 for landings and hole edges, a flight's rise for the open side of a
-## stair). Origin is the start of the base line, centred on the thickness.
+## Stone balustrade [member height] tall running along local +X for [member length],
+## its base rising by [member rise] over that length (0 for landings and hole edges, a
+## flight's rise for the open side of a stair). Origin is the start of the base line,
+## centred on the thickness. Drawn as the balustrade model in equal sections; on a
+## flight each section is sheared to the slope, so the rail and plinth follow the
+## stair while the balusters stay upright. The collider is the plain parapet.
 
 @export var length: float = 4.0:
 	set(value):
@@ -23,17 +25,9 @@ extends StaticBody3D
 		thickness = maxf(0.05, value)
 		_rebuild()
 
-const STONE_MATERIAL: StandardMaterial3D = preload("res://assets/materials/greybox_stone.tres")
-
-static var _two_sided: StandardMaterial3D
-
-
-## The shared stone, drawn from both sides (generated faces, no winding to get wrong).
-static func stone() -> StandardMaterial3D:
-	if _two_sided == null:
-		_two_sided = STONE_MATERIAL.duplicate()
-		_two_sided.cull_mode = BaseMaterial3D.CULL_DISABLED
-	return _two_sided
+const BALUSTRADE: PackedScene = preload("res://assets/models/environment/modular/balustrade.glb")
+## The model's own size: length along X, height, depth (tools/wrap_prop.py measured it).
+const MODEL_SIZE := Vector3(2.88, 1.0, 0.56)
 
 
 func _ready() -> void:
@@ -54,18 +48,18 @@ func _rebuild() -> void:
 		Vector3(0, -sink, -t), Vector3(length, rise - sink, -t), Vector3(length, rise - sink, t), Vector3(0, -sink, t),
 		Vector3(0, height, -t), Vector3(length, rise + height, -t), Vector3(length, rise + height, t), Vector3(0, height, t),
 	]
-	var faces := [[0, 1, 2, 3], [7, 6, 5, 4], [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 4, 0]]
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for f: Array in faces:
-		for idx: int in [f[0], f[1], f[2], f[0], f[2], f[3]]:
-			st.add_vertex(corners[idx])
-	st.generate_normals()
-	var mesh := MeshInstance3D.new()
-	mesh.mesh = st.commit()
-	mesh.material_override = stone()
-	mesh.set_meta("railing_generated", true)
-	add_child(mesh)
+	var sections := maxi(1, roundi(length / MODEL_SIZE.x))
+	var run := length / sections
+	var slope := rise / length
+	for i in sections:
+		var x := (i + 0.5) * run
+		var section := BALUSTRADE.instantiate() as Node3D
+		section.transform = Transform3D(
+			Basis(Vector3(run / MODEL_SIZE.x, slope * run / MODEL_SIZE.x, 0.0), Vector3(0.0, height / MODEL_SIZE.y, 0.0),
+				Vector3(0.0, 0.0, maxf(thickness, 0.3) / MODEL_SIZE.z)),
+			Vector3(x, slope * x, 0.0))
+		section.set_meta("railing_generated", true)
+		add_child(section)
 	var shape := CollisionShape3D.new()
 	var convex := ConvexPolygonShape3D.new()
 	convex.points = PackedVector3Array(corners)

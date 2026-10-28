@@ -77,6 +77,10 @@ const LAYER_PLAYER := 1 << 1
 }
 @export var looping_clips: Array[String] = ["idle", "chase", "return"]
 @export var blend_time: float = 0.2
+## Floating enemies with no clips (the ink-wisp): the model drifts this many metres up
+## and down while alive, every [member hover_period] seconds; 0 keeps it still.
+@export var hover_bob: float = 0.0
+@export var hover_period: float = 2.6
 
 @export var model: Node3D
 @export_group("Sounds")
@@ -96,6 +100,7 @@ var target: Node3D
 var home_transform: Transform3D
 var _home_set: bool = false
 var _animation_player: AnimationPlayer
+var _model_rest_y := 0.0
 var _state_time: float = 0.0
 var _idle_voice: AudioStreamPlayer3D
 var _hit_applied: bool = false
@@ -114,6 +119,7 @@ func _ready() -> void:
 	collision_layer = LAYER_WORLD | (1 << 3)  # world (blocks players, camera) + spell target
 	collision_mask = LAYER_WORLD | LAYER_PLAYER
 	if model != null:
+		_model_rest_y = model.position.y
 		var players := model.find_children("*", "AnimationPlayer", true, false)
 		if not players.is_empty():
 			_animation_player = players[0] as AnimationPlayer
@@ -159,6 +165,11 @@ func _ensure_loops() -> void:
 
 func state_name() -> String:
 	return STATE_NAMES[state]
+
+
+func _process(_delta: float) -> void:
+	if hover_bob > 0.0 and model != null and state != State.DEAD:
+		model.position.y = _model_rest_y + sin(Time.get_ticks_msec() / 1000.0 * TAU / hover_period) * hover_bob
 
 
 func _physics_process(delta: float) -> void:

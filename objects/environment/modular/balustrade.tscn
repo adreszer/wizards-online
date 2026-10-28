@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/modular/balustrade.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(2.882, 0.998, 0.5581)
+
+[node name="Balustrade" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Model" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01086, -0.001761, 0.2663)
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.499, 0.2791)
+shape = SubResource("Shape")

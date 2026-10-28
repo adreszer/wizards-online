@@ -17,6 +17,12 @@ extends Node3D
 ## platform (where new players will arrive: Grounds/Village/StationArrival).
 
 const OUTDOOR_LAYER := 1 << 10
+const LOCOMOTIVE: PackedScene = preload("res://assets/models/village/locomotive.glb")
+const CARRIAGE: PackedScene = preload("res://assets/models/village/carriage.glb")
+## The models' lengths (tools/wrap_prop.py measured them) and the gap between vehicles.
+const LOCOMOTIVE_LENGTH := 8.87
+const CARRIAGE_LENGTH := 10.8
+const COUPLING := 0.7
 const CELL := 64.0
 const WALL := 0.45
 const DOOR_HEIGHT := 3.0
@@ -1033,63 +1039,27 @@ func _portal(st: Dictionary, tx: float, bed: float, z1: float) -> void:
 	_solid(_e("paint", Color(0.01, 0.01, 0.012)), Vector3(tx, (bed + crown) / 2.0, z1 + depth + 0.2), Vector3(2.0 * open_half, crown - bed, 0.4))
 
 
+## The train standing at the platform: the locomotive at the buffer-stop end of the
+## stretch the station data gives the train, then as many carriages as fit, coupled with
+## a short gap. The models' length runs along their +X (the locomotive's chimney end
+## forward), turned to point down the line toward -Z; like the rest of the outside they
+## are on the outdoor render layer.
 func _train(st: Dictionary, tx: float, bed: float) -> void:
-	var green := Color(0.1, 0.3, 0.2)
-	var deep := Color(0.07, 0.2, 0.14)
-	var black := Color(0.06, 0.06, 0.07)
-	var wheel_red := Color(0.4, 0.1, 0.08)
 	var rail_top := bed + 0.53
-	for v: Dictionary in st["train"]:
-		var za: float = v["z"][0]
-		var zb: float = v["z"][1]
-		var mid := (za + zb) / 2.0
-		_begin(Vector3(tx, bed, mid), Transform3D.IDENTITY)
-		match str(v["kind"]):
-			"engine":
-				_box(_e("paint", black), Vector3(tx, rail_top + 1.15, mid), Vector3(2.5, 0.45, zb - za))
-				_box(_e("paint", wheel_red), Vector3(tx, rail_top + 1.15, za + 0.15), Vector3(2.8, 0.6, 0.3))
-				_prism(_e("paint", green), Vector3(tx, rail_top + 2.45, za + 1.6), Vector3(tx, rail_top + 2.45, za + 9.0), 1.05, 16)
-				_prism(_e("paint", black), Vector3(tx, rail_top + 2.45, za + 0.4), Vector3(tx, rail_top + 2.45, za + 1.7), 1.12, 16)
-				for zz in [za + 3.6, za + 6.2, za + 8.9]:
-					_prism(_e("metal", BRASS), Vector3(tx, rail_top + 2.45, zz), Vector3(tx, rail_top + 2.45, zz + 0.12), 1.08, 16)
-				_prism(_e("paint", black), Vector3(tx, rail_top + 3.3, za + 1.1), Vector3(tx, rail_top + 4.6, za + 1.1), 0.34, 10)
-				_prism(_e("metal", BRASS), Vector3(tx, rail_top + 3.3, za + 5.0), Vector3(tx, rail_top + 3.95, za + 5.0), 0.42, 10)
-				_box(_e("paint", green), Vector3(tx, rail_top + 2.75, za + 10.9), Vector3(2.8, 2.7, 3.4))
-				_box(_e("slate", black), Vector3(tx, rail_top + 4.2, za + 10.9), Vector3(3.0, 0.2, 3.8))
-				for side in [-1.0, 1.0]:
-					_quad(_e("glow", Color.WHITE), Vector3(tx + side * 1.41, rail_top + 2.9, za + 9.8), Vector3(tx + side * 1.41, rail_top + 2.9, za + 10.8),
-						Vector3(tx + side * 1.41, rail_top + 3.7, za + 10.8), Vector3(tx + side * 1.41, rail_top + 3.7, za + 9.8))
-					for k in range(3):
-						var wz := za + 4.8 + k * 2.1
-						_prism(_e("paint", wheel_red), Vector3(tx + side * 0.82, rail_top + 0.95, wz), Vector3(tx + side * 1.02, rail_top + 0.95, wz), 0.95, 14)
-					for wz in [za + 1.4, za + 2.8]:
-						_prism(_e("paint", black), Vector3(tx + side * 0.82, rail_top + 0.5, wz), Vector3(tx + side * 1.0, rail_top + 0.5, wz), 0.5, 10)
-					_prism(_e("metal", IRON), Vector3(tx + side * 0.9, rail_top + 1.15, za - 0.4), Vector3(tx + side * 0.9, rail_top + 1.15, za + 0.05), 0.2, 8)
-					_box(_e("glow", Color.WHITE), Vector3(tx + side * 0.7, rail_top + 1.75, za + 0.1), Vector3(0.3, 0.3, 0.2))
-				_collide(Vector3(tx, rail_top + 2.3, mid), Vector3(2.9, 4.6, zb - za))
-			"tender":
-				_box(_e("paint", black), Vector3(tx, rail_top + 1.0, mid), Vector3(2.5, 0.4, zb - za))
-				_box(_e("paint", green), Vector3(tx, rail_top + 2.3, mid), Vector3(2.8, 2.2, zb - za - 0.2))
-				_box(_e("stone", Color(0.12, 0.12, 0.13)), Vector3(tx, rail_top + 3.45, mid + 0.6), Vector3(2.4, 0.3, zb - za - 2.4), Basis(Vector3.RIGHT, 0.08))
-				for side in [-1.0, 1.0]:
-					for wz in [za + 1.2, mid, zb - 1.2]:
-						_prism(_e("paint", black), Vector3(tx + side * 0.82, rail_top + 0.55, wz), Vector3(tx + side * 1.0, rail_top + 0.55, wz), 0.55, 10)
-				_collide(Vector3(tx, rail_top + 1.9, mid), Vector3(2.9, 3.8, zb - za))
-			_:
-				var length := zb - za
-				_box(_e("paint", black), Vector3(tx, rail_top + 1.0, mid), Vector3(2.4, 0.35, length))
-				_box(_e("paint", deep), Vector3(tx, rail_top + 1.75, mid), Vector3(2.9, 1.3, length))
-				_box(_e("paint", CREAM), Vector3(tx, rail_top + 3.05, mid), Vector3(2.9, 1.3, length))
-				_box(_e("slate", Color(0.2, 0.2, 0.22)), Vector3(tx, rail_top + 3.85, mid), Vector3(2.8, 0.3, length + 0.1))
-				_box(_e("slate", Color(0.2, 0.2, 0.22)), Vector3(tx, rail_top + 4.05, mid), Vector3(2.0, 0.2, length + 0.1))
-				for side in [-1.0, 1.0]:
-					var n := int(length / 2.0)
-					for k in range(n):
-						var wz := za + 1.2 + k * (length - 2.4) / maxf(1.0, n - 1)
-						_quad(_e("glow", Color.WHITE), Vector3(tx + side * 1.46, rail_top + 2.6, wz - 0.55), Vector3(tx + side * 1.46, rail_top + 2.6, wz + 0.55),
-							Vector3(tx + side * 1.46, rail_top + 3.4, wz + 0.55), Vector3(tx + side * 1.46, rail_top + 3.4, wz - 0.55))
-					_box(_e("metal", BRASS), Vector3(tx + side * 1.46, rail_top + 2.42, mid), Vector3(0.03, 0.06, length - 0.4))
-					for wz in [za + 1.6, za + 3.4, zb - 3.4, zb - 1.6]:
-						_prism(_e("paint", black), Vector3(tx + side * 0.82, rail_top + 0.45, wz), Vector3(tx + side * 1.0, rail_top + 0.45, wz), 0.45, 10)
-				_box(_e("paint", black), Vector3(tx, rail_top + 2.4, zb + 0.4), Vector3(1.6, 2.6, 0.9))
-				_collide(Vector3(tx, rail_top + 2.2, mid), Vector3(2.95, 4.0, length))
+	var stretch: Array = st["train"]
+	var za: float = stretch[0]["z"][0]
+	var zb: float = stretch[-1]["z"][1]
+	var facing := Basis(Vector3.UP, PI / 2.0)
+	var z := za
+	var first := true
+	while z + (LOCOMOTIVE_LENGTH if first else CARRIAGE_LENGTH) <= zb + 0.5:
+		var length := LOCOMOTIVE_LENGTH if first else CARRIAGE_LENGTH
+		var vehicle: Node3D = (LOCOMOTIVE if first else CARRIAGE).instantiate()
+		vehicle.transform = Transform3D(facing, Vector3(tx, rail_top, z + length / 2.0))
+		add_child(vehicle)
+		for mesh: Node in vehicle.find_children("*", "VisualInstance3D", true, false):
+			(mesh as VisualInstance3D).layers |= OUTDOOR_LAYER
+		_collide(Vector3(tx, rail_top + 1.7, z + length / 2.0), Vector3(2.9, 3.4, length))
+		z += length + COUPLING
+		first = false
+
