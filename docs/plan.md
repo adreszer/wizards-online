@@ -238,7 +238,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Shield block (Block5): while alert or chasing, a spell from the front is parried with `block_chance` for a quarter of its damage and no shove; ground stomp (Angry_Ground_Stomp_2) every third strike on a close target hits everyone in a 3.5 m ring
 - [ ] Hit reaction and death clips (the model ships none; today a flash and a shrink)
 - [x] A second enemy: the ink-wisp (Meshy model, ElevenLabs sounds in `assets/audio/wisp/`), floating (`Enemy.hover_bob`), weak to light and wind, three in the lake tunnel and the undercroft
-- [ ] Spawn rules (night only, secret rooms)
+- [x] Spawn rules, night: `Enemy.night_only` (set on the ink-wisp) keeps it hidden, inert and non-colliding by day (`dormant`) and brings it back fresh at its post at dusk (`GameEvents.time_phase_changed`, `Enemy.awake_in_phase`: dusk and night); a death timer that runs out by day waits for dusk; tests in `run_tests.tscn` "Night-only enemies"
+- [ ] Spawn rules: secret rooms (enemies that appear only once a mystery opens a room)
 
 ### Milestone 18 — One source for shared lists (content pipeline, see docs/content-pipeline.md)
 - [x] `tools/export_server_content.gd` (+ `ServerContentExporter`): spells, items, sorting, characters, protocol constants → `nakama/modules/generated/*.lua`, loaded with `require("generated.<name>")`
@@ -689,7 +690,7 @@ Offset `(0.002863, 2.003874, 0.000124)` moves the model's bounding box to bottom
 
 ## Known limitations
 
-- Remote players are client-authoritative for their own transform (see `docs/architecture.md` → Authority); the server checks area reports against positions (Milestone 63) but not movement itself, so a modified client can still move faster than it should.
+- Remote players are client-authoritative for their own transform (see `docs/architecture.md` → Authority); the server checks area reports against positions (Milestone 63) and, since the movement check (`nakama/modules/movement.lua`), each reported position against the last accepted one: a jump longer than 45 m/s × elapsed + 8 m is not relayed and not kept, three such strikes in 30 s snap the client back (`OP_PUSH` kind `position`, `Player.correction_target`) and file one moderation report from "server". It is deliberately lenient: one jump of any length is forgiven every 20 s (respawns, spawns, house changes and seats teleport the body where the server cannot see why), so a modified client can still teleport now and then, and moving at up to broom-boost speed on foot is not caught. The check is off while `cheats_enabled` is set (dev servers, where tests and cheats teleport) and never applies to admins; `movement_check: false` in the school rules turns it off.
 - The one pushable block in the castle is simulated by each client (no pressure plates are placed yet); fragments are kept per character on the server (`features/fragments.lua`).
 - Enemies are local to each client (own copy, own health, only the local player is attacked); no shared combat yet.
 - PvP only in the duelling rooms (Milestone 53), with consent.

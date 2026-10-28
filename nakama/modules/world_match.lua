@@ -44,6 +44,7 @@ local Homework = require("homework")
 local Quests = require("house_quests")
 local Moderation = require("moderation")
 local Duel = require("duel")
+local Movement = require("movement")
 local WARDEN = require("generated.warden")
 local Features = require("features")
 local Plans = require("features.plans")
@@ -1032,7 +1033,7 @@ function M.match_init(context, params)
                   lessons = {}, rules = School.load_rules(), totals = School.load_totals(), points_at = {},
                   clock_offset = School.load_clock_offset(), timetable = Timetable.load(), timetable_day = 0, held_slots = {},
                   positions = {}, chat_at = {}, self_study = SelfStudy.load(), mastery_at = {}, guest_passes = {}, cup = School.load_cup(),
-                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0, caught_night = {}, rumours = {}, finished_duels = {}, features = {}, flight_checked = {}, pending_area = {}, riding_at = {} }
+                  quests = Quests.load_state(), quest_defs = Quests.load_defs(), filter = Moderation.load_filter(), blocks = {}, moderation = {}, duel_of = {}, duel_seq = 0, caught_night = {}, rumours = {}, finished_duels = {}, features = {}, flight_checked = {}, pending_area = {}, riding_at = {}, movement = {} }
   state.world.driven = state.engine.driven
   local saved = Store.read("world", "objects", nil)
   if saved and type(saved.objects) == "table" then
@@ -1138,6 +1139,7 @@ function M.match_leave(context, dispatcher, tick, state, presences)
       state.flight_checked[sid] = nil
       state.pending_area[sid] = nil
       state.riding_at[sid] = nil
+      state.movement[sid] = nil
       for area, lesson in pairs(state.lessons) do
         if lesson.by_sid == sid then
           close_lesson(dispatcher, state, area, "professor left")
@@ -1197,7 +1199,33 @@ function M.match_loop(context, dispatcher, tick, state, messages)
   for _, message in ipairs(messages) do
     local sid = message.sender.session_id
     if message.op_code == OP_STATE then
-      state.positions[sid] = Chat.position_of(message.data) or state.positions[sid]
+      local reported = Chat.position_of(message.data)
+      local verdict = "accept"
+      -- Dev servers (cheats on: tests and cheats teleport) and admins are not checked.
+      local profile = state.profiles[sid]
+      local checked = state.rules.movement_check ~= false and not state.rules.cheats_enabled
+                      and not (profile and profile.role == "admin")
+      if not checked then
+        state.movement[sid] = nil
+        state.positions[sid] = reported or state.positions[sid]
+      elseif reported then
+        local tracker = state.movement[sid] or Movement.new()
+        state.movement[sid] = tracker
+        local info
+        verdict, info = Movement.check(tracker, reported, now)
+        if verdict == "accept" then
+          state.positions[sid] = reported
+        elseif verdict == "reject" then
+          nk.logger_warn(string.format("movement: %s jumped %.1f m (allowed %.1f), strike %d", state.names[sid] or sid, info.moved, info.allowed, info.strikes))
+          if info.correct and state.presences[sid] then
+            dispatcher.broadcast_message(P.OP_PUSH, nk.json_encode({ kind = "position", data = { p = tracker.pos } }), { state.presences[sid] }, nil, true)
+          end
+          if info.report then
+            Moderation.report({ from = "server", from_name = "server", about = message.sender.user_id, about_name = state.names[sid] or "",
+                                reason = string.format("movement: %d impossible moves in %ds (last %.0f m, allowed %.0f m), snapped back", Movement.STRIKES_TO_CORRECT, Movement.STRIKE_WINDOW, info.moved, info.allowed) })
+          end
+        end
+      end
       local pending = state.pending_area[sid]
       if pending then
         if position_fits(state, sid, pending.area) then
@@ -1215,7 +1243,7 @@ function M.match_loop(context, dispatcher, tick, state, messages)
         state.flight_checked[sid] = now
         Features.each("flying", feature_api(dispatcher, state), sid)
       end
-      local rest = others(state, sid)
+      local rest = verdict == "accept" and others(state, sid) or {}
       if #rest > 0 then
         dispatcher.broadcast_message(OP_STATE, message.data, rest, message.sender, false)
       end

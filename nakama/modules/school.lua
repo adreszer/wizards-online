@@ -23,6 +23,7 @@ M.DEFAULT_RULES = {
   practice_tomes_enabled = true,
   -- Dev cheats (OP_CHEAT, chat commands such as /broom) for everyone; admins always may.
   cheats_enabled = false,
+  movement_check = true,   -- OP_STATE jumps checked (movement.lua); off while cheats_enabled, never for admins
   max_reason_bytes = 120,
   max_lecture_bytes = 400,
   -- Real minutes per school day (the day/night cycle); clients get it as OP_CLOCK.
