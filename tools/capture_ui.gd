@@ -100,6 +100,8 @@ func _run() -> void:
 		var panel := world.get_node_or_null(path)
 		if panel == null or not panel.has_method("open"):
 			continue
+		if path == "ChatPanel":
+			_fill_chat(panel)
 		panel.open()
 		await _frames(20)
 		_save(path.to_snake_case())
@@ -167,3 +169,14 @@ func _save(file_name: String) -> void:
 	var path := _out.path_join(file_name + ".png")
 	get_viewport().get_texture().get_image().save_png(path)
 	print("saved ", path)
+
+
+## A few lines of every kind so the chat capture shows tabs, houses, times and counts.
+func _fill_chat(chat: Node) -> void:
+	chat.add_system_line(tr("CHAT_HINT_OPEN"))
+	chat.add_line({"kind": "chat", "mode": "say", "name": "Ola", "text": "Ktoś widział klucz do wieży?", "house": 1, "time": "18:02"})
+	chat.add_line({"kind": "chat", "mode": "say", "name": "Kuba", "text": "Był w bibliotece, przy mapach.", "house": 2, "time": "18:03"})
+	chat.add_line({"kind": "chat", "mode": "whisper", "name": "Ania", "text": "Za portretem jest przejście…", "house": 3, "time": "18:03"})
+	chat.add_line({"kind": "lecture", "name": "Wierzbicka", "text": "Dziś ćwiczymy zaklęcie światła.", "time": "18:04"})
+	chat.add_line({"kind": "chat", "mode": "shout", "name": "Tymek", "text": "Uczta za pięć minut!", "house": 4, "time": "18:05"})
+	chat.add_line({"kind": "dm", "mode": "dm", "name": "Ola", "text": "Spotkajmy się przy fontannie.", "house": 1, "time": "18:06"})

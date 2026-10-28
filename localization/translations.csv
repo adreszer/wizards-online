@@ -1291,3 +1291,11 @@ MAP_KIND_SECRET,Hidden rooms,Ukryte komnaty
 MAP_KIND_HOUSE,House rooms (in the house's colour),Komnaty domów (w barwach domu)
 CREATOR_TURN,"Turn (or drag on the left)","Obróć (lub przeciągnij po lewej)"
 ENEMY_INK_WISP_NAME,Ink-wisp,Atramentowy Błędnik
+CHAT_TAB_ALL,All,Wszystko
+CHAT_TAB_SAY,Say,Mowa
+CHAT_TAB_WHISPER,Whisper,Szept
+CHAT_TAB_SHOUT,Shout,Krzyk
+CHAT_TAB_HOUSE,House,Dom
+CHAT_TAB_DM,Messages,Wiadomości
+CHAT_TAB_UNREAD,%s (%d),%s (%d)
+CHAT_TAB_SWITCH,channel,kanał

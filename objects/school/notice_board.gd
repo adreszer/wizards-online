@@ -20,6 +20,8 @@ const PINNED := preload("res://assets/audio/school/notice_pinned.wav")
 
 
 func _ready() -> void:
+	UiFonts.world_label(_label, UiFonts.text())
+	_label.modulate = UiTokens.CHALK
 	_interactable.prompt_text = "INTERACT_READ_TIMETABLE"
 	_interactable.interacted.connect(func(_by: Node) -> void: GameEvents.timetable_requested.emit())
 	NetworkManager.timetable_changed.connect(refresh)

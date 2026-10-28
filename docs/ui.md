@@ -173,9 +173,9 @@ Each milestone ends with a captured gallery the owner can look at and a playable
 - [~] Professor and admin panels in chrome: the lesson panel and the admin window are oak and brass; a denser, keyboard-first layout is still open
 
 ### Milestone 71 — Social: chat, bubbles, nameplates, profiles
-- [ ] Chat: channel tabs (say, whisper, shout, house, DM), names in house colour with symbols, timestamps, fades when idle, unread counts
-- [ ] Speech bubbles, nameplates, notice boards and classroom boards (3D text) use the theme fonts and colours
-- [ ] Profile card, friends, clubs, DMs, game panel on `UiWindow`
+- [x] Chat: channel tabs (say, whisper, shout, house, DM), names in house colour with symbols, timestamps, fades when idle, unread counts (`ChatChannels`; the house tab narrows the spoken lines to your house, there is no separate server channel)
+- [x] Speech bubbles, nameplates, notice boards and classroom boards (3D text) use the theme fonts and colours (`UiFonts.world_label`, `UiTokens.CHALK` / `WORLD_OUTLINE` / `NAME_*`)
+- [x] Profile card, friends, clubs, DMs, game panel on `UiWindow` (DMs in the chat's messages tab)
 
 ### Milestone 72 — Polish and ship check
 - [ ] Final icon set (Recraft) and spell roundels replace placeholders; commissioned logo and crests (if delivered)

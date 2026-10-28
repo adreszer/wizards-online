@@ -15,7 +15,6 @@ const UI_ONLY_SYMBOLS := "✕✓✗•●○◆◇▲▼◀▶←→↑↓★☆
 ## to the theme and the components (docs/ui.md, Milestone 65 onward). The list only
 ## shrinks: a file that gains one fails, a file that loses one must lower its entry.
 const STYLE_ALLOWLIST := {
-	"res://ui/chat/chat_panel.tscn": 3,
 	"res://ui/common/feature_panel.gd": 1,
 	"res://ui/debug/debug_overlay.gd": 3,
 	"res://ui/debug/debug_overlay.tscn": 4,
