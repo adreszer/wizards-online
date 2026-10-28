@@ -241,8 +241,9 @@ def dress_room(plan, r, names):
         corner_pieces(r, ["coat_rack", "side_table", "cushions", "side_table"])
     elif r.kind == "common_room":
         slots = wall_slots(r, 3.0)
-        if slots:
-            s, along = slots[0]
+        hearth = slots[0] if slots else None
+        if hearth:
+            s, along = hearth
             on_wall(r, s, along, f"hearth_h{r.house}" if r.house else "hearth", "Hearth")
             on_wall(r, s, along + 2.2, "log_basket", "Logs")
         if floor_clear(r, cx, cz, 2.5):
@@ -255,7 +256,14 @@ def dress_room(plan, r, names):
             at_floor(r, cx, cz - 2.2, "cushions", 0.0)
         for s, along in wall_slots(r, 1.6)[1:4]:
             on_wall(r, s, along, f"banner_h{r.house or 1}", "Banner")
-        for (s, along), kind in zip(wall_slots(r, 1.8)[4:], ["bookshelf", "coat_rack", "harp", "bookshelf", "clock"] + FILLER):
+        common = wall_slots(r, 1.8)[4:]
+        # The house's trophy cabinet takes the first of those slots clear of the hearth
+        # and its log basket (the two slot lists are spaced independently).
+        clear = [sl for sl in common if not hearth or sl[0] != hearth[0] or not -2.8 < sl[1] - hearth[1] < 3.4]
+        if clear:
+            on_wall(r, clear[0][0], clear[0][1], f"trophy_h{r.house or 1}", "Trophy")
+            common.remove(clear[0])
+        for (s, along), kind in zip(common, ["bookshelf", "coat_rack", "harp", "bookshelf", "clock"] + FILLER):
             on_wall(r, s, along, kind, "Common")
         if r.width >= 20 or r.depth >= 20:
             sitting_set(r, cx + (r.width / 4 if r.width >= r.depth else 0), cz + (r.depth / 4 if r.depth > r.width else 0), "book_stack", 4)
