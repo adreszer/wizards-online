@@ -80,14 +80,56 @@ func play(id: StringName) -> void:
 	p.play()
 
 
+## Plays `id` unless any interface sound started in the last instant (a panel that
+## played its own open sound keeps it; the router's generic one stays quiet).
+func play_unless_recent(id: StringName, within := 0.08) -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	for other: StringName in _last_played:
+		if other != &"hover" and now - float(_last_played[other]) < within:
+			return
+	play(id)
+
+
+## The sound a control makes: its `ui_sound` meta, else `fallback`.
+static func sound_for(control: Node, fallback: StringName) -> StringName:
+	return control.get_meta(&"ui_sound", fallback)
+
+
+## Every interactive control answers the same way: a hover tick (mouse, or pad focus
+## moving onto it), a click on press, toggle, choice, tab or list pick, a softer tick
+## as a slider settles. The `ui_sound` meta (&"" for silence) overrides any of them.
 func _on_node_added(node: Node) -> void:
-	var button := node as BaseButton
-	if button == null:
+	var control := node as Control
+	if control == null:
 		return
-	button.mouse_entered.connect(func() -> void:
-		if not button.disabled:
-			play(&"hover"))
-	button.pressed.connect(func() -> void: play(button.get_meta(&"ui_sound", &"click")))
+	if control is BaseButton or control is Range or control is ItemList or control is Tree or control is TabBar or control is LineEdit:
+		control.mouse_entered.connect(func() -> void:
+			if not (control is BaseButton and (control as BaseButton).disabled):
+				play(&"hover"))
+		control.focus_entered.connect(func() -> void:
+			if UiRouter.using_pad():
+				play(&"hover"))
+	if control is OptionButton:
+		(control as OptionButton).item_selected.connect(func(_i: int) -> void: play(sound_for(control, &"click")))
+		# The button's own press opens the list: a hover tick, not a click.
+		control.set_meta(&"_ui_press", &"hover")
+	if control is BaseButton:
+		var button := control as BaseButton
+		button.pressed.connect(func() -> void: play(button.get_meta(&"_ui_press", sound_for(button, &"click"))))
+	elif control is Slider:
+		(control as Slider).drag_ended.connect(func(changed: bool) -> void:
+			if changed:
+				play(sound_for(control, &"hover")))
+		# Keyboard and pad steps tick as they go.
+		(control as Slider).value_changed.connect(func(_v: float) -> void:
+			if control.has_focus() and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+				play(sound_for(control, &"hover")))
+	elif control is TabBar:
+		(control as TabBar).tab_clicked.connect(func(_i: int) -> void: play(sound_for(control, &"click")))
+	elif control is ItemList:
+		(control as ItemList).item_selected.connect(func(_i: int) -> void: play(sound_for(control, &"click")))
+	elif control is Tree:
+		(control as Tree).item_selected.connect(func() -> void: play(sound_for(control, &"click")))
 
 
 func _on_mystery_cue(cue: String) -> void:

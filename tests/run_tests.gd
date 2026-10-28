@@ -135,7 +135,7 @@ func _test_ui_window() -> void:
 	panel.open_panel()
 	t.check(card.visible and panel.is_open and GameSession.ui_input_captured, "opening shows the window")
 	card.close_button.pressed.emit()
-	t.check(not card.visible and not panel.is_open and not GameSession.ui_input_captured, "the close control closes the panel")
+	t.check(not card.is_shown() and not panel.is_open and not GameSession.ui_input_captured, "the close control closes the panel")
 	var chrome := UiWindow.new(UiWindow.Family.CHROME)
 	add_child(chrome)
 	t.check(chrome.theme == null and chrome.get_theme_stylebox("panel").get_meta(&"frame", "") == "oak_window", "a chrome window takes the oak frame from the project theme")
@@ -147,6 +147,107 @@ func _test_ui_window() -> void:
 	await _test_hud()
 	await _test_settings_window()
 	await _test_front_door()
+	await _test_ui_polish()
+
+
+## Milestone 72 (docs/ui.md): one motion vocabulary with reduced motion, sounds on every
+## control, pad glyphs, the spell wheel, pad paging, contrast.
+func _test_ui_polish() -> void:
+	var reduce: bool = GameSettings.get_value("reduce_motion")
+	GameSettings.values["reduce_motion"] = false
+	var win := UiWindow.new(UiWindow.Family.CHROME)
+	add_child(win)
+	win.show_window()
+	t.check(win.is_shown() and win.modulate.a < 1.0 and win.scale.x < 1.0, "a window opens with a fade and settle")
+	win.hide_window()
+	t.check(not win.is_shown() and win.visible, "closing fades the window out before it hides")
+	await get_tree().create_timer(UiTokens.FAST + 0.1).timeout
+	t.check(not win.visible and win.modulate.a == 1.0 and win.scale == Vector2.ONE, "after the fade the window is hidden and reset")
+	GameSettings.values["reduce_motion"] = true
+	win.show_window()
+	t.check(win.visible and win.modulate.a == 1.0 and win.scale == Vector2.ONE, "reduced motion opens at once")
+	win.hide_window()
+	t.check(not win.visible, "reduced motion closes at once")
+	var b := Button.new()
+	add_child(b)
+	UiMotion.hover(b, true)
+	t.check(b.self_modulate == UiTokens.HOVER_TINT and UiMotion.seconds(UiTokens.SLOW) == 0.0, "reduced motion: hover feedback and durations are instant")
+	GameSettings.values["reduce_motion"] = false
+	t.check(UiMotion.seconds(UiTokens.SLOW) == UiTokens.SLOW and UiTokens.FAST < UiTokens.NORMAL and UiTokens.NORMAL < UiTokens.SLOW, "durations come from the tokens")
+	win.queue_free()
+
+	# Sounds on every control kind (UiSounds hooks them as they enter the tree).
+	var opt := OptionButton.new()
+	opt.add_item("a")
+	opt.add_item("b")
+	add_child(opt)
+	UiSounds.last_sound = &""
+	opt.item_selected.emit(1)
+	t.check(UiSounds.last_sound == &"click", "choosing in an option button clicks")
+	var list := ItemList.new()
+	list.add_item("x")
+	add_child(list)
+	UiSounds.last_sound = &""
+	list.item_selected.emit(0)
+	t.check(UiSounds.last_sound == &"click", "picking a list row clicks")
+	var quiet := CheckBox.new()
+	quiet.set_meta(&"ui_sound", &"")
+	add_child(quiet)
+	UiSounds.last_sound = &""
+	quiet.pressed.emit()
+	t.check(UiSounds.last_sound == &"", "the ui_sound meta still silences a control")
+	b.pressed.emit()
+	t.check(UiSounds.last_sound == &"click", "a button clicks")
+	for n: Node in [opt, list, quiet, b]:
+		n.queue_free()
+
+	# Pad glyphs: a key chip turns into a drawn glyph after pad input and back.
+	t.check(KeyChip.glyph_for("A") == &"face" and KeyChip.glyph_for("RB") == &"shoulder" and KeyChip.glyph_for("RT") == &"trigger" and KeyChip.glyph_for("↑") == &"dpad" and KeyChip.glyph_for("K") == &"", "pad labels map to glyph shapes")
+	var chip := KeyChip.new(&"jump")
+	add_child(chip)
+	UiRouter._set_pad(true)
+	t.check(chip.glyph == &"face" and chip.text == "A", "after pad input the chip draws the pad button's glyph")
+	UiRouter._set_pad(false)
+	t.check(chip.glyph == &"" and chip.text == KeyChip.label_for(&"jump", false), "after keyboard input it is a key cap again")
+	chip.queue_free()
+
+	# The spell wheel: stick direction to slot, empty slots skipped, the pick emitted.
+	t.check(SpellWheel.slot_at(Vector2(0, -1), 10) == 0 and SpellWheel.slot_at(Vector2(1, 0), 4) == 1 and SpellWheel.slot_at(Vector2(0, 1), 10) == 5 and SpellWheel.slot_at(Vector2(-1, 0), 4) == 3, "the stick points at slots clockwise from the top")
+	t.check(SpellWheel.slot_at(Vector2(0.1, 0.1), 10) == -1 and SpellWheel.slot_at(Vector2(-0.5, -1), 10) == 9 and SpellWheel.slot_at(Vector2(-0.2, -1), 10) == 0, "a centred stick points at nothing; well left of the top is the last slot, just left still the first")
+	var wheel := SpellWheel.new()
+	add_child(wheel)
+	wheel.build(4)
+	wheel.set_spells([ARCANE_PULSE, null, UNBOLT, null], 0)
+	var got: Array[int] = []
+	wheel.picked.connect(func(i: int) -> void: got.append(i))
+	wheel.open()
+	t.check(wheel.is_open and UiRouter.is_open(wheel) and GameSession.ui_input_captured, "holding the wheel button opens the wheel (input captured)")
+	wheel.point(Vector2(1, 0))
+	t.check(wheel.highlighted == -1, "an empty slot cannot be highlighted")
+	wheel.point(Vector2(0, 1))
+	t.check(wheel.highlighted == 2 and wheel._name_label.text == tr(UNBOLT.display_name), "the stick lights a slot and names its spell")
+	wheel.close()
+	t.check(got == [2] and not UiRouter.is_open(wheel), "letting go picks the lit slot")
+	wheel.open()
+	wheel.close()
+	t.check(got == [2], "letting go with the stick centred keeps the current spell")
+	wheel.queue_free()
+	t.check(InputMap.has_action(&"spell_wheel") and KeyChip.label_for(&"spell_wheel", true) == "LB", "the wheel is on LB")
+
+	# LB / RB page a panel's tabs.
+	var host := Control.new()
+	var tabs := TabContainer.new()
+	for i in 3:
+		var page := Control.new()
+		page.name = "P%d" % i
+		tabs.add_child(page)
+	host.add_child(tabs)
+	add_child(host)
+	await get_tree().process_frame
+	t.check(UiRouter.page(host, 1) and tabs.current_tab == 1 and UiRouter.page(host, -1) and UiRouter.page(host, -1) and tabs.current_tab == 2, "shoulder buttons step through a panel's tabs, wrapping")
+	host.queue_free()
+	GameSettings.values["reduce_motion"] = reduce
+	await get_tree().process_frame
 
 
 ## Milestone 66: the frame kit behind the themes, the 2x swap, the icon registry and
@@ -168,7 +269,7 @@ func _test_front_door() -> void:
 	t.check(menu.first_run.visible and started.is_empty(), "a first-time player is asked their name before playing")
 	menu.name_edit.text = "Ola"
 	menu._confirm_first_run()
-	t.check(started.size() == 1 and GameSession.display_name == "Ola" and GameSession.name_chosen and not menu.first_run.visible, "then the game starts with that name")
+	t.check(started.size() == 1 and GameSession.display_name == "Ola" and GameSession.name_chosen and not menu.first_run.is_shown(), "then the game starts with that name")
 	t.check(menu.playing_as.text == tr("MENU_PLAYING_AS") % "Ola", "the menu says who is playing")
 	menu._on_offline()
 	t.check(started.size() == 2, "after that the menu starts straight away")
@@ -1268,6 +1369,7 @@ func _test_spell_effects() -> void:
 	body.queue_free()
 	player.set_profile(str(player.role), old_house)
 	hud.set_house_totals(PackedInt32Array([5, 10, 15, 20]))
+	t.check(hud.house_tally._labels[1].text == "%s 10" % GameSettings.HOUSE_SYMBOLS[2], "each crystal's points carry the house symbol (colour is never the only signal)")
 	t.check(hud.house_tally_text() == "5 10 15 20" and hud.house_tally.visible and is_equal_approx(hud.house_tally.fill_of(4), 1.0) and is_equal_approx(hud.house_tally.fill_of(2), 0.5), "the HUD crystals fill by each house's share of the leader's points")
 	hud.queue_free()
 	await _clear([floor_body, aim])

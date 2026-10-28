@@ -17,7 +17,7 @@ const BRASS_BRIGHT := Color("e8c77a")
 const BRASS_DIM := Color("7a6240")
 const CANDLE := Color("f2e6cc")
 const CANDLE_SOFT := Color("b9a98c")
-const CANDLE_DIM := Color("7d705c")
+const CANDLE_DIM := Color("938570")
 
 # Parchment & ink: reading surfaces (journal, books, notices, letters, small panels).
 const PARCHMENT := Color("e9ddbf")
@@ -29,7 +29,7 @@ const INK_FAINT := Color("5c463059")
 const RUBRIC := Color("8a2e1c")
 
 # States.
-const DANGER := Color("c2523c")
+const DANGER := Color("d66850")
 const SUCCESS := Color("7fa35a")
 const SHADOW := Color("00000080")
 
@@ -69,6 +69,51 @@ const NAME_ADMIN := Color("a9d6a0")
 const FAST := 0.12
 const NORMAL := 0.2
 const SLOW := 0.35
+## Every open, close, fade and hover eases the same way (UiMotion applies these).
+const TRANS := Tween.TRANS_SINE
+const EASE_OPEN := Tween.EASE_OUT
+const EASE_CLOSE := Tween.EASE_IN
+## A window settles from this scale as it opens and shrinks back to it as it closes.
+const OPEN_SCALE_FROM := 0.97
+## A hovered or focused button brightens to this tint (self_modulate) over FAST.
+const HOVER_TINT := Color(1.12, 1.09, 1.04)
+
+## Text and its background, by family, with the WCAG contrast each must reach
+## (4.5 body text, 3.0 large text and non-text marks); tests/check_ui.gd checks them.
+## Each entry: text colour, background, minimum ratio, a name for the report.
+const TEXT_PAIRS := [
+	[CANDLE, OAK_SOLID, 4.5, "candle on oak_solid"],
+	[CANDLE, OAK_RAISED, 4.5, "candle on oak_raised"],
+	[CANDLE, OAK_HOVER, 4.5, "candle on oak_hover"],
+	[CANDLE_SOFT, OAK_SOLID, 4.5, "candle_soft on oak_solid"],
+	[CANDLE_SOFT, OAK_RAISED, 4.5, "candle_soft on oak_raised"],
+	[BRASS, OAK_SOLID, 4.5, "brass on oak_solid"],
+	[BRASS_BRIGHT, OAK_HOVER, 4.5, "brass_bright on oak_hover"],
+	[BRASS_BRIGHT, OAK_SOLID, 4.5, "brass_bright on oak_solid"],
+	[CANDLE_DIM, OAK_SOLID, 4.5, "candle_dim on oak_solid"],
+	[DANGER, OAK_SOLID, 4.5, "danger on oak_solid"],
+	[SUCCESS, OAK_SOLID, 4.5, "success on oak_solid"],
+	[INK, PARCHMENT, 4.5, "ink on parchment"],
+	[INK, PARCHMENT_DEEP, 4.5, "ink on parchment_deep"],
+	[INK_SOFT, PARCHMENT, 4.5, "ink_soft on parchment"],
+	[INK_SOFT, PARCHMENT_DEEP, 4.5, "ink_soft on parchment_deep"],
+	[RUBRIC, PARCHMENT, 4.5, "rubric on parchment"],
+	[RUBRIC, PARCHMENT_DEEP, 4.5, "rubric on parchment_deep"],
+	[CHALK, WORLD_OUTLINE, 4.5, "chalk on world_outline"],
+]
+
+
+## WCAG 2 relative luminance of an sRGB colour (alpha ignored).
+static func luminance(c: Color) -> float:
+	var lin := func(v: float) -> float: return v / 12.92 if v <= 0.04045 else pow((v + 0.055) / 1.055, 2.4)
+	return 0.2126 * lin.call(c.r) + 0.7152 * lin.call(c.g) + 0.0722 * lin.call(c.b)
+
+
+## WCAG contrast ratio between two colours (1 to 21).
+static func contrast(a: Color, b: Color) -> float:
+	var la := luminance(a)
+	var lb := luminance(b)
+	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
 
 ## The theme a parchment surface sets on its root control so everything inside it is
 ## drawn in ink on paper; written by tools/build_ui_theme.gd.

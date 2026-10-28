@@ -12,6 +12,8 @@ const ACCENTS := {Kind.INFO: UiTokens.CANDLE_SOFT, Kind.REWARD: UiTokens.BRASS_B
 	Kind.DISCOVERY: UiTokens.SUCCESS, Kind.WARNING: UiTokens.DANGER}
 const MAX_SHOWN := 4
 const WIDTH := 440
+## Room kept free at each top corner (player plate, clock and crystals).
+const CORNER_CLEARANCE := 300.0
 ## Seconds a toast stays, plus a little per character so long lines can be read.
 const HOLD := 3.5
 const HOLD_PER_CHAR := 0.035
@@ -54,22 +56,31 @@ func push(text: String, kind: Kind = Kind.INFO, icon_id := "", hold := -1.0) -> 
 	var label := Label.new()
 	label.text = text
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.custom_minimum_size.x = WIDTH
+	label.custom_minimum_size.x = text_width()
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(label)
 	add_child(toast)
-	var instant: bool = GameSettings.get_value("reduce_motion")
+	var instant := UiMotion.reduced()
 	var stay := hold if hold >= 0.0 else hold_for(text)
-	var tween := toast.create_tween()
+	var tween := UiMotion.tween(toast, false, false)
 	if not instant:
 		toast.modulate.a = 0.0
 		tween.tween_property(toast, "modulate:a", 1.0, UiTokens.NORMAL)
 	if stay > 0.0:
 		tween.tween_interval(stay)
-		tween.tween_property(toast, "modulate:a", 0.0, 0.0 if instant else UiTokens.SLOW)
+		tween.tween_property(toast, "modulate:a", 0.0, UiMotion.seconds(UiTokens.SLOW)).set_ease(UiTokens.EASE_CLOSE)
 		tween.tween_callback(toast.queue_free)
 	return toast
+
+
+## The text column's width: WIDTH, narrower on a small screen or at a large interface
+## scale so the stack keeps clear of the player plate (top left) and the clock and
+## house crystals (top right).
+func text_width() -> float:
+	if not is_inside_tree():
+		return WIDTH
+	return clampf(get_viewport().get_visible_rect().size.x - 2.0 * CORNER_CLEARANCE, 260.0, WIDTH)
 
 
 func clear() -> void:
