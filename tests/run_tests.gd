@@ -2483,14 +2483,29 @@ func _test_map() -> void:
 	for spec: Array in [[&"hall_a", "hall", Vector3(0, 4.5, 0), Vector3(16, 9, 16)], [&"nook", "secret", Vector3(12, 13.5, 0), Vector3(8, 9, 8)]]:
 		var z := _make_zone(spec[0], spec[1], spec[2], spec[3])
 		z.reparent(fixture_zones)
+	# Doorways: one in the hall's south wall (along x), one from nowhere into the nook (along z).
+	var fixture_walls := Node3D.new()
+	fixture_walls.name = "Walls"
+	fixture.add_child(fixture_walls)
+	for spec: Array in [["Doorway_hall", Vector3(0, 0, 8), 0.0], ["Doorway_nook", Vector3(8, 9, 0), PI / 2.0]]:
+		var doorway := Node3D.new()
+		doorway.name = spec[0]
+		fixture_walls.add_child(doorway)
+		doorway.global_transform = Transform3D(Basis(Vector3.UP, spec[2]), spec[1])
 	var small := CastleMap.new()
 	add_child(small)
 	small.build(fixture)
 	t.check(small.rooms.size() == 2 and small.min_storey == 0 and small.max_storey == 1 and small.terrain == null,
 		"the map is built from the level's zones (%d rooms, storeys %d..%d)" % [small.rooms.size(), small.min_storey, small.max_storey])
 	t.check(small.rooms_on(0).size() == 1 and small.rooms_on(1).is_empty(), "an unfound secret room is not on the map")
+	var hall_doors := small.doors_on(0)
+	t.check(small.doors.size() == 2 and hall_doors.size() == 1 and (hall_doors[0]["at"] as Vector2).is_equal_approx(Vector2(0, 8))
+		and absf((hall_doors[0]["along"] as Vector2).dot(Vector2.RIGHT)) > 0.99,
+		"doorways are read from the level's walls and drawn on their storey (%d, %d on the ground floor)" % [small.doors.size(), hall_doors.size()])
+	t.check(small.doors_on(1).is_empty(), "a doorway into an unfound secret room stays off the map")
 	small.reveal("nook")
 	t.check(small.rooms_on(1).size() == 1 and small.room_at(Vector3(12, 9.2, 0)).get("id", "") == "nook", "a found secret room appears on its storey")
+	t.check(small.doors_on(1).size() == 1, "its doorway appears with it")
 	small.queue_free()
 	fixture.queue_free()
 
@@ -2510,6 +2525,31 @@ func _test_map() -> void:
 	t.check(castle_map.rooms.size() == non_grounds and castle_map.grounds.size() > 3, "every castle zone is a map room (%d), named grounds places are labels (%d)" % [castle_map.rooms.size(), castle_map.grounds.size()])
 	t.check(castle_map.min_storey <= -1 and castle_map.max_storey >= 3, "the map spans the dungeons to the towers (%d..%d)" % [castle_map.min_storey, castle_map.max_storey])
 	t.check(castle_map.stairs.size() > 5 and not castle_map.stairs_on(0).is_empty(), "stairs are on the map (%d)" % castle_map.stairs.size())
+	var hall_door := castle_map.doors_on(0).any(func(d: Dictionary) -> bool:
+		return castle_map.room_at_point(d["at"] + (d["along"] as Vector2).orthogonal(), 0).get("id", "") == "entrance_hall" \
+			or castle_map.room_at_point(d["at"] - (d["along"] as Vector2).orthogonal(), 0).get("id", "") == "entrance_hall")
+	t.check(castle_map.doors.size() > 100 and hall_door, "the castle's doorways are on the map, the entrance hall's among them (%d)" % castle_map.doors.size())
+	# A returning player starts where they left, when that place is still safe.
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var world_script: GDScript = load("res://core/world.gd")
+	var back: Variant = world_script.resume_point(castle, {"pos": [0.0, 0.6, 36.0], "area": "entrance_hall"}, 0)
+	t.check(back is Vector3 and Vector2((back as Vector3).x, (back as Vector3).z).distance_to(Vector2(0, 36)) < 0.01 and absf((back as Vector3).y) < 0.5,
+		"a returning player is put back where they left, on the floor (%s)" % str(back))
+	t.check(world_script.resume_point(castle, {}, 0) == null and world_script.resume_point(castle, {"pos": [0.0, 0.6, 36.0], "area": "library"}, 0) == null
+		and world_script.resume_point(castle, {"pos": [0.0, 0.6, 36.0], "area": "no_such_room"}, 0) == null,
+		"no saved place, a position outside its area or an unknown area starts at the start point")
+	var refused := []
+	for z: AreaZone in castle.get_zones():
+		var at := [z.global_position.x, z.global_position.y - z.size.y * 0.5 + 0.5, z.global_position.z]
+		if (z.kind == "secret" or z.house != 0 or str(z.area_id) == "globe_room") and world_script.resume_point(castle, {"pos": at, "area": str(z.area_id)}, 0) != null:
+			refused.append(str(z.area_id))
+	t.check(refused.is_empty(), "never back into a hidden room, another house's rooms or a room behind a scheduled door (let in: %s)" % str(refused))
+	var own_house: Array = castle.get_zones().filter(func(z: AreaZone) -> bool: return z.house != 0 and z.kind == "common_room")
+	if not own_house.is_empty():
+		var z: AreaZone = own_house[0]
+		var at := [z.global_position.x + 1.0, z.global_position.y - z.size.y * 0.5 + 0.5, z.global_position.z + 1.0]
+		t.check(world_script.resume_point(castle, {"pos": at, "area": str(z.area_id)}, z.house) != null, "a member goes back into their own common room (%s)" % z.area_id)
 	var hall := castle_map.room_at(Vector3(0, 0.1, 36))
 	t.check(hall.get("id", "") == "entrance_hall" and castle_map.view_storey_at(Vector3(0, 0.1, 36)) == 0, "the room under a position is found (%s)" % hall.get("id", "none"))
 	t.check(castle_map.view_storey_at(Vector3(0, 9.1, 36)) == 1, "standing on the first floor shows the first floor")

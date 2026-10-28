@@ -4,6 +4,58 @@ Authoritative implementation tracker. Updated continuously as work progresses. L
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` complete
 
+## Open after launch readiness (2026-10-29)
+
+Every `[ ]` left in the milestones below, grouped by who moves it next. Each line points to the item; details stay there.
+
+**Owner decisions**
+- In-game sign-off of the wall module and whether it becomes the canonical workflow → Milestone 11
+- Seam strategy for the modular kit → Milestone 11
+- Final names for the village, its shops and the station → Milestone 36
+- Which spells self-study may teach, the Lecture Quill's final name → Milestone 41
+- How a character advances a year, final year names → Milestone 45
+- When years advance, the exam hall setup, practical exams → Milestone 47
+- How prefects are chosen → Milestone 49
+- Age-appropriate defaults → Milestone 52
+
+**Owner tasks (testing, art, text)**
+- Native-speaker pass over the Polish copy → Milestone 12
+- Measure on a mid-range laptop at 1080p and tune the low/medium presets → Milestone 14
+- Measure SDFGI on a mid laptop at 1080p → Lighting overhaul
+- A tall window type for the two-storey halls, a glass greenhouse → Milestone 14
+- Modelled stair asset → Milestone 14
+- An authored broom riding clip → Milestone 13b
+- Hit reaction and death clips for the guardian → Milestone 17
+- Real assets for the village houses and the station buildings → Milestone 36
+- Sounds not made yet (chests, wardrobes, telescope… and two ambiences) → Milestone 38
+- More voices, a second take per line, professors' demonstration lines → Milestone 38
+- More takes for hover/click if the repeats grate → Milestone 38
+- Authored clips (Mixamo) and casting gestures per spell family → Milestone 40
+- Faces and hairstyles (more character models) → Milestone 42
+- Real food and tableware models, feasts as ceremonies → Milestone 43
+
+**Post-launch features**
+- Steam language hook and store languages → Milestone 12
+- Steam (GodotSteam) → Milestone 63
+- A general professor item grant in lessons, consumable torches → Milestone 13
+- Doors relock after a while / at curfew, a carved frame round the house crest → Milestone 14
+- Mend receivers and lockable chests → Milestone 15
+- Drag to reorder hotbar slots → Milestone 15
+- Shared enemy positions and targets → Milestone 17
+- Enemies that appear once a mystery opens a secret room → Milestone 17
+- Night-only content: the turning stairs' night flight, stargazing → Milestone 34
+- Sun shadows outdoors → Milestone 34
+- Shopkeeper figures and limited stock per shop → Milestone 36
+- Faster travel between the station and the castle → Milestone 36
+- Sounds for water freezing, a basin filling, a mended object → Milestone 38
+- Wooden stages and stairs with their own step sounds → Milestone 38
+- The cup carried in at the house cup ceremony → Milestone 50
+- Hit reaction and duel meter visuals → Milestone 53
+- Stealth, a lantern familiar, curfew-only secrets → Milestone 54
+- Portrait hints tied to mysteries → Milestone 55
+- Sitters visiting neighbouring frames → Living portraits
+- A shadowed sun with volumetric fog → Lighting overhaul
+
 ## Architecture overview
 
 Godot 4.7 project (GDScript, static typing) with an optional Nakama backend (Docker Compose: Nakama + PostgreSQL).
@@ -153,7 +205,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Display names accept accented Latin letters client- and server-side (Lua sanitizer cuts on UTF-8 boundaries)
 - [x] Headless test: both locales load, every key has both columns, no duplicates, no stale import, name sanitizing
 - [ ] Steam: wire `Localization.steam_language()` to `Steam.getCurrentGameLanguage()` when GodotSteam is added; list PL + EN on the store page
-- [ ] Native-speaker pass over the Polish copy before release; add a dedicated UI font and verify diacritics in every label (default Godot font covers Latin Extended-A)
+- [ ] Native-speaker pass over the Polish copy before release (the dedicated UI fonts and the diacritics coverage check are in: `UiFonts`, `tests/check_ui.tscn`, Milestone 65)
 
 ### Milestone 13 — Inventory and carried light (first step of the lighting overhaul)
 - [x] `ItemDefinition` resource + `ItemRegistry` (id → `resources/items/<id>.tres`, sanitized ids, starting kit)
@@ -165,7 +217,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Headless tests: inventory data/visuals/panel (run_tests), held torch replication + server-issued inventory (two-client test)
 - [x] Lighting overhaul proper: dim ambient/sun so only placed and carried light sources light the castle (see "Lighting overhaul" below)
 - [x] Ways to obtain items in the world: `item_rack` world objects (server-granted via `OP_WORLD_EVENT`), dev cheats `/give` (`OP_CHEAT`)
-- [ ] Items from professors (granted in lessons, like spells), consumable torches that burn down (`burn_seconds`)
+- [ ] A general item grant from professors in lessons (today professors grant only the stacks' permission slip, `features/stacks.lua`, and the broom with a licence, `features/flying.lua`, Milestones 60 and 64); consumable torches that burn down (`burn_seconds` is in the item data and the export, nothing burns it yet)
 
 ### Milestone 13b — Brooms and flying
 - [x] Broom item (`resources/items/broom.tres`, `ItemDefinition.mount_scene`), procedural `BroomModel` (tapered shaft, brass bindings, twig bundle, spark trail)
@@ -174,7 +226,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Broom racks (`BroomRack`, kind `item_rack`) beside the grounds spawn and in the flying classroom; server `give_item` (one per character)
 - [x] Cheats: chat commands `/broom` `/miotla` `/give <id>` `/help` (offline too); server `OP_CHEAT` / `OP_CHEAT_RESULT`, admins or `cheats_enabled` (school rules, on in dev)
 - [x] Headless tests: flight (lift-off, hover, climb/sink, cruise/boost, ceiling, landing, no-fly zone, lost broom), rack, remote mount, satchel, cheats
-- [ ] Flying lessons: grant brooms in Flying lessons instead of open racks; server-side checks on flight (owns a broom, allowed area); a modelled broom (and an authored riding clip if the procedural pose falls short)
+- [ ] An authored riding clip if the procedural pose falls short (built: brooms granted with a licence in Flying lessons and racks shut without one, server checks on where riders fly, `features/flying.lua`, Milestone 60; the Meshy broom, `objects/items/broom.gd`, fifth props batch)
 
 ### Milestone 14 — The castle (open world)
 - [x] `tools/generate_castle.py`: declarative plan (rooms on a 4 m grid, doors, stairs, secrets) → `levels/castle/castle.tscn`; shared walls emitted once, doorway modules where doors are declared, stair holes cut in floors/ceilings, pillars, torches, band fillers for multi-storey rooms, overlap + reachability checks
@@ -189,13 +241,13 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Every room furnished (Milestone 32), then set dressing 2.0 (2026-10-28) because the castle still felt empty: carpet runners down every corridor (crimson, blue in the north and archive wings, green in the east wing and below), room-sized hall rugs (`tools/make_carpets.py`, scaled to the room, kept clear of stairs), benches, clocks, urns, plants and side tables between the corridor portraits, a sitting set (rug, table, chairs, books or a writing set on the table; two in long rooms) and full walls (`FILLER`) in ordinary rooms, a hearth per house, log baskets, cushions, coat racks, harps and bookshelves in the common rooms, lecterns with chained books in the libraries; 16 new Meshy props in `objects/environment/props/dress/` (all batched, `StaticBatch.DRESSING`); furniture 1,900 → 5,384 pieces
 - [x] Windows: 195 `WallWindow` modules on walls facing outside or an open-air area (grounds, courtyard), in the lower row of every storey a room spans (two- and three-storey halls get a high second tier); every module except a wall's end modules and those next to a doorway, kept off stair walls, bookshelf walls and placed objects; a classroom's front wall gets a pair in its end modules, flanking the boards. Dungeons and secret rooms have none (`choose_windows` in the generator). Window type by room kind / room (`WINDOW_TYPES` / `WINDOW_ROOMS`): the wide rose window in classrooms and the great hall, the double in other halls, the library and common rooms, the single lancet elsewhere. Measured cost: windows add ≈1.2–2.3 M primitives per view (6–8 % incl. shadow passes), FPS unchanged
 - [x] Outdoor lighting and daylight/moonlight through the windows: brighter sun (2.0), a brighter sky by day (`DAY_SKY_ENERGY`, it lights the shaded grounds with GI) and a stronger ambient under the open sky by day (`OUTDOOR_DAY_AMBIENT`, without GI); fake light shafts through every glazed window (warm by day, a faint blue moonbeam at night; see docs/lighting.md)
-- [ ] Taller windows for the two-storey halls once a tall window type exists; glass greenhouse; tower exteriors (rooms currently share one plain exterior)
+- [ ] A tall window type for the two-storey halls (today they get a second tier of ordinary windows); a glass greenhouse (tower exteriors are built: spires, roofs and facades from `CastleExterior`, Milestone 27)
 - [x] Doors: 41 `CastleDoor`s (`emit_castle_doors`): oak pairs in the doorways of classrooms, offices, dormitories, common rooms, the library and tower rooms; ceremonial pairs, standing open (`start_open`), in both arches of the four wide openings (entrance, courtyard ×2, library) and in the great hall's doorways (`GRAND_DOOR_ROOMS`). House gates and hall/corridor passages stay open. Object ids count per room (`<room>/door_<n>`), so like torches they shift when a room's doors change. Leaves swing 90° into the room (toward the other side if a placed object stands in the way); a closed door occludes. Server-authoritative like levers: `castle_door` in `object_rules.lua`, states `"locked"` / false / true, `locked` exported to `world_objects.lua`; the staff room and the cellars start locked and an unlock spell (Unbolt, the first receiver for `unlock`) frees them, still shut. Offline the door acts locally. `tools/capture_model.tscn -- --open-doors` renders a scene with every door open
 - [x] House gates (`HouseDoor`) rebuilt on the oak leaves: same members-only rule and auto-close, leaves swing into the house area (the generator turns them), and the house crest is a round emblem (house colour in an iron rim, generated mesh) split across the meeting line on both faces, so it parts as the door opens. The greybox frame and the sliding slab are gone
 - [ ] Doors: relock after a while / at curfew (server tick like torch relighting); a carved frame around the crest plate on the house doors
-- [ ] House names, common-room access rules (server-side house membership), classroom/lesson context from `AreaZone`
+- [x] House names, common-room access rules (server-side house membership), classroom/lesson context from `AreaZone` (built: house names from the owner and house-gated common rooms with the server dropping another house's area reports, Milestone 16; lessons keyed off the classroom area, `world_areas.lua`, Milestones 16 and 22)
 - [x] Railings: the 99 generated railings are the Meshy stone balustrade in equal sections, sheared on flights so rail and plinth follow the stair while the balusters stay upright
-- [ ] Modelled stair asset to replace the generated slab steps; more secret passages and multi-step puzzles
+- [ ] Modelled stair asset to replace the generated slab steps (more secret passages and multi-step puzzles are built: `tools/castle/secrets.py`, 15 hidden rooms, 7 shortcuts, 22 chains, Milestone 31; mystery chains per year, Milestone 64)
 - [x] Performance measured after set dressing 2.0 (`tools/perf_castle.tscn`, M3 Ultra, 2026-10-28): the same as before the dressing (entrance hall 26 ms / 50 M primitives vs 24 ms / 47 M; other views 14–18 ms): the cost is the modules seen across the castle, not the props. Small batched props (dressing, portraits) now draw to 40 m (`StaticBatch.detail_end`), and a Draw distance setting (presets: low 50 %, medium 75 %) scales every batched range
 - [ ] Measure on a mid-range laptop at 1080p (owner) and tune the low/medium presets from it
 
@@ -207,10 +259,10 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Reactions: PushableBlock floats under Uplift and is shoved by Galewind; WallTorch lit by Emberkindle, put out by Wellspring/Frostbind/Duskveil (relights after 45 s); Glowmote leaves a floating `LightMote` via the new `burst_scene` hook
 - [x] A practice tome per spell in the matching classroom (Charms ×2, Flying, Kitchens, Potions, Defence Against the Dark Arts, Library, Astronomy, Ancient Runes, Transfiguration, Herbology) + a practice block in Sigilcraft; `-- --all-spells` for playtesting
 - [x] Headless tests: registry/translations, spellbook + input actions, block/torch/mote effects, cooldown rules, HUD hotbar, tomes in the castle
-- [ ] Receivers for unlock / mend / growth (locked doors and chests, breakables, plants) once rooms are furnished
-- [ ] Server-side spellbook: persist `SpellCaster.to_state()` per character in Nakama, grant spells from lessons, validate cast ids server-side (duel groundwork: target field + PvP flag per area)
-- [ ] Spell icons for the hotbar; drag to reorder slots; radial spell wheel for gamepad
-- [ ] Torch lit state replicated (local-only for now, like puzzles)
+- [ ] Receivers for mend (breakables) and lockable chests (unlock is built: `CastleDoor` takes Unbolt, Milestone 14; growth: the greenhouse beds take Quicksprout, `features/garden.lua`, Milestone 61)
+- [x] Server-side spellbook: persist `SpellCaster.to_state()` per character in Nakama, grant spells from lessons, validate cast ids server-side (duel groundwork: target field + PvP flag per area) (built: spellbook in the server profile, `OP_GRANT_SPELL`, casts relayed only for known spells, Milestones 16 and 22; duelling only in `duel_areas`, `duel.lua`, Milestone 53)
+- [ ] Drag to reorder hotbar slots (built: spell icons per effect, `SpellSlot.icon_for` over the placeholder `UiIcons`, Milestone 66; the radial wheel `SpellWheel` on LB, Milestone 72)
+- [x] Torch lit state replicated (local-only for now, like puzzles) (built: torches are server-authoritative world objects and relight server-side, `object_rules.lua`, Milestone 20)
 
 ### Milestone 16 — Character record, roles and live lessons
 - [x] Server-side character profile (`character`/`profile`: house, role, spellbook) created on first join, sent as `OP_PROFILE`, role/house in every roster entry; `ADMIN_USER_IDS` env promotes on join
@@ -221,20 +273,20 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Nameplates show professor/admin titles and colours; HUD role line with the lesson-tools hint
 - [x] Tests: unit (profile sanitising, nested-zone tracker, nameplates, panel) and two-client (promotion by id and name, denied self-promotion, dropped unknown cast, refused grants, successful grant, tome request, persistence of spells and hotbar across reconnect)
 - [x] Lecture text to the room, house points award/deduct, grants tied to a lesson session (Milestone 22)
-- [ ] Questions to students, timetables
+- [x] Questions to students, timetables (built: quizzes, `quiz.lua`, `QuizPanel`, Milestone 41; the timetable, `timetable.lua`, `OP_TIMETABLE`, Milestone 35)
 - [x] Sorting into houses: the Choosing Stone in the great hall opens a four-question ceremony; the server tallies (`OP_SORT`), balances ties by house population, stores the house once, updates nameplates/HUD/roster; offline runs the same rule locally; houses Drakoryn / Grypheon / Phoenara / Hipporys with emblem animals and colours
 - [x] House-gated common rooms: `HouseDoor` on every doorway into a house area (dungeon and kitchen-side common rooms, the two tower landings that now own the stairs up), members open by interacting, others refused; server drops area reports for another house's area
 - [x] House columns (`HouseTally`, placement kind `house_tally`) at the head of the great hall: four glass columns that fill with light in house colours from the server tally (`house_totals_changed`), against whole hundreds above the leader; rank numerals I–IV above (ties share a rank, the leader glows brightest), house name and points on the plinth, a spark burst up the column on a gain and down it on a loss; empty and unranked offline. `tools/capture_model.tscn -- --house-totals=a,b,c,d` previews a tally
 - [~] House crests (dragon, griffin, phoenix, hippocampus): on the house doors, the house columns, the HUD, the sorting reveal, the profile card, the house banners (repainted by `tools/make_banners.py`: house-colour damask, brass border, the crest; the house cup, its ceremony and the year-end hall hang the same banners) and the robes (a decal on the chest bone, `CharacterLook`); still to come: a visible ceremony (others watching in the great hall); house cup at term end
-- [ ] Server-side position sanity for area reports (today the area id is client-reported, validated only against the map)
-- [ ] In-game admin UI for `admin_set_profile` (today: script/console)
+- [x] Server-side position sanity for area reports (today the area id is client-reported, validated only against the map) (built: area reports checked against the zone boxes in `world_areas.lua`, Milestone 63; the movement check, `movement.lua`)
+- [x] In-game admin UI for `admin_set_profile` (today: script/console) (built: `AdminPanel`, `/admin`, `features/admin.lua`, Milestone 62)
 
 ### Milestone 17 — Dungeon enemies (first combat)
 - [x] Crystalstone Guardian model (Meshy, Mixamo rig, 8 clips) verified and imported under `assets/models/characters/crystal_guardian/`
 - [x] `Enemy` (`characters/enemies/enemy.gd`): idle / alert / chase / attack / return / dead, line-of-sight detection, leash, melee hit window, knockback from force/wind, hit flash, death shatter + respawn; damage through the existing `Health` + `SpellReceiver` components
 - [x] Three guardians placed by the generator in the dungeons (cellars ×2, dungeon corridor); cellars plaque warns the player
 - [x] Tests: idle at range, detection, chase + blow on the player, spell damage (direct effect and a real projectile), death, respawn; castle test counts the guardians
-- [ ] Server-authoritative enemies (shared position/health, every player a target, loot/house points on a kill)
+- [ ] Shared enemy positions and targets: every player a target of the same guardian (shared health, deaths, respawns and house points and coins on a kill are built: `features/guardians.lua`, `GuardianSync`, Milestone 60; each client still animates the chase and only its own player is attacked)
 - [x] Shield block (Block5): while alert or chasing, a spell from the front is parried with `block_chance` for a quarter of its damage and no shove; ground stomp (Angry_Ground_Stomp_2) every third strike on a close target hits everyone in a 3.5 m ring
 - [ ] Hit reaction and death clips (the model ships none; today a flash and a shrink)
 - [x] A second enemy: the ink-wisp (Meshy model, ElevenLabs sounds in `assets/audio/wisp/`), floating (`Enemy.hover_bob`), weak to light and wind, three in the lake tunnel and the undercroft
@@ -267,7 +319,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Content: the undercroft (enter the dungeon holding a torch, then strike the wall), the hidden study (turn the new reader statue to the right state, then strike the wall), the loft (two players in the gallery, then strike the wall), and a player-scoped tale read from three plaques in order
 - [x] `admin_reset_world` RPC + `tools/reset_world.sh`; `admin_set_profile` takes `forget_mysteries`
 - [x] Tests: content validation (objects, areas, effects, items, both languages, nothing in the CSV); two-client test solves the plaque tale and the two-player loft
-- [ ] House points from mysteries are only logged until the ledger exists (Milestone 22)
+- [x] House points from mysteries are only logged until the ledger exists (Milestone 22) (built: mystery awards go through the house points ledger, `school.lua`, Milestone 22)
 
 ### Milestone 22 — Subjects, lesson sessions, house points
 - [x] `SubjectDefinition` resources (12 subjects with placeholder names from the classrooms; every spell in exactly one) + `generated/subjects.lua`; `subject` on each exported spell
@@ -276,7 +328,7 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [x] Lecture text (`OP_LECTURE` → everyone in the room, shown in chat) and lesson plans stored per professor (`lesson_plan_save`/`lesson_plan_list`), read out line by line from the panel
 - [x] Two-client test: no lesson → refused, open lesson, other subject → refused, grant, lecture received, points checks and tally on both clients, ledger sums equal totals, plan stored
 - [x] Final subject names from the owner (display names only; ids unchanged)
-- [ ] Attendance is recorded but not shown anywhere yet
+- [x] Attendance is recorded but not shown anywhere yet (built: the journal's school record per subject, `ui/school/journal.gd`, Milestone 45; attendance in the grades, `SchoolGrades`, Milestone 47; `lesson_log` for admins, Milestone 35)
 
 ### Milestone 23 — Release hygiene
 - [x] Client export presets (Windows Desktop, macOS) with include/exclude filters, committed without signing secrets
@@ -314,8 +366,8 @@ Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B
 - [x] `MapView` (`ui/map/map_view.gd`): one drawing control for both (relief shader `map_terrain.gdshader` from `Terrain.height_image()` + splat, rooms tinted by kind and house, stairs with up/down arrows, current room outlined, local player arrow, other players as house-coloured dots, labels that fit)
 - [x] Minimap (bottom right, `ui/map/minimap.tscn`): follows the player north up, zooms in indoors and out on the grounds, names the place and floor
 - [x] Full map (`ui/map/map_panel.tscn`, M / D-pad up): drag to pan, wheel zoom about the cursor, floor buttons and PgUp/PgDn, "Find me", hover names a room; `tools/capture_map.tscn` renders screenshots
-- [ ] Doorways on the map (the generator knows them; export them with the zones or read the door nodes)
-- [ ] The map as an in-world item (roadmap: self-filling chart, house-mates' locations)
+- [x] Doorways on the map (the generator knows them; export them with the zones or read the door nodes) (built 2026-10-29: `CastleMap` reads every doorway module under `Walls` at load, `doors_on(storey)` keeps those into an unfound secret room hidden, `MapView` breaks the wall outline with inked jambs on the minimap and the full map; tests in `run_tests.tscn` "Map")
+- [x] The map as an in-world item (roadmap: self-filling chart, house-mates' locations) (built: the Wayfinder's Chart item, `features/explore.lua`, house-mates sharing with `/share`, Milestone 58)
 
 ### Milestone 34 — School clock, day and night
 - [x] `SchoolClock` (`gameplay/world/school_clock.gd`): hours = ((world time + offset) / day length) mod 1 × 24, a pure function of `NetworkManager.server_time()`, so every client agrees without streaming; phases night (21–5), dawn (5–7), day (7–19), dusk (19–21)
@@ -324,7 +376,7 @@ Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B
 - [x] `DayNightCycle` (added by `castle.gd`): sky colours and a generated star field, the outdoor light is the sun by day (warm and low at dawn and dusk, white at noon, east → south → west) and the moon by night, swapping at the horizon while it is dark; ambient, fog and the interior fill rise a little by day; window glass glows with daylight and the far-view window glows fade by day; `GameEvents.time_phase_changed` plus dawn/nightfall notifications
 - [x] HUD clock (top right: "14:05 · day"); headless tests for the clock maths, `/time`, and the castle's noon/midnight/dawn lighting
 - [x] Torches and chandeliers lit at dusk and snuffed after dawn: `Lamplighter` (`gameplay/world/lamplighter.gd`, driven by `DayNightCycle`), a pure function of the school hour with a per-light delay of up to 45 school minutes so rooms go dark one by one; only lights the generator marks `daylit` (their room has a window: ~500 of ~680), so dungeons, stairwells and windowless rooms burn all day; a torch put out by a spell stays out. Tests: the rule, daylit vs windowless, noon/midnight in the castle
-- [ ] Night-only content keys off `time_phase_changed` / `SchoolClock.is_night`: night flight of the turning stairs, night creatures, stargazing, curfew; the same check on the server for anything it decides
+- [ ] Night-only content still to come: a night flight of the turning stairs, stargazing (built: night creatures, `Enemy.night_only`, Milestone 17; curfew and the warden, Milestone 54; doors that follow the night, `CastleSchedule` with the server's `features/shifting.lua`, and the corridor guardian waking at curfew, Milestones 60 and 64)
 - [ ] Sun shadows outdoors (off for now; measure the cost on the grounds first)
 
 ### Milestone 35 — Timetable and bells
@@ -337,7 +389,7 @@ Rules (anchors A, stairs S, circulation C, moving pieces M, grounds G, budgets B
 - [x] Tests: timetable model, board/HUD/panel text, bells, `timetable.json` validity, board placement; two clients: occurrences land on their slot's weekday and hour in school time, reload resends; `tools/capture_timetable.tscn` for screenshots
 - [x] School records (`nakama/modules/records.lua`): a closed lesson adds itself to every attendee's record (`records/transcript`, owner-readable: per subject attended / self-study / quiz counters, the last 30 lessons) and writes a `lesson_log` entry (subject, room, slot, professor, times, attendance, points); a timetabled lesson nobody opened is logged as `not_held` when its slot ends. RPCs `school_record` (your own; staff and admins any student's) and `lesson_log` (admins)
 - [x] Self-study fallback when a timetabled lesson has no professor (Milestone 41)
-- [ ] In-game timetable editing for admins (today: edit the JSON, then reload)
+- [x] In-game timetable editing for admins (today: edit the JSON, then reload) (built: the admin panel's timetable slots, `admin_timetable_*`, Milestone 62)
 - [x] Terms and holidays: `nakama/content/calendar.json` (terms, breaks, exam weeks with dates and translated name keys); lessons and self-study happen only on term days outside breaks, exam days are flagged; OP_TIMETABLE carries `cal` {term, week, brk, exam, next_term}, shown on the notice boards and the week panel ("Autumn term, week 7 · exam week", "Holidays: …")
 
 ### Milestone 36 — The village and the railway station
@@ -350,11 +402,11 @@ Outside the estate's outer gatehouse (whose gate now stands open), at the foot o
 - [x] `/goto <place>` (`/idz`): station, village, castle or any area id (offline always; online professors and admins), for playtesting the long walk
 - [x] Tests: Python (stable shop ids, every walk-in building an area, a house on the street or facing nowhere refused), headless (built, layers, glows, walk in off the street into a shop, platform → station hall → forecourt, `/goto`); `tools/capture_village.tscn` renders street, square, interiors, platform, portal and an aerial view by day and night
 - [ ] Owner: final names for the village, its shops, the station
-- [ ] New players start at `StationArrival` (needs a first-arrival flag on the profile so returning players spawn where they left)
-- [ ] Shops: an economy (roadmap Term G), shopkeepers, stock per shop, the village weekend schedule
+- [x] New players start at `StationArrival` (needs a first-arrival flag on the profile so returning players spawn where they left) (built: the first-arrival flag, `features/arrival.lua`, Milestone 64; 2026-10-29: the server keeps where each character left, position and area, and `World.resume_point` puts a returning player back there on the floor, unless it is a hidden room, another house's rooms, behind a scheduled door or outside its area; tests in `run_tests.tscn` "Map")
+- [ ] Shopkeeper figures behind the counters and limited stock per shop (built: the shops' economy and the weekend schedule, `features/shops.lua`, `village_open`, Milestone 61)
 - [ ] A way back and forth faster than walking (~800 m from the platform to the castle gate): carriages along the causeway, or the train itself
 - [x] The train at the station: a Meshy locomotive and carriages coupled along the platform (`Village._train`)
-- [ ] Real assets for the village houses and the station; snow and seasons
+- [ ] Real assets for the village houses and the station buildings (snow and seasons are built: `Seasons`, Milestone 64)
 
 ### Milestone 37 — Currency
 One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10-22; one unit, no denominations; only the `CURRENCY_*` translation keys name it, code and server data say coins).
@@ -364,8 +416,8 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] Admin: RPC `admin_grant_coins` {user_id | name, ±amount, reason} (online players update at once, offline ones by user id; `max_coin_grant`), RPC `wallet_ledger` (your own purse; admins any), `tools/grant_coins.sh`, `admin_set_profile` `reset_purse`; dev cheat `/coins ±n` (`/korony`), online through `OP_CHEAT` (cheats_enabled or admins), offline a practice purse
 - [x] Mystery content may set `on_solved.coins` (0–1000, needs a discovery; validated on load)
 - [x] Tests: Polish/English amounts, change lines, offline `/coins`, economy rules shipped; two clients against Nakama: purse on join and reset, a first solve pays and notifies, two solves, no going below zero, cheat through the server, own ledger (no pay for a too-short lesson), no reading another purse, admin grants by id and name, refusals (overdraft, no reason), ledger order and reasons. Lesson pay checked by hand with `lesson_coin_minutes` 0 (server log "10 coins paid")
-- [ ] Owner: the currency's name (and whether it should have denominations)
-- [ ] Spending: shops in the village (`Economy.spend`, stock, prices, purchases into the inventory), cosmetics and decoration only
+- [x] Owner: the currency's name (and whether it should have denominations) (decided 2026-10-22: gold / "złoto", one unit; only the `CURRENCY_*` translation keys name it, `Currency`)
+- [x] Spending: shops in the village (`Economy.spend`, stock, prices, purchases into the inventory), cosmetics and decoration only (built: `features/shops.lua`, `api.spend`, `ShopPanel`, prices in the item catalogue, Milestones 58 and 61)
 - [~] More ways to earn: homework graded by professors (done, Milestone 46); events, house-cup bonuses, a professor tool to reward a student in a lesson still open
 
 ### Milestone 38 — Audio (list: docs/audio-list.md)
@@ -387,7 +439,7 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] Incantations: every spell has original Latin words (`SpellDefinition.incantation`, `SPELL_*_INCANTATION`, the same in both languages, shown on the HUD after the spell's name): Arcana Pulsa, Surge Sublimis, Procella Ruat, Accende Favillam, Fons Erumpe, Gelu Liga, Scintilla Mane, Vela Crepusculo, Pessulum Solve, Texe Integrum, Germina Cito; the caster speaks them on every cast, heard in 3D by everyone (`PlayerSounds.play_incantation`), in the voice of their body (`CharacterRegistry.voice`: two voices designed in ElevenLabs, young adult apprentices, `assets/audio/voice/<voice>/<spell>.wav`); a cast during the last words stays silent; a squeaky-voice potion pitches them up; tests
 - [x] Spell effects on the world and puzzle/secret sounds (list sections 2 and 3, 35 generated, three re-rolled; `assets/audio/world/`, helper `Sfx`: one-shots at a node, loop players): torches catch, puff out or hiss under water (`WallTorch`, silent for snapshots and the Lamplighter), and `FireAmbience` (world.gd) moves four crackle voices to the nearest burning torches and two to the nearest village hearths instead of a loop on each of the 318 torches; light motes hum and twinkle away; the pushable crate hums while levitated, scrapes while it slides and thuds when it drops; Unbolt clicks a lock open; a house door turns strangers away with a warded thrum; secret walls grind open with a discovery chime for everyone near (and close again); magic doors, crystal switches, levers, pressure plates and turning statues have their own sounds and a solved statue puzzle clunks open; gears creak, shifting stairs grind while they swing (`ScheduledMover.swing_started`) and boom as they lock, landing rails clank, trick steps give way and grind back, moving platforms hum; greenhouse beds splash when watered and burst up under Quicksprout; a mystery's clue and its solve chime (`GameEvents.mystery_cue`, from the offline engine or a `cue` on the server's text, which then stands in for the notification blip); `switch.wav` removed; tests (and the multiplayer test checks the server's cues)
 - [x] The rest of the list (sections 4, 5, 6, 8 and 10; 34 sounds and 34 ambience files generated, eight re-rolled here and 22 ambience takes re-rolled): oak doors creak open and thud shut, the ceremonial doors boom (`CastleDoor.open_sound`/`close_sound`), house doors chime for members; the tower bell is a recording (`SchoolBells.BELL`); the Choosing Stone wakes and each house has its own reveal (`UiSounds` `sorting_reveal_<house>`), with the sorting music; the house columns hum and chime up or fall dim with points; the feast arrives with a clatter of plates; new board writing scratches in chalk; a new house-board post is pinned up; a spell tome creaks open; book pages turn; the cauldron bubbles while brewing, pours, fizzes or burps (and the classroom cauldrons bubble); a broom comes off its rack, kicks off, rides on a wind that blends from a rush to a roar with speed and lands; a Lantern Chase goal whooshes through its ring; the crystal guardian hums, rings out at an intruder, strikes, chips when hit (a blocked spell glances off) and shatters (`Enemy` sound exports); `AmbienceDirector` (castle.gd, Ambience bus) plays a bed per area (by id, prefix, then kind; night outdoors, a busy hall at meals) and, on rainy days, rain outside or on the windows and rolling thunder, never underground; beds are MP3s that crossfade into themselves (16 MB instead of 70 MB of WAV); the paddock snorts and shuffles; the mystery music plays in hidden rooms and the house cup fanfare when a house wins it; `door.wav` removed; tests
-- [ ] Not made (nothing in the game uses them yet): chests, wardrobes, bed curtains, shutters, telescope, crystal ball, abacus, rune stone, globe, quill, broom return, river and divination room ambiences; a volume slider for the Ambience bus
+- [ ] Not made (nothing in the game uses them yet): chests, wardrobes, bed curtains, shutters, telescope, crystal ball, abacus, rune stone, globe, quill, broom return, river and divination room ambiences (the Ambience volume slider is built: `GameSettings.VOLUMES`, Milestone 68)
 - [ ] Sounds still without an object: water freezing, a basin filling, a mended object (list section 2), for when those puzzles exist
 - [ ] More voices once the character creator offers more than two bodies (or a voice choice of its own); a second take per line so repeats vary; professors' demonstration lines
 - [x] Surfaces where the area guess is wrong: `SurfacePatch` (a box footprint, in the rug wrapper: 38 rugs sound like carpet) and gravel wherever the grounds splat marks a path (`Terrain.path_weight`); the floor `surface` meta still works for grates
@@ -402,7 +454,7 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] Speech bubbles over the speaker (`SpeechBubble`: whisper small and short-range, shout big, lecture lines the largest); the chat panel marks whispers, shouts, DMs and mail
 - [x] `NetworkManager.server_message` / `send_op`: one generic path for new ops
 - [x] Tests: commands, line formats, bubbles; two clients: a conversation in the library is not heard in the gallery, a DM crosses the castle, unknown names are refused, a DM to an absent player waits in the mailbox and arrives on the next join
-- [ ] Paper birds: DMs drawn as a folded paper bird flying to the recipient (Term E)
+- [x] Paper birds: DMs drawn as a folded paper bird flying to the recipient (Term E) (built: `PaperBirds`, Milestone 59; the journal's Post page, Milestone 64)
 - [x] Moderation: word filter, report, mute, kick, ban, block (Milestone 52)
 
 ### Milestone 40 — Gestures and seats
@@ -431,7 +483,7 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] Stored on the server: `appearance` {body, skin, robe, set} in the profile (`OP_APPEARANCE`), the body decides the join character once chosen, roster entries and `OP_ROSTER_UPDATE` carry `char` and `look` so everyone sees it; offline in the settings
 - [x] `CharacterCreator` (live preview with its own camera): opens on the first join of a character without a chosen look (offline: the first game), and with `/look` (`/wyglad`)
 - [x] Tests: clamping, body swap, shader parameters, house trim, profile; two clients: a look is stored and reaches the other player. `tools/capture_looks.tscn` renders every house, tone and robe
-- [ ] Faces and hairstyles need more character models (asset-drop workflow); the crest on the robe is in (a decal on the chest bone)
+- [ ] Faces and hairstyles need more character models (asset-drop workflow) (the crest on the robe is built: a decal on the chest bone, `CharacterLook`)
 
 ### Milestone 43 — Meals in the great hall
 - [x] `FeastMeals` (added by `castle.gd`): breakfast 7:00–8:30, lunch 12:00–13:30, dinner 18:30–20:00 on the school clock (no server traffic, every client agrees); plates, food, goblets, platters, roasts, bread and fruit appear on every feast table (MultiMeshes over the positions `StaticBatch` records), "Dinner is served" notification
@@ -451,7 +503,7 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] School year on the server profile (`year` 1–7; placeholder names First … Seventh Circle, `YEAR_n`); admins set it with `admin_set_profile {year}`
 - [x] `Journal` (J): year and house, tabs for the week's timetable, the spellbook (mastery rank, points to the next rank, the spell's rune), the school record per subject (attendance, self-study, quiz answers, practicals; `school_record` RPC) and discoveries (mysteries solved, hidden rooms found)
 - [x] Tests: header, record, discoveries, spellbook text; two clients: an admin sets a year
-- [ ] Owner: how a character advances a year (exams vs time served), final year names; homework and grades in the journal (Term B7–B8)
+- [ ] Owner: how a character advances a year (exams vs time served), final year names (homework and grades in the journal are built: Milestones 46 and 47)
 
 ### Milestone 46 — Homework
 - [x] `nakama/modules/homework.lua`: the professor running a lesson sets homework (`OP_HOMEWORK {text, days}`) for everyone who attended (online attendees are told, `OP_HOMEWORK_NEW`); students hand in a written answer before the due date (RPC `homework_submit`, replaceable until graded); the professor who set it grades each answer once, 1–6 with a comment (RPCs `homework_inbox`, `homework_grade`); grades go into the record (`homework_count`, `homework_points`) and a passing grade (2+) earns `coins_per_homework`
@@ -463,24 +515,24 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] Exams: on exam days (calendar exam weeks) an unclaimed timetabled lesson runs as an exam (`SelfStudy.exam_plan`: the subject's questions only, 75 s each, no lecture); answers go to `exam_right` / `exam_total`; `/exam` (`/egzamin`) starts one for playtesting
 - [x] Year advancement tool: admin RPC `admin_advance_years {dry_run, min_subjects}` moves every student whose graded subjects all pass up a year (online players live)
 - [x] Tests: grade formula, journal grade; two clients: the advancement dry run
-- [ ] Owner: when years advance (run the RPC after summer exams, or automatically), the exam hall setup (desks in the great hall, proximity chat muted), practical exams
+- [ ] Owner: when years advance (run the RPC after summer exams, or automatically), the exam hall setup (desks in the great hall), practical exams (exams held in silence are built: Milestone 64)
 
 ### Milestone 48 — Library books
 - [x] `LoreBook` (placement kind `lore_book`, field `book`): a book open on a reading stand; interact opens `BookPanel` (parchment, page turning with the buttons, A/D or the arrows); reading is reported to the server so mysteries can use it
 - [x] Six original books in the library (founding, the four houses, moving charms, the castle's walls, the greenhouse herbal, the sky over the tower) in Polish and English; several answer self-study questions or hint at secrets
 - [x] Tests: books placed and titled with pages, opening and turning
-- [ ] Sealed stacks behind a permission slip a professor grants (needs professors to grant items)
+- [x] Sealed stacks behind a permission slip a professor grants (needs professors to grant items) (built: `features/stacks.lua`, `/slip name`, Milestone 64)
 
 ### Milestone 49 — Prefects
 - [x] Role `prefect` (set by admins, `admin_set_profile`), titled on the nameplate: deducts up to `max_prefect_points` (5) per change through the house points ledger (source `prefect`; `/odejmij <house> <points> <reason>`), and gives a student of another house a guest pass to the prefect's house rooms for `guest_pass_minutes` (`OP_GUEST_PASS`, `/gosc name`): their house doors open for the guest and the server accepts the guest's area reports there
 - [x] Tests: role, door with and without a pass; two clients: the limit, a small deduction, a guest pass
-- [ ] Heads of house (a professor's house-wide stats and house board posts); how prefects are chosen (owner decision)
+- [ ] Owner: how prefects are chosen (heads of house with house-wide stats and board posts are built: `features/heads.lua`, Milestone 57)
 
 ### Milestone 50 — The house cup
 - [x] At the end of each calendar term the match awards the house cup to the house with the most points (`School.award_cup`: stored in `school/house_cup`, every house brought back to zero through the ledger, so totals still equal their records); `OP_HOUSE_CUP` to everyone and joiners; admin RPC `admin_award_cup` awards it at once
 - [x] `HouseCupDisplay` (great hall, north end): a golden cup on a plinth under a banner in the holder's colour with its name; the holder's members wear brighter house trim for the term; a ceremony notification
 - [x] Tests: display; two clients: award, tally reset, ledger consistency
-- [ ] A staged ceremony (hall decor in the winner's colours, the cup carried in, music cue), real cup and banner models
+- [ ] The cup carried in at the ceremony (built: the hall hung in the winners' colours, confetti and the fanfare, `HouseCupDisplay.ceremony`, Milestone 64; the Meshy cup and the house banners, props batches three and five)
 
 ### Milestone 51 — House quests
 - [x] `nakama/modules/house_quests.lua` + `nakama/content/house_quests.json`: each school week two quests rotate in (attend lessons, finish practicals, right answers, first mystery solves); every member's actions count for their house (lesson close, practical finish, marked answers, discoveries); reaching a target awards the quest's points once per week through the ledger (source `quest`); progress stored in `school/house_quests`, sent as `OP_HOUSE_QUESTS`
@@ -491,25 +543,25 @@ One school currency, server-authoritative, named gold / "złoto" (owner, 2026-10
 - [x] `nakama/modules/moderation.lua`: a word filter (`nakama/content/word_filter.json`, Polish and English stems, diacritics folded) over chat, DMs, lecture lines and board text; mutes (staff, minutes, stored), kicks (staff), bans (admins; a banned account cannot join), reports (anyone; admin RPC `moderation_reports`), personal block lists (a blocked player's chat is not delivered and their DMs are refused)
 - [x] Chat commands `/report` `/block` `/unblock` `/mute` `/kick` `/ban` with Polish aliases
 - [x] Tests: command usage; two clients: filtered swearing, block/unblock, a student refused a ban
-- [ ] Chat logs kept for a limited time, an in-game admin view of reports, age-appropriate defaults (roadmap section 7)
+- [ ] Age-appropriate defaults (roadmap section 7) (built: chat logs kept `chat_log_days`, `features/chatlog.lua`, Milestone 63; reports and the chat log in the admin panel, Milestone 62)
 
 ### Milestone 53 — The duelling club
 - [x] `nakama/modules/duel.lua`: challenge by name, accept, countdown (both bow), fight, first to `duel_hits_to_win` (3); only in `duel_areas` (the duelling hall, the Defence classroom); hits are reported by the caster (`OP_DUEL_HIT`, from `GameEvents.spell_hit_player` when a projectile hits a remote player) and validated by the server (fighting, both still in a duelling area, the opponent, a known spell, at most one hit per 0.6 s); leaving the area or the game forfeits; challenges expire after a minute; nothing else changes (no health, no points)
 - [x] `DuelHud`: the banner with names and score for duellists and spectators in the room, the result, the duel music while a fight runs; chat commands `/duel` `/accept` `/decline` `/forfeit` (`/pojedynek` `/przyjmij` `/odrzuc` `/poddaj`)
 - [x] Tests: banner, usage; two clients: refused outside the rooms, unknown names refused, challenge and withdrawal
-- [ ] A professor-run club mode (rule sets, a ladder), a hit reaction and duel meter visuals
+- [ ] A hit reaction and duel meter visuals (the club mode is built: rule sets and refereed duels, Milestone 64; the ladder, `features/ladder.lua`, Milestone 59)
 
 ### Milestone 54 — Curfew and the night warden
 - [x] `NightWarden` (added by `castle.gd`): from 22:00 to 6:00 school time a lantern-carrying warden paces the ground-floor halls and corridors of `ROUTE`, 45 s per room; his room and position are a pure function of the shared time (exported to the server as `generated/warden.lua`)
 - [x] A student out after curfew in his room who comes into his light (within 9 m, in front of him, in sight) is caught: the client reports `OP_CAUGHT`, the server checks the school clock, the warden's room and the role, deducts `curfew_points` from the house (source `curfew`) once per player per night and logs a detention; staff and prefects pass
 - [x] Tests: curfew hours, route, sight; the route's rooms exist
-- [ ] Detention tasks (Term D5), noise and darkness as stealth, a lantern familiar, curfew-only secrets
+- [ ] Noise and darkness as stealth, a lantern familiar, curfew-only secrets (detention tasks are built: `features/detention.lua`, Milestone 56)
 
 ### Milestone 55 — Rumours and talking portraits
 - [x] Rumours: the match keeps the last eight anonymous rumours from real events (a house solved a mystery, finished a house quest, won the cup) and sends them as `OP_RUMOURS`; notice boards show the latest under "They say:"
 - [x] `TalkingPortraits` (added by `castle.gd`; portrait positions recorded by `StaticBatch`): walking up to a portrait makes it greet the student by name and house and pass on a rumour, or old castle gossip when there is no news; each portrait then keeps quiet for 90 s
 - [x] Tests: portraits found, lines, a portrait speaking when approached
-- [ ] Portraits as messengers between each other, hints tied to mysteries, real portrait art
+- [ ] Portrait hints tied to mysteries (built: portraits as messengers, `features/portraits.lua`, Milestone 64; real portrait art, ten framed sitters, props batch three, and living portraits)
 
 ### Milestone 56 — Feature modules, detention tasks
 - [x] One request channel for school-life systems: `OP_REQUEST` {rid, req, …} → `OP_REPLY` {rid, ok, reason, data}, and `OP_PUSH` {kind, data} for their state (`NetworkManager.request()`, `feature()`, `pushed`; kind `notice` is a translated notification). Server: `nakama/modules/features.lua` routes requests to modules under `nakama/modules/features/` and runs their hooks (join, leave, tick, area, event, caught) with an `api` built by the match (points, coins, items, notices, rumours, objects); `store.lua` holds their storage helpers. Refusals read as `REFUSED_<REASON>` lines (a test checks every reason a module returns is translated); chat commands map to requests (`REQUEST_COMMANDS`), results print through `RequestText`

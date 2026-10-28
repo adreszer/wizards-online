@@ -79,17 +79,64 @@ func _build_map() -> void:
 
 
 ## A character's first time in the shared world starts at the railway station (feature
-## "arrival"); headless runs (tests, servers) stay at the start point.
+## "arrival"); a returning character starts where they left, when that place is still
+## safe to stand in (see resume_point); headless runs (tests, servers) stay at the start point.
 func _arrive(player: Node) -> void:
 	if not NetworkManager.is_in_world() or DisplayServer.get_name() == "headless":
 		return
 	var ok := await _wait_for_arrival()
-	if not ok or not NetworkManager.feature("arrival").get("first", false) or not is_instance_valid(player):
+	if not ok or not is_instance_valid(player):
+		return
+	var arrival := NetworkManager.feature("arrival")
+	if not arrival.get("first", false):
+		var back: Variant = resume_point(_level, arrival, int(NetworkManager.get_local_profile().get("house", 0)))
+		if back != null:
+			(player as Node3D).global_position = back
 		return
 	var at: Variant = ChatCommands.place_position(player as Node3D, "@station")
 	if at != null:
 		(player as Node3D).global_position = at
 		GameEvents.notification_requested.emit(tr("ARRIVAL_WELCOME"), 10.0)
+
+
+## Where a returning character should stand: the position the server kept when they left
+## ({pos: [x, y, z], area}), dropped onto the floor below it, or null for the start point.
+## Refused: no saved place, an area the level does not have, a hidden room (its wall may have
+## closed again), another house's rooms (a guest pass runs out), a room behind a door the
+## castle's schedule shuts (CastleSchedule), a position outside its area, or no floor under it.
+static func resume_point(level: Node, data: Dictionary, house: int) -> Variant:
+	var p: Variant = data.get("pos")
+	if not (p is Array) or (p as Array).size() != 3 or level == null or not (level is Node3D):
+		return null
+	var pos := Vector3(float(p[0]), float(p[1]), float(p[2]))
+	var area := str(data.get("area", ""))
+	if area.is_empty():
+		return null
+	for oid: String in CastleSchedule.DOORS:
+		if oid.get_slice("/", 0) == area:
+			return null
+	var zone: AreaZone = null
+	for z in level.find_children("*", "AreaZone", true, false):
+		if str((z as AreaZone).area_id) == area:
+			zone = z
+			break
+	if zone == null or zone.kind == "secret" or (zone.house != 0 and zone.house != house):
+		return null
+	var half := zone.size * 0.5 + Vector3(0.5, 2.0, 0.5)
+	var d := (pos - zone.global_position).abs()
+	if d.x > half.x or d.y > half.y or d.z > half.z:
+		return null
+	var space := (level as Node3D).get_world_3d().direct_space_state
+	var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(pos + Vector3.UP * 0.5, pos + Vector3.DOWN * 40.0, 1))
+	if not hit.is_empty():
+		return (hit["position"] as Vector3) + Vector3.UP * 0.1
+	# Open ground far from the start point has no collision streamed in yet: use the heights.
+	var terrain := level.get_node_or_null("Grounds/Terrain") as Terrain
+	if terrain != null and terrain.is_inside(pos.x, pos.z) and terrain.has_ground(pos.x, pos.z):
+		var ground := terrain.height_at(pos.x, pos.z)
+		if pos.y > ground - 1.0 and pos.y < ground + 40.0:
+			return Vector3(pos.x, ground + 0.2, pos.z)
+	return null
 
 
 func _wait_for_arrival() -> bool:

@@ -138,6 +138,7 @@ func _draw_ink() -> void:
 	for r in rooms:
 		if view.intersects(r["rect"]):
 			_ink.draw_rect(_to_screen(r["rect"]), INK, false, line)
+	_draw_doors(view, line)
 	for s in castle_map.stairs_on(storey):
 		_draw_stair(s, line)
 	var here := _local_player()
@@ -162,6 +163,26 @@ func _draw_ink() -> void:
 		var at := Vector2(size.x * 0.5 - w * 0.5, 4.0 + font.get_ascent(14))
 		_ink.draw_string_outline(font, at, north, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 4, Color(0, 0, 0, 0.7))
 		_ink.draw_string(font, at, north, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1, 0.95, 0.8))
+
+
+## Doorways: the wall outline broken by the opening (paper across the gap) with a short
+## inked jamb at each side. Too small to read when zoomed far out, so skipped there.
+func _draw_doors(view: Rect2, line: float) -> void:
+	if pixels_per_metre < 0.8:
+		return
+	var gap := line + 2.0
+	var jamb := maxf(2.0, 0.5 * pixels_per_metre)
+	for d in castle_map.doors_on(storey):
+		var at: Vector2 = d["at"]
+		if not view.grow(4.0).has_point(at):
+			continue
+		var half: Vector2 = d["along"] * float(d["width"]) * 0.5
+		var a := world_to_screen(at - half)
+		var b := world_to_screen(at + half)
+		var n := (b - a).orthogonal().normalized() * jamb
+		_ink.draw_line(a, b, PAPER, gap)
+		_ink.draw_line(a - n, a + n, INK, line)
+		_ink.draw_line(b - n, b + n, INK, line)
 
 
 ## An inked compass rose: eight points (the cardinal ones long, north in rubric), a

@@ -544,6 +544,28 @@ func _run_b() -> void:
 	await _await_step(24)
 	await _step(25)
 
+	t.section("Arrival (returning student)")
+	t.check(NetworkManager.feature("arrival").has("first"), "the server says on join whether this is a first arrival (%s)" % str(NetworkManager.feature("arrival")))
+	t.check(await _enter_zone(&"library", Vector3(2.0, 0.0, 1.0)), "the student walks into the library")
+	await _wait(0.8)
+	var left_at: Vector3 = spawner.local_player.global_position
+	await NetworkManager.disconnect_online("arrival test")
+	await _wait(1.0)
+	pushes.clear()
+	var err: String = await NetworkManager.connect_online(GameSession.display_name)
+	t.check(err.is_empty(), "the student comes back (%s)" % err)
+	var came := await _wait_until(func() -> bool: return pushes.any(func(p: Array) -> bool: return p[0] == "arrival"), 15.0)
+	var arrival: Dictionary = {}
+	for p: Array in pushes:
+		if p[0] == "arrival":
+			arrival = p[1]
+	var pos := _arr(arrival.get("pos"))
+	t.check(came and arrival.get("first", true) == false and pos.size() == 3 and str(arrival.get("area", "")) == "library"
+		and Vector3(float(pos[0]), float(pos[1]), float(pos[2])).distance_to(left_at) < 1.0,
+		"a returning student is told where they left: the library, at %s (%s)" % [str(left_at), str(arrival)])
+	var back: Variant = load("res://core/world.gd").resume_point(world.get_node("Level"), arrival, 3)
+	t.check(back is Vector3 and (back as Vector3).distance_to(left_at) < 1.0, "and is put back there (%s)" % str(back))
+
 
 # --- Helpers --------------------------------------------------------------------------
 

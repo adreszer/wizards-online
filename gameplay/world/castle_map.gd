@@ -2,7 +2,8 @@ class_name CastleMap
 extends Node
 ## What the map and minimap draw, read from the level at runtime: every
 ## AreaZone becomes a room rectangle on the storeys it spans, every Staircase
-## and SpiralStaircase a stair symbol, and the grounds' Terrain supplies the
+## and SpiralStaircase a stair symbol, every doorway module (Walls/Doorway_*) a
+## gap in the room outlines, and the grounds' Terrain supplies the
 ## outdoor relief. Nothing is baked, so regenerating the castle (any seed)
 ## changes the map with it.
 ##
@@ -31,6 +32,11 @@ const OUTSIDE_KINDS := ["shop", "inn", "post_office", "station"]
 ## What the school's plan shows without the chart.
 const PLAN_KINDS := ["hall", "corridor", "classroom", "library", "stair_turret", "shaft", "outdoor", "grounds", "bridge", "shop", "inn", "post_office", "station"]
 const CHART_ITEM := "wayfinder_chart"
+const DOORWAY_SCENE := "res://objects/environment/modular/doorway.tscn"
+## The doorway module's opening, jamb to jamb (the arch is about 3.6 m at its base).
+const DOORWAY_WIDTH := 3.6
+## How far to either side of a doorway's wall its two rooms are looked for.
+const DOORWAY_SIDE := 1.0
 
 ## {id, key, kind, house, rect: Rect2 (x, z), lo, hi (storeys, inclusive), secret}
 ## sorted largest first, so nested rooms draw over the ones they sit in.
@@ -40,6 +46,8 @@ var grounds: Array[Dictionary] = []
 ## {foot: Vector2, dir: Vector2 (uphill), run, width, lo, hi} straight flights;
 ## spirals have {centre, radius, lo, hi, spiral = true}.
 var stairs: Array[Dictionary] = []
+## Doorways: {at: Vector2 (centre, x z), along: Vector2 (unit, along the wall), width, storey}.
+var doors: Array[Dictionary] = []
 ## Lowest and highest storey with a room.
 var min_storey: int = 0
 var max_storey: int = 0
@@ -71,6 +79,7 @@ func build(level: Node) -> void:
 	rooms.clear()
 	grounds.clear()
 	stairs.clear()
+	doors.clear()
 	min_storey = 0
 	max_storey = 0
 	var bounds_set := false
@@ -111,6 +120,14 @@ func build(level: Node) -> void:
 			var lo := storey_of(sp.global_position.y)
 			stairs.append({"centre": Vector2(sp.global_position.x, sp.global_position.z), "radius": sp.half_size,
 				"lo": lo, "hi": lo + maxi(1, roundi(sp.turns * sp.rise_per_turn / STOREY_HEIGHT)), "spiral": true})
+	var walls := level.get_node_or_null("Walls")
+	for child in (walls.get_children() if walls != null else []):
+		var d := child as Node3D
+		if d == null or not (d.scene_file_path == DOORWAY_SCENE or str(d.name).begins_with("Doorway")):
+			continue
+		var dx := d.global_transform
+		doors.append({"at": Vector2(dx.origin.x, dx.origin.z), "along": Vector2(dx.basis.x.x, dx.basis.x.z).normalized(),
+			"width": DOORWAY_WIDTH, "storey": storey_of(dx.origin.y + 0.5)})
 	terrain = level.get_node_or_null("Grounds/Terrain") as Terrain
 	rebuilt.emit()
 
@@ -174,6 +191,24 @@ func stairs_on(storey: int) -> Array[Dictionary]:
 	return out
 
 
+## Doorways on a storey that lead into at least one room drawn there; one that opens into
+## an unfound secret room stays off the map with it.
+func doors_on(storey: int) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for d in doors:
+		if d["storey"] != storey:
+			continue
+		var normal: Vector2 = (d["along"] as Vector2).orthogonal() * DOORWAY_SIDE
+		var hidden := false
+		var known := false
+		for p: Vector2 in [d["at"] + normal, d["at"] - normal]:
+			hidden = hidden or _in_hidden_secret_at(p, storey)
+			known = known or not room_at_point(p, storey).is_empty()
+		if known and not hidden:
+			out.append(d)
+	return out
+
+
 ## The smallest known room containing a world position on its storey, or {}.
 func room_at(pos: Vector3) -> Dictionary:
 	return room_at_point(Vector2(pos.x, pos.z), storey_of(pos.y))
@@ -219,6 +254,10 @@ func place_name_at(pos: Vector3) -> String:
 
 func _in_hidden_secret(stair: Dictionary, storey: int) -> bool:
 	var point: Vector2 = stair["centre"] if stair.has("spiral") else stair["foot"] + stair["dir"] * stair["run"] * 0.5
+	return _in_hidden_secret_at(point, storey)
+
+
+func _in_hidden_secret_at(point: Vector2, storey: int) -> bool:
 	for r in rooms:
 		if r["secret"] and not _revealed.has(r["id"]) and storey >= r["lo"] and storey <= r["hi"] and (r["rect"] as Rect2).has_point(point):
 			return true
