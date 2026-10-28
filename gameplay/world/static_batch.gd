@@ -71,6 +71,9 @@ const CONTAINERS := ["Pillars", "Furniture"]
 @export var storey_height: float = 9.0
 ## Batched meshes are drawn up to this distance (the castle's far view takes over).
 @export var visibility_end: float = 170.0
+## Small things (set dressing, portraits) only this far: nobody sees a book stack or a
+## frame from 170 m, and the castle's tall rooms hold thousands of them.
+@export var detail_end: float = 40.0
 
 ## Dev switch (tools/perf_castle.gd --no-batch): instance modules as plain nodes instead.
 static var disabled := false
@@ -175,12 +178,13 @@ func add(scene: PackedScene, xform: Transform3D) -> bool:
 	if Seats.BY_SCENE.has(scene.resource_path):
 		seats.append_array(Seats.for_instance(scene.resource_path, xform))
 	var proto := prototype(scene)
+	var detail := scene.resource_path.begins_with(DRESSING) or TalkingPortraits.is_portrait(scene.resource_path)
 	var local := global_transform.affine_inverse() * xform
 	var cell := Vector3i(floori(local.origin.x / cell_size), floori((local.origin.y + 0.5) / storey_height), floori(local.origin.z / cell_size))
 	for m: Array in proto["meshes"]:
-		var key := [cell, m[0], m[2], m[3]]
+		var key := [cell, m[0], m[2], m[3], detail]
 		if not _meshes.has(key):
-			_meshes[key] = {"mesh": m[0], "material": m[2], "shadow": m[3], "cell": cell, "xforms": []}
+			_meshes[key] = {"mesh": m[0], "material": m[2], "shadow": m[3], "cell": cell, "xforms": [], "detail": detail}
 		(_meshes[key]["xforms"] as Array).append(local * (m[1] as Transform3D))
 	if not _shapes.has(cell):
 		_shapes[cell] = []
@@ -197,11 +201,20 @@ func add(scene: PackedScene, xform: Transform3D) -> bool:
 	return true
 
 
+## Scales how far the batched meshes are drawn (the graphics setting draw_distance,
+## 0.5–1: the low preset halves it).
+func set_draw_distance(factor: float) -> void:
+	factor = clampf(factor, 0.3, 1.0)
+	for child in get_children():
+		if child is MultiMeshInstance3D and child.has_meta(&"base_range"):
+			(child as MultiMeshInstance3D).visibility_range_end = float(child.get_meta(&"base_range")) * factor
+
+
 ## Add a mesh drawn with an arbitrary transform (wall-run backing slabs: a unit box scaled).
 func add_mesh(mesh: Mesh, material: Material, xform: Transform3D) -> void:
 	var local := global_transform.affine_inverse() * xform
 	var cell := Vector3i(floori(local.origin.x / cell_size), floori((local.origin.y + 0.5) / storey_height), floori(local.origin.z / cell_size))
-	var key := [cell, mesh, material, GeometryInstance3D.SHADOW_CASTING_SETTING_ON]
+	var key := [cell, mesh, material, GeometryInstance3D.SHADOW_CASTING_SETTING_ON, false]
 	if not _meshes.has(key):
 		_meshes[key] = {"mesh": mesh, "material": material, "shadow": GeometryInstance3D.SHADOW_CASTING_SETTING_ON, "cell": cell, "xforms": []}
 	(_meshes[key]["xforms"] as Array).append(local)
@@ -236,7 +249,7 @@ func flush() -> void:
 		if entry["material"] != null:
 			mmi.material_override = entry["material"]
 		mmi.cast_shadow = entry["shadow"]
-		mmi.visibility_range_end = visibility_end
+		mmi.set_meta(&"base_range", detail_end if entry.get("detail", false) else visibility_end)
 		mmi.visibility_range_end_margin = 10.0
 		add_child(mmi)
 	for cell in _shapes:
@@ -251,6 +264,7 @@ func flush() -> void:
 		add_child(body)
 	for patch in _patches:
 		add_child(patch)
+	set_draw_distance(float(GameSettings.get_value("draw_distance")))
 	_meshes.clear()
 	_shapes.clear()
 	_patches.clear()

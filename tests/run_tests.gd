@@ -1842,6 +1842,12 @@ func _test_castle() -> void:
 	var dress_batch: StaticBatch = castle.get_node_or_null("StaticBatch")
 	var patches := dress_batch.find_children("*", "SurfacePatch", true, false) if dress_batch != null else []
 	t.check(patches.size() >= 100, "rugs, runners and hall rugs keep their carpet footsteps through the batch (%d)" % patches.size())
+	var batched: Array = dress_batch.find_children("*", "MultiMeshInstance3D", false, false).filter(func(m: Node) -> bool: return m.has_meta(&"base_range"))
+	var small_far := batched.filter(func(m: Node) -> bool: return float(m.get_meta(&"base_range")) < 100.0)
+	dress_batch.set_draw_distance(0.5)
+	var halved := batched.all(func(m: MultiMeshInstance3D) -> bool: return is_equal_approx(m.visibility_range_end, float(m.get_meta(&"base_range")) * 0.5))
+	dress_batch.set_draw_distance(1.0)
+	t.check(not small_far.is_empty() and halved, "small dressing draws nearer than walls, and the draw distance setting scales every range (%d of %d)" % [small_far.size(), batched.size()])
 	var corridor: AreaZone = zones.filter(func(z: AreaZone) -> bool: return z.area_id == &"corridor_w_0").front()
 	var on_runner := patches.any(func(p: SurfacePatch) -> bool:
 		var d := (p.global_position - corridor.global_position).abs()

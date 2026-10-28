@@ -11,13 +11,13 @@ extends RefCounted
 const PRESETS := ["low", "medium", "high", "ultra"]
 ## What each preset sets; individual settings override afterwards.
 const PRESET_VALUES := {
-	"low": {"render_scale": 0.67, "fsr": true, "shadows": false, "ssao": false, "ssil": false, "gi": false, "glow": false, "fog": false},
-	"medium": {"render_scale": 0.85, "fsr": true, "shadows": true, "ssao": false, "ssil": false, "gi": false, "glow": true, "fog": true},
-	"high": {"render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": false, "gi": true, "glow": true, "fog": true},
-	"ultra": {"render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": true, "gi": true, "glow": true, "fog": true},
+	"low": {"render_scale": 0.67, "draw_distance": 0.5, "fsr": true, "shadows": false, "ssao": false, "ssil": false, "gi": false, "glow": false, "fog": false},
+	"medium": {"render_scale": 0.85, "draw_distance": 0.75, "fsr": true, "shadows": true, "ssao": false, "ssil": false, "gi": false, "glow": true, "fog": true},
+	"high": {"render_scale": 1.0, "draw_distance": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": false, "gi": true, "glow": true, "fog": true},
+	"ultra": {"render_scale": 1.0, "draw_distance": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": true, "gi": true, "glow": true, "fog": true},
 }
 const DEFAULTS := {
-	"preset": "high", "render_scale": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": false, "gi": true, "glow": true, "fog": true,
+	"preset": "high", "render_scale": 1.0, "draw_distance": 1.0, "fsr": false, "shadows": true, "ssao": true, "ssil": false, "gi": true, "glow": true, "fog": true,
 	"vsync": true, "fps_cap": 0, "fullscreen": false,
 	"vol_master": 1.0, "vol_music": 0.8, "vol_ambience": 0.9, "vol_ui": 0.9,
 	"look_sensitivity": 1.0, "invert_y": false,
@@ -163,6 +163,9 @@ static func apply(tree: SceneTree) -> void:
 		if full != bool(get_value("fullscreen")):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if get_value("fullscreen") else DisplayServer.WINDOW_MODE_WINDOWED)
 	RenderingServer.directional_shadow_atlas_set_size(4096 if get_value("shadows") else 256, true)
+	# By group name and an untyped call: naming StaticBatch here would close a class cycle.
+	for batch: Node in tree.get_nodes_in_group(&"static_batch"):
+		batch.call(&"set_draw_distance", float(get_value("draw_distance")))
 	for node in tree.root.find_children("*", "WorldEnvironment", true, false):
 		var env := (node as WorldEnvironment).environment
 		if env == null:

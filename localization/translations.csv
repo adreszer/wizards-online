@@ -1291,3 +1291,4 @@ MAP_KIND_SECRET,Hidden rooms,Ukryte komnaty
 MAP_KIND_HOUSE,House rooms (in the house's colour),Komnaty domów (w barwach domu)
 CREATOR_TURN,"Turn (or drag on the left)","Obróć (lub przeciągnij po lewej)"
 ENEMY_INK_WISP_NAME,Ink-wisp,Atramentowy Błędnik
+SETTINGS_DRAW_DISTANCE,Draw distance,Zasięg widzenia

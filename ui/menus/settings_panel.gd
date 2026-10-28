@@ -74,6 +74,7 @@ func _build_graphics(page: VBoxContainer) -> void:
 	_row(page, "SETTINGS_PRESET", _preset)
 	_toggle(page, "fullscreen")
 	_slider(page, "SETTINGS_RENDER_SCALE", 0.5, 1.0, "render_scale")
+	_slider(page, "SETTINGS_DRAW_DISTANCE", 0.5, 1.0, "draw_distance")
 	for k: String in ["fsr", "shadows", "ssao", "ssil", "gi", "glow", "fog", "vsync"]:
 		_toggle(page, k)
 	_fps = OptionButton.new()

@@ -195,7 +195,8 @@ See `docs/architecture.md` for the full breakdown. In short:
 - [ ] House names, common-room access rules (server-side house membership), classroom/lesson context from `AreaZone`
 - [x] Railings: the 99 generated railings are the Meshy stone balustrade in equal sections, sheared on flights so rail and plinth follow the stair while the balusters stay upright
 - [ ] Modelled stair asset to replace the generated slab steps; more secret passages and multi-step puzzles
-- [ ] Performance pass in-game (torch count is 353 omni lights; cluster limits if many are visible at once)
+- [x] Performance measured after set dressing 2.0 (`tools/perf_castle.tscn`, M3 Ultra, 2026-10-28): the same as before the dressing (entrance hall 26 ms / 50 M primitives vs 24 ms / 47 M; other views 14–18 ms): the cost is the modules seen across the castle, not the props. Small batched props (dressing, portraits) now draw to 40 m (`StaticBatch.detail_end`), and a Draw distance setting (presets: low 50 %, medium 75 %) scales every batched range
+- [ ] Measure on a mid-range laptop at 1080p (owner) and tune the low/medium presets from it
 
 ### Milestone 15 — Spells and quick selection
 - [x] Ten new spells as data (`resources/spells/`): Uplift (levitate), Galewind (wind), Emberkindle (fire), Wellspring (water), Frostbind (frost), Glowmote (light), Duskveil (dark), Unbolt (unlock), Mendweave (mend), Quicksprout (growth); each with its own effect type, colour and PL/EN texts

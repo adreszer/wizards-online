@@ -297,6 +297,8 @@ def dress_room(plan, r, names):
         if r.house:
             for s, along in wall_slots(r, 1.6)[-2:]:
                 on_wall(r, s, along, f"banner_h{r.house}", "Banner")
+    if r.kind in ("room", "common_room", "library", "classroom") and r.id != "kitchens" and r.ceiling_y - r.y >= 8.0:
+        high_gallery(r)
     if r.get("dressing") == "feast":
         on_wall(r, "n", cx, "high_table", "HighTable", inset=6.5)
         for i in range(4):
@@ -306,6 +308,20 @@ def dress_room(plan, r, names):
         for (s, along), kind in zip(wall_slots(r, 2.6), ["workbench", "plant_pot", "workbench", "plant_pot"]):
             on_wall(r, s, along, kind, "Green")
     return len(B.nodes) - before
+
+
+# Lift of the upper row of portraits above their usual hang (tall rooms; clear of shelves).
+HIGH_LIFT = 2.6
+
+
+def high_gallery(r):
+    """Tall rooms (9 m walls) get a second row of portraits high above the furniture, in
+    the gaps between the wall slots used below, so the upper walls are not bare stone."""
+    for i, (s, along) in enumerate(wall_slots(r, 2.0)):
+        if i % 3:
+            continue
+        B.inst(B.uname(f"HighPortrait_{r.id}"), prop("portrait"), on_wall_pos(r, s, along, HIGH_LIFT), parent="Furniture",
+               rot_y=math.radians({"w": 90.0, "e": -90.0, "n": 0.0, "s": 180.0}[s]))
 
 
 def on_wall_pos(r, side, along, lift):
