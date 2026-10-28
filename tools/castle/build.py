@@ -612,9 +612,20 @@ def wall_free_intervals(r, side, width, storey=None):
         axis, coord, lo, hi = "x", (r.z0 if side == "n" else r.z1), r.x0, r.x1
         along = lambda x, z: x; other = lambda x, z: z
     blocked = []
+    walled = set()
     for (a, c, off, st), u in units.items():
-        if a == axis and c == coord and st == storey and lo <= off < hi and (u["door"] or u["secret"] or u["window"]):
+        if a == axis and c == coord and st == storey and lo <= off < hi:
+            if u["door"] or u["secret"] or u["window"]:
+                blocked.append((off - 0.3, off + 4.3))
+            elif u["rows"] > 0:
+                walled.add(off)
+    # Where the room opens into its neighbour with no wall at all (arches, halls that
+    # flow into corridors) there is nothing to stand against: keep that span clear too.
+    off = lo - (lo % 4)
+    while off < hi:
+        if off >= lo and off not in walled and not any(b0 <= off + 2 <= b1 for b0, b1 in blocked):
             blocked.append((off - 0.3, off + 4.3))
+        off += 4
     for x, z, st in pillar_points:
         if st == storey and abs(other(x, z) - coord) < 0.01 and lo - 1 <= along(x, z) <= hi + 1:
             blocked.append((along(x, z) - 0.6, along(x, z) + 0.6))

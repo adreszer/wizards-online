@@ -50,12 +50,40 @@ def prop(kind):
     return path or f"res://objects/environment/placeholders/{kind}.tscn"
 
 
+# Wall-hung pieces and flat carpets may sit by stairs and doorways; everything that
+# stands on the floor must keep clear of stair treads and landings and of door openings
+# (the castle doors' leaves swing into the room).
+HUNG = ("portrait", "tapestry", "banner_", "jar_shelf", "runner_", "hall_rug_", "rug")
+DOOR_CLEAR = 2.6
+_doors = {}   # storey -> [(x, z)] door and secret-wall openings, filled on first use
+
+
+def door_points(storey):
+    if storey not in _doors:
+        _doors[storey] = [((off + 2, c) if a == "x" else (c, off + 2)) for (a, c, off, st), u in B.units.items()
+                          if st == storey and (u["door"] or u["secret"])]
+    return _doors[storey]
+
+
+def spot_clear(r, x, z, kind=""):
+    """May a floor-standing `kind` stand at (x, z) in room r?"""
+    if kind.startswith(HUNG):
+        return True
+    if B.kept_out(x, z, r.y, 0.7):
+        return False
+    return all((x - dx) ** 2 + (z - dz) ** 2 >= DOOR_CLEAR ** 2 for dx, dz in door_points(r.storey))
+
+
 def on_wall(r, side, along, kind, name="Dress", inset=0.0):
     if side in "we":
         pos = ((r.x0 + T / 2 + inset) if side == "w" else (r.x1 - T / 2 - inset), r.y, along)
     else:
         pos = (along, r.y, (r.z0 + T / 2 + inset) if side == "n" else (r.z1 - T / 2 - inset))
     yaw = {"w": 90.0, "e": -90.0, "n": 0.0, "s": 180.0}[side]
+    # Checked half a metre into the room, where the piece stands.
+    into = {"w": (0.6, 0), "e": (-0.6, 0), "n": (0, 0.6), "s": (0, -0.6)}[side]
+    if not spot_clear(r, pos[0] + into[0], pos[2] + into[1], kind):
+        return False
     B.inst(B.uname(f"{name}_{r.id}"), prop(kind) if kind != "bookshelf" else B.K("bookshelf"), pos, parent="Furniture",
            rot_y=math.radians(yaw))
 
@@ -81,7 +109,10 @@ def floor_clear(r, x, z, margin=1.6):
 
 
 def at_floor(r, x, z, kind, yaw=0.0, name="Dress"):
+    if not spot_clear(r, x, z, kind):
+        return False
     B.inst(B.uname(f"{name}_{r.id}"), prop(kind), (x, r.y, z), parent="Furniture", rot_y=math.radians(yaw))
+    return True
 
 
 # Corridor runners by wing (the rest are crimson); hall rugs and common rooms by house.
@@ -161,7 +192,9 @@ def sitting_set(r, x, z, clutter="writing_set", chairs=2):
     on its back edge, so it is set 0.5 m back to centre it on (x, z))."""
     if not floor_clear(r, x, z, 2.0):
         return False
-    at_floor(r, x, z - 0.5, "table", 0.0, "SetTable")
+    # Table first: without it, nothing of the set (the clutter would float).
+    if not at_floor(r, x, z - 0.5, "table", 0.0, "SetTable") or not spot_clear(r, x, z + 0.5, "table"):
+        return False
     for i in range(chairs):
         side = -1 if i % 2 == 0 else 1
         at_floor(r, x + side * 0.5, z + side * 1.15, "chair", 0.0 if side < 0 else 180.0, "SetChair")
@@ -187,6 +220,7 @@ def themed(r, names):
 
 def dress(plan, names):
     _turn.clear()
+    _doors.clear()
     n = 0
     for r in plan.rooms.values():
         if r.get("terrain") or r.kind in ("outdoor", "grounds", "stair_turret") or r.inside is not None and r.kind == "outdoor":
