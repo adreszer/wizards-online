@@ -15,10 +15,13 @@ extends StaticBody3D
 ## full occluder and full collision like a plain wall.
 ##
 ## Glazed windows also get a fake light shaft in the game (not in the editor): the
-## open sides of a slanted prism from the opening down into the room, drawn additive
-## with one shared shader material. No real light and no shadow, so it costs one
-## transparent draw within SHAFT_RANGE and nothing of the light budget. set_daylight
-## turns it into warm daylight by day and a faint blue moonbeam at night.
+## open sides of a prism from the opening into the room, slanted along the sun's (or
+## the moon's) direction in the shader, drawn additive with one shared shader material.
+## Only windows the light shines into show a shaft. No real light and no shadow, so it
+## costs one transparent draw per SHAFT_CELL cell within SHAFT_RANGE (the shafts of a
+## level are batched into MultiMeshes) and nothing of the light budget.
+## set_daylight makes it warm daylight by day and a faint blue moonbeam at night;
+## set_shaft_light (DayNightCycle) aims it.
 
 @export var window_scene: PackedScene = preload("res://objects/environment/windows/window_gothic_iron.tscn"):
 	set(value):
@@ -49,11 +52,13 @@ static var _glass_material: StandardMaterial3D
 static var _shaft_material: ShaderMaterial
 
 const SHAFT_SHADER := preload("res://objects/environment/modular/light_shaft.gdshader")
-## Where a shaft goes from the opening: into the room (+Z) and down, metres.
-const SHAFT_REACH := Vector3(0.0, -3.6, 4.2)
+## A shaft drops this far below its window (metres), and reaches at most MAX_REACH
+## along the light (a low sun gives long, flat shafts).
+const SHAFT_DROP := 3.6
+const SHAFT_MAX_REACH := 7.0
 ## The far end of the shaft is this much wider than the opening (the light spreads).
 const SHAFT_SPREAD := 1.25
-## Shafts are drawn out to this distance from the camera (fading out over the last 6 m).
+## A cell of shafts is drawn out to this distance from the camera (fading out over the last 6 m).
 const SHAFT_RANGE := 40.0
 const SHAFT_DAY := Color(1.0, 0.9, 0.72)
 const SHAFT_NIGHT := Color(0.55, 0.65, 1.0)
@@ -89,8 +94,8 @@ func _rebuild() -> void:
 	_add_generated(_build_reveal(segs))
 	if frame.glass:
 		_add_generated(_build_glass(segs))
-		if not Engine.is_editor_hint():
-			_add_generated(build_shaft(segs))
+		if not Engine.is_editor_hint() and not shafts_disabled:
+			_queue_shaft(segs)
 	_add_backing(o, arches)
 	if occluder and not Engine.is_editor_hint():
 		var occ := OccluderInstance3D.new()
@@ -223,11 +228,10 @@ func _build_glass(segs: Array) -> MeshInstance3D:
 	return mi
 
 
-## The fake light shaft for an opening outline (module space): the four sides of a
-## prism from the opening's bounding box (a little inside it) along SHAFT_REACH,
-## widening by SHAFT_SPREAD. UV.x runs across a side, UV.y from the window (0) to the
-## far end (1).
-static func build_shaft(segs: Array) -> MeshInstance3D:
+## Where the light shaft of an opening outline (module space) sits: a transform that
+## maps the unit shaft (shaft_mesh: a ±1 square in the window plane) onto the opening's
+## bounding box, a little inside it and just inside the room's wall face.
+static func shaft_transform(segs: Array) -> Transform3D:
 	var lo := Vector2(INF, INF)
 	var hi := Vector2(-INF, -INF)
 	for seg in segs:
@@ -236,32 +240,114 @@ static func build_shaft(segs: Array) -> MeshInstance3D:
 		hi = Vector2(maxf(hi.x, p.x), maxf(hi.y, p.y))
 	var mid := (lo + hi) / 2.0
 	var half := (hi - lo) / 2.0 * 0.9
-	var z := 0.2   # just inside the room's wall face
+	return Transform3D(Basis.from_scale(Vector3(half.x, half.y, 1.0)), Vector3(mid.x, mid.y, 0.2))
+
+
+## The unit shaft every window shares: the four sides of a prism from a ±1 square in
+## the window plane, its far end (UV.y = 1) widened by SHAFT_SPREAD and pushed along the
+## light in the shader. UV.x runs across a side.
+static func shaft_mesh() -> ArrayMesh:
+	if _shaft_mesh != null:
+		return _shaft_mesh
 	var near: Array[Vector3] = []
 	var far: Array[Vector3] = []
 	for c: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(1, 1), Vector2(-1, 1)]:
-		near.append(Vector3(mid.x + c.x * half.x, mid.y + c.y * half.y, z))
-		far.append(Vector3(mid.x + c.x * half.x * SHAFT_SPREAD, mid.y + c.y * half.y * SHAFT_SPREAD, z) + SHAFT_REACH)
+		near.append(Vector3(c.x, c.y, 0.0))
+		far.append(Vector3(c.x * SHAFT_SPREAD, c.y * SHAFT_SPREAD, 0.0))
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for i in 4:
 		var j := (i + 1) % 4
 		var quad := [near[i], near[j], far[j], far[i]]
 		var uvs := [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)]
-		st.set_normal((near[j] - near[i]).cross(far[i] - near[i]).normalized())
+		st.set_normal((near[j] - near[i]).cross(Vector3.BACK).normalized())
 		for k in [0, 1, 2, 0, 2, 3]:
 			st.set_uv(uvs[k])
 			st.add_vertex(quad[k])
-	var mi := MeshInstance3D.new()
-	mi.name = "LightShaft"
-	mi.mesh = st.commit()
-	mi.material_override = _get_shaft_material()
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	mi.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
-	mi.visibility_range_end = SHAFT_RANGE
-	mi.visibility_range_end_margin = 6.0
-	mi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
-	return mi
+	_shaft_mesh = st.commit()
+	return _shaft_mesh
+
+
+static var _shaft_mesh: ArrayMesh
+## Dev switch (tools/perf_castle --no-shafts): no light shafts at all.
+static var shafts_disabled := false
+## Shafts waiting to be batched: level root → Array[Transform3D] (global).
+static var _pending_shafts := {}
+
+
+## Queues this window's shaft; LightShafts batches every queued shaft of a level into a
+## MultiMesh per SHAFT_CELL cell once the level has loaded (one draw per cell).
+func _queue_shaft(segs: Array) -> void:
+	var level := _shaft_level()
+	if level == null:
+		return
+	if not _pending_shafts.has(level):
+		_pending_shafts[level] = []
+		# A static callable: a window freed before the flush must not cancel its level's batch.
+		Callable(WallWindow, &"_flush_shafts").call_deferred(level)
+	(_pending_shafts[level] as Array).append(global_transform * shaft_transform(segs))
+
+
+## The node whose shafts are batched together: the level (the nearest ancestor with a
+## StaticBatch, as the castle has), else the scene this window was saved in, else its
+## parent. Windows that wall runs create at runtime have no owner, so the owner alone
+## would make a batch per wall run.
+func _shaft_level() -> Node:
+	var node := get_parent()
+	while node != null:
+		if node.has_node(^"StaticBatch"):
+			return node
+		node = node.get_parent()
+	return owner if owner != null else get_parent()
+
+
+static func _flush_shafts(level: Node) -> void:
+	var xforms: Array = _pending_shafts.get(level, [])
+	_pending_shafts.erase(level)
+	if is_instance_valid(level) and not xforms.is_empty():
+		level.add_child(build_shaft_batches(xforms))
+
+
+## Shafts are grouped into cells this wide (metres); each cell is one MultiMesh draw.
+const SHAFT_CELL := 32.0
+
+
+## A "LightShafts" node holding one MultiMeshInstance3D per SHAFT_CELL cell (and storey)
+## for the given shaft transforms (global).
+static func build_shaft_batches(xforms: Array) -> Node3D:
+	var cells := {}
+	for xf: Transform3D in xforms:
+		var key := Vector3i(floori(xf.origin.x / SHAFT_CELL), floori(xf.origin.y / 6.0), floori(xf.origin.z / SHAFT_CELL))
+		if not cells.has(key):
+			cells[key] = []
+		(cells[key] as Array).append(xf)
+	var root := Node3D.new()
+	root.name = "LightShafts"
+	for key: Vector3i in cells:
+		var list: Array = cells[key]
+		var centre := Vector3.ZERO
+		for xf: Transform3D in list:
+			centre += xf.origin
+		centre /= list.size()
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = shaft_mesh()
+		mm.instance_count = list.size()
+		for i in list.size():
+			mm.set_instance_transform(i, Transform3D((list[i] as Transform3D).basis, (list[i] as Transform3D).origin - centre))
+		var mmi := MultiMeshInstance3D.new()
+		mmi.name = "LightShaft_%d_%d_%d" % [key.x, key.y, key.z]
+		mmi.multimesh = mm
+		mmi.position = centre
+		mmi.material_override = _get_shaft_material()
+		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mmi.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+		mmi.extra_cull_margin = SHAFT_MAX_REACH   # the shader pushes the far ends out along the light
+		mmi.visibility_range_end = SHAFT_RANGE
+		mmi.visibility_range_end_margin = 6.0
+		mmi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+		root.add_child(mmi)
+	return root
 
 
 static func _get_shaft_material() -> ShaderMaterial:
@@ -269,14 +355,47 @@ static func _get_shaft_material() -> ShaderMaterial:
 		_shaft_material = ShaderMaterial.new()
 		_shaft_material.shader = SHAFT_SHADER
 		_shaft_material.set_shader_parameter("shaft", shaft_color(0.0))
+		_shaft_material.set_shader_parameter("drop", SHAFT_DROP)
+		_shaft_material.set_shader_parameter("max_reach", SHAFT_MAX_REACH)
 	return _shaft_material
+
+
+## Aims every shaft along `light_dir` (the way the sun's or moon's light travels,
+## world space); `strength` (0–1) fades them while the body is low (the sun/moon swap).
+## One uniform on the shared material, however many windows there are.
+static func set_shaft_light(light_dir: Vector3, strength: float = 1.0) -> void:
+	var mat := _get_shaft_material()
+	mat.set_shader_parameter("light_dir", light_dir.normalized())
+	_shaft_strength = clampf(strength, 0.0, 1.0)
+	mat.set_shader_parameter("shaft", shaft_color(_shaft_daylight))
+
+
+static var _shaft_strength := 1.0
+static var _shaft_daylight := 0.0
+
+
+## How far a shaft reaches along `light_dir` (mirrors light_shaft.gdshader).
+static func shaft_reach(light_dir: Vector3) -> float:
+	var l := light_dir.normalized()
+	return minf(SHAFT_DROP / maxf(-l.y, 0.05), SHAFT_MAX_REACH)
+
+
+## 0…1: whether light travelling along `light_dir` shines into a room whose inside is
+## `inward` (the window module's +Z, world space). Mirrors light_shaft.gdshader.
+static func shaft_facing(light_dir: Vector3, inward: Vector3) -> float:
+	var l := light_dir.normalized()
+	var lh := Vector2(l.x, l.z)
+	var ih := Vector2(inward.x, inward.z)
+	if lh.length() < 0.001 or ih.length() < 0.001 or l.y > -0.02:
+		return 0.0
+	return smoothstep(0.2, 0.45, lh.normalized().dot(ih.normalized()))
 
 
 ## The shaft's colour (rgb) and strength (a) at `daylight` 0 (night, moonlight) … 1 (day).
 static func shaft_color(daylight: float) -> Color:
 	var t := clampf(daylight, 0.0, 1.0)
 	var c := SHAFT_NIGHT.lerp(SHAFT_DAY, t)
-	c.a = lerpf(SHAFT_NIGHT_STRENGTH, SHAFT_DAY_STRENGTH, t)
+	c.a = lerpf(SHAFT_NIGHT_STRENGTH, SHAFT_DAY_STRENGTH, t) * _shaft_strength
 	return c
 
 
@@ -328,6 +447,7 @@ static func set_daylight(amount: float, gi: bool = false) -> void:
 	var t := clampf(amount, 0.0, 1.0)
 	glass.emission = GLASS_NIGHT_EMISSION.lerp(GLASS_DAY_EMISSION, t)
 	glass.emission_energy_multiplier = lerpf(0.6, GLASS_DAY_ENERGY_GI if gi else 1.5, t)
+	_shaft_daylight = t
 	_get_shaft_material().set_shader_parameter("shaft", shaft_color(t))
 
 

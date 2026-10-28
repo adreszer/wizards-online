@@ -30,6 +30,9 @@ const OUTDOOR_DAY_AMBIENT := 1.9
 ## The sky's energy at full daylight (1 at night). With GI on the sky is what lights
 ## the shaded grounds and what comes in through doors and windows.
 const DAY_SKY_ENERGY := 1.5
+## Colour saturation outdoors at full daylight (AgX bleaches sunlit grass to mint
+## otherwise); 1 indoors and at night.
+const OUTDOOR_DAY_SATURATION := 1.3
 const MOON_ENERGY := 0.38
 const SUN_LOW := Color(1.0, 0.58, 0.32)
 const SUN_HIGH := Color(1.0, 0.96, 0.9)
@@ -54,10 +57,10 @@ const KEYS := [
 		"amb": Color(0.72, 0.6, 0.56), "amb_e": 0.27, "fog": Color(0.55, 0.42, 0.38), "fog_d": 0.0015,
 		"fill": Color(1.0, 0.72, 0.55), "fill_e": 0.1, "stars": 0.15, "day": 0.45},
 	{"h": 8.0, "top": Color(0.24, 0.42, 0.72), "hor": Color(0.66, 0.74, 0.84), "gnd": Color(0.3, 0.3, 0.29),
-		"amb": Color(0.75, 0.8, 0.88), "amb_e": 0.34, "fog": Color(0.62, 0.7, 0.8), "fog_d": 0.0011,
+		"amb": Color(0.75, 0.8, 0.88), "amb_e": 0.34, "fog": Color(0.62, 0.7, 0.8), "fog_d": 0.0008,
 		"fill": Color(1.0, 0.96, 0.9), "fill_e": 0.16, "stars": 0.0, "day": 1.0},
 	{"h": 17.0, "top": Color(0.24, 0.42, 0.72), "hor": Color(0.66, 0.74, 0.84), "gnd": Color(0.3, 0.3, 0.29),
-		"amb": Color(0.75, 0.8, 0.88), "amb_e": 0.34, "fog": Color(0.62, 0.7, 0.8), "fog_d": 0.0011,
+		"amb": Color(0.75, 0.8, 0.88), "amb_e": 0.34, "fog": Color(0.62, 0.7, 0.8), "fog_d": 0.0008,
 		"fill": Color(1.0, 0.96, 0.9), "fill_e": 0.16, "stars": 0.0, "day": 1.0},
 	{"h": 18.8, "top": Color(0.2, 0.22, 0.42), "hor": Color(0.96, 0.48, 0.26), "gnd": Color(0.3, 0.22, 0.2),
 		"amb": Color(0.78, 0.6, 0.52), "amb_e": 0.27, "fog": Color(0.58, 0.4, 0.34), "fog_d": 0.0014,
@@ -105,6 +108,9 @@ func _ready() -> void:
 		fill_light.light_specular = 0.2   # sky light: no sharp highlight on the floors
 		fill_light.shadow_enabled = false   # it shines through the ceilings (the shadows setting skips it)
 		fill_light.set_meta(GameSettings.NO_SHADOWS, true)
+		# Interiors only: the grounds have the real sun and sky; the extra straight-down
+		# light washed the terrain out by day.
+		fill_light.light_cull_mask = INTERIOR_LAYERS
 		for dir: Vector3 in BOUNCE_FILLS:
 			var bounce := DirectionalLight3D.new()
 			bounce.name = "BounceFill"
@@ -260,6 +266,9 @@ func apply_hours(h: float) -> void:
 		var w := _atmosphere_weight if not atm.is_empty() else 0.0
 		environment.ambient_light_color = (look.amb as Color).lerp(atm.get("amb", look.amb), w * 0.6)
 		environment.ambient_light_energy = float(look.amb_e) * lerpf(1.0, float(atm.get("amb_k", 1.0)), w) * lerpf(1.0, INDOOR_AMBIENT, indoors) * outdoor_day_boost(daylight, indoors)
+		var sat_k := clampf(daylight, 0.0, 1.0) * (1.0 - indoors)
+		environment.adjustment_enabled = true
+		environment.adjustment_saturation = lerpf(1.0, OUTDOOR_DAY_SATURATION, sat_k)
 		environment.fog_light_color = (look.fog as Color).lerp(atm.get("fog", look.fog), w * 0.7)
 		environment.fog_density = float(look.fog_d) * lerpf(1.0, float(atm.get("fog_k", 1.0)), w) * morning_mist(h) * (Seasons.RAIN_FOG if Seasons.rain_today else 1.0)
 	if sky_material != null:
@@ -303,6 +312,8 @@ func _place_sky_light(to_sun: Vector3) -> void:
 	# A light shines along its -Z: point it from the body toward the ground.
 	sky_light.global_basis = Basis.looking_at(-to_body, Vector3.UP)
 	sky_light.visible = rise > 0.001
+	# The window shafts slant along the same light, fading with it at the horizon.
+	WallWindow.set_shaft_light(-to_body, rise)
 
 
 ## How much of the moon is lit at unix time `t` (0 new … 1 full), from a known new moon

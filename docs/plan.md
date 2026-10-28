@@ -605,7 +605,8 @@ Spike and decisions in `docs/lighting.md`.
 - [x] Tests: presets and shadow distances, light fade and shadows, particles, still props, indoor kinds, the castle's GI/AgX/glow, the overhead fill and the bounce fills with and without GI
 - [ ] Measure SDFGI on a mid laptop at 1080p (this M3 Ultra is CPU-bound; GI cost didn't show)
 - [x] Windows and light shafts (roadmap 5.1): `WallWindow` adds a `LightShaft` (additive prism, `light_shaft.gdshader`, one shared material) to every glazed window, no real lights; the outdoor daylight fix with it. `tools/capture_model.tscn --hours=12,18.8,0` renders a view at fixed school hours
-- [ ] Shafts that follow the sun (only on windows facing it, angled by its direction) and a shadowed sun with volumetric fog through bigger windows
+- [x] Shafts follow the sun (only windows it shines into, slanted by its elevation; the moon by night), batched into a MultiMesh per 32 m cell (perf_castle `--hour`, `--no-shafts`: +9 draw calls in corridor_w_0); sunny grounds at noon (interior-only fill, outdoor day saturation, thinner day fog, low terrain specular); GI-off noon checked (`capture_model --no-gi`)
+- [ ] A shadowed sun with volumetric fog through bigger windows
 
 ### Walking and stairs overhaul
 

@@ -45,4 +45,5 @@ void fragment() {
 	float total = max(w.r + w.g + w.b + w.a, 0.001);
 	ALBEDO = (grass * w.r + rock * w.g + dirt * w.b + sand * w.a) / total;
 	ROUGHNESS = 0.92;
+	SPECULAR = 0.12;   // grass and earth: no pale sky sheen at grazing angles
 }

@@ -8,7 +8,8 @@ extends Node
 ## --open-doors swings every CastleDoor and HouseDoor in it open first; --frames=N waits N
 ## frames after placing the camera (streamed terrain detail needs a few dozen);
 ## --house-totals=a,b,c,d shows that tally on every HouseTally in it; --hours=12,18.8,0
-## pins the level's DayNightCycle to each school hour in turn and saves one PNG per hour.
+## pins the level's DayNightCycle to each school hour in turn and saves one PNG per hour;
+## --no-gi turns global illumination off first (the low and medium presets).
 
 const FLOOR := preload("res://objects/environment/modular/floor_tile.tscn")
 
@@ -31,6 +32,7 @@ var _target := Vector3.INF
 var _settle_frames := 20
 var _house_totals := PackedInt32Array()
 var _hours := PackedFloat32Array()
+var _no_gi := false
 
 
 func _ready() -> void:
@@ -52,6 +54,8 @@ func _ready() -> void:
 		elif arg.begins_with("--house-totals="):
 			for part in arg.trim_prefix("--house-totals=").split(","):
 				_house_totals.append(int(part))
+		elif arg == "--no-gi":
+			_no_gi = true
 		elif arg.begins_with("--hours="):
 			for part in arg.trim_prefix("--hours=").split(","):
 				_hours.append(float(part))
@@ -102,6 +106,10 @@ func _run() -> void:
 		cam.look_at(_target, Vector3.UP)
 		await _frames(_settle_frames)
 		var cycle := scene_root.find_child("DayNightCycle", true, false) as DayNightCycle
+		if _no_gi:
+			for node in scene_root.find_children("*", "WorldEnvironment", true, false):
+				(node as WorldEnvironment).environment.sdfgi_enabled = false
+			await _frames(10)
 		if _hours.is_empty() or cycle == null:
 			_save("custom")
 		for h in _hours:
