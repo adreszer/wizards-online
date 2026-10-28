@@ -2814,24 +2814,37 @@ func _test_day_night() -> void:
 		t.check((-sun.global_basis.z).y < -0.8, "noon: the sun shines down from high up")
 		t.check(cycle.daylight > 0.99 and cycle.sky_material.sky_cover_modulate.a < 0.01, "noon: full daylight, no stars")
 		t.check(cycle.sky_material.energy_multiplier > 1.3, "noon: a bright sky lights the shaded grounds")
+		t.check(is_equal_approx(cycle.environment.adjustment_saturation, lerpf(1.0, DayNightCycle.OUTDOOR_DAY_SATURATION, 1.0 - cycle.indoors))
+			and DayNightCycle.OUTDOOR_DAY_SATURATION > 1.2, "noon outdoors: sunny colours, not bleached (indoors %.1f)" % cycle.indoors)
+		t.check(cycle.fill_light.light_cull_mask & (1 << 10) == 0, "the overhead fill lights interiors only (the grounds have sun and sky)")
 		t.check(is_equal_approx(DayNightCycle.outdoor_day_boost(1.0, 0.0), DayNightCycle.OUTDOOR_DAY_AMBIENT)
 			and is_equal_approx(DayNightCycle.outdoor_day_boost(0.0, 0.0), 1.0) and is_equal_approx(DayNightCycle.outdoor_day_boost(1.0, 1.0), 1.0),
 			"daylight boosts the ambient outdoors only, and only by day")
-		var shafts := castle.find_children("LightShaft", "MeshInstance3D", true, false)
-		t.check(shafts.size() > 20 and shafts.all(func(m: MeshInstance3D) -> bool:
-				return m.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF and m.visibility_range_end > 0.0 and m.mesh.get_surface_count() == 1),
-			"glazed windows cast fake light shafts (no shadows, distance-culled): %d" % shafts.size())
+		var shafts := castle.find_children("LightShaft_*", "MultiMeshInstance3D", true, false)
+		var shaft_count := 0
+		for m: MultiMeshInstance3D in shafts:
+			shaft_count += m.multimesh.instance_count
+		t.check(shaft_count > 20 and shafts.size() * 3 < shaft_count and shafts.all(func(m: MultiMeshInstance3D) -> bool:
+				return m.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF and m.visibility_range_end > 0.0),
+			"glazed windows cast fake light shafts, batched per cell, no shadows, distance-culled: %d in %d draws" % [shaft_count, shafts.size()])
+		var noon_light := -DayNightCycle.sun_direction(12.0)
+		t.check(WallWindow.shaft_facing(noon_light, Vector3.FORWARD) > 0.99 and WallWindow.shaft_facing(noon_light, Vector3.BACK) == 0.0
+			and WallWindow.shaft_facing(noon_light, Vector3.RIGHT) == 0.0, "noon: only windows facing south let a shaft in")
+		t.check(WallWindow.shaft_facing(-DayNightCycle.sun_direction(9.0), Vector3.LEFT) > 0.5, "morning: east windows let the sun in")
+		t.check(WallWindow.shaft_reach(-DayNightCycle.sun_direction(7.0)) > WallWindow.shaft_reach(noon_light)
+			and WallWindow.shaft_reach(Vector3(1, -0.01, 0)) <= WallWindow.SHAFT_MAX_REACH, "a low sun gives long shafts, within a limit")
 		var day_shaft := WallWindow.shaft_color(1.0)
 		var night_shaft := WallWindow.shaft_color(0.0)
 		t.check(day_shaft.a > night_shaft.a and night_shaft.a > 0.0 and night_shaft.b > night_shaft.r and day_shaft.r > day_shaft.b,
 			"shafts: warm daylight by day, a faint blue moonbeam at night")
 		if not shafts.is_empty():
-			var shaft_mat := (shafts[0] as MeshInstance3D).material_override as ShaderMaterial
+			var shaft_mat := (shafts[0] as MultiMeshInstance3D).material_override as ShaderMaterial
 			t.check(shaft_mat != null and (shaft_mat.get_shader_parameter("shaft") as Color).a > 0.1, "noon: the shafts shine")
 		cycle.time_override = 0.0
 		cycle.refresh()
 		t.check(sun.visible and sun.light_energy < 0.5 and sun.light_color.b > sun.light_color.r, "midnight: the dim blue moon (%.2f)" % sun.light_energy)
 		t.check(cycle.environment.ambient_light_energy < noon_ambient and cycle.sky_material.sky_cover_modulate.a > 0.99, "midnight: darker, with stars")
+		t.check(is_equal_approx(cycle.environment.adjustment_saturation, 1.0), "midnight: no daylight saturation")
 		t.check(phases.has(SchoolClock.Phase.DAY) and phases.has(SchoolClock.Phase.NIGHT), "phase changes reach GameEvents")
 		GameEvents.time_phase_changed.disconnect(on_phase)
 		cycle.time_override = 6.0

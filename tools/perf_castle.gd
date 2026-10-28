@@ -1,6 +1,6 @@
 extends Node
 ## Dev tool: performance of the castle scene (needs a window; not --headless).
-##   godot --path . tools/perf_castle.tscn -- [--copies=5] [--out=/abs/report.json]
+##   godot --path . tools/perf_castle.tscn -- [--copies=5] [--hour=12] [--no-shafts] [--out=/abs/report.json]
 ## Loads the castle (with --copies=N, N castles 220 m apart: the stress fixture for the
 ## target scale; only the first keeps its grounds), then for each viewpoint waits for the
 ## streaming to settle and averages frame time, draw calls, objects and primitives over
@@ -21,6 +21,11 @@ var copies := 1
 var out_path := ""
 
 
+## --hour=H pins every castle's DayNightCycle (the clock otherwise changes the lighting
+## between runs); --no-shafts leaves out the window light shafts (to measure them).
+var hour := NAN
+
+
 func _ready() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)   # measure frames, not the display
 	for arg in OS.get_cmdline_user_args():
@@ -28,6 +33,10 @@ func _ready() -> void:
 			copies = int(arg.trim_prefix("--copies="))
 		elif arg == "--no-batch":
 			StaticBatch.disabled = true
+		elif arg.begins_with("--hour="):
+			hour = float(arg.trim_prefix("--hour="))
+		elif arg == "--no-shafts":
+			WallWindow.shafts_disabled = true
 		elif arg.begins_with("--out="):
 			out_path = arg.trim_prefix("--out=")
 	await _run()
@@ -53,6 +62,10 @@ func _run() -> void:
 				g.free()
 		add_child(c)
 	await get_tree().process_frame
+	if not is_nan(hour):
+		for cycle in find_children("DayNightCycle", "DayNightCycle", true, false):
+			(cycle as DayNightCycle).time_override = hour
+			(cycle as DayNightCycle).refresh()
 	var instance_ms := Time.get_ticks_msec() - t0
 	var report := {"copies": copies, "load_ms": load_ms, "instance_ms": instance_ms,
 		"nodes": get_tree().get_node_count(), "mesh_instances": find_children("*", "MeshInstance3D", true, false).size(),
