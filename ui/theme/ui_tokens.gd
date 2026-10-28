@@ -53,6 +53,18 @@ const SIZE_READING := 19
 const SIZE_TITLE := 30
 const SIZE_BANNER := 64
 
+# Text in the world (Label3D: nameplates, speech bubbles, boards).
+## Chalk on a slate board, and chalk on a board with nothing running.
+const CHALK := Color("eeece2")
+const CHALK_DIM := Color("bfc7b8bf")
+## The dark rim that keeps floating text readable against a bright wall or sky.
+const WORLD_OUTLINE := Color("0a0710d9")
+## Nameplate tints by role: students in candlelight, professors in brass, the
+## administrator in a cool green so staff are recognisable across a room.
+const NAME_STUDENT := CANDLE
+const NAME_PROFESSOR := BRASS_BRIGHT
+const NAME_ADMIN := Color("a9d6a0")
+
 # Motion (seconds); reduced motion turns these into instant changes.
 const FAST := 0.12
 const NORMAL := 0.2

@@ -27,7 +27,6 @@ shape = SubResource("Shape")
 [node name="Text" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.06, 0, 0.29)
 pixel_size = 0.0032
-modulate = Color(0.94, 0.93, 0.88, 1)
 line_spacing = 2.0
 outline_size = 0
 font_size = 26

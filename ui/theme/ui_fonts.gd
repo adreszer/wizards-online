@@ -44,5 +44,13 @@ static func text(italic: bool = false, bold: bool = false) -> Font:
 	return load(TEXT_BOLD if bold else (TEXT_ITALIC if italic else TEXT))
 
 
+## Sets up a Label3D (nameplate, bubble, board) in a theme font with the world
+## outline when it floats in the air (`outline_px` 0 for text written on a surface).
+static func world_label(label: Label3D, font: Font, outline_px: int = 0) -> void:
+	label.font = font
+	label.outline_size = outline_px
+	label.outline_modulate = UiTokens.WORLD_OUTLINE
+
+
 static func ui(weight: String = "regular") -> Font:
 	return load({"italic": UI_ITALIC, "medium": UI_MEDIUM, "bold": UI_BOLD}.get(weight, UI))

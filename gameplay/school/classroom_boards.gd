@@ -9,8 +9,8 @@ extends Node
 const WALL_BOARD := "res://objects/environment/props/wall_board.tscn"
 ## The writing face sits this far in front of the board's origin (its back face), along -Z.
 const FACE_DEPTH := 0.29
-const CHALK := Color(0.93, 0.93, 0.88)
-const CHALK_DIM := Color(0.75, 0.78, 0.72, 0.75)
+const CHALK := UiTokens.CHALK
+const CHALK_DIM := UiTokens.CHALK_DIM
 ## Refresh rate of the idle text (the next lesson's time).
 const IDLE_REFRESH := 5.0
 
@@ -85,7 +85,7 @@ func _make_label(board: Transform3D, level: Node) -> Label3D:
 	label.name = "BoardText"
 	label.font_size = 56
 	label.pixel_size = 0.0022
-	label.outline_size = 0
+	UiFonts.world_label(label, UiFonts.text())
 	label.width = 1050.0
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

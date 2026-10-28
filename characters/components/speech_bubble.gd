@@ -3,13 +3,14 @@ extends Label3D
 ## What a character just said, floating over their head for a few seconds. Whispers
 ## are small and only readable up close, shouts large and seen from afar; a lecture
 ## line (a professor teaching) is the largest and stays longest. Each new line
-## replaces the last. Text arrives already filtered by the server's hearing rules.
+## replaces the last. Set in the reading face (UiFonts.TEXT; whispers italic, shouts
+## bold, lectures in the display face) in UiTokens colours. Text arrives already filtered by the server's hearing rules.
 
 const STYLE := {
-	"whisper": {"size": 26, "range": 6.0, "seconds": 5.0, "color": Color(0.82, 0.86, 0.95)},
-	"say": {"size": 34, "range": 22.0, "seconds": 7.0, "color": Color(1, 1, 1)},
-	"shout": {"size": 46, "range": 55.0, "seconds": 7.0, "color": Color(1, 0.88, 0.62)},
-	"lecture": {"size": 44, "range": 40.0, "seconds": 12.0, "color": Color(1, 0.9, 0.55)},
+	"whisper": {"size": 26, "range": 6.0, "seconds": 5.0, "color": UiTokens.CANDLE_SOFT, "font": UiFonts.TEXT_ITALIC},
+	"say": {"size": 34, "range": 22.0, "seconds": 7.0, "color": UiTokens.CANDLE, "font": UiFonts.TEXT},
+	"shout": {"size": 46, "range": 55.0, "seconds": 7.0, "color": UiTokens.BRASS_BRIGHT, "font": UiFonts.TEXT_BOLD},
+	"lecture": {"size": 44, "range": 40.0, "seconds": 12.0, "color": UiTokens.BRASS_BRIGHT, "font": UiFonts.DISPLAY_BOLD},
 }
 ## Long lines wrap at this many characters per row.
 const WRAP_CHARACTERS := 34
@@ -25,8 +26,7 @@ func _ready() -> void:
 	no_depth_test = false
 	fixed_size = false
 	pixel_size = 0.0035
-	outline_size = 12
-	outline_modulate = Color(0.04, 0.03, 0.06, 0.85)
+	UiFonts.world_label(self, UiFonts.text(), 12)
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	width = 600.0
 	autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -41,6 +41,7 @@ func show_line(line: String, p_mode: String = "say") -> void:
 	mode = p_mode if STYLE.has(p_mode) else "say"
 	text = line
 	font_size = int(style.size)
+	font = load(style.font)
 	modulate = style.color
 	visibility_range_end = float(style.range)
 	visibility_range_end_margin = 2.0
