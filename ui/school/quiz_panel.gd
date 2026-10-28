@@ -91,7 +91,7 @@ func show_view(p_view: Dictionary) -> void:
 		var b := Button.new()
 		b.text = "%d. %s" % [i + 1, str(choices[i])]
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.focus_mode = Control.FOCUS_NONE
+		b.focus_mode = Control.FOCUS_ALL
 		b.disabled = closed
 		if answered and int(view.answer) == i:
 			b.text = "➤ " + b.text
@@ -99,6 +99,7 @@ func show_view(p_view: Dictionary) -> void:
 			b.text += "  ✓"
 		b.pressed.connect(answer.bind(i))
 		_choices.add_child(b)
+	UiRouter.refocus(self)
 	_entry.get_parent().visible = choices.is_empty() and not closed
 	if is_new:
 		_entry.text = ""

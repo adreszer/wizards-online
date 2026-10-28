@@ -46,6 +46,10 @@ var _toast_layer: CanvasLayer
 var _slots: Array[SpellSlot] = []
 var _player: Node
 var _caster: SpellCaster
+## The gamepad's spell wheel (hold LB), over the hotbar's slots.
+var spell_wheel: SpellWheel
+## Room the minimap takes in the bottom-right corner (and, for balance, bottom left).
+const HOTBAR_CLEARANCE := 215.0
 var _inventory: Inventory
 var _health: Health
 var _clock_timer := 0.0
@@ -183,6 +187,10 @@ func _build() -> void:
 	held_slot.visible = false
 	bottom.add_child(held_slot)
 	hotbar.visible = false
+	spell_wheel = SpellWheel.new()
+	add_child(spell_wheel)
+	spell_wheel.build(_slots.size())
+	spell_wheel.picked.connect(_on_wheel_picked)
 	# Toasts on their own layer, above windows, so a "saved" or a refusal still reads.
 	_toast_layer = CanvasLayer.new()
 	_toast_layer.name = "Toasts"
@@ -206,9 +214,39 @@ func _label(variation: StringName, align: HorizontalAlignment) -> Label:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("spell_wheel") and open_spell_wheel():
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("toggle_hud"):
 		set_shown(not shown)
 		get_viewport().set_input_as_handled()
+
+
+## The hotbar keeps clear of the minimap (bottom right) and the corner opposite it: on
+## a narrow screen or at a large interface scale it is drawn smaller as a whole.
+func _fit_hotbar() -> void:
+	var room := get_viewport().get_visible_rect().size.x - 2.0 * HOTBAR_CLEARANCE
+	var want := hotbar_root.get_combined_minimum_size().x
+	var k := clampf(room / want, 0.6, 1.0) if want > 0.0 else 1.0
+	hotbar_root.pivot_offset = Vector2(hotbar_root.size.x / 2.0, hotbar_root.size.y)
+	if not is_equal_approx(hotbar_root.scale.x, k):
+		hotbar_root.scale = Vector2(k, k)
+
+
+## Opens the spell wheel with the caster's quick slots (not over a window, not with
+## nothing learned). True if it opened.
+func open_spell_wheel() -> bool:
+	if _caster == null or GameSession.ui_input_captured or get_tree().paused or not hotbar.visible:
+		return false
+	spell_wheel.set_spells(_caster.quick_slots, _caster.equipped_slot())
+	spell_wheel.open()
+	return true
+
+
+## The wheel's pick goes to the player's input like a number key.
+func _on_wheel_picked(index: int) -> void:
+	if _player != null and is_instance_valid(_player) and _player.get("player_input") != null:
+		(_player.get("player_input") as PlayerInput).spell_slot_pressed = index
 
 
 ## Hides or shows the whole interface (the minimap listens to hud_toggled).
@@ -222,14 +260,12 @@ func set_shown(value: bool) -> void:
 ## Fades out while a window is open, so the window and the dimmed world read first.
 func _on_windows_changed() -> void:
 	var alpha := BEHIND_WINDOW if UiRouter.has_modal() else 1.0
-	if GameSettings.get_value("reduce_motion") or not is_inside_tree():
-		hud_root.modulate.a = alpha
-	else:
-		# Runs while the game is paused too (the pause menu is a window).
-		hud_root.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).tween_property(hud_root, "modulate:a", alpha, UiTokens.NORMAL)
+	# Runs while the game is paused too (the pause menu is a window).
+	UiMotion.fade(hud_root, alpha, UiTokens.NORMAL)
 
 
 func _process(delta: float) -> void:
+	_fit_hotbar()
 	_update_cooldowns()
 	if _health_full_for > 0.0:
 		_health_full_for -= delta

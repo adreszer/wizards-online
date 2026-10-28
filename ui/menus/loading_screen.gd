@@ -77,9 +77,8 @@ func _init(seed_value := -1) -> void:
 
 ## Fades out (instantly under reduced motion) and frees itself.
 func finish() -> void:
-	if GameSettings.get_value("reduce_motion") or not is_inside_tree():
+	var tween := UiMotion.fade(_root, 0.0, UiTokens.SLOW) if is_inside_tree() else null
+	if tween == null:
 		queue_free()
 		return
-	var tween := _root.create_tween()
-	tween.tween_property(_root, "modulate:a", 0.0, UiTokens.SLOW)
-	tween.tween_callback(queue_free)
+	tween.chain().tween_callback(queue_free)

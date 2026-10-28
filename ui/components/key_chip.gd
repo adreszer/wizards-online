@@ -2,7 +2,10 @@ class_name KeyChip
 extends Label
 ## A key cap with the key bound to an action (docs/ui.md, "Components"), read from the
 ## InputMap, so a rebinding shows in every hint; when the last input came from a
-## gamepad it shows the pad button instead. `key_text` gives a fixed label ("1", "Esc").
+## gamepad it shows the pad button instead, drawn as a glyph (a ring for a face button,
+## a shoulder tab for a bumper or trigger, a cross for the d-pad, a stick cap), all
+## plain shapes with the button's letter, no controller art. `key_text` gives a fixed
+## label ("1", "Esc").
 
 const PAD_NAMES := {
 	JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y",
@@ -16,6 +19,10 @@ const SHORT_KEYS := {KEY_ESCAPE: "Esc", KEY_SPACE: "UI_KEY_SPACE",
 const PAD_AXES := {JOY_AXIS_TRIGGER_LEFT: "LT", JOY_AXIS_TRIGGER_RIGHT: "RT"}
 const MOUSE_KEYS := {MOUSE_BUTTON_LEFT: "UI_MOUSE_LEFT", MOUSE_BUTTON_RIGHT: "UI_MOUSE_RIGHT", MOUSE_BUTTON_MIDDLE: "UI_MOUSE_MIDDLE",
 	MOUSE_BUTTON_WHEEL_UP: "UI_MOUSE_WHEEL", MOUSE_BUTTON_WHEEL_DOWN: "UI_MOUSE_WHEEL"}
+
+## The glyph drawn round the label: &"" (a key cap from the theme), &"face", &"shoulder",
+## &"trigger", &"dpad" or &"stick".
+var glyph: StringName = &""
 
 var action: StringName = &"":
 	set(value):
@@ -46,10 +53,85 @@ func _ready() -> void:
 
 
 func refresh() -> void:
+	var g: StringName = &""
 	if key_text != "":
 		text = key_text
 	elif action != &"":
-		text = label_for(action, is_inside_tree() and UiRouter.using_pad())
+		var pad := is_inside_tree() and UiRouter.using_pad()
+		text = label_for(action, pad)
+		if pad:
+			g = glyph_for(text)
+	if g != glyph:
+		glyph = g
+		# The glyph is drawn here instead of the key cap, and its letter on top of it.
+		if glyph != &"":
+			add_theme_stylebox_override(&"normal", StyleBoxEmpty.new())
+			add_theme_color_override(&"font_color", Color.TRANSPARENT)
+		else:
+			remove_theme_stylebox_override(&"normal")
+			remove_theme_color_override(&"font_color")
+		custom_minimum_size.x = 26 if glyph == &"" else 30
+	queue_redraw()
+
+
+## What a pad button's label is drawn as (see `glyph`); &"" for a key or mouse name.
+static func glyph_for(label: String) -> StringName:
+	match label:
+		"A", "B", "X", "Y":
+			return &"face"
+		"LB", "RB":
+			return &"shoulder"
+		"LT", "RT":
+			return &"trigger"
+		"↑", "↓", "←", "→":
+			return &"dpad"
+		"LS", "RS":
+			return &"stick"
+	return &""
+
+
+func _draw() -> void:
+	if glyph == &"":
+		return
+	var col := UiTokens.CANDLE
+	var line := Color(UiTokens.BRASS_BRIGHT, 0.9)
+	var c := size / 2.0
+	var r := minf(size.x, size.y) / 2.0 - 1.0
+	match glyph:
+		&"face", &"stick":
+			draw_circle(c, r, Color(UiTokens.OAK_PRESSED, 0.85), true, -1.0, true)
+			draw_arc(c, r, 0.0, TAU, 32, line, 1.5, true)
+			if glyph == &"stick":
+				draw_arc(c, r - 3.0, 0.0, TAU, 32, Color(line, 0.5), 1.0, true)
+		&"shoulder", &"trigger":
+			var w := maxf(size.x - 2.0, 28.0)
+			var rect := Rect2(c - Vector2(w, size.y - 2.0) / 2.0, Vector2(w, size.y - 2.0))
+			var box := StyleBoxFlat.new()
+			box.bg_color = Color(UiTokens.OAK_PRESSED, 0.85)
+			box.border_color = line
+			box.set_border_width_all(1)
+			box.anti_aliasing = true
+			# A bumper is a flat tab, a trigger rounder at the top.
+			var top := 9 if glyph == &"trigger" else 4
+			box.corner_radius_top_left = top
+			box.corner_radius_top_right = top
+			box.corner_radius_bottom_left = 2
+			box.corner_radius_bottom_right = 2
+			draw_style_box(box, rect)
+		&"dpad":
+			var a := r * 0.42
+			var cross := PackedVector2Array([
+				c + Vector2(-a, -r), c + Vector2(a, -r), c + Vector2(a, -a), c + Vector2(r, -a),
+				c + Vector2(r, a), c + Vector2(a, a), c + Vector2(a, r), c + Vector2(-a, r),
+				c + Vector2(-a, a), c + Vector2(-r, a), c + Vector2(-r, -a), c + Vector2(-a, -a)])
+			draw_colored_polygon(cross, Color(UiTokens.OAK_PRESSED, 0.85))
+			cross.append(cross[0])
+			draw_polyline(cross, Color(line, 0.6), 1.0, true)
+	var font := get_theme_font(&"font")
+	var fs := get_theme_font_size(&"font_size")
+	var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	var pos := Vector2((size.x - w) / 2.0, (size.y - font.get_height(fs)) / 2.0 + font.get_ascent(fs))
+	draw_string(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
 
 
 ## A key hint: the chip for `action` and `verb` (translated text) beside it in the

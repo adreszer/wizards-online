@@ -44,7 +44,7 @@ func _build() -> void:
 		var button := Button.new()
 		button.name = String(id)
 		button.text = "%d  %s" % [i + 1, tr("GESTURE_" + String(id).to_upper())]
-		button.focus_mode = Control.FOCUS_NONE
+		button.focus_mode = Control.FOCUS_ALL
 		button.pressed.connect(choose.bind(id))
 		row.add_child(button)
 	var footer := Label.new()

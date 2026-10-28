@@ -33,10 +33,7 @@ func _ready() -> void:
 func _fade() -> void:
 	_ring.texture = UiFrames.texture("minimap_ring")
 	var alpha := 1.0 if _hud_shown and not UiRouter.has_modal() else 0.0
-	if GameSettings.get_value("reduce_motion") or not is_inside_tree():
-		_root.modulate.a = alpha
-	else:
-		_root.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).tween_property(_root, "modulate:a", alpha, UiTokens.NORMAL)
+	UiMotion.fade(_root, alpha, UiTokens.NORMAL)
 
 
 func set_map(map: CastleMap) -> void:

@@ -35,6 +35,13 @@ static func make(title: String, body := "", action: StringName = &"", verb := ""
 	return t
 
 
+## Fades in over FAST like every other surface (at once under reduced motion).
+func _ready() -> void:
+	if not UiMotion.reduced():
+		modulate.a = 0.0
+		UiMotion.fade(self, 1.0, UiTokens.FAST)
+
+
 ## Splits "Title\nBody" (translating each part) into a tooltip.
 static func from_text(for_text: String) -> UiTooltip:
 	var parts := for_text.split("\n", true, 1)

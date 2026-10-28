@@ -13,7 +13,7 @@ signal close_requested
 
 enum Family { PARCHMENT, CHROME }
 
-const SCALE_FROM := 0.97
+const SCALE_FROM := UiTokens.OPEN_SCALE_FROM
 
 var family: Family = Family.PARCHMENT
 var title_label: Label
@@ -24,6 +24,8 @@ var status_label: Label
 ## Key hints along the bottom; hidden while empty.
 var footer: HBoxContainer
 var _tween: Tween
+var _closing := false
+var _half := Vector2.ZERO
 
 
 ## `scrolls`: the body sits in a vertical scroll container (long lists); without it the
@@ -63,6 +65,7 @@ func _init(window_family: Family = Family.PARCHMENT, scrolls: bool = true) -> vo
 		scroll.name = "Scroll"
 		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		scroll.follow_focus = true
 		scroll.add_child(body)
 		outer.add_child(scroll)
 	else:
@@ -81,13 +84,34 @@ func _init(window_family: Family = Family.PARCHMENT, scrolls: bool = true) -> vo
 	outer.add_child(footer)
 
 
-## Centres the window on screen at twice `half_size`.
+## Centres the window on screen at twice `half_size`, never larger than the screen
+## less a margin (a small window or a large interface scale shrinks it; the body
+## scrolls), and keeps it so when the screen changes.
 func centre(half_size: Vector2) -> void:
+	_half = half_size
 	set_anchors_preset(Control.PRESET_CENTER)
-	offset_left = -half_size.x
-	offset_right = half_size.x
-	offset_top = -half_size.y
-	offset_bottom = half_size.y
+	_fit()
+
+
+func _fit() -> void:
+	if _half == Vector2.ZERO:
+		return
+	var h := _half
+	if is_inside_tree():
+		h = h.min(get_viewport_rect().size / 2.0 - Vector2(UiTokens.SPACE_3, UiTokens.SPACE_3))
+	offset_left = -h.x
+	offset_right = h.x
+	offset_top = -h.y
+	offset_bottom = h.y
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_ENTER_TREE:
+		if not get_viewport().size_changed.is_connected(_fit):
+			get_viewport().size_changed.connect(_fit)
+		_fit()
+	elif what == NOTIFICATION_EXIT_TREE and get_viewport().size_changed.is_connected(_fit):
+		get_viewport().size_changed.disconnect(_fit)
 
 
 ## Adds a hint ("Esc  close") to the footer.
@@ -110,24 +134,24 @@ func add_key_hint(action: StringName, verb: String) -> HBoxContainer:
 
 ## Shows the window with a short fade and settle (instant under reduced motion).
 func show_window() -> void:
-	visible = true
 	if _tween != null:
 		_tween.kill()
-	pivot_offset_ratio = Vector2(0.5, 0.5)
-	if GameSettings.get_value("reduce_motion"):
-		modulate.a = 1.0
-		scale = Vector2.ONE
-		return
-	modulate.a = 0.0
-	scale = Vector2(SCALE_FROM, SCALE_FROM)
-	_tween = create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(self, "modulate:a", 1.0, UiTokens.NORMAL)
-	_tween.tween_property(self, "scale", Vector2.ONE, UiTokens.NORMAL)
+	_closing = false
+	mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_INHERITED
+	_tween = UiMotion.pop_in(self, UiTokens.NORMAL)
 
 
+## Hides the window with a quick fade and shrink (instant under reduced motion); it
+## stops taking input at once.
 func hide_window() -> void:
 	if _tween != null:
 		_tween.kill()
-	modulate.a = 1.0
-	scale = Vector2.ONE
-	visible = false
+	_closing = true
+	# Nothing inside takes a click while it fades.
+	mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_DISABLED
+	_tween = UiMotion.pop_out(self, UiTokens.FAST)
+
+
+## True while the window is open (false from the moment it starts closing).
+func is_shown() -> bool:
+	return visible and not _closing

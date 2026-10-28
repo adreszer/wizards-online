@@ -12,8 +12,8 @@ signal close_requested
 ## A bookmark was chosen (index of add_tab).
 signal tab_selected(index: int)
 
-const SCALE_FROM := 0.97
-const TURN_SECONDS := 0.22
+const SCALE_FROM := UiTokens.OPEN_SCALE_FROM
+const TURN_SECONDS := UiTokens.NORMAL
 
 var cover: PanelContainer
 var left_page: PanelContainer
@@ -28,6 +28,7 @@ var tabs: VBoxContainer
 var _frame: Control
 var _group := ButtonGroup.new()
 var _tween: Tween
+var _half := Vector2.ZERO
 var _turn_tween: Tween
 
 
@@ -109,6 +110,29 @@ func centre(half_size: Vector2) -> void:
 	_frame.offset_top = -half_size.y
 	_frame.offset_bottom = half_size.y
 	tabs.offset_right = tabs.offset_left + 190
+	_half = half_size
+	_fit()
+
+
+## A book larger than the screen (a small window, a large interface scale) is drawn
+## smaller as a whole, so its spread keeps its proportions and nothing is cut off.
+func _fit() -> void:
+	if _half == Vector2.ZERO or not is_inside_tree():
+		return
+	# The ribbons and the close seal stand out past the binding: keep room for them.
+	var room := get_viewport_rect().size / 2.0 - Vector2(UiTokens.SPACE_7, UiTokens.SPACE_5)
+	var k := minf(1.0, minf(room.x / _half.x, room.y / _half.y))
+	pivot_offset_ratio = Vector2(0.5, 0.5)
+	scale = Vector2(k, k)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_ENTER_TREE:
+		if not get_viewport().size_changed.is_connected(_fit):
+			get_viewport().size_changed.connect(_fit)
+		_fit()
+	elif what == NOTIFICATION_EXIT_TREE and get_viewport().size_changed.is_connected(_fit):
+		get_viewport().size_changed.disconnect(_fit)
 
 
 ## Adds a ribbon bookmark; the first one added starts selected. Returns its index.
@@ -150,7 +174,7 @@ func set_folios(left_number: int, right_number: int) -> void:
 ## forward, < 0 back: the left page folds instead).
 func turn(step: int) -> void:
 	UiSounds.play(&"book_page_turn")
-	if GameSettings.get_value("reduce_motion") or not is_visible_in_tree():
+	if UiMotion.reduced() or not is_visible_in_tree():
 		return
 	if _turn_tween != null:
 		_turn_tween.kill()
@@ -162,7 +186,7 @@ func turn(step: int) -> void:
 	page.pivot_offset = Vector2(0.0 if page == right_page else page.size.x, page.size.y / 2.0)
 	page.scale = Vector2(0.15, 1.0)
 	page.modulate.a = 0.4
-	_turn_tween = create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_turn_tween = UiMotion.tween(self)
 	_turn_tween.tween_property(page, "scale", Vector2.ONE, TURN_SECONDS)
 	_turn_tween.tween_property(page, "modulate:a", 1.0, TURN_SECONDS * 0.8)
 
@@ -172,24 +196,24 @@ func show_book() -> void:
 	visible = true
 	if _tween != null:
 		_tween.kill()
-	_frame.pivot_offset_ratio = Vector2(0.5, 0.5)
-	if GameSettings.get_value("reduce_motion"):
-		_frame.modulate.a = 1.0
-		_frame.scale = Vector2.ONE
-		return
-	_frame.modulate.a = 0.0
-	_frame.scale = Vector2(SCALE_FROM, SCALE_FROM)
-	_tween = create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(_frame, "modulate:a", 1.0, UiTokens.NORMAL)
-	_tween.tween_property(_frame, "scale", Vector2.ONE, UiTokens.NORMAL)
+	mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_INHERITED
+	_tween = UiMotion.pop_in(_frame, UiTokens.NORMAL)
 
 
+## Closes the book with a quick fade and shrink (instant under reduced motion).
 func hide_book() -> void:
 	if _tween != null:
 		_tween.kill()
-	_frame.modulate.a = 1.0
-	_frame.scale = Vector2.ONE
-	visible = false
+	_frame.visible = true
+	_tween = UiMotion.pop_out(_frame, UiTokens.FAST)
+	if _tween == null:
+		visible = false
+	else:
+		mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_DISABLED
+		_tween.chain().tween_callback(func() -> void:
+			visible = false
+			_frame.visible = true
+			mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_INHERITED)
 
 
 ## Empties both pages.

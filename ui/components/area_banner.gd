@@ -41,8 +41,8 @@ func show_area(title: String, subtitle := "", hold := HOLD) -> void:
 	subtitle_label.visible = subtitle != ""
 	if _tween != null:
 		_tween.kill()
-	var instant: bool = GameSettings.get_value("reduce_motion")
-	_tween = create_tween()
+	var instant := UiMotion.reduced()
+	_tween = UiMotion.tween(self, false, false)
 	_tween.tween_property(self, "modulate:a", 1.0, 0.0 if instant else UiTokens.SLOW)
 	if hold > 0.0:
 		_tween.tween_interval(hold)

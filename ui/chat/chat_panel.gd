@@ -282,11 +282,7 @@ func _wake() -> void:
 
 
 func _fade_to(alpha: float, seconds: float) -> void:
-	if GameSettings.get_value("reduce_motion"):
-		_panel.modulate.a = alpha
-		return
-	_fade = create_tween()
-	_fade.tween_property(_panel, "modulate:a", alpha, seconds)
+	_fade = UiMotion.fade(_panel, alpha, seconds)
 
 
 ## Shows brackets literally instead of as BBCode tags.

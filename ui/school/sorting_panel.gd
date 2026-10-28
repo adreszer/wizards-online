@@ -94,12 +94,13 @@ func _show_question() -> void:
 	_progress.text = progress_marks(current_question, HouseSorting.question_count())
 	_progress.tooltip_text = tr("SORT_PROGRESS") % [current_question + 1, HouseSorting.question_count()]
 	_slide_in()
+	UiRouter.refocus(self)
 	_question.text = tr(q["key"])
 	for i in q["answers"].size():
 		var button := Button.new()
 		button.text = tr(q["answers"][i]["key"])
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.focus_mode = Control.FOCUS_NONE
+		button.focus_mode = Control.FOCUS_ALL
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.pressed.connect(answer.bind(i + 1))
 		_answers.add_child(button)
@@ -115,14 +116,7 @@ static func progress_marks(current: int, count: int) -> String:
 
 ## Each question's card arrives with a short rise and fade.
 func _slide_in() -> void:
-	if GameSettings.get_value("reduce_motion"):
-		return
-	_card.modulate.a = 0.0
-	_card.pivot_offset_ratio = Vector2(0.5, 0.5)
-	_card.scale = Vector2(0.97, 0.97)
-	var tween := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(_card, "modulate:a", 1.0, UiTokens.NORMAL)
-	tween.tween_property(_card, "scale", Vector2.ONE, UiTokens.NORMAL)
+	UiMotion.pop_in(_card, UiTokens.NORMAL)
 
 
 ## Records a 1-based answer to the current question and advances.
@@ -190,7 +184,7 @@ func _reveal_crest(house: int) -> void:
 	_seal.modulate.a = 0.0
 	_seal.pivot_offset_ratio = Vector2(0.5, 0.5)
 	_seal.scale = Vector2(1.8, 1.8)
-	var tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	var tween := UiMotion.tween(self, false, false)
 	tween.set_parallel()
 	tween.tween_property(_crest, "modulate:a", 1.0, UiTokens.SLOW * 2.0)
 	tween.tween_property(_crest, "scale", Vector2.ONE, UiTokens.SLOW * 2.0)

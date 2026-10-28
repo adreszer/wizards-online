@@ -43,6 +43,7 @@ func _ready() -> void:
 		_check(path, letters)
 	_check_styles()
 	_check_keys()
+	_check_contrast()
 	if _failures == 0:
 		print("UI_CHECK_OK: %d characters covered" % everything.size())
 		get_tree().quit(0)
@@ -88,6 +89,24 @@ func _check_keys() -> void:
 		push_error("translation key %s (%s) is in no table under localization/" % [key, missing[key]])
 	if not missing.is_empty():
 		_failures += 1
+
+
+## WCAG contrast of every text token on the backgrounds it is drawn on, in both
+## families (UiTokens.TEXT_PAIRS): 4.5:1 for body text, 3:1 for large text and marks.
+func _check_contrast() -> void:
+	var lines := PackedStringArray()
+	for pair: Array in UiTokens.TEXT_PAIRS:
+		var fg: Color = pair[0]
+		var bg: Color = pair[1]
+		# A see-through background is judged over the darkest thing behind it for
+		# light text (and the lightest for dark text): here, over its own solid colour.
+		bg.a = 1.0
+		var ratio := UiTokens.contrast(fg, bg)
+		lines.append("%s %.2f" % [pair[3], ratio])
+		if ratio < float(pair[2]):
+			push_error("contrast: %s is %.2f:1, needs %.1f:1" % [pair[3], ratio, pair[2]])
+			_failures += 1
+	print("UI_CONTRAST: " + ", ".join(lines))
 
 
 func _check_styles() -> void:

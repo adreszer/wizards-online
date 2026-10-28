@@ -40,7 +40,9 @@ func set_totals(totals: PackedInt32Array) -> void:
 	_totals = totals
 	for i in _labels.size():
 		var points := totals[i] if i < totals.size() else 0
-		_labels[i].text = str(points)
+		# The house's symbol beside its points: the crystals differ by colour, and colour
+		# is never the only way to tell the houses apart.
+		_labels[i].text = "%s %d" % [GameSettings.HOUSE_SYMBOLS[i + 1], points]
 		(_labels[i].get_parent() as Control).tooltip_text = tr("HUD_HOUSE_POINTS") % [CharacterProfile.house_name(i + 1), points]
 		_crystals[i].queue_redraw()
 
@@ -48,8 +50,8 @@ func set_totals(totals: PackedInt32Array) -> void:
 ## The points as shown, "5 10 15 20" (tests).
 func text() -> String:
 	var parts := PackedStringArray()
-	for label in _labels:
-		parts.append(label.text)
+	for i in _labels.size():
+		parts.append(str(_totals[i] if i < _totals.size() else 0))
 	return " ".join(parts)
 
 

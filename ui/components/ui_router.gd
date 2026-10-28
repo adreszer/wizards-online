@@ -36,6 +36,7 @@ var _pad := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	get_tree().node_added.connect(_on_node_added)
 
 
 ## `modal`: the panel takes the screen (dim behind it, HUD faded); chat and the
@@ -46,7 +47,12 @@ func opened(panel: Node, modal: bool = true) -> void:
 	var on_exit := closed.bind(panel)
 	if not panel.tree_exiting.is_connected(on_exit):
 		panel.tree_exiting.connect(on_exit)
+	var fresh := not _modal.has(panel)
 	_modal[panel] = modal
+	# Every window opens with a sound; a panel that played its own this instant
+	# (map, satchel) keeps it.
+	if modal and fresh:
+		UiSounds.play_unless_recent(&"panel_open")
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if _pad:
 		_focus_first.call_deferred(panel)
@@ -57,6 +63,8 @@ func closed(panel: Node) -> void:
 	if not _stack.has(panel):
 		return
 	_stack.erase(panel)
+	if _modal.get(panel, false):
+		UiSounds.play_unless_recent(&"panel_close")
 	_modal.erase(panel)
 	var backdrop: Node = _backdrops.get(panel)
 	_backdrops.erase(panel)
@@ -95,14 +103,96 @@ func _input(event: InputEvent) -> void:
 		_set_pad(true)
 	elif event is InputEventKey or event is InputEventMouseButton:
 		_set_pad(false)
-	if not _stack.is_empty() and event.is_action_pressed("pause"):
+	if _stack.is_empty():
+		return
+	# Esc, or B on a pad, goes back from the top panel (a text field keeps B for itself
+	# only on the keyboard: a pad has no other way out).
+	if event.is_action_pressed("pause") or (event is InputEventJoypadButton and event.is_action_pressed("ui_cancel")):
 		_back(top())
 		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventJoypadButton and event.pressed:
+		var b := (event as InputEventJoypadButton).button_index
+		if b == JOY_BUTTON_LEFT_SHOULDER or b == JOY_BUTTON_RIGHT_SHOULDER:
+			if page(top(), -1 if b == JOY_BUTTON_LEFT_SHOULDER else 1):
+				get_viewport().set_input_as_handled()
+			return
+		# A pad press with nothing focused finds the panel's first control.
+		var focused := get_viewport().gui_get_focus_owner()
+		if focused == null or not focused.is_visible_in_tree():
+			_focus_first(top())
 
 
 ## True when the last input came from a gamepad.
 func using_pad() -> bool:
 	return _pad
+
+
+## Gives the first control focus again after a panel rebuilt its content (a new quiz
+## question), when a pad is in use.
+func refocus(panel: Node) -> void:
+	if _pad:
+		_focus_first.call_deferred(panel)
+
+
+## LB / RB on a pad: the panel's own page turn (`ui_page(step)` or a book's `turn`),
+## else the next or previous tab of its first visible tab strip. True if something moved.
+func page(panel: Node, step: int) -> bool:
+	if not is_instance_valid(panel):
+		return false
+	if panel.has_method("ui_page"):
+		panel.ui_page(step)
+		return true
+	if panel.has_method("turn"):
+		panel.turn(step)
+		return true
+	var tabs := _first_tabs(panel)
+	if tabs is TabContainer:
+		var tc := tabs as TabContainer
+		if tc.get_tab_count() > 1:
+			tc.current_tab = posmod(tc.current_tab + step, tc.get_tab_count())
+			UiSounds.play(&"click")
+			refocus(panel)
+			return true
+	elif tabs is TabBar:
+		var tb := tabs as TabBar
+		if tb.tab_count > 1:
+			tb.current_tab = posmod(tb.current_tab + step, tb.tab_count)
+			UiSounds.play(&"click")
+			return true
+	return false
+
+
+func _first_tabs(node: Node) -> Control:
+	for child in node.get_children():
+		if child is Control and not (child as Control).is_visible_in_tree():
+			continue
+		if child is TabContainer or child is TabBar:
+			return child
+		var found := _first_tabs(child)
+		if found != null:
+			return found
+	return null
+
+
+## Hover and pad focus brighten every button a little (UiMotion.hover), the same way
+## everywhere; meta `ui_no_hover` opts a button out.
+func _on_node_added(node: Node) -> void:
+	var button := node as BaseButton
+	if button == null or button.get_meta(&"ui_no_hover", false):
+		return
+	var on := func() -> void:
+		if not button.disabled:
+			UiMotion.hover(button, true)
+	var off := func() -> void:
+		if not button.has_focus() or not _pad:
+			UiMotion.hover(button, false)
+	button.mouse_entered.connect(on)
+	button.mouse_exited.connect(off)
+	button.focus_entered.connect(func() -> void:
+		if _pad:
+			on.call())
+	button.focus_exited.connect(func() -> void: UiMotion.hover(button, false))
 
 
 func _set_pad(pad: bool) -> void:
@@ -143,9 +233,9 @@ func _update() -> void:
 			_backdrops[panel] = backdrop
 		var was_shown := backdrop.visible
 		backdrop.visible = panel == modal and not panel.get_meta(SEE_WORLD, false)
-		if backdrop.visible and not was_shown and not GameSettings.get_value("reduce_motion"):
+		if backdrop.visible and not was_shown and not UiMotion.reduced():
 			backdrop.modulate.a = 0.0
-			backdrop.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).tween_property(backdrop, "modulate:a", 1.0, UiTokens.NORMAL)
+			UiMotion.fade(backdrop, 1.0, UiTokens.NORMAL)
 	changed.emit()
 
 
