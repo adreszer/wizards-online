@@ -63,6 +63,9 @@ const LAYER_PLAYER := 1 << 1
 ## Time spent on the alert reaction before chasing.
 @export var alert_duration: float = 1.2
 @export var respawn_delay: float = 20.0
+## Out only from dusk to dawn: by day it is hidden, inert and passes no collisions; at dusk
+## it appears at its home post (the school clock's phase, GameEvents.time_phase_changed).
+@export var night_only: bool = false
 ## Force spells shove the enemy back a little; everything else just hurts.
 @export var knockback_per_strength: float = 0.35
 ## Damage per spell effect type; types not listed use [member default_spell_damage].
@@ -96,6 +99,8 @@ const LAYER_PLAYER := 1 << 1
 @export var health_label: Label3D
 
 var state: State = State.IDLE
+## A night_only enemy by day: hidden, still, not collidable.
+var dormant: bool = false
 var target: Node3D
 var home_transform: Transform3D
 var _home_set: bool = false
@@ -145,6 +150,47 @@ func _ready() -> void:
 		_idle_voice.position.y = 1.5
 		Sfx.start_loop(_idle_voice)
 	_enter(State.IDLE)
+	if night_only:
+		GameEvents.time_phase_changed.connect(set_time_phase)
+		set_time_phase(SchoolClock.phase_of(NetworkManager.school_hours()))
+
+
+## Whether a night_only enemy is out in `phase`: dusk and night.
+static func awake_in_phase(phase: int) -> bool:
+	return phase == SchoolClock.Phase.DUSK or phase == SchoolClock.Phase.NIGHT
+
+
+## The school clock moved to `phase`: a night_only enemy goes dormant by day and
+## comes back, fresh at its post, at dusk. Others ignore it.
+func set_time_phase(phase: int) -> void:
+	if not night_only:
+		return
+	var awake := awake_in_phase(phase)
+	if awake != dormant:
+		return
+	if awake:
+		dormant = false
+		set_physics_process(true)
+		respawn()
+	else:
+		_go_dormant()
+
+
+func _go_dormant() -> void:
+	if not _home_set:
+		set_home(global_transform)
+	dormant = true
+	target = null
+	velocity = Vector3.ZERO
+	_knockback = Vector3.ZERO
+	visible = false
+	collision_layer = 0
+	collision_mask = 0
+	if spell_receiver != null:
+		spell_receiver.enabled = false
+	if _idle_voice != null:
+		_idle_voice.stop()
+	set_physics_process(false)
 
 
 ## The post the enemy guards and returns to. Taken from the transform on the first
@@ -489,6 +535,8 @@ func _on_died(_source: Node) -> void:
 
 
 func respawn() -> void:
+	if dormant:
+		return   # a death timer that ran out by day: it comes back at dusk instead
 	global_transform = home_transform
 	velocity = Vector3.ZERO
 	_knockback = Vector3.ZERO

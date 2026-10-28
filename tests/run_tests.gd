@@ -33,6 +33,7 @@ const HOUSE_DOOR_SCENE := preload("res://objects/school/house_door.tscn")
 const SORTING_STONE_SCENE := preload("res://objects/school/sorting_stone.tscn")
 const HOUSE_TALLY_SCENE := preload("res://objects/school/house_tally.tscn")
 const GUARDIAN_SCENE := preload("res://characters/enemies/crystal_guardian.tscn")
+const INK_WISP_SCENE := preload("res://characters/enemies/ink_wisp.tscn")
 const SECRET_WALL_SCENE := preload("res://objects/puzzles/secret_wall.tscn")
 const STATUE_SCENE := preload("res://objects/puzzles/rotating_statue.tscn")
 const DOOR_SCENE := preload("res://objects/puzzles/magic_door.tscn")
@@ -67,6 +68,7 @@ func _run() -> void:
 	await _test_camera()
 	await _test_health_and_checkpoints()
 	await _test_enemy()
+	await _test_night_only()
 	await _test_collectibles()
 	await _test_spell()
 	await _test_spellbook()
@@ -847,6 +849,43 @@ func _test_health_and_checkpoints() -> void:
 
 
 # --- Enemies ----------------------------------------------------------------------
+
+func _test_night_only() -> void:
+	t.section("Night-only enemies and the server's position correction")
+	var wisp: Enemy = INK_WISP_SCENE.instantiate()
+	t.check(wisp.night_only, "the ink-wisp is night_only")
+	add_child(wisp)
+	wisp.global_position = Vector3(40, 0.05, 40)
+	await get_tree().physics_frame
+	wisp.set_time_phase(SchoolClock.Phase.NIGHT)
+	t.check(not wisp.dormant and wisp.visible and wisp.collision_layer != 0, "at night the wisp is out")
+	var home := wisp.home_transform.origin
+	wisp.global_position = home + Vector3(3, 0, 0)
+	wisp.set_time_phase(SchoolClock.Phase.DAWN)
+	t.check(wisp.dormant and not wisp.visible and wisp.collision_layer == 0 and wisp.collision_mask == 0, "by day it is hidden and passes no collisions")
+	t.check(not wisp.is_physics_processing() and not wisp.spell_receiver.enabled, "by day it is inert and takes no spells")
+	wisp.respawn()
+	t.check(wisp.dormant and not wisp.visible, "a death timer running out by day does not bring it back")
+	wisp.set_time_phase(SchoolClock.Phase.DAY)
+	t.check(wisp.dormant, "it stays dormant through the day")
+	wisp.set_time_phase(SchoolClock.Phase.DUSK)
+	t.check(not wisp.dormant and wisp.visible and wisp.collision_layer != 0 and wisp.is_physics_processing(), "at dusk it appears")
+	t.check(wisp.global_position.distance_to(home) < 0.1 and wisp.health.current == wisp.health.max_health, "fresh, at its post")
+	t.check(Enemy.awake_in_phase(SchoolClock.Phase.NIGHT) and not Enemy.awake_in_phase(SchoolClock.Phase.DAWN), "awake from dusk to dawn only")
+	wisp.queue_free()
+	var guardian: Enemy = GUARDIAN_SCENE.instantiate()
+	add_child(guardian)
+	guardian.set_time_phase(SchoolClock.Phase.DAY)
+	t.check(not guardian.night_only and not guardian.dormant and guardian.visible, "an enemy without night_only ignores the clock")
+	guardian.queue_free()
+	# The server's movement check snaps the local body back (OP_PUSH kind "position").
+	var at: Variant = Player.correction_target("position", {"p": [1.5, 2, -3]})
+	t.check(at is Vector3 and (at as Vector3).is_equal_approx(Vector3(1.5, 2, -3)), "a position push decodes to the server's position")
+	t.check(Player.correction_target("guardians", {"p": [1, 2, 3]}) == null, "other pushes are not corrections")
+	t.check(Player.correction_target("position", {"p": [1, 2]}) == null and Player.correction_target("position", {"p": ["a", 2, 3]}) == null
+		and Player.correction_target("position", {}) == null, "a malformed correction is ignored")
+	await get_tree().process_frame
+
 
 func _test_enemy() -> void:
 	t.section("Enemy")

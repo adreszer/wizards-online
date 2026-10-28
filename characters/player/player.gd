@@ -182,6 +182,7 @@ func _setup_local() -> void:
 	movement.flying_changed.connect(_on_flying_changed)
 	area_tracker.area_changed.connect(broom_rider.on_area_changed)
 	NetworkManager.pushed.connect(broom_rider.on_server_flight)
+	NetworkManager.pushed.connect(_on_server_push)
 	inventory.changed.connect(broom_rider.on_inventory_changed)
 	movement.stepped.connect(_on_stepped)
 	spell_caster.setup(self, peer_id, camera_rig, cast_origin)
@@ -377,6 +378,31 @@ func _physics_process(delta: float) -> void:
 			try_sit()
 	if player_input.consume_mount():
 		broom_rider.toggle()
+
+
+## The server's movement check (nakama/modules/movement.lua) refused several states in a row
+## and pushed {kind "position", data {p: [x, y, z]}}: the last position it accepted, or null.
+static func correction_target(kind: String, data: Dictionary) -> Variant:
+	if kind != "position":
+		return null
+	var p: Variant = data.get("p", null)
+	if not p is Array or (p as Array).size() != 3:
+		return null
+	for v: Variant in p:
+		if not (v is float or v is int):
+			return null
+	return Vector3(float(p[0]), float(p[1]), float(p[2]))
+
+
+## Snaps the local body back to where the server last saw it.
+func _on_server_push(kind: String, data: Dictionary) -> void:
+	var target: Variant = correction_target(kind, data)
+	if target == null:
+		return
+	broom_rider.dismount()
+	velocity = Vector3.ZERO
+	global_position = target
+	_tick_start = global_transform
 
 
 func _on_flying_changed(is_flying: bool) -> void:
